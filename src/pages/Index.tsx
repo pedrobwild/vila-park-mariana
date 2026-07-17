@@ -18,6 +18,7 @@ import { PROPERTY } from "@/data/propertyData";
 import { POIS, CATEGORY_ORDER, WHATSAPP_PHONE, type PoiCategory } from "@/data/surroundings";
 
 const PlantasSection = lazy(() => import("@/components/PlantasSection"));
+const MarketIntelSection = lazy(() => import("@/components/MarketIntelSection"));
 
 const HERO_IMG = "https://vilaparkmariana.com.br/wp-content/uploads/2023/03/frente-fachada-noite-vila-park-mariana.jpg";
 
