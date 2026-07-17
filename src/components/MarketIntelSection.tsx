@@ -144,64 +144,45 @@ export default function MarketIntelSection({ property = DEFAULT_PROPERTY }: Mark
     text.replace(/\*\*(.+?)\*\*/g, '<strong class="text-foreground font-semibold">$1</strong>');
 
   return (
-    <section id="market-intel" className="scroll-mt-24 py-16 md:py-20">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-        <div>
-          <Badge variant="outline" className="mb-3 text-primary border-primary/30">
-            <Sparkles className="h-3 w-3 mr-1" />
-            Dados ao vivo via IA
-          </Badge>
-          <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">
-            Inteligência de Mercado · Vila Mariana
-          </h2>
-          <p className="text-muted-foreground mt-1 max-w-xl">
-            Análise atualizada do mercado imobiliário residencial no bairro Vila Mariana: tendências de
-            valorização, perfil do bairro e projetos concorrentes na região.
-          </p>
-        </div>
-        <Button
-          onClick={() => fetchIntel(false)}
-          disabled={loading}
-          size="lg"
-          className="min-h-[48px] shrink-0"
-        >
-          {loading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Analisando mercado…
-            </>
-          ) : content ? (
-            <>
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Atualizar dados
-            </>
-          ) : (
-            <>
-              <TrendingUp className="mr-2 h-4 w-4" />
-              Analisar mercado agora
-            </>
-          )}
-        </Button>
+    <section id="market-intel" ref={sectionRef as any} className="scroll-mt-24">
+      <div className="flex items-center justify-between gap-4 mb-4">
+        <Badge variant="outline" className="text-primary border-primary/30">
+          <Sparkles className="h-3 w-3 mr-1" />
+          Dados ao vivo via IA
+        </Badge>
+        {content && (
+          <Button
+            onClick={() => fetchIntel(false)}
+            disabled={loading}
+            size="sm"
+            variant="outline"
+          >
+            {loading ? (
+              <><Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />Atualizando…</>
+            ) : (
+              <><RefreshCw className="mr-2 h-3.5 w-3.5" />Atualizar</>
+            )}
+          </Button>
+        )}
       </div>
-
-      {!content && !loading && (
-        <Card className="border-dashed border-2 border-border/60">
-          <CardContent className="py-16 text-center">
-            <TrendingUp className="h-10 w-10 text-muted-foreground/40 mx-auto mb-4" />
-            <p className="text-muted-foreground font-medium mb-1">Nenhuma análise carregada</p>
-            <p className="text-sm text-muted-foreground/70 max-w-md mx-auto">
-              Clique em "Analisar mercado agora" para buscar dados atualizados sobre valorização, perfil do bairro e projetos concorrentes na região do empreendimento.
-            </p>
-          </CardContent>
-        </Card>
-      )}
 
       {loading && !content && (
         <Card className="border-border/60">
           <CardContent className="py-16 text-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
-            <p className="text-muted-foreground font-medium">Buscando dados de mercado imobiliário via Perplexity AI…</p>
+            <p className="text-muted-foreground font-medium">Buscando dados de mercado imobiliário…</p>
             <p className="text-sm text-muted-foreground/60 mt-1">Isso pode levar alguns segundos.</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {!content && !loading && (
+        <Card className="border-border/60">
+          <CardContent className="py-10 text-center">
+            <Button onClick={() => fetchIntel(false)} size="lg">
+              <TrendingUp className="mr-2 h-4 w-4" />
+              Carregar análise de mercado
+            </Button>
           </CardContent>
         </Card>
       )}
@@ -253,3 +234,4 @@ export default function MarketIntelSection({ property = DEFAULT_PROPERTY }: Mark
     </section>
   );
 }
+
