@@ -1,3 +1,7 @@
+// Plantas do Vila Park — Vila Mariana.
+// Estruturamos como "pavimentos" (o empreendimento fornece plantas por
+// pavimento, não por unidade). URLs absolutas do site oficial.
+
 export interface TipologiaVariant {
   variantId: string;
   label: string;
@@ -12,85 +16,73 @@ export interface Tipologia {
   bedrooms: string;
   bathrooms: string;
   highlights: string[];
-  plantaFile: string; // filename in plantas/ folder
-  variants?: TipologiaVariant[]; // when multiple project lines exist
+  /** Absolute URL to the floor-plan image */
+  plantaFile: string;
+  variants?: TipologiaVariant[];
 }
-
-const STORAGE_BASE = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/images`;
 
 export const tipologias: Tipologia[] = [
   {
-    id: "19",
-    name: "Studio Compacto",
-    area: "19 m²",
-    bedrooms: "Integrado",
-    bathrooms: "1",
-    highlights: ["Entrada acessível", "Ideal para Airbnb", "Alta liquidez"],
-    plantaFile: "planta-19m2.png",
+    id: "terreo",
+    name: "Térreo",
+    area: "Pavimento",
+    bedrooms: "Lazer + acessos",
+    bathrooms: "—",
+    highlights: ["Portaria e acessos", "Áreas comuns decoradas"],
+    plantaFile: "https://vilaparkmariana.com.br/wp-content/uploads/2024/05/planta-em-alta-com-ampliacao-pavimento-terreo-vila-park.jpg",
   },
   {
-    id: "38",
-    name: "Studio Confort",
-    area: "38 m²",
-    bedrooms: "1 suíte",
-    bathrooms: "1",
-    highlights: ["Living amplo", "Piso chevron", "Cozinha completa"],
-    plantaFile: "planta-38m2.png",
-    variants: [
-      {
-        variantId: "38-collection",
-        label: "Bwild Collection",
-        projetosFolder: "projetos3d/38-collection",
-        orcamentoUrl: "https://envision-build-guide.lovable.app/o/7d9a7b268320",
-      },
-      {
-        variantId: "38",
-        label: "Bwild Signature",
-        projetosFolder: "projetos3d/38",
-        orcamentoUrl: "https://orcamento-bwild.lovable.app/o/bc1ff5cfc7b9",
-      },
-    ],
+    id: "pav-1",
+    name: "1º pavimento",
+    area: "Pavimento",
+    bedrooms: "Unidades",
+    bathrooms: "—",
+    highlights: ["Distribuição das unidades", "Circulações"],
+    plantaFile: "https://vilaparkmariana.com.br/wp-content/uploads/2024/05/planta-em-alta-com-ampliacao-pavimento-1-vila-park.jpg",
   },
   {
-    id: "40",
-    name: "Studio Premium",
-    area: "40 m²",
-    bedrooms: "1 suíte",
-    bathrooms: "1",
-    highlights: ["Varanda gourmet", "Sala de estar separada", "Acabamento premium"],
-    plantaFile: "planta-40m2.png",
+    id: "pav-2-3",
+    name: "2º e 3º pavimentos",
+    area: "Pavimentos",
+    bedrooms: "Unidades",
+    bathrooms: "—",
+    highlights: ["Plantas repetidas", "Distribuição das unidades"],
+    plantaFile: "https://vilaparkmariana.com.br/wp-content/uploads/2024/05/planta-em-alta-com-ampliacao-pavimentos-2-e-3-vila-park.jpg",
   },
   {
-    id: "54",
-    name: "Flat Executive",
-    area: "54 m²",
-    bedrooms: "1 suíte",
-    bathrooms: "1 lavabo",
-    highlights: ["Mesa de jantar 6 lugares", "Closet", "Pé-direito generoso"],
-    plantaFile: "planta-54m2.png",
+    id: "pav-4",
+    name: "4º pavimento",
+    area: "Pavimento",
+    bedrooms: "Unidades",
+    bathrooms: "—",
+    highlights: ["Distribuição das unidades"],
+    plantaFile: "https://vilaparkmariana.com.br/wp-content/uploads/2024/05/planta-em-alta-com-ampliacao-pavimento-4-vila-park.jpg",
   },
   {
-    id: "76",
-    name: "Duplex Assinatura",
-    area: "76 m²",
-    bedrooms: "1 suíte + living",
-    bathrooms: "2",
-    highlights: ["Dois pavimentos", "Layout versátil", "Design autoral"],
-    plantaFile: "planta-76m2.jpg",
+    id: "pav-5",
+    name: "5º pavimento",
+    area: "Pavimento",
+    bedrooms: "Lazer + unidades",
+    bathrooms: "—",
+    highlights: ["Áreas comuns decoradas", "Lazer no meio da torre"],
+    plantaFile: "https://vilaparkmariana.com.br/wp-content/uploads/2024/05/planta-em-alta-com-ampliacao-pavimento-5-vila-park.jpg",
   },
   {
-    id: "80",
-    name: "Cobertura Garden",
-    area: "83 m²",
-    bedrooms: "1 suíte",
-    bathrooms: "1",
-    highlights: ["Área externa privativa", "Jacuzzi", "Espaço gourmet"],
-    plantaFile: "planta-80m2.png",
+    id: "pav-6-9",
+    name: "6º ao 9º pavimento",
+    area: "Pavimentos",
+    bedrooms: "Unidades",
+    bathrooms: "—",
+    highlights: ["Plantas repetidas", "Distribuição das unidades"],
+    plantaFile: "https://vilaparkmariana.com.br/wp-content/uploads/2024/05/planta-em-alta-com-ampliacao-pavimento-6-ao-9-vila-park.jpg",
   },
 ];
 
 export function getPlantaUrl(t: Tipologia): string {
-  return `${STORAGE_BASE}/plantas/${t.plantaFile}`;
+  // Absolute URL — return as-is. Kept as a function for API stability.
+  if (t.plantaFile.startsWith("http")) return t.plantaFile;
+  const base = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/images`;
+  return `${base}/plantas/${t.plantaFile}`;
 }
 
 export function getProjetosFolder(tipologiaId: string): string {
@@ -98,5 +90,5 @@ export function getProjetosFolder(tipologiaId: string): string {
 }
 
 export function getStorageBase(): string {
-  return STORAGE_BASE;
+  return `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/images`;
 }

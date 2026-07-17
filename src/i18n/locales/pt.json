@@ -5,113 +5,145 @@
     "label": "Idioma"
   },
   "nav": {
-    "insights": "Insights",
+    "insights": "Painel",
     "ferramentas": "Ferramentas",
-    "urbanFlex": "Urban Flex",
+    "urbanFlex": "Guia do Comprador",
     "back": "Voltar",
     "menu": "Menu"
   },
   "quickNav": {
     "plantas": "Plantas",
-    "comparativo": "Comparativo",
-    "guia": "Guia",
+    "comparativo": "Entorno",
+    "guia": "Reserva",
     "ariaLabel": "Navegação rápida da página",
     "goTo": "Ir para {{label}}"
   },
   "hero": {
-    "badgeMobile": "Urban Flex · Consolação",
-    "badgeDesktop": "LM Urban Flex · R. Bela Cintra, 209 — Consolação",
-    "headlineMobileA": "Seu studio na Paulista.",
-    "headlineMobileB": "Projetado para render.",
-    "headlineDesktopA": "Seu studio a 200m da Paulista.",
-    "headlineDesktopB": "Projetado para rentabilizar.",
-    "subMobile": "6 tipologias com projetos 3D baseados em dados reais de ocupação.",
-    "subDesktop": "6 tipologias de 19 a 83 m² com projetos de reforma 3D criados a partir de dados reais de ocupação e rentabilidade — cada detalhe pensado para o seu imóvel performar acima da média.",
-    "ctaPrimary": "Ver plantas e projetos 3D",
+    "badgeMobile": "Vila Park · Vila Mariana",
+    "badgeDesktop": "Vila Park · R. Baltazar Lisboa, 543 — Vila Mariana",
+    "headlineMobileA": "Seu apê a 900 m do metrô Vila Mariana.",
+    "headlineMobileB": "Qualidade de vida com preço acessível.",
+    "headlineDesktopA": "Seu apê a 900 m do metrô Vila Mariana.",
+    "headlineDesktopB": "Qualidade de vida com preço acessível.",
+    "subMobile": "Torre única, 10 pavimentos e 33 apartamentos. Garden, terraço descoberto e 1 dorm./studio.",
+    "subDesktop": "Torre única com 10 pavimentos e 33 apartamentos (garden privativo, terraço descoberto e 1 dorm./studio). Áreas de lazer no térreo e no 5º pavimento. A 900 m do metrô Vila Mariana e 950 m do Parque da Aclimação.",
+    "ctaPrimary": "Ver plantas e tipologias",
     "trust": {
-      "deliveryShort": "Entrega",
-      "deliveryLong": "Previsão de entrega",
-      "progressShort": "Obra",
-      "progressLong": "Obra concluída",
-      "typologiesShort": "Tipologias",
-      "typologiesLong": "De studio a cobertura",
-      "optionsShort": "2 opções",
-      "optionsLabel": "De reforma por planta"
+      "floors": "Pavimentos",
+      "units": "Apartamentos",
+      "area": "m² construídos",
+      "metro": "Do metrô Vila Mariana"
     }
   },
   "why": {
-    "eyebrow": "Por que o Urban Flex",
-    "title": "Localização, dados e design trabalhando juntos pelo seu retorno.",
+    "eyebrow": "Por que o Vila Park",
+    "title": "Localização, mobilidade e preço acessível para morar bem em Vila Mariana.",
     "items": {
       "location": {
-        "title": "Localização premium",
-        "desc": "Rua Bela Cintra, 209 — a 200m da Av. Paulista, entre metrô Consolação e Trianon-MASP."
+        "title": "A 900 m do metrô",
+        "desc": "R. Baltazar Lisboa, 543 — a 900 m do metrô Vila Mariana e 950 m do Parque da Aclimação."
       },
       "design": {
-        "title": "Design orientado por dados",
-        "desc": "Studios com design estratégico alcançam até 30% mais ocupação que unidades sem reforma. Cada projeto 3D foi pensado para maximizar diária e taxa de reserva."
+        "title": "Áreas comuns decoradas",
+        "desc": "Lazer entregue equipado, mobiliado e decorado no térreo e no 5º pavimento."
       },
       "construction": {
         "title": "Obra em andamento",
-        "desc": "63,5% concluída, entrega prevista para dezembro de 2026. Retrofit com padrão construtivo Leal Moreira."
+        "desc": "Acompanhe o andamento da obra com registros atualizados no canteiro."
       },
       "returnValidated": {
-        "title": "Retorno validado",
-        "descWith": "Consolação tem {{occupancy}}% de ocupação e diária média de {{rate}} para studios.",
-        "descFallback": "Consolação é um dos bairros com melhor yield bruto de SP para short stay."
+        "title": "Arquitetura contemporânea",
+        "descWith": "Torre única com 33 apartamentos e 1.600 m² construídos, com infraestrutura para ar-condicionado.",
+        "descFallback": "Torre única com 33 apartamentos e 1.600 m² construídos."
       }
     },
     "proof": {
-      "incorporator": "Incorporadora Leal Moreira",
-      "ready": "Operação short stay ready",
-      "amenities": "Amenidades completas no empreendimento"
+      "incorporator": "Matere Bittar Incorporações",
+      "ready": "Áreas comuns mobiliadas",
+      "amenities": "Infraestrutura para ar-condicionado"
     },
-    "source": "Fonte: AirDNA Market Minder, pesquisa Bwild 2025. Dados referentes a studios 20–35 m² na região da Consolação."
+    "source": "As imagens são meramente ilustrativas e a decoração é apenas uma sugestão. Os móveis e utensílios não fazem parte do contrato de compra e venda."
   },
-  "comparative": {
-    "eyebrow": "Dados de mercado",
-    "title": "Consolação: um dos melhores yields de São Paulo.",
-    "subtitle": "Diária competitiva com preço de aquisição abaixo de bairros vizinhos — a combinação que gera o melhor retorno para o investidor.",
-    "stats": {
-      "adrLabel": "Diária média (studios)",
-      "occupancyLabel": "Ocupação média anual",
-      "occupancyDetail": "Acima da média de SP",
-      "listingsLabel": "Listings ativos",
-      "listingsDetail": "Mercado validado",
-      "priceLabel": "Preço médio residencial",
-      "priceDetail": "Abaixo de Pinheiros e Itaim",
-      "priceValue": "R$ 10.500/m²"
+  "typologies": {
+    "eyebrow": "Tipologias",
+    "title": "Três formas de morar no Vila Park.",
+    "subtitle": "Escolha entre garden privativo, apartamento com terraço descoberto ou 1 dormitório/studio.",
+    "garden": {
+      "title": "Apartamento com garden privativo",
+      "desc": "Área externa privativa no térreo, integrada à unidade."
+    },
+    "terrace": {
+      "title": "Apartamento com terraço descoberto",
+      "desc": "Terraço descoberto para lazer ao ar livre na sua unidade."
+    },
+    "studio": {
+      "title": "1 dormitório / studio",
+      "desc": "Planta compacta, ideal para morar próximo ao metrô Vila Mariana."
     }
   },
+  "progress": {
+    "eyebrow": "Andamento da obra",
+    "title": "Acompanhe o canteiro em imagens reais.",
+    "subtitle": "Última atualização em 07/07/2026.",
+    "may2025": "Registro de 14/05/2025",
+    "jul2026": "Fachada em 07/07/2026"
+  },
+  "surroundings": {
+    "eyebrow": "Entorno · Vila Mariana",
+    "title": "Tudo o que importa a poucos minutos.",
+    "subtitle": "Metrô, parques, universidades, serviços e gastronomia no raio do empreendimento.",
+    "leisure": "Lazer",
+    "mobility": "Mobilidade",
+    "education": "Educação",
+    "services": "Serviços",
+    "gastronomy": "Gastronomia"
+  },
+  "reservation": {
+    "eyebrow": "Reserva",
+    "title": "Preencha e garanta sua reserva.",
+    "subtitle": "Nosso time comercial entra em contato para confirmar disponibilidade e enviar o material completo.",
+    "name": "Nome",
+    "email": "E-mail",
+    "phone": "Telefone",
+    "message": "Mensagem",
+    "messagePlaceholder": "Conte um pouco do que procura (tipologia, prazo, forma de pagamento)…",
+    "submit": "Enviar reserva",
+    "sending": "Enviando…",
+    "success": "Reserva recebida — nosso time entra em contato em breve.",
+    "error": "Não foi possível enviar. Tente novamente ou fale por WhatsApp.",
+    "whatsapp": "Falar no WhatsApp"
+  },
   "guide": {
-    "badge": "Ferramenta exclusiva",
-    "titleA": "Guia do Investidor.",
-    "titleB": "Tudo antes de comprar.",
-    "subtitle": "Dados, critérios objetivos e análise — para decidir com segurança.",
-    "cta": "Acessar o Guia do Investidor",
+    "badge": "Guia do Comprador",
+    "titleA": "Guia do Comprador.",
+    "titleB": "Tudo antes de reservar.",
+    "subtitle": "Localização, tipologias, áreas comuns e as etapas até a reserva.",
+    "cta": "Acessar o Guia do Comprador",
     "items": {
-      "quiz": { "title": "Quiz de Perfil", "desc": "Descubra qual tipologia combina com seu objetivo de investimento." },
-      "simulator": { "title": "Simulador de Retorno", "desc": "Projete receita em cenários otimista e conservador." },
-      "neighborhood": { "title": "Análise de Bairro", "desc": "Dados de ocupação, diária e yield da Consolação vs. concorrentes." },
-      "choice": { "title": "Checklist de Escolha", "desc": "16 critérios técnicos para avaliar o imóvel com clareza." },
-      "readiness": { "title": "Checklist de Prontidão", "desc": "10 itens para garantir que você está pronto para fechar." },
-      "income": { "title": "Estratégia de Renda", "desc": "Como operar short stay e maximizar retorno desde o dia 1." }
+      "quiz": { "title": "Localização", "desc": "Como o entorno da Vila Mariana valoriza o dia a dia." },
+      "simulator": { "title": "Financiamento", "desc": "Simule parcela, entrada e prazo para o seu bolso." },
+      "neighborhood": { "title": "Entorno", "desc": "Parques, metrô, universidades e serviços próximos." },
+      "choice": { "title": "Tipologias", "desc": "Garden, terraço e 1 dormitório: qual combina com você." },
+      "readiness": { "title": "Reserva", "desc": "Passo a passo do formulário ao contato comercial." },
+      "income": { "title": "Áreas comuns", "desc": "Lazer decorado e mobiliado no térreo e no 5º pavimento." }
     }
   },
   "finalCta": {
-    "title": "Cada projeto foi desenhado para performar.",
-    "subtitle": "Explore as plantas, veja os projetos pensados para alta rentabilidade e converse com a equipe comercial.",
-    "talk": "Falar com consultor",
-    "viewPlans": "Ver plantas e projetos"
+    "title": "Reserve a sua unidade no Vila Park.",
+    "subtitle": "Fale com o time comercial e receba plantas, condições e o memorial descritivo completo.",
+    "talk": "Falar no WhatsApp",
+    "viewPlans": "Ver plantas"
   },
   "footer": {
-    "rights": "© 2026 Bwild. Todos os direitos reservados.",
+    "rights": "© 2026 Vila Park — Vila Mariana · Matere Bittar Incorporações",
     "ariaLabel": "Links do rodapé",
     "tools": "Ferramentas",
-    "guide": "Guia do Investidor"
+    "guide": "Guia do Comprador",
+    "disclaimer": "Apenas para reserva. O empreendimento só será comercializado após o Registro de Incorporação Imobiliária. Imagens ilustrativas sujeitas a alterações. As plantas apresentadas são meramente ilustrativas, sendo que a decoração é apenas uma sugestão. Os móveis e utensílios contemplados não farão parte do contrato de compra e venda do imóvel. Os acabamentos serão entregues conforme o memorial descritivo."
   },
   "whatsapp": {
-    "message": "Olá! Vi o site da Bwild e quero saber mais sobre o Urban Flex Bela Cintra."
+    "message": "Olá! Vi o site do Vila Park Vila Mariana e quero saber mais sobre a reserva.",
+    "float": "Falar no WhatsApp"
   },
   "common": {
     "loading": "Carregando...",

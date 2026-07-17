@@ -1,11 +1,20 @@
 import { useState } from "react";
 import { Building2, Wrench, ArrowLeft, Menu, Sparkles } from "lucide-react";
-import lealMoreiraLogo from "@/assets/leal-moreira-logo.png";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+
+function Logo() {
+  return (
+    <span className="flex items-baseline gap-1 font-display text-lg font-bold leading-none">
+      <span className="text-foreground">Vila</span>
+      <span className="text-accent">Park</span>
+      <span className="hidden sm:inline text-xs font-medium text-muted-foreground ml-1">Vila Mariana</span>
+    </span>
+  );
+}
 
 export default function AppNavbar() {
   const { pathname } = useLocation();
@@ -30,12 +39,11 @@ export default function AppNavbar() {
               </Button>
             </Link>
           )}
-          <Link to="/" className="flex items-center gap-2 font-display text-lg font-bold text-foreground">
-            <img src={lealMoreiraLogo} alt="Leal Moreira" className="h-8 w-auto" />
+          <Link to="/" aria-label="Vila Park — Vila Mariana">
+            <Logo />
           </Link>
         </div>
 
-        {/* Desktop nav */}
         <div className="hidden sm:flex items-center gap-2">
           {navLinks.map((link) => (
             <Link key={link.to} to={link.to}>
@@ -45,13 +53,12 @@ export default function AppNavbar() {
               </Button>
             </Link>
           ))}
-          <Link to="/urban-flex-bela-cintra">
+          <Link to="/guia-comprador">
             <Button variant="outline" size="sm">{t("nav.urbanFlex")}</Button>
           </Link>
           <LanguageSwitcher variant="compact" className="ml-1" />
         </div>
 
-        {/* Mobile right side: language switcher always visible + hamburger */}
         <div className="flex items-center gap-1 sm:hidden">
           <LanguageSwitcher variant="icon" />
           {!(isHome && isMobile) && (
@@ -68,12 +75,11 @@ export default function AppNavbar() {
         </div>
       </div>
 
-      {/* Mobile sheet */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
         <SheetContent side="right" className="w-64 p-0">
           <SheetHeader className="px-5 pt-5 pb-4 border-b border-border/40">
-            <SheetTitle className="flex items-center gap-2 font-display text-lg font-bold">
-              <img src={lealMoreiraLogo} alt="Leal Moreira" className="h-8 w-auto" />
+            <SheetTitle>
+              <Logo />
             </SheetTitle>
           </SheetHeader>
           <nav className="px-4 py-5 space-y-1">
@@ -96,10 +102,10 @@ export default function AppNavbar() {
               );
             })}
             <Link
-              to="/urban-flex-bela-cintra"
+              to="/guia-comprador"
               onClick={() => setMobileOpen(false)}
               className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm transition-colors min-h-[44px] ${
-                pathname === "/urban-flex-bela-cintra"
+                pathname === "/guia-comprador"
                   ? "bg-primary text-primary-foreground font-semibold"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
               }`}
