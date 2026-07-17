@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Building2, TrendingUp, Wrench, ArrowLeft, Menu, Sparkles } from "lucide-react";
+import { TrendingUp, Wrench, ArrowLeft, Menu, Sparkles } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
