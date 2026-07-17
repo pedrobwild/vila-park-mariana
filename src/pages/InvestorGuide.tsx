@@ -40,14 +40,31 @@ import {
 type SectionId =
   | "hero"
   | "location"
+  | "nearby"
   | "typologies"
+  | "amenities"
+  | "progress"
   | "market"
   | "howItWorks"
   | "antiChecklist"
   | "faq"
   | "contact";
 
-const sectionIds: SectionId[] = ["hero", "location", "typologies", "market", "howItWorks", "antiChecklist", "faq", "contact"];
+const sectionIds: SectionId[] = ["hero", "location", "nearby", "typologies", "amenities", "progress", "market", "howItWorks", "antiChecklist", "faq", "contact"];
+
+const sectionLabels: Record<SectionId, string> = {
+  hero: "Início",
+  location: "Localização",
+  nearby: "Entorno",
+  typologies: "Tipologias",
+  amenities: "Áreas comuns",
+  progress: "Obra",
+  market: "Mercado",
+  howItWorks: "Como funciona",
+  antiChecklist: "Cuidados",
+  faq: "FAQ",
+  contact: "Contato",
+};
 
 function SectionLabel({ children }: { children: ReactNode }) {
   return <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent mb-3">{children}</p>;
