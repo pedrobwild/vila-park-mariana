@@ -12,17 +12,28 @@ import { Separator } from "@/components/ui/separator";
 import { PROPERTY } from "@/data/propertyData";
 import { WHATSAPP_PHONE } from "@/data/surroundings";
 import ReservationForm from "@/components/ReservationForm";
+import { POIS } from "@/data/surroundings";
 import {
   ArrowRight,
   Briefcase,
+  Building2,
+  Coffee,
+  Compass,
+  Dumbbell,
   GraduationCap,
+  Hammer,
   KeyRound,
   MapPin,
   MessageCircle,
   Phone,
+  ShieldCheck,
+  ShoppingBag,
   Sparkles,
+  Sofa,
   Train,
+  Trees,
   TrendingUp,
+  Utensils,
   XCircle,
 } from "lucide-react";
 
