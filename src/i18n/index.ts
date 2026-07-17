@@ -22,7 +22,10 @@ void i18n
     load: "languageOnly",
     interpolation: { escapeValue: false },
     detection: {
-      order: ["localStorage", "navigator", "htmlTag"],
+      // Only honor an explicit user choice from localStorage; otherwise use
+      // fallbackLng (pt) so the site loads in PT-BR by default regardless of
+      // the browser locale. The EN toggle still persists via localStorage.
+      order: ["localStorage"],
       lookupLocalStorage: "bwild_lang",
       caches: ["localStorage"],
     },
