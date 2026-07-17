@@ -1,8 +1,8 @@
-// src/data/districtMetrics.mock.ts
-
-// Seed 1:1 com o UI do mock (ranking + detalhes do painel + chips)
-// ✅ Valores EXATOS do mock para: Pinheiros, Itaim Bibi, Jardim Paulista
-// ⚠️ Os demais distritos estão com placeholders coerentes (troque quando plugar dados reais)
+// src/data/districtMetrics.ts
+// ⚠️ SEED / PLACEHOLDER — dados fictícios do template original.
+// NÃO renderizar valores deste arquivo em UI pública do Vila Park.
+// Números reais de mercado devem vir da edge function `market-intel` (Perplexity)
+// em runtime, com fonte e data da consulta.
 
 export type DemandChip =
   | "Misto"
@@ -183,21 +183,23 @@ export const DISTRICTS_MOCK: DistrictRow[] = [
     },
   },
   {
+    // ⚠️ SEED-ONLY. Não renderizar em UI pública do Vila Park.
+    // Números fictícios de placeholder — dados reais vêm da edge function market-intel.
     districtName: "Vila Mariana",
     score: 83,
     chips: ["Hospitais", "Universidades", "Próximo ao metrô"],
-    roiPercent: 33.2,
-    nightlyRateBRL: 366,
-    occupancyPercent: 80,
-    revenueMonthBRL: 8909,
-    adrRangeLabel: "R$300–R$460",
-    listingsCount: 1600,
-    priceSqm: 12500,
+    roiPercent: 15.4,
+    nightlyRateBRL: 350,
+    occupancyPercent: 71,
+    revenueMonthBRL: 7455,
+    adrRangeLabel: "R$280–R$420",
+    listingsCount: 850,
+    priceSqm: 12000,
     competition: "Média",
-    sourceLabel: "Seed (substituir por dados reais)",
+    sourceLabel: "Seed placeholder (não exibir em UI pública)",
     recommendation: {
       bestStudioType: "Funcional (estadia média) + cozinha completa",
-      whyItWorks: "Demanda recorrente de saúde/universidades: hóspedes valorizam praticidade.",
+      whyItWorks: "Demanda recorrente de saúde/universidades: inquilinos valorizam praticidade.",
       tips: ["Cozinha bem equipada.", "Ambiente silencioso + cama premium."],
       risks: ["Menos picos de ADR: performance vem de ocupação consistente."],
     },
