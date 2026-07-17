@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { motion, useInView, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import {
   ArrowRight, Building2, MapPin, MessageCircle, Eye, CheckCircle2, Sparkles,
-  Shield, Trees, Train, GraduationCap, ShoppingBag, UtensilsCrossed,
+  Shield, Trees, Train, GraduationCap, ShoppingBag, UtensilsCrossed, Briefcase, KeyRound,
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import { PROPERTY } from "@/data/propertyData";
 import { POIS, CATEGORY_ORDER, WHATSAPP_PHONE, type PoiCategory } from "@/data/surroundings";
 
 const PlantasSection = lazy(() => import("@/components/PlantasSection"));
+const MarketIntelSection = lazy(() => import("@/components/MarketIntelSection"));
 
 const HERO_IMG = "https://vilaparkmariana.com.br/wp-content/uploads/2023/03/frente-fachada-noite-vila-park-mariana.jpg";
 
@@ -351,6 +352,75 @@ export default function Index() {
                 </div>
               ))}
             </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* DADOS DE MERCADO */}
+      <section className="border-b border-border/40 bg-muted/25">
+        <div className="max-w-7xl mx-auto px-5 md:px-6 py-12 md:py-24">
+          <FadeIn>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent mb-3">{t("market.eyebrow")}</p>
+            <h2 className="font-display text-2xl md:text-4xl font-bold text-foreground max-w-2xl">{t("market.title")}</h2>
+            <p className="mt-3 text-muted-foreground max-w-2xl">{t("market.subtitle")}</p>
+          </FadeIn>
+
+          <FadeIn delay={0.1} className="mt-4">
+            <Suspense fallback={<div className="min-h-[200px]" />}>
+              <MarketIntelSection />
+            </Suspense>
+          </FadeIn>
+
+          <FadeIn delay={0.15} className="mt-4 flex flex-col sm:flex-row gap-3">
+            <Link to="/guia-investidor">
+              <Button size="lg" variant="outline" className="min-h-[48px] w-full sm:w-auto">
+                {t("market.ctaGuide")}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+            <Link to="/ferramentas">
+              <Button size="lg" variant="outline" className="min-h-[48px] w-full sm:w-auto">
+                {t("market.ctaSimulate")}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* POR QUE INVESTIR AQUI */}
+      <section className="border-b border-border/40 bg-background">
+        <div className="max-w-7xl mx-auto px-5 md:px-6 py-12 md:py-24">
+          <FadeIn>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent mb-3">{t("invest.why.eyebrow")}</p>
+            <h2 className="font-display text-2xl md:text-4xl font-bold text-foreground max-w-3xl leading-tight">{t("invest.why.title")}</h2>
+          </FadeIn>
+
+          <div className="mt-8 grid gap-4 grid-cols-1 sm:grid-cols-2">
+            {[
+              { icon: Train, titleKey: "invest.why.mobility.title", descKey: "invest.why.mobility.desc" },
+              { icon: GraduationCap, titleKey: "invest.why.university.title", descKey: "invest.why.university.desc" },
+              { icon: Briefcase, titleKey: "invest.why.jobs.title", descKey: "invest.why.jobs.desc" },
+              { icon: KeyRound, titleKey: "invest.why.product.title", descKey: "invest.why.product.desc" },
+            ].map((item, i) => (
+              <FadeIn key={item.titleKey} delay={i * 0.06}>
+                <Card className="h-full border-border/60 hover:border-accent/30 transition-colors">
+                  <CardContent className="p-5">
+                    <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center mb-3">
+                      <item.icon className="h-5 w-5 text-accent" />
+                    </div>
+                    <h3 className="text-base font-bold text-foreground mb-1">{t(item.titleKey)}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{t(item.descKey)}</p>
+                  </CardContent>
+                </Card>
+              </FadeIn>
+            ))}
+          </div>
+
+          <FadeIn delay={0.3}>
+            <p className="mt-6 text-xs text-muted-foreground/70 leading-relaxed max-w-3xl">
+              {t("invest.why.disclaimer")}
+            </p>
           </FadeIn>
         </div>
       </section>

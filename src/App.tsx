@@ -9,6 +9,7 @@ import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const UrbanFlexInvestorGuide = lazy(() => import("./pages/UrbanFlexInvestorGuide"));
+const InvestorGuide = lazy(() => import("./pages/InvestorGuide"));
 const Ferramentas = lazy(() => import("./pages/Ferramentas"));
 const AdminUpload = lazy(() => import("./pages/AdminUpload"));
 const Insights = lazy(() => import("./pages/Insights"));
@@ -27,6 +28,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/guia-comprador" element={<UrbanFlexInvestorGuide />} />
+              <Route path="/guia-investidor" element={<InvestorGuide />} />
               {/* Legacy path — redirect to the new one */}
               <Route path="/urban-flex-bela-cintra" element={<Navigate to="/guia-comprador" replace />} />
               <Route path="/ferramentas" element={<Ferramentas />} />
