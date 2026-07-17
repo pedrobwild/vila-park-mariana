@@ -10,9 +10,9 @@ function makeDashboard(overrides: Partial<any> = {}) {
   const base = {
     __mock: true,
     executiveTakeaways: [
-      { icon: "brain", title: "Perfil dominante: Analítico", insight: "68% dos investidores decidem por dados. Sempre abra a reunião com AirDNA + simulador ao vivo." },
-      { icon: "shield", title: "Objeção #1 é preço (38%)", insight: "Reforce diferencial de design (+30% ocupação) e yield líquido 30% acima da média da região." },
-      { icon: "target", title: "Sinal forte de compra", insight: "Pedido de 2ª reunião com cônjuge/sócio antecede fechamento em 71% dos casos — priorize agenda." },
+      { icon: "brain", title: "Perfil dominante: Família em expansão", insight: "64% dos leads buscam mais espaço ou proximidade do trabalho. Sempre abra a reunião entendendo a rotina da família." },
+      { icon: "shield", title: "Objeção #1 é preço (35%)", insight: "Reforce o diferencial de metragem e a proximidade do Metrô Vila Mariana (900m) para justificar o valor." },
+      { icon: "target", title: "Sinal forte de compra", insight: "Pedido de 2ª visita ao decorado com cônjuge/família antecede fechamento em 68% dos casos — priorize agenda." },
     ],
     metrics: {
       totalForFrequency,
@@ -23,9 +23,9 @@ function makeDashboard(overrides: Partial<any> = {}) {
         objection: {
           count: 84,
           examples: [
-            { description: "Preço está acima do praticado por outros studios da região." },
-            { description: "Dúvida sobre a real ocupação prometida no cenário Airbnb." },
-            { description: "Receio da entrega no prazo (dezembro/2026)." },
+            { description: "Preço está acima do praticado por outros lançamentos da região." },
+            { description: "Dúvida sobre o prazo de entrega da torre." },
+            { description: "Receio com o valor do condomínio." },
           ],
         },
         positive_point: { count: 112, examples: [] },
@@ -35,10 +35,10 @@ function makeDashboard(overrides: Partial<any> = {}) {
         score_conversion: { count: 47, examples: [] },
       },
       answerScores: [
-        { question: "Clareza sobre rentabilidade projetada", avg: 8.4, count: 47 },
+        { question: "Clareza sobre tipologias disponíveis", avg: 8.4, count: 47 },
         { question: "Confiança na incorporadora e entrega", avg: 7.6, count: 42 },
-        { question: "Percepção de localização e demanda", avg: 8.9, count: 45 },
-        { question: "Aderência ao perfil do investidor", avg: 7.1, count: 39 },
+        { question: "Percepção de localização e mobilidade", avg: 8.9, count: 45 },
+        { question: "Aderência ao perfil da família compradora", avg: 7.1, count: 39 },
         { question: "Objeção de preço tratada com dados", avg: 6.3, count: 34 },
       ],
       competitors: [
@@ -56,7 +56,7 @@ function makeDashboard(overrides: Partial<any> = {}) {
           topObjections: [
             { objection: "Preço acima do mercado", count: 7 },
             { objection: "Prazo de entrega longo", count: 5 },
-            { objection: "Ocupação Airbnb realista?", count: 4 },
+            { objection: "Valor do condomínio", count: 4 },
           ],
         },
         {
@@ -64,14 +64,14 @@ function makeDashboard(overrides: Partial<any> = {}) {
           topObjections: [
             { objection: "Preço acima do mercado", count: 12 },
             { objection: "Concorrência na região", count: 8 },
-            { objection: "Ocupação Airbnb realista?", count: 7 },
+            { objection: "Valor do condomínio", count: 7 },
           ],
         },
         {
           windowDays: 90, meetings: 47, avgScore: 72, positiveSentimentPct: 58,
           topObjections: [
             { objection: "Preço acima do mercado", count: 18 },
-            { objection: "Ocupação Airbnb realista?", count: 11 },
+            { objection: "Valor do condomínio", count: 11 },
             { objection: "Prazo de entrega longo", count: 9 },
           ],
         },
@@ -88,206 +88,206 @@ function makeDashboard(overrides: Partial<any> = {}) {
     },
     buyerPersona: {
       summary:
-        "Investidor de 34–52 anos, executivo de médio/alto escalão ou profissional liberal, que busca renda passiva em imóveis com gestão simplificada e valorização de médio prazo em bairros premium de São Paulo.",
-      ageRange: "34–52 anos",
-      avgTicket: "R$ 850 mil – R$ 1,2 mi",
-      professions: ["Executivos", "Médicos", "Advogados", "Empresários", "Engenheiros"],
+        "Comprador de 28–50 anos, em fase de mudança de vida (casamento, filhos ou troca de imóvel), que busca morar em Vila Mariana pela mobilidade (metrô a 900m), infraestrutura de lazer e educação, priorizando qualidade de vida no dia a dia.",
+      ageRange: "28–50 anos",
+      avgTicket: "R$ 650 mil – R$ 1,1 mi",
+      professions: ["Executivos", "Profissionais liberais", "Casais jovens", "Famílias com filhos", "Servidores públicos"],
       motivations: [
-        "Diversificar carteira além de renda fixa",
-        "Renda passiva mensal previsível",
-        "Valorização em bairro consolidado",
-        "Proteção contra inflação",
+        "Morar perto do trabalho e do metrô",
+        "Trocar apartamento por um maior (garden/terraço)",
+        "Primeiro imóvel próprio na região",
+        "Qualidade de vida em bairro consolidado",
       ],
     },
     personalityProfiles: [
       {
-        type: "Investidor Analítico",
+        type: "Comprador Analítico",
         frequency: "alta",
         description:
-          "Chega com planilhas e questiona cada premissa. Compara ADR, ocupação e yield com benchmarks públicos (AirDNA, mercado).",
+          "Chega com pesquisas de mercado prontas. Compara metragem, valor do m² e prazo de entrega com outros lançamentos da região.",
         approachStrategy:
-          "Traga fontes primárias (AirDNA, IBGE, comparáveis reais). Ofereça o simulador para ele mesmo ajustar as premissas.",
-        pitfalls: "Não use argumentos emocionais nem projeções otimistas sem dados por trás.",
+          "Traga dados comparativos de mercado em Vila Mariana e memorial de acabamentos detalhado. Deixe ele conferir a planta com calma.",
+        pitfalls: "Não use argumentos emocionais sem dados concretos por trás.",
       },
       {
         type: "Executivo Ocupado",
         frequency: "alta",
         description:
-          "Tem capital, mas pouco tempo. Quer solução turnkey e clareza sobre quem opera o imóvel no dia a dia.",
+          "Tem pouco tempo disponível. Quer decisão rápida, visita objetiva ao decorado e clareza sobre prazo de entrega.",
         approachStrategy:
-          "Enfatize gestão Bwild (turnkey), relatórios mensais e zero dor de cabeça. Reuniões curtas e objetivas.",
-        pitfalls: "Evite reuniões longas ou envio de documentos densos sem resumo executivo.",
+          "Reuniões curtas e objetivas, com resumo executivo por escrito e agenda flexível para visita ao decorado.",
+        pitfalls: "Evite reuniões longas ou envio de documentos densos sem resumo.",
       },
       {
-        type: "Investidor Iniciante",
+        type: "Comprador de Primeira Viagem",
         frequency: "média",
         description:
-          "Primeira compra para investimento. Muitas dúvidas conceituais sobre Airbnb, tributação e como funciona a operação.",
+          "Primeira compra de imóvel. Muitas dúvidas conceituais sobre financiamento, documentação e prazo de obra.",
         approachStrategy:
-          "Eduque com o Guia do Investidor. Simplifique termos e mostre casos de investidores similares.",
-        pitfalls: "Não sobrecarregue com jargão técnico. Não pule a etapa de contextualização.",
+          "Eduque com linguagem simples sobre financiamento e etapas da obra. Mostre casos de clientes com perfil parecido.",
+        pitfalls: "Não sobrecarregue com jargão técnico do mercado imobiliário.",
       },
       {
-        type: "Comprador Conservador",
+        type: "Família em Expansão",
         frequency: "média",
         description:
-          "Prefere renda fixa e compara tudo com CDI. Busca segurança acima de tudo e teme volatilidade.",
+          "Busca trocar o imóvel atual por um com mais espaço (garden ou terraço). Decisão compartilhada com o cônjuge.",
         approachStrategy:
-          "Foque em spread vs CDI + valorização patrimonial. Mostre histórico de valorização da região.",
-        pitfalls: "Não prometa retornos agressivos. Evite comparar com ativos de alto risco.",
+          "Foque em metragem, área de lazer do condomínio e proximidade de escolas. Convide o casal junto para a visita.",
+        pitfalls: "Não conduza a conversa apenas com um dos decisores.",
       },
       {
-        type: "Colecionador de Ativos",
+        type: "Comprador Prático",
         frequency: "baixa",
         description:
-          "Já tem múltiplos imóveis e busca completar portfólio em bairros premium. Decisão rápida se enxergar valor.",
+          "Já conhece a região e decide rápido se enxergar valor. Prioriza studio ou 1 dormitório para uso próprio.",
         approachStrategy:
-          "Destaque exclusividade da localização (Bela Cintra), diferencial arquitetônico e potencial de valorização.",
-        pitfalls: "Não trate como investidor iniciante nem repita informações básicas.",
+          "Destaque a mobilidade (metrô a 900m) e a praticidade do dia a dia perto de serviços e comércio.",
+        pitfalls: "Não repita informações básicas que ele já pesquisou.",
       },
     ],
     topQuestions: [
       {
-        question: "Qual a ocupação realista do Airbnb no primeiro ano?",
+        question: "Qual a data prevista de entrega da torre?",
         frequency: "alta", evidenceCount: 22, frequencyPct: 47,
         idealAnswer:
-          "Trabalhamos com premissa conservadora de 65% no primeiro ano, subindo para 75%+ a partir do segundo. AirDNA aponta 78% de média para studios na região.",
-        context: "Surge logo após apresentação do yield projetado, quando o investidor quer validar a premissa.",
+          "A previsão de entrega está no memorial de incorporação. Trazemos o cronograma físico-financeiro atualizado na reunião de reserva.",
+        context: "Surge logo após a apresentação das tipologias, quando o comprador quer se planejar.",
         evidence: [],
       },
       {
-        question: "Quem faz a gestão operacional do imóvel?",
+        question: "Quais as opções de tipologia disponíveis?",
         frequency: "alta", evidenceCount: 19, frequencyPct: 40,
         idealAnswer:
-          "A Bwild oferece gestão turnkey: precificação dinâmica, atendimento 24/7, limpeza, manutenção e relatórios mensais. O investidor não toca em nada.",
-        context: "Aparece quando o investidor pergunta 'e depois de pronto, como funciona?'",
+          "Temos unidades Garden, Terraço e Studio 1 dormitório, com plantas e metragens variadas. Posso enviar a tabela completa com disponibilidade.",
+        context: "Aparece quando o comprador pergunta 'quais opções eu tenho hoje?'",
         evidence: [],
       },
       {
-        question: "Como funciona a tributação da receita de Airbnb?",
+        question: "Como funciona o financiamento e as condições de pagamento?",
         frequency: "média", evidenceCount: 14, frequencyPct: 30,
         idealAnswer:
-          "Pessoa física: carnê-leão até R$ 27,5% (com deduções). Vale estudar PJ acima de ~R$ 8k/mês. Podemos indicar contador especializado.",
-        context: "Costuma surgir na segunda reunião, após o investidor discutir com contador.",
+          "Trabalhamos com entrada parcelada, saldo financiável na entrega e parcerias com os principais bancos. Podemos simular junto com você.",
+        context: "Costuma surgir na segunda reunião, após o comprador avaliar o orçamento em casa.",
         evidence: [],
       },
       {
-        question: "Vocês têm cases de investidores que já receberam?",
+        question: "Vocês têm outros empreendimentos entregues na região?",
         frequency: "média", evidenceCount: 12, frequencyPct: 26,
         idealAnswer:
-          "Sim, temos 3 empreendimentos entregues e 47 investidores recebendo mensalmente. Podemos agendar conversa com um deles.",
-        context: "Surge quando o investidor demonstra ceticismo sobre a operação real.",
+          "Sim, temos histórico de entregas na região. Podemos agendar uma visita a um empreendimento já concluído.",
+        context: "Surge quando o comprador quer validar a confiabilidade da incorporadora.",
         evidence: [],
       },
       {
-        question: "E se a regulação de Airbnb mudar em São Paulo?",
+        question: "Como é a mobilidade e o acesso ao metrô?",
         frequency: "média", evidenceCount: 9, frequencyPct: 19,
         idealAnswer:
-          "O studio funciona também como aluguel de temporada (30d+) e long-term. Nosso modelo é híbrido, então mitigamos o risco regulatório.",
-        context: "Perfil analítico ou conservador levanta como risco macro.",
+          "O Vila Park fica a 900m do Metrô Vila Mariana e a 1,1km do Metrô Ana Rosa, com fácil acesso à Av. Paulista e ao restante da cidade.",
+        context: "Perfil executivo ou família costuma perguntar sobre deslocamento diário.",
         evidence: [],
       },
     ],
     objections: [
       {
-        objection: "Preço está acima de outros studios que vi na região",
+        objection: "Preço está acima de outros lançamentos que vi na região",
         frequency: "alta", evidenceCount: 18, frequencyPct: 38,
         rebuttal:
-          "Comparação por m² não captura design otimizado + gestão turnkey. Nosso yield líquido é 30% acima da média AirDNA da região.",
+          "Comparação por m² não captura o diferencial de acabamento, área de lazer e localização a 900m do metrô. O valor reflete a qualidade construtiva do Vila Park.",
         evidence: [],
       },
       {
-        objection: "Prazo de entrega em dez/2026 é longo demais",
+        objection: "Prazo de entrega é longo demais",
         frequency: "alta", evidenceCount: 11, frequencyPct: 23,
         rebuttal:
-          "A valorização durante a obra (VGV) historicamente supera 25% em Jardins/Bela Cintra. E a parcela é escalonada até a entrega.",
+          "O cronograma segue o memorial de incorporação, com parcelas escalonadas até a entrega, o que facilita o planejamento financeiro.",
         evidence: [],
       },
       {
-        objection: "Não confio na projeção de ocupação",
+        objection: "Não sei se o valor do condomínio cabe no orçamento",
         frequency: "média", evidenceCount: 9, frequencyPct: 19,
         rebuttal:
-          "Usamos dados AirDNA (públicos) + histórico de 3 empreendimentos entregues. Cenário conservador está no simulador para o investidor testar.",
+          "O valor estimado do condomínio está descrito no memorial, considerando a infraestrutura de lazer e portaria. Podemos detalhar item a item.",
         evidence: [],
       },
       {
-        objection: "Prefiro comprar pronto e alugar direto",
+        objection: "Prefiro comprar um imóvel pronto",
         frequency: "média", evidenceCount: 7, frequencyPct: 15,
         rebuttal:
-          "Pronto: perde valorização + 40–50% do yield potencial (Airbnb vs long-term). Compare o cenário completo no simulador.",
+          "Comprar na planta permite escolher a melhor unidade disponível e parcelar a entrada até a entrega, além do potencial de valorização durante a obra.",
         evidence: [],
       },
       {
-        objection: "E se o mercado de Airbnb saturar?",
+        objection: "Tenho receio sobre a região no futuro",
         frequency: "baixa", evidenceCount: 5, frequencyPct: 11,
         rebuttal:
-          "Bela Cintra tem barreira de entrada altíssima (poucos terrenos). Além disso, modelo híbrido (temporada + long-term) mitiga saturação.",
+          "Vila Mariana é um bairro já consolidado, com infraestrutura completa de mobilidade, lazer, educação e serviços — não depende de expectativa futura.",
         evidence: [],
       },
     ],
     hiddenObjections: [
       {
-        objection: "Medo de ficar preso a uma operadora",
-        signals: "Perguntas insistentes sobre contrato de gestão e cláusulas de saída.",
-        approach: "Deixe claro desde o início: contrato de 12 meses, renovação opcional, transparência total nos relatórios.",
+        objection: "Medo de assinar contrato longo com a incorporadora",
+        signals: "Perguntas insistentes sobre distrato e cláusulas de saída.",
+        approach: "Deixe claro desde o início as condições contratuais e ofereça o memorial de incorporação para leitura calma.",
       },
       {
         objection: "Insegurança sobre a solidez da incorporadora",
         signals: "Pesquisas online durante a reunião, perguntas sobre outros empreendimentos.",
-        approach: "Envie institucional Bwild + tour virtual de empreendimentos entregues. Ofereça conversa com investidores atuais.",
+        approach: "Envie material institucional e ofereça visita a um empreendimento já entregue.",
       },
       {
-        objection: "Comparação inconsciente com CDI",
-        signals: "Menciona 'e se eu deixar no CDB?' em tom retórico.",
-        approach: "Traga o gráfico de yield líquido + valorização vs CDI de 5 anos. O spread real é 4-6 pp a.a.",
+        objection: "Comparação inconsciente com aluguel atual",
+        signals: "Menciona 'e se eu continuar alugando?' em tom retórico.",
+        approach: "Traga simulação comparando parcela de financiamento com o valor do aluguel atual pago pelo cliente.",
       },
     ],
     buyingSignals: [
       { signal: "Pergunta sobre unidades específicas disponíveis", meaning: "Alto interesse — passou da fase de avaliação genérica." },
-      { signal: "Menciona conversar com contador ou família", meaning: "Está validando decisão — avanço para próxima etapa." },
-      { signal: "Pede segunda reunião com sócio/cônjuge", meaning: "Sinal forte — quer alinhar decisão a dois." },
+      { signal: "Menciona conversar com cônjuge ou família", meaning: "Está validando decisão — avanço para próxima etapa." },
+      { signal: "Pede segunda visita com cônjuge/família", meaning: "Sinal forte — quer alinhar decisão em conjunto." },
       { signal: "Pergunta sobre condições de financiamento e ITBI", meaning: "Está aterrissando na parte prática — proximidade do fechamento." },
-      { signal: "Solicita ver planta em tamanho maior ou visitar stand", meaning: "Engajamento emocional — quer visualizar a compra." },
+      { signal: "Solicita ver planta em tamanho maior ou visitar o decorado", meaning: "Engajamento emocional — quer visualizar a compra." },
     ],
     closingArguments: [
       {
-        argument: "Escassez de terrenos em Bela Cintra",
-        when: "Quando o investidor está comparando com outros bairros",
-        example: "Apenas 3 empreendimentos novos previstos para a região nos próximos 24 meses.",
+        argument: "Localização consolidada em Vila Mariana",
+        when: "Quando o comprador está comparando com outros bairros",
+        example: "Bairro com infraestrutura completa de metrô, educação, lazer e serviços já estabelecida.",
       },
       {
-        argument: "Diferencial de design Bwild (+30% ocupação)",
-        when: "Contra objeção de preço",
-        example: "Projetos com nossa curadoria têm 30% mais ocupação vs padrão de mercado (dados AirDNA).",
+        argument: "Metrô Vila Mariana a 900m",
+        when: "Contra objeção de mobilidade",
+        example: "Menos de 10 minutos a pé até o Metrô Vila Mariana, com acesso direto à Av. Paulista.",
       },
       {
-        argument: "Gestão turnkey completa",
-        when: "Perfil executivo ocupado",
-        example: "Você recebe relatório mensal, dinheiro na conta, e não precisa se envolver com nada operacional.",
+        argument: "Diversidade de tipologias (Garden, Terraço, Studio)",
+        when: "Perfil família em expansão ou comprador prático",
+        example: "Há opção para cada momento de vida: do studio 1 dorm ao garden com mais espaço.",
       },
       {
         argument: "Valorização durante a obra",
         when: "Objeção de prazo",
-        example: "Histórico mostra 25%+ de valorização até a entrega em Jardins/Bela Cintra.",
+        example: "Comprar na planta permite parcelar a entrada e acompanhar a valorização até a entrega.",
       },
     ],
     actionItems: [
-      { priority: "alta", item: "Preparar comparativo yield vs CDI para próxima reunião", owner: "Corretor" },
-      { priority: "alta", item: "Enviar case de investidor Bwild já recebendo", owner: "Marketing" },
-      { priority: "média", item: "Agendar visita ao stand de vendas", owner: "Corretor" },
-      { priority: "média", item: "Compartilhar Guia do Investidor após primeira reunião", owner: "Corretor" },
-      { priority: "baixa", item: "Preparar material sobre tributação Airbnb", owner: "Marketing" },
+      { priority: "alta", item: "Preparar tabela comparativa de tipologias para próxima reunião", owner: "Corretor" },
+      { priority: "alta", item: "Enviar case de cliente já morando em empreendimento entregue", owner: "Marketing" },
+      { priority: "média", item: "Agendar visita ao decorado do Vila Park", owner: "Corretor" },
+      { priority: "média", item: "Compartilhar memorial de incorporação após primeira reunião", owner: "Corretor" },
+      { priority: "baixa", item: "Preparar material sobre condições de financiamento", owner: "Marketing" },
     ],
     sentimentSummary:
-      "Predominância positiva (62%) com objeções concentradas em preço e ocupação. Investidores analíticos convertem melhor com dados AirDNA e simulador. Perfil conservador exige comparação explícita com CDI.",
+      "Predominância positiva (62%) com objeções concentradas em preço e valor do condomínio. Compradores analíticos convertem melhor com tabela comparativa e memorial detalhado. Famílias em expansão respondem bem a visitas conjuntas ao decorado.",
   };
   return { ...base, ...overrides };
 }
 
 export const MOCK_CORRETORES = [
-  { id: "mock-amanda", name: "Amanda Silva", email: "amanda@bwild.com.br" },
-  { id: "mock-juliana", name: "Juliana Costa", email: "juliana@bwild.com.br" },
-  { id: "mock-rafael", name: "Rafael Mendes", email: "rafael@bwild.com.br" },
+  { id: "mock-amanda", name: "Amanda Silva", email: "amanda@vilapark.com.br" },
+  { id: "mock-juliana", name: "Juliana Costa", email: "juliana@vilapark.com.br" },
+  { id: "mock-rafael", name: "Rafael Mendes", email: "rafael@vilapark.com.br" },
 ];
 
 export const MOCK_CORRETOR_DATA: Record<string, {
