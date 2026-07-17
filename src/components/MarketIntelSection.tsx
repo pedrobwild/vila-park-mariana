@@ -172,7 +172,7 @@ export default function MarketIntelSection({ property = DEFAULT_PROPERTY }: Mark
           </p>
         </div>
         <Button
-          onClick={fetchIntel}
+          onClick={() => fetchIntel(false)}
           disabled={loading}
           size="lg"
           className="min-h-[48px] shrink-0"
