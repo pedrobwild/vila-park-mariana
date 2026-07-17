@@ -29,8 +29,8 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/guia-comprador" element={<UrbanFlexInvestorGuide />} />
               <Route path="/guia-investidor" element={<InvestorGuide />} />
-              {/* Legacy path — redirect to the new one */}
-              <Route path="/urban-flex-bela-cintra" element={<Navigate to="/guia-comprador" replace />} />
+              {/* Legacy path — redirect to home */}
+              <Route path="/urban-flex-bela-cintra" element={<Navigate to="/" replace />} />
               <Route path="/ferramentas" element={<Ferramentas />} />
               <Route path="/admin/upload" element={<AdminUpload />} />
               <Route path="/insights" element={<Insights />} />
