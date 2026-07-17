@@ -19,6 +19,7 @@ import { POIS, CATEGORY_ORDER, WHATSAPP_PHONE, type PoiCategory } from "@/data/s
 
 const PlantasSection = lazy(() => import("@/components/PlantasSection"));
 const MarketIntelSection = lazy(() => import("@/components/MarketIntelSection"));
+const VilaMarianaYieldSection = lazy(() => import("@/components/VilaMarianaYieldSection"));
 
 const HERO_IMG = "https://vilaparkmariana.com.br/wp-content/uploads/2023/03/frente-fachada-noite-vila-park-mariana.jpg";
 
@@ -365,7 +366,13 @@ export default function Index() {
             <p className="mt-3 text-muted-foreground max-w-2xl">{t("market.subtitle")}</p>
           </FadeIn>
 
-          <FadeIn delay={0.1} className="mt-4">
+          <FadeIn delay={0.08} className="mt-8">
+            <Suspense fallback={<div className="min-h-[300px]" />}>
+              <VilaMarianaYieldSection />
+            </Suspense>
+          </FadeIn>
+
+          <FadeIn delay={0.15} className="mt-10">
             <Suspense fallback={<div className="min-h-[200px]" />}>
               <MarketIntelSection />
             </Suspense>
