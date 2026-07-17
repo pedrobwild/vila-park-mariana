@@ -212,10 +212,11 @@ export default function InvestorGuide() {
                   </Button>
                 </div>
 
-                <div className="mt-10 grid gap-3 sm:grid-cols-3">
-                  <KpiCard value="900 m" label={t("investorGuide.hero.kpi.metro")} highlight />
-                  <KpiCard value={PROPERTY.address} label={t("investorGuide.hero.kpi.address")} />
-                  <KpiCard value={`${PROPERTY.units} apartamentos`} label={t("investorGuide.hero.kpi.units")} />
+                <div className="mt-10 grid gap-3 grid-cols-2 lg:grid-cols-4">
+                  <KpiCard value="900 m" label="Metrô Vila Mariana" highlight />
+                  <KpiCard value="850 m" label="FMU (universidade)" />
+                  <KpiCard value="2,5 km" label="Av. Paulista" />
+                  <KpiCard value="950 m" label="Parque da Aclimação" />
                 </div>
               </motion.div>
 
