@@ -1,8 +1,8 @@
-// src/data/districtMetrics.mock.ts
-
-// Seed 1:1 com o UI do mock (ranking + detalhes do painel + chips)
-// ✅ Valores EXATOS do mock para: Pinheiros, Itaim Bibi, Jardim Paulista
-// ⚠️ Os demais distritos estão com placeholders coerentes (troque quando plugar dados reais)
+// src/data/districtMetrics.ts
+// ⚠️ SEED / PLACEHOLDER — dados fictícios do template original.
+// NÃO renderizar valores deste arquivo em UI pública do Vila Park.
+// Números reais de mercado devem vir da edge function `market-intel` (Perplexity)
+// em runtime, com fonte e data da consulta.
 
 export type DemandChip =
   | "Misto"
