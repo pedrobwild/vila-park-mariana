@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,14 +25,19 @@ const DEFAULT_PROPERTY: PropertyConfig = {
 const DEFAULT_CONTEXT =
   "residencial familiar, próximo ao metrô Vila Mariana e Parque da Aclimação";
 
+const CACHE_KEY = "vilapark_market_intel_v1";
+const CACHE_TTL_MS = 1000 * 60 * 60 * 6; // 6h
+
 export default function MarketIntelSection({ property = DEFAULT_PROPERTY }: MarketIntelProps) {
   const [content, setContent] = useState<string | null>(null);
   const [citations, setCitations] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const { toast } = useToast();
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const autoFetchedRef = useRef(false);
 
-  const fetchIntel = async () => {
+  const fetchIntel = async (silent = false) => {
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("market-intel", {
@@ -44,21 +49,67 @@ export default function MarketIntelSection({ property = DEFAULT_PROPERTY }: Mark
       if (data?.success) {
         setContent(data.content);
         setCitations(data.citations || []);
-        setLastUpdated(new Date());
+        const now = new Date();
+        setLastUpdated(now);
+        try {
+          sessionStorage.setItem(
+            CACHE_KEY,
+            JSON.stringify({ content: data.content, citations: data.citations || [], ts: now.getTime() })
+          );
+        } catch {}
       } else {
         throw new Error(data?.error || "Erro ao buscar dados");
       }
     } catch (err: any) {
       console.error("MarketIntel error:", err);
-      toast({
-        title: "Erro ao buscar dados de mercado",
-        description: err.message || "Tente novamente em alguns segundos.",
-        variant: "destructive",
-      });
+      if (!silent) {
+        toast({
+          title: "Erro ao buscar dados de mercado",
+          description: err.message || "Tente novamente em alguns segundos.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }
   };
+
+  // Hydrate from cache immediately
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(CACHE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (parsed?.content && Date.now() - parsed.ts < CACHE_TTL_MS) {
+        setContent(parsed.content);
+        setCitations(parsed.citations || []);
+        setLastUpdated(new Date(parsed.ts));
+        autoFetchedRef.current = true;
+      }
+    } catch {}
+  }, []);
+
+  // Auto-fetch on first scroll into view
+  useEffect(() => {
+    if (!sectionRef.current || autoFetchedRef.current) return;
+    const el = sectionRef.current;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting && !autoFetchedRef.current) {
+            autoFetchedRef.current = true;
+            fetchIntel(true);
+            obs.disconnect();
+          }
+        });
+      },
+      { rootMargin: "200px" }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
 
   // Simple markdown-like rendering (bold, headings, lists)
   const renderContent = (text: string) => {
@@ -121,7 +172,7 @@ export default function MarketIntelSection({ property = DEFAULT_PROPERTY }: Mark
           </p>
         </div>
         <Button
-          onClick={fetchIntel}
+          onClick={() => fetchIntel(false)}
           disabled={loading}
           size="lg"
           className="min-h-[48px] shrink-0"
