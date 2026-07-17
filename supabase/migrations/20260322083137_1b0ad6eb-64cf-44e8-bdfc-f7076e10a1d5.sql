@@ -1,0 +1,1 @@
+ALTER TABLE public.elephant_insights_cache ADD COLUMN charts_data jsonb;

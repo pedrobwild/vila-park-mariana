@@ -1,0 +1,121 @@
+{
+  "lang": {
+    "switchTo": "EN",
+    "current": "Português",
+    "label": "Idioma"
+  },
+  "nav": {
+    "insights": "Insights",
+    "ferramentas": "Ferramentas",
+    "urbanFlex": "Urban Flex",
+    "back": "Voltar",
+    "menu": "Menu"
+  },
+  "quickNav": {
+    "plantas": "Plantas",
+    "comparativo": "Comparativo",
+    "guia": "Guia",
+    "ariaLabel": "Navegação rápida da página",
+    "goTo": "Ir para {{label}}"
+  },
+  "hero": {
+    "badgeMobile": "Urban Flex · Consolação",
+    "badgeDesktop": "LM Urban Flex · R. Bela Cintra, 209 — Consolação",
+    "headlineMobileA": "Seu studio na Paulista.",
+    "headlineMobileB": "Projetado para render.",
+    "headlineDesktopA": "Seu studio a 200m da Paulista.",
+    "headlineDesktopB": "Projetado para rentabilizar.",
+    "subMobile": "6 tipologias com projetos 3D baseados em dados reais de ocupação.",
+    "subDesktop": "6 tipologias de 19 a 83 m² com projetos de reforma 3D criados a partir de dados reais de ocupação e rentabilidade — cada detalhe pensado para o seu imóvel performar acima da média.",
+    "ctaPrimary": "Ver plantas e projetos 3D",
+    "trust": {
+      "deliveryShort": "Entrega",
+      "deliveryLong": "Previsão de entrega",
+      "progressShort": "Obra",
+      "progressLong": "Obra concluída",
+      "typologiesShort": "Tipologias",
+      "typologiesLong": "De studio a cobertura",
+      "optionsShort": "2 opções",
+      "optionsLabel": "De reforma por planta"
+    }
+  },
+  "why": {
+    "eyebrow": "Por que o Urban Flex",
+    "title": "Localização, dados e design trabalhando juntos pelo seu retorno.",
+    "items": {
+      "location": {
+        "title": "Localização premium",
+        "desc": "Rua Bela Cintra, 209 — a 200m da Av. Paulista, entre metrô Consolação e Trianon-MASP."
+      },
+      "design": {
+        "title": "Design orientado por dados",
+        "desc": "Studios com design estratégico alcançam até 30% mais ocupação que unidades sem reforma. Cada projeto 3D foi pensado para maximizar diária e taxa de reserva."
+      },
+      "construction": {
+        "title": "Obra em andamento",
+        "desc": "63,5% concluída, entrega prevista para dezembro de 2026. Retrofit com padrão construtivo Leal Moreira."
+      },
+      "returnValidated": {
+        "title": "Retorno validado",
+        "descWith": "Consolação tem {{occupancy}}% de ocupação e diária média de {{rate}} para studios.",
+        "descFallback": "Consolação é um dos bairros com melhor yield bruto de SP para short stay."
+      }
+    },
+    "proof": {
+      "incorporator": "Incorporadora Leal Moreira",
+      "ready": "Operação short stay ready",
+      "amenities": "Amenidades completas no empreendimento"
+    },
+    "source": "Fonte: AirDNA Market Minder, pesquisa Bwild 2025. Dados referentes a studios 20–35 m² na região da Consolação."
+  },
+  "comparative": {
+    "eyebrow": "Dados de mercado",
+    "title": "Consolação: um dos melhores yields de São Paulo.",
+    "subtitle": "Diária competitiva com preço de aquisição abaixo de bairros vizinhos — a combinação que gera o melhor retorno para o investidor.",
+    "stats": {
+      "adrLabel": "Diária média (studios)",
+      "occupancyLabel": "Ocupação média anual",
+      "occupancyDetail": "Acima da média de SP",
+      "listingsLabel": "Listings ativos",
+      "listingsDetail": "Mercado validado",
+      "priceLabel": "Preço médio residencial",
+      "priceDetail": "Abaixo de Pinheiros e Itaim",
+      "priceValue": "R$ 10.500/m²"
+    }
+  },
+  "guide": {
+    "badge": "Ferramenta exclusiva",
+    "titleA": "Guia do Investidor.",
+    "titleB": "Tudo antes de comprar.",
+    "subtitle": "Dados, critérios objetivos e análise — para decidir com segurança.",
+    "cta": "Acessar o Guia do Investidor",
+    "items": {
+      "quiz": { "title": "Quiz de Perfil", "desc": "Descubra qual tipologia combina com seu objetivo de investimento." },
+      "simulator": { "title": "Simulador de Retorno", "desc": "Projete receita em cenários otimista e conservador." },
+      "neighborhood": { "title": "Análise de Bairro", "desc": "Dados de ocupação, diária e yield da Consolação vs. concorrentes." },
+      "choice": { "title": "Checklist de Escolha", "desc": "16 critérios técnicos para avaliar o imóvel com clareza." },
+      "readiness": { "title": "Checklist de Prontidão", "desc": "10 itens para garantir que você está pronto para fechar." },
+      "income": { "title": "Estratégia de Renda", "desc": "Como operar short stay e maximizar retorno desde o dia 1." }
+    }
+  },
+  "finalCta": {
+    "title": "Cada projeto foi desenhado para performar.",
+    "subtitle": "Explore as plantas, veja os projetos pensados para alta rentabilidade e converse com a equipe comercial.",
+    "talk": "Falar com consultor",
+    "viewPlans": "Ver plantas e projetos"
+  },
+  "footer": {
+    "rights": "© 2026 Bwild. Todos os direitos reservados.",
+    "ariaLabel": "Links do rodapé",
+    "tools": "Ferramentas",
+    "guide": "Guia do Investidor"
+  },
+  "whatsapp": {
+    "message": "Olá! Vi o site da Bwild e quero saber mais sobre o Urban Flex Bela Cintra."
+  },
+  "common": {
+    "loading": "Carregando...",
+    "back": "Voltar",
+    "close": "Fechar"
+  }
+}

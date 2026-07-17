@@ -1,0 +1,121 @@
+{
+  "lang": {
+    "switchTo": "PT",
+    "current": "English",
+    "label": "Language"
+  },
+  "nav": {
+    "insights": "Insights",
+    "ferramentas": "Tools",
+    "urbanFlex": "Urban Flex",
+    "back": "Back",
+    "menu": "Menu"
+  },
+  "quickNav": {
+    "plantas": "Floor plans",
+    "comparativo": "Comparison",
+    "guia": "Guide",
+    "ariaLabel": "Quick page navigation",
+    "goTo": "Go to {{label}}"
+  },
+  "hero": {
+    "badgeMobile": "Urban Flex · Consolação",
+    "badgeDesktop": "LM Urban Flex · R. Bela Cintra, 209 — Consolação",
+    "headlineMobileA": "Your studio on Paulista.",
+    "headlineMobileB": "Engineered to earn.",
+    "headlineDesktopA": "Your studio 200m from Paulista Avenue.",
+    "headlineDesktopB": "Engineered for high returns.",
+    "subMobile": "6 layouts with 3D designs based on real occupancy data.",
+    "subDesktop": "6 typologies from 19 to 83 m² with 3D renovation projects built from real occupancy and yield data — every detail designed so your unit performs above average.",
+    "ctaPrimary": "View floor plans & 3D projects",
+    "trust": {
+      "deliveryShort": "Delivery",
+      "deliveryLong": "Expected delivery",
+      "progressShort": "Build",
+      "progressLong": "Construction completed",
+      "typologiesShort": "Layouts",
+      "typologiesLong": "Studios to penthouse",
+      "optionsShort": "2 options",
+      "optionsLabel": "Renovation per plan"
+    }
+  },
+  "why": {
+    "eyebrow": "Why Urban Flex",
+    "title": "Location, data and design working together for your return.",
+    "items": {
+      "location": {
+        "title": "Premium location",
+        "desc": "Rua Bela Cintra, 209 — 200m from Av. Paulista, between Consolação and Trianon-MASP metro stations."
+      },
+      "design": {
+        "title": "Data-driven design",
+        "desc": "Studios with strategic design reach up to 30% more occupancy than unrenovated units. Every 3D project is designed to maximize nightly rate and booking conversion."
+      },
+      "construction": {
+        "title": "Construction underway",
+        "desc": "63.5% completed, delivery expected December 2026. Retrofit with Leal Moreira's construction standard."
+      },
+      "returnValidated": {
+        "title": "Validated returns",
+        "descWith": "Consolação has {{occupancy}}% occupancy and average nightly rate of {{rate}} for studios.",
+        "descFallback": "Consolação is one of the best gross-yield neighborhoods in SP for short stay."
+      }
+    },
+    "proof": {
+      "incorporator": "Leal Moreira developer",
+      "ready": "Short-stay ready operation",
+      "amenities": "Full amenities on site"
+    },
+    "source": "Source: AirDNA Market Minder, Bwild research 2025. Data refers to 20–35 m² studios in the Consolação area."
+  },
+  "comparative": {
+    "eyebrow": "Market data",
+    "title": "Consolação: one of São Paulo's top yields.",
+    "subtitle": "Competitive nightly rates with acquisition prices below neighboring districts — the combination that generates the best return for investors.",
+    "stats": {
+      "adrLabel": "Average nightly rate (studios)",
+      "occupancyLabel": "Annual average occupancy",
+      "occupancyDetail": "Above SP average",
+      "listingsLabel": "Active listings",
+      "listingsDetail": "Validated market",
+      "priceLabel": "Average residential price",
+      "priceDetail": "Below Pinheiros and Itaim",
+      "priceValue": "R$ 10,500/m²"
+    }
+  },
+  "guide": {
+    "badge": "Exclusive tool",
+    "titleA": "Investor Guide.",
+    "titleB": "Everything before you buy.",
+    "subtitle": "Data, objective criteria and analysis — to decide with confidence.",
+    "cta": "Open the Investor Guide",
+    "items": {
+      "quiz": { "title": "Profile Quiz", "desc": "Discover which layout fits your investment goal." },
+      "simulator": { "title": "Return Simulator", "desc": "Project revenue in optimistic and conservative scenarios." },
+      "neighborhood": { "title": "Neighborhood Analysis", "desc": "Occupancy, nightly and yield data for Consolação vs. competitors." },
+      "choice": { "title": "Selection Checklist", "desc": "16 technical criteria to evaluate the property clearly." },
+      "readiness": { "title": "Readiness Checklist", "desc": "10 items to make sure you are ready to close." },
+      "income": { "title": "Income Strategy", "desc": "How to operate short stay and maximize return from day 1." }
+    }
+  },
+  "finalCta": {
+    "title": "Every project is designed to perform.",
+    "subtitle": "Explore the floor plans, see the projects designed for high yield and talk to the sales team.",
+    "talk": "Talk to a consultant",
+    "viewPlans": "See floor plans & projects"
+  },
+  "footer": {
+    "rights": "© 2026 Bwild. All rights reserved.",
+    "ariaLabel": "Footer links",
+    "tools": "Tools",
+    "guide": "Investor Guide"
+  },
+  "whatsapp": {
+    "message": "Hi! I saw the Bwild website and want to know more about Urban Flex Bela Cintra."
+  },
+  "common": {
+    "loading": "Loading...",
+    "back": "Back",
+    "close": "Close"
+  }
+}

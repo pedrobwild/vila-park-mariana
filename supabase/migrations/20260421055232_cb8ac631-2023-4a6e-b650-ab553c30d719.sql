@@ -1,0 +1,1 @@
+DELETE FROM public.elephant_insights_cache;

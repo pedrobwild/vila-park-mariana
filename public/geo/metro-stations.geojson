@@ -1,0 +1,25 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    { "type": "Feature", "properties": { "name": "Faria Lima", "line": "Linha 4 - Amarela", "color": "#FFD700" }, "geometry": { "type": "Point", "coordinates": [-46.6936, -23.5668] } },
+    { "type": "Feature", "properties": { "name": "Pinheiros", "line": "Linha 4 - Amarela", "color": "#FFD700" }, "geometry": { "type": "Point", "coordinates": [-46.7020, -23.5670] } },
+    { "type": "Feature", "properties": { "name": "Consolação", "line": "Linha 2 - Verde", "color": "#00A651" }, "geometry": { "type": "Point", "coordinates": [-46.6603, -23.5575] } },
+    { "type": "Feature", "properties": { "name": "Trianon-Masp", "line": "Linha 2 - Verde", "color": "#00A651" }, "geometry": { "type": "Point", "coordinates": [-46.6558, -23.5614] } },
+    { "type": "Feature", "properties": { "name": "Brigadeiro", "line": "Linha 2 - Verde", "color": "#00A651" }, "geometry": { "type": "Point", "coordinates": [-46.6513, -23.5680] } },
+    { "type": "Feature", "properties": { "name": "Vila Madalena", "line": "Linha 2 - Verde", "color": "#00A651" }, "geometry": { "type": "Point", "coordinates": [-46.6907, -23.5466] } },
+    { "type": "Feature", "properties": { "name": "Fradique Coutinho", "line": "Linha 4 - Amarela", "color": "#FFD700" }, "geometry": { "type": "Point", "coordinates": [-46.6920, -23.5533] } },
+    { "type": "Feature", "properties": { "name": "Oscar Freire", "line": "Linha 4 - Amarela", "color": "#FFD700" }, "geometry": { "type": "Point", "coordinates": [-46.6725, -23.5584] } },
+    { "type": "Feature", "properties": { "name": "Moema", "line": "Linha 5 - Lilás", "color": "#9B59B6" }, "geometry": { "type": "Point", "coordinates": [-46.6650, -23.6007] } },
+    { "type": "Feature", "properties": { "name": "Eucaliptos", "line": "Linha 5 - Lilás", "color": "#9B59B6" }, "geometry": { "type": "Point", "coordinates": [-46.6565, -23.6046] } },
+    { "type": "Feature", "properties": { "name": "Palmeiras-Barra Funda", "line": "Linha 3 - Vermelha", "color": "#EE3124" }, "geometry": { "type": "Point", "coordinates": [-46.6670, -23.5254] } },
+    { "type": "Feature", "properties": { "name": "Brooklin", "line": "Linha 5 - Lilás", "color": "#9B59B6" }, "geometry": { "type": "Point", "coordinates": [-46.6966, -23.6130] } },
+    { "type": "Feature", "properties": { "name": "Butantã", "line": "Linha 4 - Amarela", "color": "#FFD700" }, "geometry": { "type": "Point", "coordinates": [-46.7088, -23.5716] } },
+    { "type": "Feature", "properties": { "name": "República", "line": "Linha 3 - Vermelha", "color": "#EE3124" }, "geometry": { "type": "Point", "coordinates": [-46.6422, -23.5430] } },
+    { "type": "Feature", "properties": { "name": "Sé", "line": "Linha 1 - Azul", "color": "#0455A1" }, "geometry": { "type": "Point", "coordinates": [-46.6341, -23.5505] } },
+    { "type": "Feature", "properties": { "name": "Paraíso", "line": "Linha 1 - Azul", "color": "#0455A1" }, "geometry": { "type": "Point", "coordinates": [-46.6484, -23.5738] } },
+    { "type": "Feature", "properties": { "name": "Ana Rosa", "line": "Linha 1 - Azul", "color": "#0455A1" }, "geometry": { "type": "Point", "coordinates": [-46.6385, -23.5810] } },
+    { "type": "Feature", "properties": { "name": "Vila Mariana", "line": "Linha 1 - Azul", "color": "#0455A1" }, "geometry": { "type": "Point", "coordinates": [-46.6338, -23.5878] } },
+    { "type": "Feature", "properties": { "name": "Santa Cruz", "line": "Linha 1 - Azul", "color": "#0455A1" }, "geometry": { "type": "Point", "coordinates": [-46.6373, -23.5983] } },
+    { "type": "Feature", "properties": { "name": "Clínicas", "line": "Linha 2 - Verde", "color": "#00A651" }, "geometry": { "type": "Point", "coordinates": [-46.6700, -23.5534] } }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "id": "pinheiros", "name": "Pinheiros", "score": 92, "nightlyRate": 410, "occupancy": 75, "estimatedROI": 19.2, "revenueMonth": 9225, "listingsCount": 3200, "adrMin": 340, "adrMax": 480, "priceSqm": 14000 },
+      "geometry": { "type": "Polygon", "coordinates": [[[-46.7020,-23.5530],[-46.6950,-23.5520],[-46.6870,-23.5560],[-46.6860,-23.5650],[-46.6920,-23.5700],[-46.7010,-23.5680],[-46.7050,-23.5600],[-46.7020,-23.5530]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "vila-madalena", "name": "Vila Madalena", "score": 88, "nightlyRate": 390, "occupancy": 72, "estimatedROI": 16.5, "revenueMonth": 8424, "listingsCount": 1800, "adrMin": 320, "adrMax": 460, "priceSqm": 13000 },
+      "geometry": { "type": "Polygon", "coordinates": [[[-46.7000,-23.5390],[-46.6920,-23.5380],[-46.6860,-23.5430],[-46.6870,-23.5520],[-46.6940,-23.5540],[-46.7010,-23.5500],[-46.7030,-23.5440],[-46.7000,-23.5390]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "jardim-paulista", "name": "Jardim Paulista", "score": 87, "nightlyRate": 440, "occupancy": 70, "estimatedROI": 17.4, "revenueMonth": 9240, "listingsCount": 2800, "adrMin": 360, "adrMax": 520, "priceSqm": 15000 },
+      "geometry": { "type": "Polygon", "coordinates": [[[-46.6780,-23.5560],[-46.6680,-23.5540],[-46.6600,-23.5590],[-46.6590,-23.5680],[-46.6650,-23.5720],[-46.6760,-23.5700],[-46.6800,-23.5630],[-46.6780,-23.5560]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "itaim-bibi", "name": "Itaim Bibi", "score": 91, "nightlyRate": 440, "occupancy": 73, "estimatedROI": 18.1, "revenueMonth": 9636, "listingsCount": 2600, "adrMin": 360, "adrMax": 520, "priceSqm": 16000 },
+      "geometry": { "type": "Polygon", "coordinates": [[[-46.6870,-23.5770],[-46.6780,-23.5760],[-46.6700,-23.5810],[-46.6690,-23.5910],[-46.6750,-23.5950],[-46.6850,-23.5930],[-46.6890,-23.5850],[-46.6870,-23.5770]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "vila-olimpia", "name": "Vila Olímpia", "score": 89, "nightlyRate": 410, "occupancy": 74, "estimatedROI": 17.0, "revenueMonth": 9102, "listingsCount": 2200, "adrMin": 340, "adrMax": 480, "priceSqm": 15500 },
+      "geometry": { "type": "Polygon", "coordinates": [[[-46.6860,-23.5920],[-46.6780,-23.5910],[-46.6700,-23.5940],[-46.6690,-23.6020],[-46.6740,-23.6050],[-46.6830,-23.6030],[-46.6870,-23.5980],[-46.6860,-23.5920]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "consolacao", "name": "Consolação", "score": 86, "nightlyRate": 390, "occupancy": 74, "estimatedROI": 16.6, "revenueMonth": 8660, "listingsCount": 2400, "adrMin": 320, "adrMax": 470, "priceSqm": 10500 },
+      "geometry": { "type": "Polygon", "coordinates": [[[-46.6660,-23.5520],[-46.6580,-23.5500],[-46.6500,-23.5550],[-46.6490,-23.5630],[-46.6540,-23.5670],[-46.6640,-23.5650],[-46.6680,-23.5580],[-46.6660,-23.5520]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "bela-vista", "name": "Bela Vista", "score": 82, "nightlyRate": 360, "occupancy": 72, "estimatedROI": 15.4, "revenueMonth": 7776, "listingsCount": 2100, "adrMin": 290, "adrMax": 430, "priceSqm": 9500 },
+      "geometry": { "type": "Polygon", "coordinates": [[[-46.6520,-23.5550],[-46.6440,-23.5540],[-46.6380,-23.5580],[-46.6370,-23.5660],[-46.6420,-23.5700],[-46.6510,-23.5680],[-46.6540,-23.5610],[-46.6520,-23.5550]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "moema", "name": "Moema", "score": 85, "nightlyRate": 380, "occupancy": 70, "estimatedROI": 15.8, "revenueMonth": 7980, "listingsCount": 1800, "adrMin": 310, "adrMax": 460, "priceSqm": 14500 },
+      "geometry": { "type": "Polygon", "coordinates": [[[-46.6750,-23.5950],[-46.6660,-23.5930],[-46.6570,-23.5980],[-46.6560,-23.6080],[-46.6620,-23.6130],[-46.6720,-23.6100],[-46.6770,-23.6030],[-46.6750,-23.5950]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "vila-clementino", "name": "Vila Clementino", "score": 83, "nightlyRate": 350, "occupancy": 71, "estimatedROI": 15.2, "revenueMonth": 7455, "listingsCount": 850, "adrMin": 280, "adrMax": 420, "priceSqm": 11500 },
+      "geometry": { "type": "Polygon", "coordinates": [[[-46.6470,-23.5950],[-46.6380,-23.5930],[-46.6300,-23.5990],[-46.6290,-23.6090],[-46.6350,-23.6140],[-46.6450,-23.6110],[-46.6490,-23.6030],[-46.6470,-23.5950]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "barra-funda", "name": "Barra Funda", "score": 80, "nightlyRate": 340, "occupancy": 68, "estimatedROI": 14.8, "revenueMonth": 6936, "listingsCount": 1200, "adrMin": 260, "adrMax": 420, "priceSqm": 8500 },
+      "geometry": { "type": "Polygon", "coordinates": [[[-46.6800,-23.5180],[-46.6700,-23.5160],[-46.6600,-23.5210],[-46.6590,-23.5310],[-46.6660,-23.5360],[-46.6770,-23.5340],[-46.6820,-23.5260],[-46.6800,-23.5180]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "brooklin", "name": "Brooklin", "score": 80, "nightlyRate": 290, "occupancy": 60, "estimatedROI": 12.1, "revenueMonth": 5292, "listingsCount": 2800, "adrMin": 240, "adrMax": 350, "priceSqm": 12500 },
+      "geometry": { "type": "Polygon", "coordinates": [[[-46.7050,-23.6050],[-46.6960,-23.6030],[-46.6870,-23.6080],[-46.6860,-23.6180],[-46.6920,-23.6230],[-46.7020,-23.6200],[-46.7070,-23.6130],[-46.7050,-23.6050]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "liberdade", "name": "Liberdade", "score": 84, "nightlyRate": 340, "occupancy": 70, "estimatedROI": 15.0, "revenueMonth": 7140, "listingsCount": 1400, "adrMin": 270, "adrMax": 410, "priceSqm": 9800 },
+      "geometry": { "type": "Polygon", "coordinates": [[[-46.6380,-23.5580],[-46.6310,-23.5560],[-46.6250,-23.5610],[-46.6240,-23.5700],[-46.6290,-23.5740],[-46.6370,-23.5720],[-46.6400,-23.5650],[-46.6380,-23.5580]]] }
+    }
+  ]
+}

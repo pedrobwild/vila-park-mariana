@@ -1,0 +1,1 @@
+TRUNCATE TABLE public.elephant_insights_cache;

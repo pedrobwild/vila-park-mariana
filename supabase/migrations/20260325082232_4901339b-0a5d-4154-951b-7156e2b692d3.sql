@@ -1,0 +1,1 @@
+DELETE FROM public.elephant_insights_cache WHERE cache_key = 'amanda_default';
