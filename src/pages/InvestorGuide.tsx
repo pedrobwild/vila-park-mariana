@@ -168,7 +168,7 @@ export default function InvestorGuide() {
                     : "bg-transparent text-muted-foreground hover:text-foreground hover:bg-secondary",
                 )}
               >
-                {t(`investorGuide.nav.${id}`)}
+                {sectionLabels[id]}
               </button>
             ))}
           </div>
