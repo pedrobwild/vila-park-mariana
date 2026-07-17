@@ -64,7 +64,7 @@ function PlantaCard({ tipologia, index, onOpen }: { tipologia: Tipologia; index:
           <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
             <span className="text-primary-foreground text-sm font-semibold flex items-center gap-1.5 bg-accent px-4 py-2 rounded-full shadow-lg">
               <Eye className="h-4 w-4" />
-              Ver projetos de reforma
+              Ver planta em alta
             </span>
           </div>
         </div>
@@ -155,7 +155,7 @@ function MobileVariantTabs({
         ) : (
           <Eye className="mr-2 h-4 w-4" />
         )}
-        Visualizar projetos de reforma
+        Visualizar planta em alta
       </Button>
     );
   }
@@ -225,7 +225,7 @@ function MobileVariantTabs({
           ) : (
             <Eye className="mr-2 h-4 w-4" />
           )}
-          Ver projetos 3D — {current.label}
+          Ver planta em alta — {current.label}
         </Button>
       </div>
     </div>
@@ -269,7 +269,7 @@ function VariantButtons({
               ) : (
                 <>
                   <span className="text-sm font-bold">{variant.label}</span>
-                  <span className="text-xs opacity-70">Ver projetos 3D</span>
+                  <span className="text-xs opacity-70">Ver planta em alta</span>
                 </>
               )}
             </Button>
@@ -291,7 +291,7 @@ function VariantButtons({
       ) : (
         <Eye className="mr-2 h-4 w-4" />
       )}
-      Visualizar projetos de reforma
+      Visualizar planta em alta
     </Button>
   );
 }
@@ -760,7 +760,7 @@ export default function PlantasSection() {
           <FadeIn delay={0.8}>
             <div className="mt-10 flex items-center justify-center">
               <p className="text-sm text-muted-foreground text-center max-w-md">
-                Clique em qualquer planta acima para ver os projetos 3D decorados e solicitar o orçamento de reforma.
+                Clique em qualquer planta acima para ver os projetos 3D decorados e falar com o time comercial.
               </p>
             </div>
           </FadeIn>
