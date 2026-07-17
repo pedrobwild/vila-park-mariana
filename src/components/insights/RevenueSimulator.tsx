@@ -83,6 +83,8 @@ function formatCurrency(value: number): string {
 }
 
 export default function RevenueSimulator({ eventsData }: Props) {
+  // Hidden for Vila Park (residential, buyer-final)
+  return null;
   const [selectedTypo, setSelectedTypo] = useState<string>(TYPOLOGIES[0].id);
   const [occupancy, setOccupancy] = useState<number>(PROPERTY.avgOccupancy);
 

@@ -17,10 +17,13 @@ interface MarketIntelProps {
 }
 
 const DEFAULT_PROPERTY: PropertyConfig = {
-  propertyName: "LM Urban Flex Bela Cintra",
-  neighborhood: "Consolação (Av. Paulista)",
+  propertyName: "Vila Park Vila Mariana",
+  neighborhood: "Vila Mariana",
   city: "São Paulo",
 };
+
+const DEFAULT_CONTEXT =
+  "residencial familiar, próximo ao metrô Vila Mariana e Parque da Aclimação";
 
 export default function MarketIntelSection({ property = DEFAULT_PROPERTY }: MarketIntelProps) {
   const [content, setContent] = useState<string | null>(null);
@@ -33,7 +36,7 @@ export default function MarketIntelSection({ property = DEFAULT_PROPERTY }: Mark
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("market-intel", {
-        body: property,
+        body: { ...property, context: DEFAULT_CONTEXT },
       });
 
       if (error) throw error;
@@ -110,10 +113,11 @@ export default function MarketIntelSection({ property = DEFAULT_PROPERTY }: Mark
             Dados ao vivo via IA
           </Badge>
           <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">
-            Inteligência de Mercado — Consolação
+            Inteligência de Mercado · Vila Mariana
           </h2>
           <p className="text-muted-foreground mt-1 max-w-xl">
-            Análise atualizada do mercado de short stay no bairro Consolação, com dados reais de plataformas de hospedagem.
+            Análise atualizada do mercado imobiliário residencial no bairro Vila Mariana: tendências de
+            valorização, perfil do bairro e projetos concorrentes na região.
           </p>
         </div>
         <Button
@@ -147,7 +151,7 @@ export default function MarketIntelSection({ property = DEFAULT_PROPERTY }: Mark
             <TrendingUp className="h-10 w-10 text-muted-foreground/40 mx-auto mb-4" />
             <p className="text-muted-foreground font-medium mb-1">Nenhuma análise carregada</p>
             <p className="text-sm text-muted-foreground/70 max-w-md mx-auto">
-              Clique em "Analisar mercado agora" para buscar dados atualizados de diárias, ocupação e tendências na região do empreendimento.
+              Clique em "Analisar mercado agora" para buscar dados atualizados sobre valorização, perfil do bairro e projetos concorrentes na região do empreendimento.
             </p>
           </CardContent>
         </Card>
@@ -157,7 +161,7 @@ export default function MarketIntelSection({ property = DEFAULT_PROPERTY }: Mark
         <Card className="border-border/60">
           <CardContent className="py-16 text-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
-            <p className="text-muted-foreground font-medium">Buscando dados de mercado via Perplexity AI…</p>
+            <p className="text-muted-foreground font-medium">Buscando dados de mercado imobiliário via Perplexity AI…</p>
             <p className="text-sm text-muted-foreground/60 mt-1">Isso pode levar alguns segundos.</p>
           </CardContent>
         </Card>

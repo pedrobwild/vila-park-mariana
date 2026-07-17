@@ -64,7 +64,7 @@ function PlantaCard({ tipologia, index, onOpen }: { tipologia: Tipologia; index:
           <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
             <span className="text-primary-foreground text-sm font-semibold flex items-center gap-1.5 bg-accent px-4 py-2 rounded-full shadow-lg">
               <Eye className="h-4 w-4" />
-              Ver projetos de reforma
+              Ver planta em alta
             </span>
           </div>
         </div>
@@ -155,7 +155,7 @@ function MobileVariantTabs({
         ) : (
           <Eye className="mr-2 h-4 w-4" />
         )}
-        Visualizar projetos de reforma
+        Visualizar planta em alta
       </Button>
     );
   }
@@ -225,7 +225,7 @@ function MobileVariantTabs({
           ) : (
             <Eye className="mr-2 h-4 w-4" />
           )}
-          Ver projetos 3D — {current.label}
+          Ver planta em alta — {current.label}
         </Button>
       </div>
     </div>
@@ -269,7 +269,7 @@ function VariantButtons({
               ) : (
                 <>
                   <span className="text-sm font-bold">{variant.label}</span>
-                  <span className="text-xs opacity-70">Ver projetos 3D</span>
+                  <span className="text-xs opacity-70">Ver planta em alta</span>
                 </>
               )}
             </Button>
@@ -291,7 +291,7 @@ function VariantButtons({
       ) : (
         <Eye className="mr-2 h-4 w-4" />
       )}
-      Visualizar projetos de reforma
+      Visualizar planta em alta
     </Button>
   );
 }
@@ -711,39 +711,37 @@ export default function PlantasSection() {
             <FadeIn>
               <Badge className="mb-4 bg-accent/10 text-accent border-accent/20 hover:bg-accent/15 text-xs font-semibold tracking-wide px-3 py-1">
                 <Sparkles className="h-3.5 w-3.5 mr-1.5" />
-                Catálogo de Reforma · 6 Tipologias
+                Plantas humanizadas · Vila Park
               </Badge>
             </FadeIn>
 
             <FadeIn delay={0.08}>
               <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground leading-[1.1] tracking-tight">
-                Escolha sua planta.{" "}
-                <span className="text-accent">Visualize a reforma.</span>{" "}
-                Receba o orçamento.
+                Plantas por pavimento.{" "}
+                <span className="text-accent">Entenda o edifício</span>{" "}
+                antes de reservar.
               </h2>
             </FadeIn>
 
             <FadeIn delay={0.16}>
               <p className="mt-5 text-muted-foreground text-base md:text-lg leading-relaxed max-w-2xl">
-                De 19 a 83 m², cada tipologia tem projetos 3D prontos com opções de design para você comparar e decidir. 
-                Selecione a planta, explore os renders e solicite seu orçamento em poucos cliques.
+                Torre única de 10 pavimentos e 33 apartamentos. Clique em qualquer pavimento para ver a planta humanizada em alta.
               </p>
             </FadeIn>
 
-            {/* Value props row */}
             <FadeIn delay={0.24}>
               <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
                 <span className="flex items-center gap-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-                  Projetos 3D de alta fidelidade
+                  Áreas comuns no térreo e 5º pavimento
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-                  2 linhas de design por tipologia
+                  Garden, terraço descoberto e 1 dorm./studio
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-                  Orçamento direto em 1 clique
+                  1.600 m² construídos
                 </span>
               </div>
             </FadeIn>
@@ -760,7 +758,7 @@ export default function PlantasSection() {
           <FadeIn delay={0.8}>
             <div className="mt-10 flex items-center justify-center">
               <p className="text-sm text-muted-foreground text-center max-w-md">
-                Clique em qualquer planta acima para ver os projetos 3D decorados e solicitar o orçamento de reforma.
+                Clique em qualquer pavimento para ampliar a planta humanizada e falar com o time comercial.
               </p>
             </div>
           </FadeIn>

@@ -33,7 +33,11 @@ interface CorretorUser {
   email: string | null;
 }
 
+// Hidden until ASKELEPHANT_API_KEY secret is configured and this feature is ready to launch.
+// Set VITE_ELEPHANT_ENABLED=true in the environment to re-enable this section.
 export default function ElephantInsightsSection() {
+  if (!import.meta.env.VITE_ELEPHANT_ENABLED) return null;
+
   const [data, setData] = useState<InsightsData | null>(null);
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);

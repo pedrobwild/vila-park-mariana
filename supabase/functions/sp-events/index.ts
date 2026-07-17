@@ -17,11 +17,11 @@ function getSupabaseAdmin() {
   );
 }
 
-const PERPLEXITY_PROMPT = `Você é um analista de mercado imobiliário de short-stay (aluguel por temporada) em São Paulo.
+const PERPLEXITY_PROMPT = `Você é um analista de mercado imobiliário residencial em São Paulo, especializado no bairro Vila Mariana.
 
-Liste os PRINCIPAIS GRANDES EVENTOS que acontecerão em São Paulo nos próximos 2 anos (2025-2027) que geram alta demanda por hospedagem.
+Liste os PRINCIPAIS GRANDES EVENTOS e movimentos urbanos que acontecerão em São Paulo e no bairro Vila Mariana nos próximos 2 anos (2025-2027) que possam impactar a procura e a valorização de imóveis residenciais na região (ex: obras de mobilidade, novos empreendimentos, eventos culturais e esportivos de grande porte na cidade, expansão de infraestrutura).
 
-Para cada evento, estime o impacto na diária média de studios/apartamentos compactos na região da Consolação / Bela Vista / Paulista (região do empreendimento Urban Flex Bela Cintra).
+Para cada evento, estime o impacto no interesse por moradia na região da Vila Mariana, próxima ao metrô Vila Mariana e ao empreendimento residencial Vila Park (incorporadora Matere Bittar).
 
 Retorne um JSON válido (sem markdown, sem backticks) com esta estrutura:
 
@@ -31,30 +31,29 @@ Retorne um JSON válido (sem markdown, sem backticks) com esta estrutura:
       "name": "Nome do evento",
       "category": "esporte|música|negócios|cultura|fórmula1|carnaval|tech|outros",
       "dateRange": "Mês/Ano ou período estimado",
-      "expectedAudience": "Número estimado de visitantes/participantes",
+      "expectedAudience": "Número estimado de pessoas impactadas/participantes",
       "dailyRateImpact": "+XX%",
-      "estimatedDailyRate": "R$ XXX - R$ XXX",
-      "normalDailyRate": "R$ XXX - R$ XXX",
-      "occupancyImpact": "XX% de ocupação esperada",
+      "estimatedDailyRate": "descrição do impacto no interesse pela região",
+      "normalDailyRate": "cenário de referência sem o evento",
+      "occupancyImpact": "XX% de aumento estimado na procura por imóveis na região",
       "description": "Breve descrição do evento e por que impacta a região",
       "durationDays": 3,
       "recurring": true,
       "confidence": "alta|média|baixa"
     }
   ],
-  "baselineDaily": "R$ 200 - R$ 350",
-  "annualHighlights": "Resumo de 2 frases sobre o calendário de eventos e o potencial de receita para proprietários",
+  "baselineDaily": "cenário de referência do bairro sem eventos especiais",
+  "annualHighlights": "Resumo de 2 frases sobre o calendário de eventos e o potencial de valorização para o comprador final",
   "topMonths": ["Mês 1", "Mês 2", "Mês 3"],
-  "estimatedAnnualBoost": "+XX% de receita adicional estimada com eventos vs sem eventos"
+  "estimatedAnnualBoost": "+XX% de aumento estimado no interesse pela região com eventos vs período normal"
 }
 
 REGRAS:
 - Retorne APENAS o JSON, sem texto antes ou depois
 - Mínimo 10 eventos, máximo 20
-- Ordene por impacto na diária (maior primeiro)
-- Inclua: F1, shows internacionais, eventos de tech (Web Summit Rio pode ter edição SP), CCXP, São Paulo Fashion Week, Lollapalooza, GP de Interlagos, maratonas, congressos médicos, eventos corporativos grandes, Carnaval
-- A diária base na região da Consolação/Paulista para studios é R$ 200-350/noite em período normal
-- Seja realista nos percentuais de aumento — eventos como F1 e shows grandes podem dobrar a diária
+- Ordene por impacto no interesse pela região (maior primeiro)
+- Inclua: eventos esportivos, shows internacionais, eventos de tech, CCXP, São Paulo Fashion Week, Lollapalooza, GP de Interlagos, maratonas, congressos, obras de mobilidade urbana relevantes para Vila Mariana, expansão de infraestrutura, Carnaval
+- Foque no impacto sobre a demanda residencial e a valorização de imóveis para o comprador final, não em hospedagem de curta duração
 - Use dados reais de edições anteriores como referência
 - Escreva em português do Brasil`;
 

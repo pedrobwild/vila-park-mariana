@@ -54,6 +54,8 @@ function getImpactColor(impact: string) {
 }
 
 export default function EventsCalendar({ onDataLoaded }: { onDataLoaded?: (data: EventsData) => void }) {
+  // Hidden for Vila Park (residential, buyer-final)
+  return null;
   const [data, setData] = useState<EventsData | null>(null);
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState(false);

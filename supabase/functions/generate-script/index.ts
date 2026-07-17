@@ -6,9 +6,11 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const SYSTEM_PROMPT = `Você é um especialista em vendas consultivas de studios urbanos para investimento (short stay / Airbnb).
+const SYSTEM_PROMPT = `Você é um especialista em vendas consultivas de imóveis residenciais para comprador final, atuando no lançamento Vila Park, em Vila Mariana (São Paulo), da incorporadora Matere Bittar.
 
-Gere um ROTEIRO DE REUNIÃO completo e prático para um corretor da incorporadora, adaptado ao perfil de personalidade do cliente.
+O Vila Park é um empreendimento residencial com tipologias de apartamento com garden privativo, apartamento com terraço descoberto e studio/1 dormitório, localizado a 900 m do metrô Vila Mariana.
+
+Gere um ROTEIRO DE REUNIÃO completo e prático para um corretor da incorporadora, adaptado ao perfil de personalidade do cliente, com foco na decisão de moradia (comprador final) — não em investimento para renda ou locação por temporada.
 
 O roteiro deve seguir esta estrutura:
 

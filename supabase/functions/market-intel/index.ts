@@ -32,14 +32,14 @@ serve(async (req) => {
       );
     }
 
-    const query = `Dados atualizados do mercado de short stay e aluguel por temporada no bairro ${neighborhood}, ${city}, Brasil.
+    const query = `Dados atualizados do mercado imobiliário residencial no bairro ${neighborhood}, ${city}, Brasil.
 Inclua:
-1. Diária média de studios/apartamentos compactos no bairro ${neighborhood} (Airbnb/Booking)
-2. Taxa de ocupação média no bairro ${neighborhood}
-3. Crescimento da demanda por short stay nos últimos 12 meses na região
-4. Vantagens competitivas do bairro ${neighborhood} para short stay (proximidade a hospitais, empresas, metrô, Av. Paulista, pontos turísticos)
-5. Perfil de hóspedes mais frequentes na região (corporativo, turismo, saúde)
-6. Tendências do mercado imobiliário de studios em ${neighborhood} para 2025-2026
+1. Valor médio do m² de apartamentos residenciais no bairro ${neighborhood}
+2. Valorização imobiliária do bairro ${neighborhood} nos últimos 12 meses
+3. Perfil demográfico e de moradores do bairro ${neighborhood} (famílias, jovens profissionais, etc.)
+4. Vantagens do bairro ${neighborhood} para morar (proximidade a metrô, parques, comércio, escolas, mobilidade)
+5. Novos lançamentos residenciais e projetos de infraestrutura na região
+6. Tendências do mercado imobiliário residencial em ${neighborhood} para 2025-2026
 
 NÃO compare com outros bairros. Foque exclusivamente nos dados do bairro ${neighborhood}. Seja objetivo e use números quando possível.`;
 
@@ -54,7 +54,7 @@ NÃO compare com outros bairros. Foque exclusivamente nos dados do bairro ${neig
         messages: [
           {
             role: "system",
-            content: `Você é um analista de mercado imobiliário especializado em short stay e investimentos em studios urbanos no Brasil. Sempre responda em português do Brasil. Seja objetivo, use dados e números reais quando disponíveis. Formate a resposta em seções claras com títulos. O objetivo é fornecer dados que ajudem um investidor a tomar a decisão de comprar um studio no empreendimento "${propertyName}" localizado no bairro ${neighborhood}, ${city}. NÃO compare com outros bairros — foque exclusivamente nos dados e vantagens do bairro ${neighborhood}.`,
+            content: `Você é um analista de mercado imobiliário residencial especializado no bairro Vila Mariana e região, em São Paulo. Sempre responda em português do Brasil. Seja objetivo, use dados e números reais quando disponíveis. Formate a resposta em seções claras com títulos. O objetivo é fornecer dados que ajudem um comprador final a decidir pela compra de um apartamento no empreendimento residencial "${propertyName}", da incorporadora Matere Bittar, localizado no bairro ${neighborhood}, ${city}. NÃO compare com outros bairros — foque exclusivamente nos dados e vantagens do bairro ${neighborhood}.`,
           },
           { role: "user", content: query },
         ],
