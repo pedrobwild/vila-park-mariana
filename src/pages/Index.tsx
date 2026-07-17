@@ -474,30 +474,6 @@ export default function Index() {
       </section>
 
 
-      {/* GUIA DO COMPRADOR — quick links */}
-      <section id="guia" className="border-b border-border/40 bg-background">
-        <div className="max-w-7xl mx-auto px-5 md:px-6 py-14 md:py-24">
-          <FadeIn>
-            <Badge className="mb-3 bg-accent/10 text-accent border-accent/20 hover:bg-accent/15 text-xs font-semibold tracking-wide px-3 py-1">
-              {t("guide.badge")}
-            </Badge>
-            <h2 className="font-display text-2xl md:text-4xl font-bold text-foreground leading-tight max-w-2xl">
-              {t("guide.titleA")} <span className="text-accent">{t("guide.titleB")}</span>
-            </h2>
-            <p className="mt-3 text-muted-foreground max-w-lg">{t("guide.subtitle")}</p>
-          </FadeIn>
-          <FadeIn delay={0.15} className="mt-8">
-            <Link to="/guia-comprador">
-              <Button size="lg" className="min-h-[52px] font-bold bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg shadow-accent/25">
-                {t("guide.cta")}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-          </FadeIn>
-        </div>
-      </section>
-
-
       {/* FOOTER */}
       <footer className="border-t border-border/40 bg-muted/25">
         <div className="max-w-7xl mx-auto px-5 md:px-6 py-8 md:py-10 pb-24 md:pb-10">
@@ -505,7 +481,7 @@ export default function Index() {
             <p>{t("footer.rights")}</p>
             <nav aria-label={t("footer.ariaLabel")} className="flex items-center gap-5">
               <Link to="/ferramentas" className="hover:text-foreground transition-colors min-h-[44px] flex items-center">{t("footer.tools")}</Link>
-              <Link to="/guia-comprador" className="hover:text-foreground transition-colors min-h-[44px] flex items-center">{t("footer.guide")}</Link>
+              <Link to="/guia-investidor" className="hover:text-foreground transition-colors min-h-[44px] flex items-center">{t("footer.guideInvestor")}</Link>
             </nav>
           </div>
           <p className="mt-6 text-[11px] leading-relaxed text-muted-foreground/70 max-w-4xl">

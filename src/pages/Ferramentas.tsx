@@ -59,9 +59,9 @@ export default function Ferramentas() {
                   Falar no WhatsApp
                 </Button>
               </a>
-              <Link to="/guia-comprador">
+              <Link to="/guia-investidor">
                 <Button size="lg" variant="outline" className="min-h-[48px] gap-2 w-full sm:w-auto">
-                  Ver Guia do Comprador
+                  Ver Guia do Investidor
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>

@@ -122,11 +122,11 @@ export default function CorretorPage() {
                     <FileText className="h-5 w-5 text-accent" />
                   </div>
                   <div>
-                    <p className="font-display font-bold text-foreground mb-1">Guia do Comprador</p>
+                    <p className="font-display font-bold text-foreground mb-1">Guia do Investidor</p>
                     <p className="text-muted-foreground text-sm leading-relaxed mb-3">
-                      Plantas, fotos e diferenciais do Vila Park Vila Mariana.
+                      Argumentos de localização, tipologias e dados de mercado do Vila Park Vila Mariana.
                     </p>
-                    <a href="/guia-comprador">
+                    <a href="/guia-investidor">
                       <Button size="sm" variant="outline" className="gap-1.5">
                         Acessar
                         <ArrowRight className="h-3.5 w-3.5" />
@@ -212,7 +212,7 @@ export default function CorretorPage() {
                   Falar com a equipe comercial
                 </Button>
               </a>
-              <a href="/guia-comprador">
+              <a href="/guia-investidor">
                 <Button size="lg" variant="outline" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 gap-2">
                   Ver o empreendimento
                   <ArrowRight className="h-4 w-4" />
