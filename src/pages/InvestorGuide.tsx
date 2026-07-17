@@ -12,31 +12,59 @@ import { Separator } from "@/components/ui/separator";
 import { PROPERTY } from "@/data/propertyData";
 import { WHATSAPP_PHONE } from "@/data/surroundings";
 import ReservationForm from "@/components/ReservationForm";
+import { POIS } from "@/data/surroundings";
 import {
   ArrowRight,
   Briefcase,
+  Building2,
+  Coffee,
+  Compass,
+  Dumbbell,
   GraduationCap,
+  Hammer,
   KeyRound,
   MapPin,
   MessageCircle,
   Phone,
+  ShieldCheck,
+  ShoppingBag,
   Sparkles,
+  Sofa,
   Train,
+  Trees,
   TrendingUp,
+  Utensils,
   XCircle,
 } from "lucide-react";
 
 type SectionId =
   | "hero"
   | "location"
+  | "nearby"
   | "typologies"
+  | "amenities"
+  | "progress"
   | "market"
   | "howItWorks"
   | "antiChecklist"
   | "faq"
   | "contact";
 
-const sectionIds: SectionId[] = ["hero", "location", "typologies", "market", "howItWorks", "antiChecklist", "faq", "contact"];
+const sectionIds: SectionId[] = ["hero", "location", "nearby", "typologies", "amenities", "progress", "market", "howItWorks", "antiChecklist", "faq", "contact"];
+
+const sectionLabels: Record<SectionId, string> = {
+  hero: "Início",
+  location: "Localização",
+  nearby: "Entorno",
+  typologies: "Tipologias",
+  amenities: "Áreas comuns",
+  progress: "Obra",
+  market: "Mercado",
+  howItWorks: "Como funciona",
+  antiChecklist: "Cuidados",
+  faq: "FAQ",
+  contact: "Contato",
+};
 
 function SectionLabel({ children }: { children: ReactNode }) {
   return <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent mb-3">{children}</p>;
@@ -140,7 +168,7 @@ export default function InvestorGuide() {
                     : "bg-transparent text-muted-foreground hover:text-foreground hover:bg-secondary",
                 )}
               >
-                {t(`investorGuide.nav.${id}`)}
+                {sectionLabels[id]}
               </button>
             ))}
           </div>
@@ -184,10 +212,11 @@ export default function InvestorGuide() {
                   </Button>
                 </div>
 
-                <div className="mt-10 grid gap-3 sm:grid-cols-3">
-                  <KpiCard value="900 m" label={t("investorGuide.hero.kpi.metro")} highlight />
-                  <KpiCard value={PROPERTY.address} label={t("investorGuide.hero.kpi.address")} />
-                  <KpiCard value={`${PROPERTY.units} apartamentos`} label={t("investorGuide.hero.kpi.units")} />
+                <div className="mt-10 grid gap-3 grid-cols-2 lg:grid-cols-4">
+                  <KpiCard value="900 m" label="Metrô Vila Mariana" highlight />
+                  <KpiCard value="850 m" label="FMU (universidade)" />
+                  <KpiCard value="2,5 km" label="Av. Paulista" />
+                  <KpiCard value="950 m" label="Parque da Aclimação" />
                 </div>
               </motion.div>
 
@@ -268,6 +297,148 @@ export default function InvestorGuide() {
                 <Sparkles className="mt-0.5 h-4 w-4 text-accent shrink-0" />
                 {t("investorGuide.typologies.recommendation")}
               </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ENTORNO / NEARBY */}
+        <section id="nearby" className="scroll-mt-32">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
+            <SectionLabel>Entorno estratégico</SectionLabel>
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3 max-w-3xl">
+              A Vila Mariana joga a favor da sua locação.
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mb-8">
+              Bairro consolidado, com metrô, universidades, polo de empregos e lazer no raio de caminhada — fatores que sustentam a demanda por moradia.
+            </p>
+
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {[
+                { icon: Train, title: "Mobilidade", items: POIS.filter((p) => p.category === "mobility") },
+                { icon: GraduationCap, title: "Universidades", items: POIS.filter((p) => p.category === "education") },
+                { icon: Trees, title: "Parques e lazer", items: POIS.filter((p) => p.category === "leisure").slice(0, 4) },
+                { icon: ShoppingBag, title: "Serviços e compras", items: POIS.filter((p) => p.category === "services").slice(0, 5) },
+                { icon: Utensils, title: "Gastronomia", items: POIS.filter((p) => p.category === "gastronomy") },
+                { icon: Briefcase, title: "Polo de empregos", items: [{ name: "Av. Paulista", distance: "2,5 km" }, { name: "Região da Paulista", distance: "corredor de escritórios" }] },
+              ].map((group) => (
+                <Card key={group.title} className="card-elevated border-border/60 h-full">
+                  <CardContent className="p-5">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="h-9 w-9 rounded-lg bg-accent/10 flex items-center justify-center">
+                        <group.icon className="h-4 w-4 text-accent" />
+                      </div>
+                      <h3 className="font-semibold text-foreground">{group.title}</h3>
+                    </div>
+                    <ul className="space-y-2">
+                      {group.items.map((item) => (
+                        <li key={item.name} className="flex items-start justify-between gap-3 text-sm border-b border-border/40 pb-2 last:border-0 last:pb-0">
+                          <span className="text-foreground">{item.name}</span>
+                          <span className="text-muted-foreground shrink-0">{item.distance}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <div className="mt-8 rounded-xl border border-accent/20 bg-accent/5 p-5 flex items-start gap-3">
+              <Compass className="mt-0.5 h-5 w-5 text-accent shrink-0" />
+              <p className="text-sm text-foreground leading-relaxed">
+                <strong>Por que isso importa para renda:</strong> imóveis próximos a metrô, universidades e polos de emprego historicamente apresentam menor vacância e giro mais rápido de inquilinos — perfil compatível com o produto Vila Park (studios e 1 dorm. sem vaga).
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ÁREAS COMUNS / AMENITIES */}
+        <section id="amenities" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
+            <SectionLabel>Áreas comuns entregues equipadas</SectionLabel>
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3 max-w-3xl">
+              Térreo e 5º pavimento decorados e mobiliados na entrega.
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mb-8">
+              Áreas comuns finalizadas reduzem o custo de preparação do imóvel para locação e melhoram a percepção de valor do inquilino desde a visita.
+            </p>
+
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {[
+                { icon: Sofa, title: "Lazer decorado", text: "Espaços mobiliados no térreo e no 5º pavimento, entregues prontos para uso." },
+                { icon: Building2, title: "Lobby de entrada", text: "Portaria e recepção que reforçam a percepção de padrão do empreendimento." },
+                { icon: Dumbbell, title: "Infraestrutura de lazer", text: "Áreas de convivência que ampliam o apelo do apartamento para o inquilino." },
+                { icon: ShieldCheck, title: "Infra para ar-condicionado", text: "Preparação técnica na unidade — um item a menos para o proprietário resolver." },
+              ].map((a) => (
+                <Card key={a.title} className="card-elevated border-border/60 h-full">
+                  <CardContent className="p-5">
+                    <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center mb-3">
+                      <a.icon className="h-5 w-5 text-accent" />
+                    </div>
+                    <h3 className="font-semibold text-foreground mb-2">{a.title}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{a.text}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <p className="mt-6 text-xs text-muted-foreground">
+              Imagens e descrições ilustrativas. A decoração é apenas uma sugestão — móveis e utensílios não integram o contrato de compra e venda.
+            </p>
+          </div>
+        </section>
+
+        {/* OBRA / PROGRESS */}
+        <section id="progress" className="scroll-mt-32">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
+            <SectionLabel>Obra em andamento</SectionLabel>
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3 max-w-3xl">
+              Acompanhe o canteiro em imagens reais.
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mb-8">
+              Registros atualizados do empreendimento — última atualização em <strong>07/07/2026</strong>.
+            </p>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card className="card-elevated overflow-hidden border-border/60">
+                <img
+                  src="https://vilaparkmariana.com.br/wp-content/uploads/2026/07/fachada_07_07.jpeg"
+                  alt="Fachada do Vila Park em 07/07/2026"
+                  className="w-full h-64 object-cover"
+                  loading="lazy"
+                />
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Hammer className="h-4 w-4 text-accent" />
+                    <h3 className="font-semibold text-foreground">Fachada · 07/07/2026</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground">Avanço da fachada no registro mais recente do canteiro.</p>
+                </CardContent>
+              </Card>
+
+              <Card className="card-elevated overflow-hidden border-border/60">
+                <img
+                  src="https://vilaparkmariana.com.br/wp-content/uploads/2025/06/obras_14_05-1.jpeg"
+                  alt="Obra Vila Park em 14/05/2025"
+                  className="w-full h-64 object-cover"
+                  loading="lazy"
+                />
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Hammer className="h-4 w-4 text-accent" />
+                    <h3 className="font-semibold text-foreground">Canteiro · 14/05/2025</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground">Registro anterior do andamento estrutural.</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="mt-6">
+              <a href="/#progress">
+                <Button variant="outline" size="lg" className="min-h-[46px]">
+                  Ver todas as fotos da obra
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </a>
             </div>
           </div>
         </section>
