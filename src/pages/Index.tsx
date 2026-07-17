@@ -366,7 +366,9 @@ export default function Index() {
           </FadeIn>
 
           <FadeIn delay={0.1} className="mt-4">
-            <MarketIntelSection />
+            <Suspense fallback={<div className="min-h-[200px]" />}>
+              <MarketIntelSection />
+            </Suspense>
           </FadeIn>
 
           <FadeIn delay={0.15} className="mt-4 flex flex-col sm:flex-row gap-3">
