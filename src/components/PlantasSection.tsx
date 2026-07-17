@@ -758,7 +758,7 @@ export default function PlantasSection() {
           <FadeIn delay={0.8}>
             <div className="mt-10 flex items-center justify-center">
               <p className="text-sm text-muted-foreground text-center max-w-md">
-                Clique em qualquer planta acima para ver os projetos 3D decorados e falar com o time comercial.
+                Clique em qualquer pavimento para ampliar a planta humanizada e falar com o time comercial.
               </p>
             </div>
           </FadeIn>
