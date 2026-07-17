@@ -505,7 +505,7 @@ export default function Index() {
             <p>{t("footer.rights")}</p>
             <nav aria-label={t("footer.ariaLabel")} className="flex items-center gap-5">
               <Link to="/ferramentas" className="hover:text-foreground transition-colors min-h-[44px] flex items-center">{t("footer.tools")}</Link>
-              <Link to="/guia-comprador" className="hover:text-foreground transition-colors min-h-[44px] flex items-center">{t("footer.guide")}</Link>
+              <Link to="/guia-investidor" className="hover:text-foreground transition-colors min-h-[44px] flex items-center">{t("footer.guideInvestor")}</Link>
             </nav>
           </div>
           <p className="mt-6 text-[11px] leading-relaxed text-muted-foreground/70 max-w-4xl">
