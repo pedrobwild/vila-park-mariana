@@ -9,7 +9,10 @@
     "ferramentas": "Ferramentas",
     "urbanFlex": "Guia do Comprador",
     "back": "Voltar",
-    "menu": "Menu"
+    "menu": "Menu",
+    "guidesGroup": "Guias",
+    "guideBuyer": "Guia do Comprador",
+    "guideInvestor": "Guia do Investidor"
   },
   "quickNav": {
     "plantas": "Plantas",
@@ -120,12 +123,30 @@
     "subtitle": "Localização, tipologias, áreas comuns e as etapas até a reserva.",
     "cta": "Acessar o Guia do Comprador",
     "items": {
-      "quiz": { "title": "Localização", "desc": "Como o entorno da Vila Mariana valoriza o dia a dia." },
-      "simulator": { "title": "Financiamento", "desc": "Simule parcela, entrada e prazo para o seu bolso." },
-      "neighborhood": { "title": "Entorno", "desc": "Parques, metrô, universidades e serviços próximos." },
-      "choice": { "title": "Tipologias", "desc": "Garden, terraço e 1 dormitório: qual combina com você." },
-      "readiness": { "title": "Reserva", "desc": "Passo a passo do formulário ao contato comercial." },
-      "income": { "title": "Áreas comuns", "desc": "Lazer decorado e mobiliado no térreo e no 5º pavimento." }
+      "quiz": {
+        "title": "Localização",
+        "desc": "Como o entorno da Vila Mariana valoriza o dia a dia."
+      },
+      "simulator": {
+        "title": "Financiamento",
+        "desc": "Simule parcela, entrada e prazo para o seu bolso."
+      },
+      "neighborhood": {
+        "title": "Entorno",
+        "desc": "Parques, metrô, universidades e serviços próximos."
+      },
+      "choice": {
+        "title": "Tipologias",
+        "desc": "Garden, terraço e 1 dormitório: qual combina com você."
+      },
+      "readiness": {
+        "title": "Reserva",
+        "desc": "Passo a passo do formulário ao contato comercial."
+      },
+      "income": {
+        "title": "Áreas comuns",
+        "desc": "Lazer decorado e mobiliado no térreo e no 5º pavimento."
+      }
     }
   },
   "finalCta": {
@@ -149,5 +170,152 @@
     "loading": "Carregando...",
     "back": "Voltar",
     "close": "Fechar"
+  },
+  "market": {
+    "eyebrow": "Dados de mercado",
+    "title": "Dados de Mercado · Vila Mariana",
+    "subtitle": "Consulte informações atualizadas sobre o mercado imobiliário do bairro para embasar sua decisão de compra ou investimento.",
+    "ctaGuide": "Ver Guia do Investidor",
+    "ctaSimulate": "Simular financiamento"
+  },
+  "invest": {
+    "why": {
+      "eyebrow": "Por que investir aqui",
+      "title": "Fundamentos que sustentam a demanda por locação na Vila Mariana.",
+      "mobility": {
+        "title": "Mobilidade",
+        "desc": "900 m do metrô Vila Mariana (Linha 1-Azul) · 1,1 km do Ana Rosa (integração Linhas 1 e 2)."
+      },
+      "university": {
+        "title": "Demanda universitária",
+        "desc": "FMU 850 m · ESPM 1,5 km · Belas Artes 1,5 km."
+      },
+      "jobs": {
+        "title": "Polos de emprego e lazer",
+        "desc": "Av. Paulista 2,5 km · Parque da Aclimação 950 m · Ibirapuera 3,1 km."
+      },
+      "product": {
+        "title": "Produto de renda",
+        "desc": "Studios e 1 dorm. de ticket acessível, sem vaga (perfil inquilino que usa metrô). Áreas comuns entregues decoradas e equipadas (térreo e 5º pav.)."
+      },
+      "disclaimer": "Argumentos de potencial locatício — não constituem promessa de rentabilidade."
+    }
+  },
+  "investorGuide": {
+    "nav": {
+      "hero": "Início",
+      "location": "Localização",
+      "typologies": "Tipologias",
+      "market": "Mercado",
+      "howItWorks": "Como funciona",
+      "antiChecklist": "Cuidados",
+      "faq": "FAQ",
+      "contact": "Contato"
+    },
+    "hero": {
+      "badge": "Guia do Investidor",
+      "titleA": "Vila Park · Um ativo residencial",
+      "titleB": "na Vila Mariana.",
+      "subtitle": "Um guia com informações práticas para quem avalia o Vila Park como opção de investimento residencial na Vila Mariana.",
+      "ctaReserve": "Fazer minha reserva",
+      "ctaTalk": "Falar com a equipe",
+      "kpi": {
+        "metro": "Do metrô Vila Mariana",
+        "address": "Endereço · Vila Mariana",
+        "units": "Torre única · 10 pavimentos"
+      }
+    },
+    "location": {
+      "eyebrow": "Por que a localização",
+      "title": "O que sustenta a demanda por locação no entorno do Vila Park.",
+      "mobility": {
+        "title": "Mobilidade",
+        "text": "A 900 m do metrô Vila Mariana (Linha 1-Azul) e a 1,1 km do Ana Rosa (integração com a Linha 2-Verde), o empreendimento atende a um perfil de morador que depende do transporte público — um fator relevante de retenção de inquilinos ao longo do tempo."
+      },
+      "university": {
+        "title": "Demanda universitária",
+        "text": "A proximidade com a FMU (850 m), a ESPM (1,5 km) e a Belas Artes (1,5 km) cria um fluxo constante de estudantes em busca de moradia próxima, um público tradicionalmente ativo no mercado de locação."
+      },
+      "jobs": {
+        "title": "Polos de emprego e lazer",
+        "text": "A Av. Paulista (2,5 km), um dos principais polos de emprego da cidade, e áreas de lazer como o Parque da Aclimação (950 m) e o Ibirapuera (3,1 km) ampliam o interesse de profissionais que buscam morar perto do trabalho e do lazer."
+      },
+      "product": {
+        "title": "Produto de renda",
+        "text": "Studios e apartamentos de 1 dormitório com ticket de entrada mais acessível, sem vaga de garagem — um desenho pensado para o perfil de inquilino que se desloca a pé ou de metrô. As áreas comuns serão entregues decoradas e equipadas, no térreo e no 5º pavimento."
+      }
+    },
+    "typologies": {
+      "eyebrow": "Tipologias",
+      "title": "Escolher a tipologia certa para renda.",
+      "subtitle": "Cada planta atende a um perfil diferente de inquilino. Veja o que considerar antes de decidir.",
+      "recommendation": "Recomendação: para quem busca maior liquidez de locação, o studio/1 dormitório tende a ser o mais procurado pelo ticket de entrada mais acessível.",
+      "studio": {
+        "title": "1 dormitório / Studio",
+        "profile": "Perfil de inquilino: estudantes e profissionais que priorizam mobilidade e praticidade, sem depender de veículo próprio."
+      },
+      "garden": {
+        "title": "Apartamento com garden privativo",
+        "profile": "Perfil de inquilino: quem busca mais espaço e uma área externa privativa, como casais ou pequenas famílias."
+      },
+      "terrace": {
+        "title": "Apartamento com terraço descoberto",
+        "profile": "Perfil de inquilino: moradores que valorizam área externa para lazer e planejam permanecer por mais tempo."
+      }
+    },
+    "market": {
+      "eyebrow": "Dados de mercado",
+      "title": "Consulte dados atualizados do mercado."
+    },
+    "howItWorks": {
+      "eyebrow": "Como funciona a reserva",
+      "title": "Passo a passo até a sua reserva.",
+      "step1": {
+        "title": "Preencha o formulário",
+        "text": "Envie seus dados de contato pelo formulário desta página."
+      },
+      "step2": {
+        "title": "Contato do time comercial",
+        "text": "Nossa equipe entra em contato para tirar dúvidas e apresentar condições."
+      },
+      "step3": {
+        "title": "Visita e apresentação",
+        "text": "Agende uma visita ou apresentação detalhada do empreendimento."
+      },
+      "step4": {
+        "title": "Reserva formal",
+        "text": "A reserva é formalizada após o Registro de Incorporação Imobiliária."
+      }
+    },
+    "anti": {
+      "eyebrow": "Anti-checklist do investidor",
+      "title": "Cuidados antes de decidir.",
+      "item1": "Não conte com rentabilidade garantida — o resultado depende do mercado de locação e da gestão do imóvel.",
+      "item2": "Não subestime o custo de mobília e preparação do imóvel para locação.",
+      "item3": "Não ignore o condomínio e o IPTU no cálculo do seu retorno líquido.",
+      "item4": "Não decida sem simular o financiamento.",
+      "ctaSimulate": "Simular financiamento"
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "title": "Perguntas frequentes de investidores",
+      "q1": "Posso alugar por temporada?",
+      "a1": "A viabilidade de locação por temporada depende das regras da convenção de condomínio, que ainda será constituída. Recomendamos confirmar essa possibilidade com a equipe comercial e, futuramente, com o síndico do condomínio.",
+      "q2": "Qual perfil de inquilino esperar?",
+      "a2": "Dado o entorno — metrô, universidades e polos de emprego próximos — o perfil mais provável é de estudantes e jovens profissionais que buscam praticidade e mobilidade, sem depender de carro.",
+      "q3": "Vale a pena sem vaga de garagem?",
+      "a3": "As unidades sem vaga foram desenhadas para reduzir o ticket de entrada e atrair um público que usa o transporte público — algo favorecido pela distância de apenas 900 m até o metrô Vila Mariana.",
+      "q4": "Como funciona o financiamento na planta?",
+      "a4": "Use nossa ferramenta de simulação para estimar parcelas, entrada e prazo, e converse com o time comercial para conhecer as condições específicas do Vila Park.",
+      "q5": "Quando começa a gerar renda?",
+      "a5": "A geração de renda por locação só é possível após a entrega das chaves. Fale com o time comercial para saber a previsão de entrega."
+    },
+    "contact": {
+      "eyebrow": "Próximo passo",
+      "title": "Fale com o time e receba mais informações",
+      "subtitle": "Preencha o formulário ou fale diretamente com a equipe comercial para tirar dúvidas sobre o Vila Park como opção de investimento.",
+      "talk": "Falar com a equipe comercial"
+    },
+    "disclaimer": "Este guia apresenta argumentos de potencial locatício, com base em fundamentos de localização e produto. Não constitui promessa de rentabilidade, valorização ou retorno financeiro. Apenas para reserva — o empreendimento só será comercializado após o Registro de Incorporação Imobiliária."
   }
 }

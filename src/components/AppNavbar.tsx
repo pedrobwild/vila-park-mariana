@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Building2, Wrench, ArrowLeft, Menu, Sparkles } from "lucide-react";
+import { Building2, TrendingUp, Wrench, ArrowLeft, Menu, Sparkles } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -53,9 +53,14 @@ export default function AppNavbar() {
               </Button>
             </Link>
           ))}
-          <Link to="/guia-comprador">
-            <Button variant="outline" size="sm">{t("nav.urbanFlex")}</Button>
-          </Link>
+          <div className="flex items-center gap-1 rounded-md border border-border/60 p-0.5">
+            <Link to="/guia-comprador">
+              <Button variant={pathname === "/guia-comprador" ? "secondary" : "ghost"} size="sm" className="h-7">{t("nav.guideBuyer")}</Button>
+            </Link>
+            <Link to="/guia-investidor">
+              <Button variant={pathname === "/guia-investidor" ? "secondary" : "ghost"} size="sm" className="h-7">{t("nav.guideInvestor")}</Button>
+            </Link>
+          </div>
           <LanguageSwitcher variant="compact" className="ml-1" />
         </div>
 
@@ -101,6 +106,9 @@ export default function AppNavbar() {
                 </Link>
               );
             })}
+            <p className="px-3 pt-2 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+              {t("nav.guidesGroup")}
+            </p>
             <Link
               to="/guia-comprador"
               onClick={() => setMobileOpen(false)}
@@ -111,7 +119,19 @@ export default function AppNavbar() {
               }`}
             >
               <Building2 className="h-4 w-4 shrink-0" />
-              {t("nav.urbanFlex")}
+              {t("nav.guideBuyer")}
+            </Link>
+            <Link
+              to="/guia-investidor"
+              onClick={() => setMobileOpen(false)}
+              className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm transition-colors min-h-[44px] ${
+                pathname === "/guia-investidor"
+                  ? "bg-primary text-primary-foreground font-semibold"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+              }`}
+            >
+              <TrendingUp className="h-4 w-4 shrink-0" />
+              {t("nav.guideInvestor")}
             </Link>
             <div className="pt-3 mt-3 border-t border-border/40">
               <LanguageSwitcher variant="full" className="w-full justify-start" />
