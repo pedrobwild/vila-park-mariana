@@ -366,7 +366,13 @@ export default function Index() {
             <p className="mt-3 text-muted-foreground max-w-2xl">{t("market.subtitle")}</p>
           </FadeIn>
 
-          <FadeIn delay={0.1} className="mt-4">
+          <FadeIn delay={0.08} className="mt-8">
+            <Suspense fallback={<div className="min-h-[300px]" />}>
+              <VilaMarianaYieldSection />
+            </Suspense>
+          </FadeIn>
+
+          <FadeIn delay={0.15} className="mt-10">
             <Suspense fallback={<div className="min-h-[200px]" />}>
               <MarketIntelSection />
             </Suspense>
