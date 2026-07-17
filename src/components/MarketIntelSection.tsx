@@ -89,26 +89,14 @@ export default function MarketIntelSection({ property = DEFAULT_PROPERTY }: Mark
     } catch {}
   }, []);
 
-  // Auto-fetch on first scroll into view
+  // Auto-fetch on mount (no button interaction required)
   useEffect(() => {
-    if (!sectionRef.current || autoFetchedRef.current) return;
-    const el = sectionRef.current;
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting && !autoFetchedRef.current) {
-            autoFetchedRef.current = true;
-            fetchIntel(true);
-            obs.disconnect();
-          }
-        });
-      },
-      { rootMargin: "200px" }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
+    if (autoFetchedRef.current) return;
+    autoFetchedRef.current = true;
+    fetchIntel(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
 
   // Simple markdown-like rendering (bold, headings, lists)
