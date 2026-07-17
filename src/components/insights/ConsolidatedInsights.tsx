@@ -62,7 +62,7 @@ export default function ConsolidatedInsights() {
             Visão Consolidada
           </h2>
           <p className="text-muted-foreground mt-1 max-w-xl">
-            Insights extraídos de todas as reuniões com leads: perfis, objeções, argumentos que convertem e sinais de compra.
+            Insights extraídos das reuniões com leads captados pelo formulário de reserva do Vila Park: perfis, objeções, argumentos que convertem e sinais de compra.
           </p>
         </div>
         <div className="flex items-end gap-3 shrink-0">
