@@ -473,29 +473,6 @@ export default function Index() {
         </div>
       </section>
 
-      {/* RESERVA / FORMULÁRIO */}
-      <section id="reserva" className="border-b border-border/40 bg-muted/25">
-        <div className="max-w-7xl mx-auto px-5 md:px-6 py-14 md:py-24">
-          <div className="grid gap-10 lg:grid-cols-2 lg:gap-14 items-start">
-            <FadeIn>
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent mb-3">{t("reservation.eyebrow")}</p>
-              <h2 className="font-display text-2xl md:text-4xl font-bold text-foreground">{t("reservation.title")}</h2>
-              <p className="mt-3 text-muted-foreground leading-relaxed">{t("reservation.subtitle")}</p>
-              <div className="mt-6 space-y-2 text-sm text-muted-foreground">
-                <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-accent" />{PROPERTY.address} — {PROPERTY.neighborhood}, {PROPERTY.city}</p>
-                <p className="flex items-center gap-2"><Building2 className="h-4 w-4 text-accent" />{PROPERTY.incorporator}</p>
-              </div>
-            </FadeIn>
-            <FadeIn delay={0.1}>
-              <Card className="border-border/60">
-                <CardContent className="p-5 md:p-7">
-                  <ReservationForm />
-                </CardContent>
-              </Card>
-            </FadeIn>
-          </div>
-        </div>
-      </section>
 
       {/* GUIA DO COMPRADOR — quick links */}
       <section id="guia" className="border-b border-border/40 bg-background">
@@ -520,27 +497,6 @@ export default function Index() {
         </div>
       </section>
 
-      {/* CTA FINAL */}
-      <section>
-        <div className="max-w-7xl mx-auto px-5 md:px-6 py-14 md:py-24">
-          <FadeIn className="text-center max-w-2xl mx-auto">
-            <h2 className="font-display text-2xl md:text-4xl font-bold text-foreground">{t("finalCta.title")}</h2>
-            <p className="mt-3 md:mt-4 text-muted-foreground text-[15px] md:text-lg leading-relaxed">{t("finalCta.subtitle")}</p>
-            <div className="mt-6 md:mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-              <Button size="lg" className="min-h-[52px]" onClick={() => window.open(whatsappLink, "_blank")}>
-                <MessageCircle className="mr-2 h-4 w-4" />
-                {t("finalCta.talk")}
-              </Button>
-              <a href="#tipologias">
-                <Button size="lg" variant="outline" className="min-h-[52px] w-full sm:w-auto">
-                  {t("finalCta.viewPlans")}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </a>
-            </div>
-          </FadeIn>
-        </div>
-      </section>
 
       {/* FOOTER */}
       <footer className="border-t border-border/40 bg-muted/25">
