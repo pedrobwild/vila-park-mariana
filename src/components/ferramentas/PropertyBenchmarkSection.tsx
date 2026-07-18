@@ -121,7 +121,7 @@ export default function PropertyBenchmarkSection() {
             <strong className="text-foreground">Por que comparar?</strong> A renda fixa paga juros sobre o capital, mas o imóvel para short stay combina <strong className="text-foreground">renda recorrente + valorização patrimonial</strong>. Em cenários de queda da Selic, o yield do imóvel se mantém enquanto a renda fixa diminui.
           </p>
           <p className="text-[11px] text-muted-foreground/80">
-            Selic 14,75% e CDI: mar/2026 (Copom) · IFIX: DY 12 meses (isento de IR para PF) · Poupança: regra Selic &gt; 8,5%. Yield do imóvel: média das tipologias com {PROPERTY.avgOccupancy}% ocupação, descontando ~25% de custos operacionais.
+            Vigência das taxas: {BENCHMARK_RATES.vintage} · Selic {BENCHMARK_RATES.selic}% · CDI {BENCHMARK_RATES.cdi}% · IFIX {BENCHMARK_RATES.ifix}% (DY 12m, isento IR PF) · Poupança {BENCHMARK_RATES.poupanca}% (regra Selic &gt; 8,5%). Yield do imóvel: média das tipologias com {PROPERTY.avgOccupancy}% ocupação, descontando ~25% de custos operacionais.
           </p>
         </div>
       </div>
