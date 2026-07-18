@@ -42,23 +42,10 @@
     "eyebrow": "Why Vila Park",
     "title": "Location, mobility and accessible pricing to live well in Vila Mariana.",
     "items": {
-      "location": {
-        "title": "900 m from the subway",
-        "desc": "R. Baltazar Lisboa, 543 — 900 m from Vila Mariana subway and 950 m from Aclimação Park."
-      },
-      "design": {
-        "title": "Furnished common areas",
-        "desc": "Amenities delivered fully equipped, furnished and decorated on the ground and 5th floors."
-      },
-      "construction": {
-        "title": "Construction in progress",
-        "desc": "Follow construction progress with fresh site photos."
-      },
-      "returnValidated": {
-        "title": "Contemporary architecture",
-        "descWith": "Single tower with 33 apartments and 1,600 sqm built, air-conditioning infrastructure ready.",
-        "descFallback": "Single tower with 33 apartments and 1,600 sqm built."
-      }
+      "location": { "title": "900 m from the subway", "desc": "R. Baltazar Lisboa, 543 — 900 m from Vila Mariana subway and 950 m from Aclimação Park." },
+      "design": { "title": "Furnished common areas", "desc": "Amenities delivered fully equipped, furnished and decorated on the ground and 5th floors." },
+      "construction": { "title": "Construction in progress", "desc": "Follow construction progress with fresh site photos." },
+      "returnValidated": { "title": "Contemporary architecture", "descWith": "Single tower with 33 apartments and 1,600 sqm built, air-conditioning infrastructure ready.", "descFallback": "Single tower with 33 apartments and 1,600 sqm built." }
     },
     "proof": {
       "incorporator": "Matere Bittar Incorporações",
@@ -71,18 +58,9 @@
     "eyebrow": "Typologies",
     "title": "Three ways to live at Vila Park.",
     "subtitle": "Choose between a private garden, an open-terrace apartment or a 1-bedroom/studio.",
-    "garden": {
-      "title": "Apartment with private garden",
-      "desc": "Private outdoor area on the ground floor, integrated to the unit."
-    },
-    "terrace": {
-      "title": "Apartment with open terrace",
-      "desc": "Open terrace for outdoor leisure within your unit."
-    },
-    "studio": {
-      "title": "1 bedroom / studio",
-      "desc": "Compact layout, ideal for living close to Vila Mariana subway."
-    }
+    "garden": { "title": "Apartment with private garden", "desc": "Private outdoor area on the ground floor, integrated to the unit." },
+    "terrace": { "title": "Apartment with open terrace", "desc": "Open terrace for outdoor leisure within your unit." },
+    "studio": { "title": "1 bedroom / studio", "desc": "Compact layout, ideal for living close to Vila Mariana subway." }
   },
   "progress": {
     "eyebrow": "Construction progress",
@@ -105,13 +83,9 @@
     "eyebrow": "Reservation",
     "title": "Fill in and secure your reservation.",
     "subtitle": "Our sales team will confirm availability and send you the full material.",
-    "name": "Name",
-    "email": "Email",
-    "phone": "Phone",
-    "message": "Message",
+    "name": "Name", "email": "Email", "phone": "Phone", "message": "Message",
     "messagePlaceholder": "Tell us a bit of what you're looking for (typology, timing, payment)…",
-    "submit": "Submit reservation",
-    "sending": "Sending…",
+    "submit": "Submit reservation", "sending": "Sending…",
     "success": "Reservation received — our team will contact you shortly.",
     "error": "Couldn't send. Please try again or reach us on WhatsApp.",
     "whatsapp": "Chat on WhatsApp"
@@ -123,30 +97,12 @@
     "subtitle": "Location, typologies, amenities and the steps to reserve your unit.",
     "cta": "Open the Buyer Guide",
     "items": {
-      "quiz": {
-        "title": "Location",
-        "desc": "How Vila Mariana's surroundings enhance daily life."
-      },
-      "simulator": {
-        "title": "Financing",
-        "desc": "Simulate installments, down payment and term."
-      },
-      "neighborhood": {
-        "title": "Surroundings",
-        "desc": "Parks, subway, universities and services nearby."
-      },
-      "choice": {
-        "title": "Typologies",
-        "desc": "Garden, terrace and 1-bedroom: which one fits you."
-      },
-      "readiness": {
-        "title": "Reservation",
-        "desc": "Step by step from the form to the sales contact."
-      },
-      "income": {
-        "title": "Amenities",
-        "desc": "Furnished leisure on the ground and 5th floors."
-      }
+      "quiz": { "title": "Location", "desc": "How Vila Mariana's surroundings enhance daily life." },
+      "simulator": { "title": "Financing", "desc": "Simulate installments, down payment and term." },
+      "neighborhood": { "title": "Surroundings", "desc": "Parks, subway, universities and services nearby." },
+      "choice": { "title": "Typologies", "desc": "Garden, terrace and 1-bedroom: which one fits you." },
+      "readiness": { "title": "Reservation", "desc": "Step by step from the form to the sales contact." },
+      "income": { "title": "Amenities", "desc": "Furnished leisure on the ground and 5th floors." }
     }
   },
   "finalCta": {
@@ -169,7 +125,9 @@
   "common": {
     "loading": "Loading...",
     "back": "Back",
-    "close": "Close"
+    "close": "Close",
+    "years": "years",
+    "dash": "—"
   },
   "market": {
     "eyebrow": "Market data",
@@ -182,35 +140,33 @@
     "why": {
       "eyebrow": "Why invest here",
       "title": "Fundamentals that support rental demand in Vila Mariana.",
-      "mobility": {
-        "title": "Mobility",
-        "desc": "900 m from Vila Mariana subway (Blue Line 1) · 1.1 km from Ana Rosa (Lines 1 and 2 interchange)."
-      },
-      "university": {
-        "title": "University demand",
-        "desc": "FMU 850 m · ESPM 1.5 km · Belas Artes 1.5 km."
-      },
-      "jobs": {
-        "title": "Employment and leisure hubs",
-        "desc": "Av. Paulista 2.5 km · Aclimação Park 950 m · Ibirapuera 3.1 km."
-      },
-      "product": {
-        "title": "Income-focused product",
-        "desc": "Accessible-ticket studios and 1-bedrooms, no parking spot (tenant profile that relies on the subway). Common areas delivered furnished and decorated (ground and 5th floors)."
-      },
+      "mobility": { "title": "Mobility", "desc": "900 m from Vila Mariana subway (Blue Line 1) · 1.1 km from Ana Rosa (Lines 1 and 2 interchange)." },
+      "university": { "title": "University demand", "desc": "FMU 850 m · ESPM 1.5 km · Belas Artes 1.5 km." },
+      "jobs": { "title": "Employment and leisure hubs", "desc": "Av. Paulista 2.5 km · Aclimação Park 950 m · Ibirapuera 3.1 km." },
+      "product": { "title": "Income-focused product", "desc": "Accessible-ticket studios and 1-bedrooms, no parking spot (tenant profile that relies on the subway). Common areas delivered furnished and decorated (ground and 5th floors)." },
       "disclaimer": "Rental potential arguments — not a promise of profitability."
     }
   },
   "investorGuide": {
-    "nav": {
+    "sectionLabels": {
       "hero": "Start",
-      "location": "Location",
+      "diagnostico": "Diagnostic",
+      "tese": "Thesis",
+      "nearby": "Surroundings",
       "typologies": "Typologies",
+      "matematica": "Return",
+      "simulador": "Simulator",
+      "avaliar": "Evaluate",
+      "eventos": "Events",
+      "amenities": "Amenities",
       "market": "Market",
-      "howItWorks": "How it works",
-      "antiChecklist": "Cautions",
+      "confianca": "Trust",
       "faq": "FAQ",
-      "contact": "Contact"
+      "cta": "Talk"
+    },
+    "nav": {
+      "aria": "Investor Guide sections",
+      "brand": "Vila Park"
     },
     "hero": {
       "badge": "Investor Guide",
@@ -219,82 +175,129 @@
       "subtitle": "A guide with practical information for those evaluating Vila Park as a residential investment option in Vila Mariana.",
       "ctaReserve": "Make my reservation",
       "ctaTalk": "Talk to the team",
+      "ctaDiag": "Take the investor diagnostic",
       "kpi": {
         "metro": "From Vila Mariana subway",
         "address": "Address · Vila Mariana",
-        "units": "Single tower · 10 floors"
-      }
+        "units": "Single tower · 10 floors",
+        "fmu": "FMU (university)",
+        "paulista": "Av. Paulista",
+        "park": "Aclimação Park"
+      },
+      "cardEyebrow": "Location fundamentals"
     },
     "location": {
       "eyebrow": "Why the location",
       "title": "What supports rental demand around Vila Park.",
-      "mobility": {
-        "title": "Mobility",
-        "text": "900 m from Vila Mariana subway (Blue Line 1) and 1.1 km from Ana Rosa (interchange with Green Line 2), the property serves residents who rely on public transport — a relevant factor for tenant retention over time."
+      "mobility": { "title": "Mobility", "text": "900 m from Vila Mariana subway (Blue Line 1) and 1.1 km from Ana Rosa (interchange with Green Line 2), the property serves residents who rely on public transport — a relevant factor for tenant retention over time." },
+      "university": { "title": "University demand", "text": "Proximity to FMU (850 m), ESPM (1.5 km) and Belas Artes (1.5 km) creates a steady flow of students looking for nearby housing, a traditionally active audience in the rental market." },
+      "jobs": { "title": "Employment and leisure hubs", "text": "Av. Paulista (2.5 km), one of the city's main employment hubs, and leisure areas like Aclimação Park (950 m) and Ibirapuera (3.1 km) broaden the appeal to professionals seeking to live close to work and leisure." },
+      "product": { "title": "Income-focused product", "text": "Studios and 1-bedroom apartments with a more accessible entry ticket, without a parking spot — designed for tenants who walk or use the subway. Common areas will be delivered furnished and decorated, on the ground and 5th floors." }
+    },
+    "diag": {
+      "eyebrow": "Investor diagnostic",
+      "title": "Discover the Vila Park typology that best fits your profile.",
+      "subtitle": "Four quick questions about objective, strategy and risk tolerance. At the end, you'll jump straight to the simulator with the suggested typology preselected."
+    },
+    "tese": {
+      "eyebrow": "Investment thesis",
+      "title": "Why Vila Mariana sustains demand for Vila Park.",
+      "subtitle": "Four objective pillars, grounded in location data, that support the unit as an income and appreciation asset."
+    },
+    "nearby": {
+      "eyebrow": "Strategic surroundings",
+      "title": "Vila Mariana works in favor of your rental.",
+      "subtitle": "A consolidated neighborhood with subway, universities, an employment hub and leisure within walking distance — fundamentals that sustain housing demand.",
+      "groups": {
+        "mobility": "Mobility",
+        "edu": "Universities",
+        "parks": "Parks & leisure",
+        "services": "Services & shopping",
+        "gastronomy": "Dining",
+        "jobs": "Employment hub"
       },
-      "university": {
-        "title": "University demand",
-        "text": "Proximity to FMU (850 m), ESPM (1.5 km) and Belas Artes (1.5 km) creates a steady flow of students looking for nearby housing, a traditionally active audience in the rental market."
-      },
-      "jobs": {
-        "title": "Employment and leisure hubs",
-        "text": "Av. Paulista (2.5 km), one of the city's main employment hubs, and leisure areas like Aclimação Park (950 m) and Ibirapuera (3.1 km) broaden the appeal to professionals seeking to live close to work and leisure."
-      },
-      "product": {
-        "title": "Income-focused product",
-        "text": "Studios and 1-bedroom apartments with a more accessible entry ticket, without a parking spot — designed for tenants who walk or use the subway. Common areas will be delivered furnished and decorated, on the ground and 5th floors."
-      }
+      "jobsPaulista": "Av. Paulista",
+      "jobsPaulistaDist": "2.5 km",
+      "jobsCorredor": "Paulista area",
+      "jobsCorredorDist": "office corridor",
+      "note": "Why this matters for income: properties near subway, universities and employment hubs have historically shown lower vacancy and faster tenant turnover — a profile compatible with the Vila Park product."
     },
     "typologies": {
       "eyebrow": "Typologies",
       "title": "Choosing the right typology for income.",
       "subtitle": "Each floor plan serves a different tenant profile. See what to consider before deciding.",
       "recommendation": "Recommendation: for those seeking greater rental liquidity, the studio/1-bedroom tends to be the most sought-after due to its more accessible entry ticket.",
-      "studio": {
-        "title": "1 bedroom / Studio",
-        "profile": "Tenant profile: students and professionals who prioritize mobility and practicality, without relying on a car."
-      },
-      "garden": {
-        "title": "Apartment with private garden",
-        "profile": "Tenant profile: those seeking more space and a private outdoor area, such as couples or small families."
-      },
-      "terrace": {
-        "title": "Apartment with open terrace",
-        "profile": "Tenant profile: residents who value outdoor leisure space and plan to stay longer."
+      "simulate": "Simulate return",
+      "studio": { "title": "1 bedroom / Studio", "profile": "Tenant profile: students and professionals who prioritize mobility and practicality, without relying on a car." },
+      "garden": { "title": "Apartment with private garden", "profile": "Tenant profile: those seeking more space and a private outdoor area, such as couples or small families." },
+      "terrace": { "title": "Apartment with open terrace", "profile": "Tenant profile: residents who value outdoor leisure space and plan to stay longer." }
+    },
+    "matematica": {
+      "eyebrow": "Return math",
+      "title": "How to think about return honestly — no promises.",
+      "subtitle": "Before running the simulator, understand the four blocks that make up any real estate income analysis.",
+      "items": {
+        "invest": { "title": "Total investment", "text": "Unit price + furniture/setup capex. Reserve budget for acquisition costs (transfer tax, registration, deed)." },
+        "revenue": { "title": "Net monthly revenue", "text": "Rent or daily × occupancy, minus condo fees, property tax, platform (~18%) and cleaning/management (~12% in short stay)." },
+        "yield": { "title": "Annual yield", "text": "Annual net revenue ÷ total investment. Compare with local interest rate + real estate spread in the region." },
+        "payback": { "title": "Payback & appreciation", "text": "Time to recover the investment with rental income + potential appreciation between plan and delivery." }
       }
+    },
+    "simuladorSection": {
+      "eyebrow": "Investor simulator",
+      "title": "Run the scenario with your own numbers.",
+      "subtitle": "Compare long-term rental vs. short stay, adjust furniture level and see yield, payback and net revenue in real time. Official values must be confirmed with the sales team."
+    },
+    "avaliar": {
+      "eyebrow": "How to evaluate the asset",
+      "title": "Investor checklist before making the call.",
+      "subtitle": "A good unit is chosen by objective criteria. Use this checklist at the sales stand and when analyzing the price sheet.",
+      "items": [
+        "Actual walking distance to subway, universities and employment hubs (not straight line).",
+        "Floor, sun orientation and view — impact daily rate and rental speed.",
+        "Usable private area vs. total advertised area.",
+        "Projected condo fee per sqm and extra dues (construction fund, reserve).",
+        "Internal rules for short-term rentals (condo bylaws).",
+        "Delivery date and track record of the developer.",
+        "Air-conditioning infra, piped gas and network points.",
+        "Comparables (asking price and closed rentals) within 1 km."
+      ]
+    },
+    "eventos": {
+      "eyebrow": "Events & demand",
+      "title": "Events calendar that heats up rentals in São Paulo.",
+      "subtitle": "Fairs, congresses and international shows concentrate short-stay demand peaks. Vila Mariana is just minutes from Ibirapuera, Anhembi and Paulista.",
+      "calendarTitle": "SP events × rental demand",
+      "calendarSubtitle": "Confirmed and projected events in São Paulo (2025–2027) and how each may impact short-stay demand in Vila Mariana."
+    },
+    "amenities": {
+      "eyebrow": "Common areas delivered fully equipped",
+      "title": "Ground floor and 5th floor decorated and furnished at delivery.",
+      "subtitle": "Finished common areas reduce the cost of preparing the property for rental and improve tenant value perception from the first visit.",
+      "items": {
+        "leisure": { "title": "Decorated leisure", "text": "Furnished spaces on the ground and 5th floors, delivered ready to use." },
+        "lobby": { "title": "Entry lobby", "text": "Reception and lobby that reinforce the property's standard perception." },
+        "infra": { "title": "Leisure infrastructure", "text": "Living areas that broaden the apartment's appeal to tenants." },
+        "ac": { "title": "A/C infrastructure", "text": "Technical preparation in the unit — one less item for the owner to handle." }
+      },
+      "disclaimer": "Illustrative images and descriptions. Decoration is a suggestion only — furniture and items are not part of the purchase contract."
     },
     "market": {
       "eyebrow": "Market data",
       "title": "Check up-to-date market data."
     },
-    "howItWorks": {
-      "eyebrow": "How the reservation works",
-      "title": "Step by step to your reservation.",
-      "step1": {
-        "title": "Fill out the form",
-        "text": "Send your contact details through the form on this page."
+    "confianca": {
+      "eyebrow": "Trust signals",
+      "title": "A grounded product, in a grounded neighborhood.",
+      "subtitle": "Elements that reduce the information asymmetry typical of a new launch and help the investor qualify the decision.",
+      "items": {
+        "units": { "label": "Single tower, 33 units", "note": "Lean supply in a consolidated area." },
+        "amenities": { "label": "Furnished common areas", "note": "Ground and 5th floors delivered decorated." },
+        "metro": { "label": "900 m from the subway", "note": "Blue Line 1, Vila Mariana." },
+        "builder": { "label": "Matere Bittar Incorporações", "note": "Developer responsible for the project." }
       },
-      "step2": {
-        "title": "Sales team contact",
-        "text": "Our team reaches out to answer questions and present conditions."
-      },
-      "step3": {
-        "title": "Visit and presentation",
-        "text": "Schedule a visit or a detailed presentation of the property."
-      },
-      "step4": {
-        "title": "Formal reservation",
-        "text": "The reservation is formalized after the Real Estate Incorporation Registration."
-      }
-    },
-    "anti": {
-      "eyebrow": "Investor anti-checklist",
-      "title": "Cautions before deciding.",
-      "item1": "Don't count on guaranteed profitability — the outcome depends on the rental market and property management.",
-      "item2": "Don't underestimate furniture and setup costs for renting out the unit.",
-      "item3": "Don't ignore condo fees and property tax in your net return calculation.",
-      "item4": "Don't decide without simulating the financing.",
-      "ctaSimulate": "Simulate financing"
+      "quote": "Vila Mariana combines three rare factors in São Paulo: subway, universities and a consolidated residential neighborhood. That sustains price and reduces the chance of prolonged vacancy.",
+      "quoteNote": "Market observation — not an investment recommendation."
     },
     "faq": {
       "eyebrow": "FAQ",
@@ -310,12 +313,169 @@
       "q5": "When does it start generating income?",
       "a5": "Rental income is only possible after the keys are delivered. Talk to the sales team to find out the delivery timeline."
     },
-    "contact": {
-      "eyebrow": "Next step",
-      "title": "Talk to the team and get more information",
-      "subtitle": "Fill out the form or talk directly with the sales team to clear up questions about Vila Park as an investment option.",
-      "talk": "Talk to the sales team"
+    "extraFaq": {
+      "f1": { "q": "Long-term rental or short stay — which yields more in Vila Mariana?", "a": "It depends on management style and condo bylaws. Short stay tends to have higher daily rates, but operating costs (platform, cleaning) and vacancy are also higher. The simulator above lets you compare both scenarios with your own numbers." },
+      "f2": { "q": "What's the average cost to furnish a unit?", "a": "For studios and 1-bedrooms in Vila Mariana, furniture and setup capex typically ranges from BRL 25k (essential), BRL 55k (premium) and BRL 95k+ (signature). The higher the standard, the higher the supported daily — but also the capex payback time." },
+      "f3": { "q": "How do I assess if the unit's price is aligned with the market?", "a": "Compare price per private sqm with active listings and recent transactions within 1 km, prioritizing launches with equivalent finishing standards. Discounts for the absence of a parking spot are normal in products like Vila Park." },
+      "f4": { "q": "Do I need a company (CNPJ) to run short stay?", "a": "Not mandatory to start, but depending on volume and tax strategy, operating through a legal entity (Lucro Presumido) is usually more efficient. Consult your accountant to model taxation and asset protection." },
+      "f5": { "q": "What changes in my return if I buy off-plan vs. ready?", "a": "Off-plan usually involves lower price per sqm and appreciation potential until delivery, with the trade-off of time without income and execution risk. Ready delivers immediate income, but at a higher price and no curve gain." }
+    },
+    "ctaFinal": {
+      "badge": "Vila Park · Vila Mariana",
+      "title": "Ready to talk about your unit?",
+      "subtitle": "Talk to the sales team for the price sheet, per-floor availability and updated payment conditions.",
+      "wa": "Chat on WhatsApp",
+      "backSim": "Back to simulator"
     },
     "disclaimer": "This guide presents rental potential arguments based on location and product fundamentals. It does not constitute a promise of profitability, appreciation or financial return. Reservation only — the property will only be marketed after the Real Estate Incorporation Registration."
+  },
+  "investorQuiz": {
+    "progress": "Question {{i}} of {{n}}",
+    "questions": {
+      "objective": {
+        "question": "What's your main goal with Vila Park?",
+        "opts": {
+          "renda": { "label": "Recurring monthly income", "hint": "Steady cash flow." },
+          "valorizacao": { "label": "Asset appreciation", "hint": "Buy off-plan, gain at delivery." },
+          "equilibrio": { "label": "Balance between both", "hint": "Income + appreciation." }
+        }
+      },
+      "strategy": {
+        "question": "Which rental strategy makes more sense for you?",
+        "opts": {
+          "tradicional": { "label": "Long-term rental (12+ months)", "hint": "Less management, predictable revenue." },
+          "temporada": { "label": "Short stay", "hint": "Higher dailies, more operation." },
+          "indeciso": { "label": "Still evaluating", "hint": "I want to compare both models." }
+        }
+      },
+      "horizon": {
+        "question": "What's your intended investment horizon?",
+        "opts": {
+          "curto": { "label": "Short (< 3 years)", "hint": "Focus on quick returns." },
+          "medio": { "label": "Medium (3–7 years)", "hint": "Typical income + appreciation cycle." },
+          "longo": { "label": "Long (7+ years)", "hint": "Wealth building." }
+        }
+      },
+      "risk": {
+        "question": "How would you describe your risk tolerance?",
+        "opts": {
+          "conservador": { "label": "Conservative", "hint": "I prefer predictability." },
+          "moderado": { "label": "Moderate", "hint": "I accept some risk for higher return." },
+          "arrojado": { "label": "Aggressive", "hint": "I seek the highest possible return." }
+        }
+      }
+    },
+    "profile": {
+      "template": "{{risk}} — {{focus}}",
+      "risk": { "conservador": "Conservative", "moderado": "Moderate", "arrojado": "Aggressive" },
+      "focus": { "renda": "income focus", "valorizacao": "appreciation focus", "equilibrio": "income + appreciation" }
+    },
+    "result": {
+      "eyebrow": "Your result",
+      "intro": "Based on your answers, the typology most aligned with your profile at Vila Park is:",
+      "ctaSim": "Simulate return for this typology",
+      "ctaReset": "Retake diagnostic",
+      "rationale": {
+        "studio": "The studio/1-bedroom has the lowest entry ticket, greatest rental liquidity near the subway and is the most compatible format for short stay or renting to students/young professionals.",
+        "garden": "The apartment with a private garden combines a product differentiator (outdoor area) with good long-term rental liquidity, balancing monthly cash flow and appreciation potential.",
+        "terrace": "Units with open terraces tend to hold resale value better in consolidated neighborhoods like Vila Mariana and attract tenants who stay longer."
+      }
+    }
+  },
+  "investorSim": {
+    "title": "Investor simulator",
+    "profileLabel": "{{profile}} profile",
+    "mode": { "trad": "Long-term rental", "temp": "Short stay" },
+    "reset": "Clear simulation",
+    "field": {
+      "price": "Unit price",
+      "priceHint": "Market estimate — replace with the actual price sheet value.",
+      "condo": "Monthly condo + property tax",
+      "condoHint": "Market placeholder for Vila Mariana — confirm official values.",
+      "capex": "Furniture / setup level (capex)",
+      "rent": "Estimated monthly rent",
+      "rentHint": "Range observed in long-term rentals in the area — replace with your estimate.",
+      "daily": "Average daily rate",
+      "dailyHint": "Base daily ({{level}} = ×{{boost}}).",
+      "occ": "Estimated occupancy",
+      "occHint": "Between 45% and 95%.",
+      "occAria": "Estimated occupancy percentage"
+    },
+    "capex": {
+      "essencial": { "label": "Essential", "note": "Functional furniture and basic setup." },
+      "premium": { "label": "Premium", "note": "Careful decoration, professional photos, comfort items." },
+      "signature": { "label": "Signature", "note": "Signature design, standout aesthetics, differentiated operation." }
+    },
+    "validate": {
+      "low": "Value too low — check if you typed it correctly.",
+      "high": "Value too high — check if you typed it correctly."
+    },
+    "result": {
+      "eyebrow": "Estimated return — {{typo}}",
+      "prompt": {
+        "trad": "Fill in the unit price and the monthly rent to see the estimated return.",
+        "temp": "Fill in the unit price and the average daily rate to see the estimated return."
+      }
+    },
+    "metrics": {
+      "netMonth": "Net / month",
+      "netYear": "Net / year",
+      "yield": "Yield p.a.",
+      "payback": "Payback",
+      "paybackYears": "{{n}} years",
+      "notApplicable": "N/A"
+    },
+    "negative": {
+      "warning": "Negative cash flow in this scenario — revenue does not cover fixed costs.",
+      "note": "Yield and payback only apply when annual net revenue is positive."
+    },
+    "sections": { "rev": "Revenue composition", "inv": "Investment composition" },
+    "rows": {
+      "gross": "Gross monthly revenue",
+      "platform": "(-) Platform fee (~18%)",
+      "cleaning": "(-) Cleaning and management (~12%)",
+      "condo": "(-) Condo + property tax",
+      "net": "Monthly net",
+      "unit": "Unit",
+      "mob": "Furniture / setup ({{level}})",
+      "total": "Total"
+    },
+    "cta": { "wa": "I want to talk about this typology", "copy": "Copy summary", "copied": "Summary copied" },
+    "copy": {
+      "okTitle": "Summary copied",
+      "okDesc": "The text is on your clipboard.",
+      "failTitle": "Couldn't copy",
+      "failDesc": "Copy manually or try again.",
+      "waMsg": "Hi! I simulated the return of Vila Park ({{typo}} typology) and would like to talk."
+    },
+    "summary": {
+      "title": "Simulation — Vila Park Mariana",
+      "scenario": "Scenario",
+      "typology": "  Typology: {{label}} ({{profile}} profile)",
+      "mode": "  Mode: {{mode}}",
+      "capexLevel": "  Furniture level: {{label}} — {{value}}",
+      "premises": "Assumptions",
+      "price": "  Unit price: {{v}}",
+      "condo": "  Condo + property tax / month: {{v}}",
+      "rent": "  Estimated monthly rent: {{v}}",
+      "daily": "  Average daily (base): {{v}}",
+      "boost": "  Standard boost: ×{{v}}",
+      "occ": "  Estimated occupancy: {{v}}%",
+      "result": "Result",
+      "fill": "  Fill in the assumptions to see the results.",
+      "invTotal": "  Total investment: {{v}}",
+      "invUnit": "    • Unit: {{v}}",
+      "invMob": "    • Furniture / setup: {{v}}",
+      "grossM": "  Gross revenue / month: {{v}}",
+      "ptf": "    • (-) Platform (~18%): -{{v}}",
+      "cln": "    • (-) Cleaning and management (~12%): -{{v}}",
+      "condoLine": "    • (-) Condo + property tax: -{{v}}",
+      "netM": "  Net / month: {{v}}",
+      "netY": "  Net / year: {{v}}",
+      "yieldLine": "  Yield p.a.: {{v}}",
+      "paybackLine": "  Payback: {{v}}",
+      "disclaimer": "Illustrative projection with user-provided assumptions. Not a promise of profitability."
+    },
+    "disclaimer": "Illustrative projection only, based on user-provided assumptions and Vila Mariana market ranges. Not a promise of profitability, return or appreciation. Actual costs may vary depending on condo bylaws, platform, management and seasonality."
   }
 }
