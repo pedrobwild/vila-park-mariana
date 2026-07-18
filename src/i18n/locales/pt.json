@@ -71,9 +71,18 @@
     "eyebrow": "Tipologias",
     "title": "Três formas de morar no Vila Park.",
     "subtitle": "Escolha entre garden privativo, apartamento com terraço descoberto ou 1 dormitório/studio.",
-    "garden": { "title": "Apartamento com garden privativo", "desc": "Área externa privativa no térreo, integrada à unidade." },
-    "terrace": { "title": "Apartamento com terraço descoberto", "desc": "Terraço descoberto para lazer ao ar livre na sua unidade." },
-    "studio": { "title": "1 dormitório / studio", "desc": "Planta compacta, ideal para morar próximo ao metrô Vila Mariana." }
+    "garden": {
+      "title": "Apartamento com garden privativo",
+      "desc": "Área externa privativa no térreo, integrada à unidade."
+    },
+    "terrace": {
+      "title": "Apartamento com terraço descoberto",
+      "desc": "Terraço descoberto para lazer ao ar livre na sua unidade."
+    },
+    "studio": {
+      "title": "1 dormitório / studio",
+      "desc": "Planta compacta, ideal para morar próximo ao metrô Vila Mariana."
+    }
   },
   "progress": {
     "eyebrow": "Andamento da obra",
@@ -96,9 +105,13 @@
     "eyebrow": "Reserva",
     "title": "Preencha e garanta sua reserva.",
     "subtitle": "Nosso time comercial entra em contato para confirmar disponibilidade e enviar o material completo.",
-    "name": "Nome", "email": "E-mail", "phone": "Telefone", "message": "Mensagem",
+    "name": "Nome",
+    "email": "E-mail",
+    "phone": "Telefone",
+    "message": "Mensagem",
     "messagePlaceholder": "Conte um pouco do que procura (tipologia, prazo, forma de pagamento)…",
-    "submit": "Enviar reserva", "sending": "Enviando…",
+    "submit": "Enviar reserva",
+    "sending": "Enviando…",
     "success": "Reserva recebida — nosso time entra em contato em breve.",
     "error": "Não foi possível enviar. Tente novamente ou fale por WhatsApp.",
     "whatsapp": "Falar no WhatsApp"
@@ -110,12 +123,30 @@
     "subtitle": "Localização, tipologias, áreas comuns e as etapas até a reserva.",
     "cta": "Acessar o Guia do Comprador",
     "items": {
-      "quiz": { "title": "Localização", "desc": "Como o entorno da Vila Mariana valoriza o dia a dia." },
-      "simulator": { "title": "Financiamento", "desc": "Simule parcela, entrada e prazo para o seu bolso." },
-      "neighborhood": { "title": "Entorno", "desc": "Parques, metrô, universidades e serviços próximos." },
-      "choice": { "title": "Tipologias", "desc": "Garden, terraço e 1 dormitório: qual combina com você." },
-      "readiness": { "title": "Reserva", "desc": "Passo a passo do formulário ao contato comercial." },
-      "income": { "title": "Áreas comuns", "desc": "Lazer decorado e mobiliado no térreo e no 5º pavimento." }
+      "quiz": {
+        "title": "Localização",
+        "desc": "Como o entorno da Vila Mariana valoriza o dia a dia."
+      },
+      "simulator": {
+        "title": "Financiamento",
+        "desc": "Simule parcela, entrada e prazo para o seu bolso."
+      },
+      "neighborhood": {
+        "title": "Entorno",
+        "desc": "Parques, metrô, universidades e serviços próximos."
+      },
+      "choice": {
+        "title": "Tipologias",
+        "desc": "Garden, terraço e 1 dormitório: qual combina com você."
+      },
+      "readiness": {
+        "title": "Reserva",
+        "desc": "Passo a passo do formulário ao contato comercial."
+      },
+      "income": {
+        "title": "Áreas comuns",
+        "desc": "Lazer decorado e mobiliado no térreo e no 5º pavimento."
+      }
     }
   },
   "finalCta": {
@@ -153,10 +184,22 @@
     "why": {
       "eyebrow": "Por que investir aqui",
       "title": "Fundamentos que sustentam a demanda por locação na Vila Mariana.",
-      "mobility": { "title": "Mobilidade", "desc": "900 m do metrô Vila Mariana (Linha 1-Azul) · 1,1 km do Ana Rosa (integração Linhas 1 e 2)." },
-      "university": { "title": "Demanda universitária", "desc": "FMU 850 m · ESPM 1,5 km · Belas Artes 1,5 km." },
-      "jobs": { "title": "Polos de emprego e lazer", "desc": "Av. Paulista 2,5 km · Parque da Aclimação 950 m · Ibirapuera 3,1 km." },
-      "product": { "title": "Produto de renda", "desc": "Studios e 1 dorm. de ticket acessível, sem vaga (perfil inquilino que usa metrô). Áreas comuns entregues decoradas e equipadas (térreo e 5º pav.)." },
+      "mobility": {
+        "title": "Mobilidade",
+        "desc": "900 m do metrô Vila Mariana (Linha 1-Azul) · 1,1 km do Ana Rosa (integração Linhas 1 e 2)."
+      },
+      "university": {
+        "title": "Demanda universitária",
+        "desc": "FMU 850 m · ESPM 1,5 km · Belas Artes 1,5 km."
+      },
+      "jobs": {
+        "title": "Polos de emprego e lazer",
+        "desc": "Av. Paulista 2,5 km · Parque da Aclimação 950 m · Ibirapuera 3,1 km."
+      },
+      "product": {
+        "title": "Produto de renda",
+        "desc": "Studios e 1 dorm. de ticket acessível, sem vaga (perfil inquilino que usa metrô). Áreas comuns entregues decoradas e equipadas (térreo e 5º pav.)."
+      },
       "disclaimer": "Argumentos de potencial locatício — não constituem promessa de rentabilidade."
     }
   },
@@ -202,10 +245,22 @@
     "location": {
       "eyebrow": "Por que a localização",
       "title": "O que sustenta a demanda por locação no entorno do Vila Park.",
-      "mobility": { "title": "Mobilidade", "text": "A 900 m do metrô Vila Mariana (Linha 1-Azul) e a 1,1 km do Ana Rosa (integração com a Linha 2-Verde), o empreendimento atende a um perfil de morador que depende do transporte público — um fator relevante de retenção de inquilinos ao longo do tempo." },
-      "university": { "title": "Demanda universitária", "text": "A proximidade com a FMU (850 m), a ESPM (1,5 km) e a Belas Artes (1,5 km) cria um fluxo constante de estudantes em busca de moradia próxima, um público tradicionalmente ativo no mercado de locação." },
-      "jobs": { "title": "Polos de emprego e lazer", "text": "A Av. Paulista (2,5 km), um dos principais polos de emprego da cidade, e áreas de lazer como o Parque da Aclimação (950 m) e o Ibirapuera (3,1 km) ampliam o interesse de profissionais que buscam morar perto do trabalho e do lazer." },
-      "product": { "title": "Produto de renda", "text": "Studios e apartamentos de 1 dormitório com ticket de entrada mais acessível, sem vaga de garagem — um desenho pensado para o perfil de inquilino que se desloca a pé ou de metrô. As áreas comuns serão entregues decoradas e equipadas, no térreo e no 5º pavimento." }
+      "mobility": {
+        "title": "Mobilidade",
+        "text": "A 900 m do metrô Vila Mariana (Linha 1-Azul) e a 1,1 km do Ana Rosa (integração com a Linha 2-Verde), o empreendimento atende a um perfil de morador que depende do transporte público — um fator relevante de retenção de inquilinos ao longo do tempo."
+      },
+      "university": {
+        "title": "Demanda universitária",
+        "text": "A proximidade com a FMU (850 m), a ESPM (1,5 km) e a Belas Artes (1,5 km) cria um fluxo constante de estudantes em busca de moradia próxima, um público tradicionalmente ativo no mercado de locação."
+      },
+      "jobs": {
+        "title": "Polos de emprego e lazer",
+        "text": "A Av. Paulista (2,5 km), um dos principais polos de emprego da cidade, e áreas de lazer como o Parque da Aclimação (950 m) e o Ibirapuera (3,1 km) ampliam o interesse de profissionais que buscam morar perto do trabalho e do lazer."
+      },
+      "product": {
+        "title": "Produto de renda",
+        "text": "Studios e apartamentos de 1 dormitório com ticket de entrada mais acessível, sem vaga de garagem — um desenho pensado para o perfil de inquilino que se desloca a pé ou de metrô. As áreas comuns serão entregues decoradas e equipadas, no térreo e no 5º pavimento."
+      }
     },
     "diag": {
       "eyebrow": "Diagnóstico do investidor",
@@ -241,19 +296,40 @@
       "subtitle": "Cada planta atende a um perfil diferente de inquilino. Veja o que considerar antes de decidir.",
       "recommendation": "Recomendação: para quem busca maior liquidez de locação, o studio/1 dormitório tende a ser o mais procurado pelo ticket de entrada mais acessível.",
       "simulate": "Simular retorno",
-      "studio": { "title": "1 dormitório / Studio", "profile": "Perfil de inquilino: estudantes e profissionais que priorizam mobilidade e praticidade, sem depender de veículo próprio." },
-      "garden": { "title": "Apartamento com garden privativo", "profile": "Perfil de inquilino: quem busca mais espaço e uma área externa privativa, como casais ou pequenas famílias." },
-      "terrace": { "title": "Apartamento com terraço descoberto", "profile": "Perfil de inquilino: moradores que valorizam área externa para lazer e planejam permanecer por mais tempo." }
+      "studio": {
+        "title": "1 dormitório / Studio",
+        "profile": "Perfil de inquilino: estudantes e profissionais que priorizam mobilidade e praticidade, sem depender de veículo próprio."
+      },
+      "garden": {
+        "title": "Apartamento com garden privativo",
+        "profile": "Perfil de inquilino: quem busca mais espaço e uma área externa privativa, como casais ou pequenas famílias."
+      },
+      "terrace": {
+        "title": "Apartamento com terraço descoberto",
+        "profile": "Perfil de inquilino: moradores que valorizam área externa para lazer e planejam permanecer por mais tempo."
+      }
     },
     "matematica": {
       "eyebrow": "Matemática do retorno",
       "title": "Como pensar retorno de forma honesta — sem promessas.",
       "subtitle": "Antes de rodar o simulador, entenda os quatro blocos que compõem qualquer análise de investimento em renda imobiliária.",
       "items": {
-        "invest": { "title": "Investimento total", "text": "Preço da unidade + capex de mobília/enxoval. Considere reserva para custos de aquisição (ITBI, registro, escritura)." },
-        "revenue": { "title": "Receita líquida mensal", "text": "Aluguel ou diária × ocupação, menos condomínio, IPTU, plataforma (~18%) e limpeza/gestão (~12% no short stay)." },
-        "yield": { "title": "Yield anual", "text": "Receita líquida anual ÷ investimento total. Compare com CDI/IPCA + spread do imobiliário na região." },
-        "payback": { "title": "Payback e valorização", "text": "Tempo para recuperar o investimento com renda + potencial de valorização do imóvel entre planta e entrega." }
+        "invest": {
+          "title": "Investimento total",
+          "text": "Preço da unidade + capex de mobília/enxoval. Considere reserva para custos de aquisição (ITBI, registro, escritura)."
+        },
+        "revenue": {
+          "title": "Receita líquida mensal",
+          "text": "Aluguel ou diária × ocupação, menos condomínio, IPTU, plataforma (~18%) e limpeza/gestão (~12% no short stay)."
+        },
+        "yield": {
+          "title": "Yield anual",
+          "text": "Receita líquida anual ÷ investimento total. Compare com CDI/IPCA + spread do imobiliário na região."
+        },
+        "payback": {
+          "title": "Payback e valorização",
+          "text": "Tempo para recuperar o investimento com renda + potencial de valorização do imóvel entre planta e entrega."
+        }
       }
     },
     "simuladorSection": {
@@ -281,17 +357,29 @@
       "title": "Calendário de eventos que aquece a locação em SP.",
       "subtitle": "Feiras, congressos e shows internacionais concentram picos de demanda por temporada. Vila Mariana está a poucos minutos do Ibirapuera, Anhembi e da Paulista.",
       "calendarTitle": "Eventos em SP × demanda de locação",
-      "calendarSubtitle": "Eventos confirmados e previstos em São Paulo (2025–2027) e como cada um pode impactar a demanda por temporada na Vila Mariana."
+      "calendarSubtitle": "Eventos confirmados e previstos em São Paulo entre julho/2026 e julho/2027 e como cada um pode impactar a demanda por temporada na Vila Mariana."
     },
     "amenities": {
       "eyebrow": "Áreas comuns entregues equipadas",
       "title": "Térreo e 5º pavimento decorados e mobiliados na entrega.",
       "subtitle": "Áreas comuns finalizadas reduzem o custo de preparação do imóvel para locação e melhoram a percepção de valor do inquilino desde a visita.",
       "items": {
-        "leisure": { "title": "Lazer decorado", "text": "Espaços mobiliados no térreo e no 5º pavimento, entregues prontos para uso." },
-        "lobby": { "title": "Lobby de entrada", "text": "Portaria e recepção que reforçam a percepção de padrão do empreendimento." },
-        "infra": { "title": "Infraestrutura de lazer", "text": "Áreas de convivência que ampliam o apelo do apartamento para o inquilino." },
-        "ac": { "title": "Infra para ar-condicionado", "text": "Preparação técnica na unidade — um item a menos para o proprietário resolver." }
+        "leisure": {
+          "title": "Lazer decorado",
+          "text": "Espaços mobiliados no térreo e no 5º pavimento, entregues prontos para uso."
+        },
+        "lobby": {
+          "title": "Lobby de entrada",
+          "text": "Portaria e recepção que reforçam a percepção de padrão do empreendimento."
+        },
+        "infra": {
+          "title": "Infraestrutura de lazer",
+          "text": "Áreas de convivência que ampliam o apelo do apartamento para o inquilino."
+        },
+        "ac": {
+          "title": "Infra para ar-condicionado",
+          "text": "Preparação técnica na unidade — um item a menos para o proprietário resolver."
+        }
       },
       "disclaimer": "Imagens e descrições ilustrativas. A decoração é apenas uma sugestão — móveis e utensílios não integram o contrato de compra e venda."
     },
@@ -304,10 +392,22 @@
       "title": "Um produto de raiz, em um bairro de raiz.",
       "subtitle": "Elementos que reduzem a assimetria de informação típica de um lançamento e ajudam o investidor a qualificar a decisão.",
       "items": {
-        "units": { "label": "Torre única, 33 unidades", "note": "Oferta enxuta em região consolidada." },
-        "amenities": { "label": "Áreas comuns equipadas", "note": "Térreo e 5º pav. entregues decorados." },
-        "metro": { "label": "900 m do metrô", "note": "Linha 1-Azul, Vila Mariana." },
-        "builder": { "label": "Matere Bittar Incorporações", "note": "Incorporadora responsável pelo empreendimento." }
+        "units": {
+          "label": "Torre única, 33 unidades",
+          "note": "Oferta enxuta em região consolidada."
+        },
+        "amenities": {
+          "label": "Áreas comuns equipadas",
+          "note": "Térreo e 5º pav. entregues decorados."
+        },
+        "metro": {
+          "label": "900 m do metrô",
+          "note": "Linha 1-Azul, Vila Mariana."
+        },
+        "builder": {
+          "label": "Matere Bittar Incorporações",
+          "note": "Incorporadora responsável pelo empreendimento."
+        }
       },
       "quote": "A Vila Mariana combina três fatores raros em São Paulo: metrô, universidades e bairro residencial consolidado. Isso segura preço e reduz a chance de vacância prolongada.",
       "quoteNote": "Observação de mercado — não constitui recomendação de investimento."
@@ -327,11 +427,26 @@
       "a5": "A geração de renda por locação só é possível após a entrega das chaves. Fale com o time comercial para saber a previsão de entrega."
     },
     "extraFaq": {
-      "f1": { "q": "Aluguel tradicional ou temporada — qual rende mais na Vila Mariana?", "a": "Depende do perfil de gestão e da convenção do condomínio. Temporada tende a ter diárias maiores, mas custos operacionais (plataforma, limpeza) e vacância também são maiores. O simulador acima permite comparar ambos os cenários com os seus próprios números." },
-      "f2": { "q": "Qual o custo médio de mobiliar uma unidade?", "a": "Para studios e 1 dormitório na Vila Mariana, o capex de mobília e enxoval costuma variar entre R$ 25 mil (essencial), R$ 55 mil (premium) e R$ 95 mil+ (signature). Quanto maior o padrão do enxoval, maior a diária suportada — mas também o tempo de payback do capex." },
-      "f3": { "q": "Como avalio se o preço da unidade está em linha com o mercado?", "a": "Compare o preço por m² privativo com anúncios ativos e transações recentes em raio de 1 km, priorizando lançamentos com padrão de acabamento equivalente. Descontos por ausência de vaga são normais em produtos como o Vila Park." },
-      "f4": { "q": "Preciso ter CNPJ para operar temporada?", "a": "Não é obrigatório para começar, mas dependendo do volume e da estratégia tributária, a operação via PJ (Lucro Presumido) costuma ser mais eficiente. Consulte seu contador para modelar tributação e proteção patrimonial." },
-      "f5": { "q": "O que muda no meu retorno se eu comprar na planta vs. pronto?", "a": "Comprar na planta costuma envolver preço menor por m² e potencial de valorização até a entrega, com contrapartida de tempo sem renda e risco de execução. Pronto entrega renda imediata, mas com preço mais alto e sem ganho de curva." }
+      "f1": {
+        "q": "Aluguel tradicional ou temporada — qual rende mais na Vila Mariana?",
+        "a": "Depende do perfil de gestão e da convenção do condomínio. Temporada tende a ter diárias maiores, mas custos operacionais (plataforma, limpeza) e vacância também são maiores. O simulador acima permite comparar ambos os cenários com os seus próprios números."
+      },
+      "f2": {
+        "q": "Qual o custo médio de mobiliar uma unidade?",
+        "a": "Para studios e 1 dormitório na Vila Mariana, o capex de mobília e enxoval costuma variar entre R$ 25 mil (essencial), R$ 55 mil (premium) e R$ 95 mil+ (signature). Quanto maior o padrão do enxoval, maior a diária suportada — mas também o tempo de payback do capex."
+      },
+      "f3": {
+        "q": "Como avalio se o preço da unidade está em linha com o mercado?",
+        "a": "Compare o preço por m² privativo com anúncios ativos e transações recentes em raio de 1 km, priorizando lançamentos com padrão de acabamento equivalente. Descontos por ausência de vaga são normais em produtos como o Vila Park."
+      },
+      "f4": {
+        "q": "Preciso ter CNPJ para operar temporada?",
+        "a": "Não é obrigatório para começar, mas dependendo do volume e da estratégia tributária, a operação via PJ (Lucro Presumido) costuma ser mais eficiente. Consulte seu contador para modelar tributação e proteção patrimonial."
+      },
+      "f5": {
+        "q": "O que muda no meu retorno se eu comprar na planta vs. pronto?",
+        "a": "Comprar na planta costuma envolver preço menor por m² e potencial de valorização até a entrega, com contrapartida de tempo sem renda e risco de execução. Pronto entrega renda imediata, mas com preço mais alto e sem ganho de curva."
+      }
     },
     "ctaFinal": {
       "badge": "Vila Park · Vila Mariana",
@@ -348,40 +463,84 @@
       "objective": {
         "question": "Qual é seu objetivo principal com o Vila Park?",
         "opts": {
-          "renda": { "label": "Renda mensal recorrente", "hint": "Fluxo de caixa constante." },
-          "valorizacao": { "label": "Valorização patrimonial", "hint": "Compra na planta, ganho na entrega." },
-          "equilibrio": { "label": "Equilíbrio entre os dois", "hint": "Renda + valorização." }
+          "renda": {
+            "label": "Renda mensal recorrente",
+            "hint": "Fluxo de caixa constante."
+          },
+          "valorizacao": {
+            "label": "Valorização patrimonial",
+            "hint": "Compra na planta, ganho na entrega."
+          },
+          "equilibrio": {
+            "label": "Equilíbrio entre os dois",
+            "hint": "Renda + valorização."
+          }
         }
       },
       "strategy": {
         "question": "Qual estratégia de locação faz mais sentido para você?",
         "opts": {
-          "tradicional": { "label": "Aluguel tradicional (12+ meses)", "hint": "Menos gestão, receita previsível." },
-          "temporada": { "label": "Temporada / short stay", "hint": "Diárias mais altas, mais operação." },
-          "indeciso": { "label": "Ainda estou avaliando", "hint": "Quero comparar os dois modelos." }
+          "tradicional": {
+            "label": "Aluguel tradicional (12+ meses)",
+            "hint": "Menos gestão, receita previsível."
+          },
+          "temporada": {
+            "label": "Temporada / short stay",
+            "hint": "Diárias mais altas, mais operação."
+          },
+          "indeciso": {
+            "label": "Ainda estou avaliando",
+            "hint": "Quero comparar os dois modelos."
+          }
         }
       },
       "horizon": {
         "question": "Qual o horizonte pretendido do investimento?",
         "opts": {
-          "curto": { "label": "Curto (< 3 anos)", "hint": "Foco em rentabilidade rápida." },
-          "medio": { "label": "Médio (3–7 anos)", "hint": "Ciclo típico de renda + valorização." },
-          "longo": { "label": "Longo (7+ anos)", "hint": "Formação de patrimônio." }
+          "curto": {
+            "label": "Curto (< 3 anos)",
+            "hint": "Foco em rentabilidade rápida."
+          },
+          "medio": {
+            "label": "Médio (3–7 anos)",
+            "hint": "Ciclo típico de renda + valorização."
+          },
+          "longo": {
+            "label": "Longo (7+ anos)",
+            "hint": "Formação de patrimônio."
+          }
         }
       },
       "risk": {
         "question": "Como você descreveria sua tolerância a risco?",
         "opts": {
-          "conservador": { "label": "Conservador", "hint": "Prefiro previsibilidade." },
-          "moderado": { "label": "Moderado", "hint": "Aceito algum risco por retorno maior." },
-          "arrojado": { "label": "Arrojado", "hint": "Busco o maior retorno possível." }
+          "conservador": {
+            "label": "Conservador",
+            "hint": "Prefiro previsibilidade."
+          },
+          "moderado": {
+            "label": "Moderado",
+            "hint": "Aceito algum risco por retorno maior."
+          },
+          "arrojado": {
+            "label": "Arrojado",
+            "hint": "Busco o maior retorno possível."
+          }
         }
       }
     },
     "profile": {
       "template": "{{risk}} — {{focus}}",
-      "risk": { "conservador": "Conservador", "moderado": "Moderado", "arrojado": "Arrojado" },
-      "focus": { "renda": "foco em renda", "valorizacao": "foco em valorização", "equilibrio": "renda + valorização" }
+      "risk": {
+        "conservador": "Conservador",
+        "moderado": "Moderado",
+        "arrojado": "Arrojado"
+      },
+      "focus": {
+        "renda": "foco em renda",
+        "valorizacao": "foco em valorização",
+        "equilibrio": "renda + valorização"
+      }
     },
     "result": {
       "eyebrow": "Seu resultado",
@@ -398,7 +557,10 @@
   "investorSim": {
     "title": "Simulador do investidor",
     "profileLabel": "Perfil {{profile}}",
-    "mode": { "trad": "Aluguel tradicional", "temp": "Temporada" },
+    "mode": {
+      "trad": "Aluguel tradicional",
+      "temp": "Temporada"
+    },
     "reset": "Limpar simulação",
     "field": {
       "price": "Preço da unidade",
@@ -415,9 +577,18 @@
       "occAria": "Ocupação estimada em porcentagem"
     },
     "capex": {
-      "essencial": { "label": "Essencial", "note": "Mobília funcional e enxoval básico." },
-      "premium": { "label": "Premium", "note": "Decoração cuidada, fotos profissionais, itens de conforto." },
-      "signature": { "label": "Signature", "note": "Projeto autoral, design de destaque, operação diferenciada." }
+      "essencial": {
+        "label": "Essencial",
+        "note": "Mobília funcional e enxoval básico."
+      },
+      "premium": {
+        "label": "Premium",
+        "note": "Decoração cuidada, fotos profissionais, itens de conforto."
+      },
+      "signature": {
+        "label": "Signature",
+        "note": "Projeto autoral, design de destaque, operação diferenciada."
+      }
     },
     "validate": {
       "low": "Valor muito baixo — confira se digitou certo.",
@@ -442,7 +613,10 @@
       "warning": "Fluxo de caixa negativo neste cenário — receita não cobre os custos fixos.",
       "note": "Yield e payback só se aplicam quando a receita líquida anual é positiva."
     },
-    "sections": { "rev": "Composição da receita", "inv": "Composição do investimento" },
+    "sections": {
+      "rev": "Composição da receita",
+      "inv": "Composição do investimento"
+    },
     "rows": {
       "gross": "Receita bruta mensal",
       "platform": "(-) Taxa de plataforma (~18%)",
@@ -453,7 +627,11 @@
       "mob": "Mobília / enxoval ({{level}})",
       "total": "Total"
     },
-    "cta": { "wa": "Quero falar sobre essa tipologia", "copy": "Copiar resumo", "copied": "Resumo copiado" },
+    "cta": {
+      "wa": "Quero falar sobre essa tipologia",
+      "copy": "Copiar resumo",
+      "copied": "Resumo copiado"
+    },
     "copy": {
       "okTitle": "Resumo copiado",
       "okDesc": "O texto está na sua área de transferência.",
@@ -490,5 +668,26 @@
       "disclaimer": "Projeção ilustrativa com premissas do próprio usuário. Não constitui promessa de rentabilidade."
     },
     "disclaimer": "Projeção meramente ilustrativa, com base em premissas informadas pelo próprio usuário e faixas de mercado da Vila Mariana. Não constitui promessa de rentabilidade, retorno ou valorização. Custos reais podem variar conforme convenção do condomínio, plataforma, gestão e sazonalidade."
+  },
+  "eventsCalendar": {
+    "eyebrow": "Calendário de Eventos SP",
+    "defaultTitle": "Grandes eventos × demanda de locação em SP",
+    "defaultSubtitle": "Eventos previstos em São Paulo entre {{window}} e como cada um pode impactar a demanda de locação na região da {{region}}.",
+    "windowLabel": "julho/2026 a julho/2027",
+    "update": "Atualizar",
+    "updating": "Atualizando…",
+    "loading": "Carregando eventos…",
+    "errorTitle": "Não foi possível carregar os eventos",
+    "retry": "Tentar novamente",
+    "kpiCount": "eventos mapeados",
+    "kpiBaseline": "cenário de referência",
+    "kpiBoost": "potencial extra com eventos",
+    "kpiTopMonths": "meses de maior demanda",
+    "listTitle": "Eventos por impacto na demanda",
+    "eventsWord": "eventos",
+    "emptyWindow": "Nenhum evento encontrado para o período ({{window}}).",
+    "showLess": "Mostrar menos",
+    "showAll": "Ver todos os {{count}} eventos",
+    "sources": "Fontes"
   }
 }

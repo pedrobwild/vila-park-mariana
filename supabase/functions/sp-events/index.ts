@@ -7,7 +7,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const CACHE_KEY = "sp_events_v1";
+const CACHE_KEY = "sp_events_v2_jul2026_jul2027";
 const CACHE_TTL_HOURS = 72; // events don't change often
 
 function getSupabaseAdmin() {
@@ -17,11 +17,11 @@ function getSupabaseAdmin() {
   );
 }
 
-const PERPLEXITY_PROMPT = `Você é um analista de mercado imobiliário residencial em São Paulo, especializado no bairro Vila Mariana.
+const PERPLEXITY_PROMPT = `Você é um analista de mercado imobiliário e de locação por temporada em São Paulo, especializado no bairro Vila Mariana.
 
-Liste os PRINCIPAIS GRANDES EVENTOS e movimentos urbanos que acontecerão em São Paulo e no bairro Vila Mariana nos próximos 2 anos (2025-2027) que possam impactar a procura e a valorização de imóveis residenciais na região (ex: obras de mobilidade, novos empreendimentos, eventos culturais e esportivos de grande porte na cidade, expansão de infraestrutura).
+Liste os PRINCIPAIS GRANDES EVENTOS e movimentos urbanos CONFIRMADOS OU PREVISTOS que acontecerão em São Paulo (capital) ESTRITAMENTE no intervalo entre 01/07/2026 e 31/07/2027 e que possam impactar a demanda por locação por temporada e o interesse por imóveis residenciais na região da Vila Mariana (próxima ao metrô Vila Mariana e ao empreendimento residencial Vila Park, da incorporadora Matere Bittar).
 
-Para cada evento, estime o impacto no interesse por moradia na região da Vila Mariana, próxima ao metrô Vila Mariana e ao empreendimento residencial Vila Park (incorporadora Matere Bittar).
+Considere: shows e turnês internacionais, festivais (Lollapalooza, The Town se houver edição no período, Primavera Sound), esportes (GP de Interlagos F1, maratona de SP, NBA House, jogos internacionais), grandes congressos e feiras (CCXP, São Paulo Fashion Week, Bienal, Web Summit Rio se atrair público a SP), eventos culturais relevantes, Carnaval 2027 e eventos recorrentes anuais que caiam dentro do intervalo.
 
 Retorne um JSON válido (sem markdown, sem backticks) com esta estrutura:
 
@@ -30,32 +30,32 @@ Retorne um JSON válido (sem markdown, sem backticks) com esta estrutura:
     {
       "name": "Nome do evento",
       "category": "esporte|música|negócios|cultura|fórmula1|carnaval|tech|outros",
-      "dateRange": "Mês/Ano ou período estimado",
+      "dateRange": "Mês/Ano específico dentro do intervalo 07/2026–07/2027 (ex: 'Novembro/2026' ou '15–17 Mar/2027')",
       "expectedAudience": "Número estimado de pessoas impactadas/participantes",
       "dailyRateImpact": "+XX%",
-      "estimatedDailyRate": "descrição do impacto no interesse pela região",
-      "normalDailyRate": "cenário de referência sem o evento",
-      "occupancyImpact": "XX% de aumento estimado na procura por imóveis na região",
-      "description": "Breve descrição do evento e por que impacta a região",
+      "estimatedDailyRate": "faixa de diária estimada no período do evento",
+      "normalDailyRate": "faixa de diária de referência sem o evento",
+      "occupancyImpact": "XX% de aumento estimado na ocupação",
+      "description": "Breve descrição do evento e por que impacta a demanda na Vila Mariana",
       "durationDays": 3,
       "recurring": true,
       "confidence": "alta|média|baixa"
     }
   ],
-  "baselineDaily": "cenário de referência do bairro sem eventos especiais",
-  "annualHighlights": "Resumo de 2 frases sobre o calendário de eventos e o potencial de valorização para o comprador final",
+  "baselineDaily": "faixa de diária de referência do bairro sem eventos especiais",
+  "annualHighlights": "Resumo de 2 frases sobre o calendário 07/2026–07/2027 e o potencial de receita/valorização na região",
   "topMonths": ["Mês 1", "Mês 2", "Mês 3"],
-  "estimatedAnnualBoost": "+XX% de aumento estimado no interesse pela região com eventos vs período normal"
+  "estimatedAnnualBoost": "+XX% de aumento estimado na receita anual com eventos vs período normal"
 }
 
-REGRAS:
+REGRAS OBRIGATÓRIAS:
 - Retorne APENAS o JSON, sem texto antes ou depois
-- Mínimo 10 eventos, máximo 20
-- Ordene por impacto no interesse pela região (maior primeiro)
-- Inclua: eventos esportivos, shows internacionais, eventos de tech, CCXP, São Paulo Fashion Week, Lollapalooza, GP de Interlagos, maratonas, congressos, obras de mobilidade urbana relevantes para Vila Mariana, expansão de infraestrutura, Carnaval
-- Foque no impacto sobre a demanda residencial e a valorização de imóveis para o comprador final, não em hospedagem de curta duração
-- Use dados reais de edições anteriores como referência
-- Escreva em português do Brasil`;
+- SOMENTE eventos com data prevista entre 01/07/2026 e 31/07/2027. NÃO inclua eventos de 2025 nem posteriores a 31/07/2027.
+- Todos os campos "dateRange" DEVEM conter mês e ano dentro desse intervalo.
+- Mínimo 8, máximo 20 eventos
+- Ordene cronologicamente (do mais próximo ao mais distante)
+- Não invente eventos: se não houver confirmação, marque "confidence": "baixa" e use frase como "edição prevista" no dateRange.
+- Escreva 100% em português do Brasil.`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS")
