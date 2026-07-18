@@ -53,9 +53,14 @@ function getImpactColor(impact: string) {
   return "text-blue-600 bg-blue-500/10";
 }
 
-export default function EventsCalendar({ onDataLoaded }: { onDataLoaded?: (data: EventsData) => void }) {
-  // Hidden for Vila Park (residential, buyer-final)
-  return null;
+interface EventsCalendarProps {
+  onDataLoaded?: (data: EventsData) => void;
+  regionLabel?: string;
+  title?: string;
+  subtitle?: string;
+}
+
+export default function EventsCalendar({ onDataLoaded, regionLabel = "Vila Mariana", title, subtitle }: EventsCalendarProps) {
   const [data, setData] = useState<EventsData | null>(null);
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState(false);
