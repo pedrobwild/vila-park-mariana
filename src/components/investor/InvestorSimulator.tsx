@@ -7,9 +7,12 @@ import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import {
   AlertCircle,
   Building2,
+  Check,
+  Copy,
   Home,
   CalendarDays,
   MessageCircle,
