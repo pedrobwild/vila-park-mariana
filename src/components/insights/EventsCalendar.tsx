@@ -47,6 +47,16 @@ const categoryConfig: Record<string, { icon: typeof Music; label: string; color:
   outros: { icon: CalendarDays, label: "Outros", color: "bg-muted text-muted-foreground border-border" },
 };
 
+function clampImpact(impact: string): string {
+  if (!impact) return impact;
+  const match = impact.match(/-?\d+(\.\d+)?/);
+  if (!match) return impact;
+  const num = parseFloat(match[0]);
+  const clamped = Math.max(0, Math.min(100, Math.abs(num)));
+  if (clamped === Math.abs(num)) return impact;
+  return `+${Math.round(clamped)}%`;
+}
+
 function getImpactColor(impact: string) {
   const num = parseInt(impact.replace(/[^0-9]/g, ""));
   if (num >= 80) return "text-red-600 bg-red-500/10";
