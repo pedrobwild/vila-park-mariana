@@ -49,10 +49,12 @@ type SectionId =
   | "avaliar"
   | "eventos"
   | "amenities"
+  | "market"
   | "confianca"
   | "faq"
   | "cta";
 
+// All in-page sections observed for active-state tracking and hash sync.
 const sectionIds: SectionId[] = [
   "hero",
   "diagnostico",
@@ -65,7 +67,25 @@ const sectionIds: SectionId[] = [
   "avaliar",
   "eventos",
   "amenities",
+  "market",
   "confianca",
+  "faq",
+  "cta",
+];
+
+// Subset shown in the sticky pill nav (kept short to fit mobile without wrapping).
+const navSectionIds: SectionId[] = [
+  "hero",
+  "diagnostico",
+  "tese",
+  "location",
+  "typologies",
+  "matematica",
+  "simulador",
+  "avaliar",
+  "eventos",
+  "amenities",
+  "market",
   "faq",
   "cta",
 ];
@@ -82,6 +102,7 @@ const sectionLabels: Record<SectionId, string> = {
   avaliar: "Avaliar",
   eventos: "Eventos",
   amenities: "Áreas comuns",
+  market: "Mercado",
   confianca: "Confiança",
   faq: "FAQ",
   cta: "Falar",
