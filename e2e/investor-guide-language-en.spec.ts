@@ -13,7 +13,7 @@ test.describe("Guia do Investidor — troca de idioma para EN", () => {
     // Sanity: em pt-BR o nav mostra "Início" antes do toggle.
     const nav = page.getByRole("navigation", { name: /guia do investidor|investor guide/i });
     await expect(nav).toBeVisible();
-    await expect(nav.getByRole("link", { name: "Início" }).first()).toBeVisible();
+    await expect(nav.getByRole("button", { name: "Início", exact: true }).first()).toBeVisible();
 
     // Clica no LanguageSwitcher (variant compact em desktop). O aria-label em
     // pt-BR é "Idioma: Português — EN".
