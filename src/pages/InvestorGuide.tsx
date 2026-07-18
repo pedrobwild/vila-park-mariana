@@ -385,55 +385,6 @@ export default function InvestorGuide() {
           </div>
         </section>
 
-        {/* COMO FUNCIONA */}
-        <section id="howItWorks" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
-          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
-            <SectionLabel>{t("investorGuide.howItWorks.eyebrow")}</SectionLabel>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-8">{t("investorGuide.howItWorks.title")}</h2>
-
-            <div className="grid gap-4 md:grid-cols-4">
-              {steps.map((s, i) => (
-                <Card key={s.key} className="card-elevated h-full border-border/60">
-                  <CardContent className="p-5">
-                    <div className="h-8 w-8 rounded-full bg-accent/10 text-accent flex items-center justify-center font-display font-bold mb-3">
-                      {i + 1}
-                    </div>
-                    <h3 className="font-semibold text-foreground mb-2">{t(`investorGuide.howItWorks.${s.key}.title`)}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{t(`investorGuide.howItWorks.${s.key}.text`)}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ANTI-CHECKLIST */}
-        <section id="antiChecklist" className="scroll-mt-32">
-          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
-            <SectionLabel>{t("investorGuide.anti.eyebrow")}</SectionLabel>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-8">{t("investorGuide.anti.title")}</h2>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              {antiItems.map((key) => (
-                <Card key={key} className="card-elevated h-full border-destructive/20">
-                  <CardContent className="p-5 flex items-start gap-3">
-                    <XCircle className="mt-0.5 h-5 w-5 text-destructive shrink-0" />
-                    <p className="text-sm text-foreground leading-relaxed">{t(`investorGuide.anti.${key}`)}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            <div className="mt-6">
-              <a href="/ferramentas">
-                <Button variant="outline" size="lg" className="min-h-[46px]">
-                  {t("investorGuide.anti.ctaSimulate")}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </a>
-            </div>
-          </div>
-        </section>
 
         {/* FAQ */}
         <section id="faq" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
