@@ -213,7 +213,12 @@
       "matematica": "Return",
       "simulador": "Simulator",
       "avaliar": "Evaluate",
+      "marketData": "Market data",
+      "case": "Case study",
+      "totalReturn": "Total return",
+      "scenarios": "Scenarios",
       "eventos": "Events",
+      "monthlyEvents": "Monthly revenue",
       "amenities": "Amenities",
       "market": "Market",
       "confianca": "Trust",
@@ -454,6 +459,147 @@
       "subtitle": "Talk to the sales team for the price sheet, per-floor availability and updated payment conditions.",
       "wa": "Chat on WhatsApp",
       "backSim": "Back to simulator"
+    },
+    "marketData": {
+      "eyebrow": "Market data",
+      "title": "Vila Mariana by the numbers",
+      "subtitle": "Market references to calibrate your assumptions. Development-specific numbers (price, HOA) should come from the sales team.",
+      "seedBadge": "Market estimate — seed",
+      "source": "Source: aggregation of active listings and platform history (AirDNA/QuintoAndar/OLX) — market estimate, non-binding.",
+      "formulaTitle": "How to read these numbers",
+      "formulaText": "Gross yield ≈ (nightly × occupancy × 30 × 12) / total investment. Net yield deducts platform fees, cleaning, HOA, property tax and vacancy.",
+      "kpi": {
+        "daily": { "label": "Average nightly", "note": "Furnished studios in Vila Mariana" },
+        "occ": { "label": "Typical occupancy", "note": "Annual average for well-run units" },
+        "price": { "label": "Price per m²", "note": "Range for comparable launches" },
+        "listings": { "label": "Active listings", "note": "Airbnb / short-stay · Vila Mariana" }
+      },
+      "cols": {
+        "district": "District",
+        "daily": "Nightly",
+        "occ": "Occupancy",
+        "price": "R$/m²",
+        "yield": "Est. yield",
+        "verdict": "Read"
+      },
+      "verdicts": {
+        "vm": "Lower entry cost, recurring demand from healthcare/universities.",
+        "itaim": "Higher ADR, but ~40% higher entry ticket.",
+        "pinh": "High competition; requires flawless operation.",
+        "moema": "Similar profile, fewer hospital/university anchors.",
+        "consol": "Great mobility; safety perception varies by street.",
+        "rep": "Low ticket, but micro-location is critical."
+      }
+    },
+    "case": {
+      "eyebrow": "Illustrative case",
+      "title": "How a unit behaves in practice",
+      "subtitle": "An educational simulation from off-plan purchase to the first operating year — illustrative only.",
+      "badge": "Illustrative case — non-binding",
+      "disclaimer": "Development-specific numbers (price, HOA, delivery) must be confirmed with the sales team. Revenue and yield depend on investor assumptions.",
+      "composition": {
+        "title": "Investment composition",
+        "unit": "Unit (to confirm with sales)",
+        "furnish": "Furniture + linens + design",
+        "total": "Total estimated investment"
+      },
+      "timeline": {
+        "title": "From deposit to first booking",
+        "step": {
+          "1": { "t": "Reservation and deposit", "d": "Launch-phase pricing with reservation conditions." },
+          "2": { "t": "Construction phase", "d": "Installments during construction; potential appreciation until delivery." },
+          "3": { "t": "Keys and furnishing", "d": "Delivery + décor and linens setup in 30–45 days." },
+          "4": { "t": "Listing and ramp-up", "d": "Photos, platform onboarding and review curve in the first 90 days." },
+          "5": { "t": "Mature operation", "d": "Dynamic pricing, professional management and event-driven surges." }
+        }
+      },
+      "kpi": {
+        "area": "Private area",
+        "location": "Location",
+        "revenue": "Monthly revenue potential",
+        "yield": "Estimated gross yield"
+      }
+    },
+    "totalReturn": {
+      "eyebrow": "Total return",
+      "title": "Rental income + appreciation vs. fixed income",
+      "subtitle": "Combine monthly cash flow with estimated annual appreciation and compare with fixed income benchmarks (Selic, CDI, IFIX, savings), net of income tax where applicable.",
+      "baseSeed": "Without simulator inputs, we use market references only to illustrate the comparison.",
+      "sliderTitle": "Estimated annual appreciation",
+      "sliderHint": "Vila Mariana historical average over long cycles tends to fall between 4% and 8% per year, varying with the market.",
+      "chartTitle": "Total annual return (rent + appreciation) vs. fixed income",
+      "perYear": "per year",
+      "marks": {
+        "region": "Vila Mariana (base)",
+        "cons": "Conservative scenario",
+        "opt": "Optimistic scenario"
+      },
+      "rows": {
+        "studioTotal": "Studio (short-stay + appreciation)",
+        "studioRent": "Studio (traditional rent + appreciation)"
+      },
+      "conclusion": {
+        "headline": "A well-operated property tends to beat fixed income when we add rent and appreciation.",
+        "horizon": "5–10 year horizons smooth vacancy and capture appreciation cycles; fixed income offers predictability, real estate offers real protection + income."
+      },
+      "methodology": "Selic/CDI/Savings shown net of 15% income tax. IFIX considered tax-exempt. Market values are public references from March/2026 — not a promise. Property returns depend on the investor's own assumptions."
+    },
+    "scenarios": {
+      "eyebrow": "Scenarios",
+      "title": "Conservative · Base · Optimistic",
+      "subtitle": "Scenarios use your simulator inputs. Adjust occupancy and nightly rate to see return sensitivity.",
+      "seedBadge": "Using market references — open the simulator to personalize",
+      "tabs": {
+        "conservador": "Conservative",
+        "base": "Base",
+        "otimista": "Optimistic"
+      },
+      "metrics": {
+        "occ": "Occupancy",
+        "daily": "Nightly",
+        "grossM": "Gross revenue/mo",
+        "netM": "Net revenue/mo",
+        "yield": "Net yield",
+        "payback": "Payback"
+      },
+      "paybackYears": "{{n}} years",
+      "driversTitle": "Levers that most move the outcome",
+      "impact": { "high": "High impact", "med": "Medium impact" },
+      "drivers": {
+        "occupancy": {
+          "title": "Occupancy",
+          "note": "Each +5 points of occupancy ≈ +{{v}}/month of gross revenue."
+        },
+        "adr": {
+          "title": "Nightly rate (ADR)",
+          "note": "Dynamic pricing captures demand peaks; photos and reviews sustain ADR."
+        },
+        "condo": {
+          "title": "HOA + property tax",
+          "note": "Fixed cost — erodes yield in lower occupancy scenarios."
+        },
+        "ops": {
+          "title": "Operations and management",
+          "note": "Professional management raises occupancy and reviews; cost is 15%–25% of revenue."
+        }
+      }
+    },
+    "monthlyEvents": {
+      "eyebrow": "Revenue × events",
+      "title": "How major events move monthly revenue",
+      "subtitle": "Monthly revenue distribution with the estimated uplift from anchor events between July/2026 and June/2027.",
+      "seedBadge": "Using market references — open the simulator to personalize",
+      "kpi": {
+        "annualBase": "Annual revenue (base)",
+        "annualEvents": "Annual revenue (w/ events)",
+        "extra": "Estimated uplift",
+        "yield": "Gross / net yield",
+        "yieldSub": "estimate over total investment"
+      },
+      "legend": { "base": "Base", "extra": "Extra from events" },
+      "tooltip": { "base": "Base", "extra": "Extra from events", "total": "Total" },
+      "avgLine": "Monthly average",
+      "disclaimer": "Uplift estimated from nightly-rate boosts calibrated by the sp-events edge function, applied over event duration and expected occupancy. Illustrative estimate, non-binding."
     },
     "disclaimer": "This guide presents rental potential arguments based on location and product fundamentals. It does not constitute a promise of profitability, appreciation or financial return. Reservation only — the property will only be marketed after the Real Estate Incorporation Registration."
   },
