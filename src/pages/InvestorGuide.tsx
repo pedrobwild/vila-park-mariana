@@ -98,6 +98,7 @@ export default function InvestorGuide() {
   const { t, i18n } = useTranslation();
   const [activeSection, setActiveSection] = useState<SectionId>("hero");
   const [preferredTypoId, setPreferredTypoId] = useState<string | undefined>(undefined);
+  const [eventsData, setEventsData] = useState<any>(null);
 
   const whatsappLink = `https://api.whatsapp.com/send?phone=${WHATSAPP_PHONE}&text=${encodeURIComponent(
     "Olá! Vi o Guia do Investidor do Vila Park e quero mais informações.",
