@@ -396,12 +396,14 @@ export default function RevenueSimulator({ eventsData }: Props) {
   );
 }
 
-// Benchmarks: valores de março/2026 ajustados por IR (15%)
+import { BENCHMARK_RATES, netOfIR } from "@/data/benchmarkRates";
+
+// Benchmarks derivados de src/data/benchmarkRates.ts (fonte única).
 const BENCHMARKS = [
-  { name: "Selic", gross: 14.25, net: 12.11, color: "hsl(220, 70%, 50%)" },
-  { name: "CDI", gross: 14.15, net: 12.03, color: "hsl(250, 50%, 55%)" },
-  { name: "IFIX", gross: 10.8, net: 10.8, color: "hsl(30, 70%, 50%)" }, // FIIs isentos de IR para PF
-  { name: "Poupança", gross: 7.7, net: 7.7, color: "hsl(0, 0%, 55%)" },
+  { name: "Selic", gross: BENCHMARK_RATES.selic, net: netOfIR(BENCHMARK_RATES.selic), color: "hsl(220, 70%, 50%)" },
+  { name: "CDI", gross: BENCHMARK_RATES.cdi, net: netOfIR(BENCHMARK_RATES.cdi), color: "hsl(250, 50%, 55%)" },
+  { name: "IFIX", gross: BENCHMARK_RATES.ifix, net: BENCHMARK_RATES.ifix, color: "hsl(30, 70%, 50%)" }, // FIIs isentos de IR para PF
+  { name: "Poupança", gross: BENCHMARK_RATES.poupanca, net: BENCHMARK_RATES.poupanca, color: "hsl(0, 0%, 55%)" },
 ];
 
 function YieldComparison({
