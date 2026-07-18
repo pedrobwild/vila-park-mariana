@@ -534,6 +534,54 @@ export default function InvestorGuide() {
           </div>
         </section>
 
+        {/* MARKET DATA */}
+        <section id="marketData" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
+            <SectionLabel>{t("investorGuide.marketData.eyebrow")}</SectionLabel>
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3 max-w-3xl">
+              {t("investorGuide.marketData.title")}
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mb-8">{t("investorGuide.marketData.subtitle")}</p>
+            <MarketDataSection />
+          </div>
+        </section>
+
+        {/* ILLUSTRATIVE CASE */}
+        <section id="case" className="scroll-mt-32">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
+            <SectionLabel>{t("investorGuide.case.eyebrow")}</SectionLabel>
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3 max-w-3xl">
+              {t("investorGuide.case.title")}
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mb-8">{t("investorGuide.case.subtitle")}</p>
+            <IllustrativeCaseSection />
+          </div>
+        </section>
+
+        {/* TOTAL RETURN */}
+        <section id="totalReturn" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
+            <SectionLabel>{t("investorGuide.totalReturn.eyebrow")}</SectionLabel>
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3 max-w-3xl">
+              {t("investorGuide.totalReturn.title")}
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mb-8">{t("investorGuide.totalReturn.subtitle")}</p>
+            <TotalReturnSection />
+          </div>
+        </section>
+
+        {/* SCENARIOS */}
+        <section id="scenarios" className="scroll-mt-32">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
+            <SectionLabel>{t("investorGuide.scenarios.eyebrow")}</SectionLabel>
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3 max-w-3xl">
+              {t("investorGuide.scenarios.title")}
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mb-8">{t("investorGuide.scenarios.subtitle")}</p>
+            <ScenariosSection />
+          </div>
+        </section>
+
         {/* EVENTOS */}
         <section id="eventos" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
           <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
@@ -546,9 +594,23 @@ export default function InvestorGuide() {
               regionLabel="Vila Mariana"
               title={t("investorGuide.eventos.calendarTitle")}
               subtitle={t("investorGuide.eventos.calendarSubtitle")}
+              onDataLoaded={setEventsData}
             />
           </div>
         </section>
+
+        {/* MONTHLY REVENUE × EVENTS */}
+        <section id="monthlyEvents" className="scroll-mt-32">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
+            <SectionLabel>{t("investorGuide.monthlyEvents.eyebrow")}</SectionLabel>
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3 max-w-3xl">
+              {t("investorGuide.monthlyEvents.title")}
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mb-8">{t("investorGuide.monthlyEvents.subtitle")}</p>
+            <MonthlyRevenueEventsSection eventsData={eventsData} />
+          </div>
+        </section>
+
 
         {/* ÁREAS COMUNS */}
         <section id="amenities" className="scroll-mt-32">
