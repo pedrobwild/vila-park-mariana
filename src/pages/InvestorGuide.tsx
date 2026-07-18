@@ -43,14 +43,10 @@ type SectionId =
   | "nearby"
   | "typologies"
   | "amenities"
-  | "progress"
   | "market"
-  | "howItWorks"
-  | "antiChecklist"
-  | "faq"
-  | "contact";
+  | "faq";
 
-const sectionIds: SectionId[] = ["hero", "location", "nearby", "typologies", "amenities", "progress", "market", "howItWorks", "antiChecklist", "faq", "contact"];
+const sectionIds: SectionId[] = ["hero", "location", "nearby", "typologies", "amenities", "market", "faq"];
 
 const sectionLabels: Record<SectionId, string> = {
   hero: "Início",
@@ -58,12 +54,8 @@ const sectionLabels: Record<SectionId, string> = {
   nearby: "Entorno",
   typologies: "Tipologias",
   amenities: "Áreas comuns",
-  progress: "Obra",
   market: "Mercado",
-  howItWorks: "Como funciona",
-  antiChecklist: "Cuidados",
   faq: "FAQ",
-  contact: "Contato",
 };
 
 function SectionLabel({ children }: { children: ReactNode }) {
