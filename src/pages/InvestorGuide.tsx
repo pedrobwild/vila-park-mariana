@@ -375,61 +375,6 @@ export default function InvestorGuide() {
           </div>
         </section>
 
-        {/* OBRA / PROGRESS */}
-        <section id="progress" className="scroll-mt-32">
-          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
-            <SectionLabel>Obra em andamento</SectionLabel>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3 max-w-3xl">
-              Acompanhe o canteiro em imagens reais.
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mb-8">
-              Registros atualizados do empreendimento — última atualização em <strong>07/07/2026</strong>.
-            </p>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <Card className="card-elevated overflow-hidden border-border/60">
-                <img
-                  src="https://vilaparkmariana.com.br/wp-content/uploads/2026/07/fachada_07_07.jpeg"
-                  alt="Fachada do Vila Park em 07/07/2026"
-                  className="w-full h-64 object-cover"
-                  loading="lazy"
-                />
-                <CardContent className="p-5">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Hammer className="h-4 w-4 text-accent" />
-                    <h3 className="font-semibold text-foreground">Fachada · 07/07/2026</h3>
-                  </div>
-                  <p className="text-sm text-muted-foreground">Avanço da fachada no registro mais recente do canteiro.</p>
-                </CardContent>
-              </Card>
-
-              <Card className="card-elevated overflow-hidden border-border/60">
-                <img
-                  src="https://vilaparkmariana.com.br/wp-content/uploads/2025/06/obras_14_05-1.jpeg"
-                  alt="Obra Vila Park em 14/05/2025"
-                  className="w-full h-64 object-cover"
-                  loading="lazy"
-                />
-                <CardContent className="p-5">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Hammer className="h-4 w-4 text-accent" />
-                    <h3 className="font-semibold text-foreground">Canteiro · 14/05/2025</h3>
-                  </div>
-                  <p className="text-sm text-muted-foreground">Registro anterior do andamento estrutural.</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="mt-6">
-              <a href="/#progress">
-                <Button variant="outline" size="lg" className="min-h-[46px]">
-                  Ver todas as fotos da obra
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </a>
-            </div>
-          </div>
-        </section>
 
         {/* MARKET */}
         <section id="market" className="scroll-mt-32">
