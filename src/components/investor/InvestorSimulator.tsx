@@ -7,9 +7,12 @@ import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import {
   AlertCircle,
   Building2,
+  Check,
+  Copy,
   Home,
   CalendarDays,
   MessageCircle,
@@ -249,8 +252,104 @@ export default function InvestorSimulator({ initialTypologyId }: Props) {
 
   const hasResult = result.totalInvestment > 0 && (mode === "tradicional" ? rentN > 0 : dailyN > 0);
 
+  const [copied, setCopied] = useState(false);
+  const copyResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const buildSummary = (): string => {
+    const line = "─".repeat(44);
+    const modeLabel = mode === "tradicional" ? "Aluguel tradicional" : "Temporada (short stay)";
+    const rows: string[] = [];
+    rows.push("Simulação — Vila Park Mariana");
+    rows.push(new Date().toLocaleString("pt-BR"));
+    rows.push(line);
+    rows.push("Cenário");
+    rows.push(`  Tipologia: ${typo.label} (perfil ${typo.idealProfile})`);
+    rows.push(`  Modo: ${modeLabel}`);
+    rows.push(`  Nível de mobília: ${capexLevel.label} — ${fmtBRL(capex)}`);
+    rows.push("");
+    rows.push("Premissas");
+    rows.push(`  Preço da unidade: ${priceN > 0 ? fmtBRL(priceN) : "—"}`);
+    rows.push(`  Condomínio + IPTU / mês: ${condoN > 0 ? fmtBRL(condoN) : "—"}`);
+    if (mode === "tradicional") {
+      rows.push(`  Aluguel mensal estimado: ${rentN > 0 ? fmtBRL(rentN) : "—"}`);
+    } else {
+      rows.push(`  Diária média (base): ${dailyN > 0 ? fmtBRL(dailyN) : "—"}`);
+      rows.push(`  Boost de padrão: ×${capexLevel.rateBoost.toFixed(2)}`);
+      rows.push(`  Ocupação estimada: ${occupancy[0]}%`);
+    }
+    rows.push("");
+    rows.push("Resultado");
+    if (!hasResult) {
+      rows.push("  Preencha as premissas para ver os resultados.");
+    } else {
+      rows.push(`  Investimento total: ${fmtBRL(result.totalInvestment)}`);
+      rows.push(`    • Unidade: ${fmtBRL(priceN)}`);
+      rows.push(`    • Mobília / enxoval: ${fmtBRL(capex)}`);
+      rows.push(`  Receita bruta / mês: ${fmtBRL(result.monthlyGross)}`);
+      if (mode === "temporada") {
+        rows.push(`    • (-) Plataforma (~18%): -${fmtBRL(result.platformFee)}`);
+        rows.push(`    • (-) Limpeza e gestão (~12%): -${fmtBRL(result.cleaningFee)}`);
+      }
+      rows.push(`    • (-) Condomínio + IPTU: -${fmtBRL(condoN)}`);
+      rows.push(`  Líquido / mês: ${fmtBRL(result.monthlyNet)}`);
+      rows.push(`  Líquido / ano: ${fmtBRL(result.annualNet)}`);
+      rows.push(`  Yield a.a.: ${fmtPct(result.yieldPct)}`);
+      rows.push(`  Payback: ${result.payback > 0 ? `${result.payback.toFixed(1)} anos` : "—"}`);
+    }
+    rows.push(line);
+    rows.push(
+      "Projeção ilustrativa com premissas do próprio usuário. Não constitui promessa de rentabilidade.",
+    );
+    return rows.join("\n");
+  };
+
+  const handleCopy = async () => {
+    const text = buildSummary();
+    let ok = false;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        ok = true;
+      } else {
+        // Fallback para navegadores sem Clipboard API (http, iframes antigos).
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "absolute";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.select();
+        ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
+    } catch {
+      ok = false;
+    }
+
+    if (ok) {
+      setCopied(true);
+      toast.success("Resumo copiado", {
+        description: "O texto está na sua área de transferência.",
+      });
+      if (copyResetRef.current) clearTimeout(copyResetRef.current);
+      copyResetRef.current = setTimeout(() => setCopied(false), 2000);
+    } else {
+      toast.error("Não foi possível copiar", {
+        description: "Copie manualmente ou tente novamente.",
+      });
+    }
+  };
+
+  useEffect(
+    () => () => {
+      if (copyResetRef.current) clearTimeout(copyResetRef.current);
+    },
+    [],
+  );
+
   return (
     <Card className="card-elevated border-accent/20">
+
       <CardContent className="p-5 md:p-7 space-y-6">
         {/* Header — tipologia + modo */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
@@ -511,7 +610,27 @@ export default function InvestorSimulator({ initialTypologyId }: Props) {
                   <MessageCircle className="mr-2 h-4 w-4" />
                   Quero falar sobre essa tipologia
                 </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="min-h-[46px]"
+                  onClick={handleCopy}
+                  aria-live="polite"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="mr-2 h-4 w-4" />
+                      Resumo copiado
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="mr-2 h-4 w-4" />
+                      Copiar resumo
+                    </>
+                  )}
+                </Button>
               </div>
+
             </>
           )}
         </div>
