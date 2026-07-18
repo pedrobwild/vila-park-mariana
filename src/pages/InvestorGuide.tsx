@@ -9,23 +9,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
-import { PROPERTY } from "@/data/propertyData";
-import { WHATSAPP_PHONE } from "@/data/surroundings";
-import ReservationForm from "@/components/ReservationForm";
 import { POIS } from "@/data/surroundings";
 import {
-  ArrowRight,
   Briefcase,
   Building2,
-  Coffee,
   Compass,
   Dumbbell,
   GraduationCap,
-  Hammer,
   KeyRound,
-  MapPin,
   MessageCircle,
-  Phone,
   ShieldCheck,
   ShoppingBag,
   Sparkles,
@@ -34,7 +26,6 @@ import {
   Trees,
   TrendingUp,
   Utensils,
-  XCircle,
 } from "lucide-react";
 
 type SectionId =
