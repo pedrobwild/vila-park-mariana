@@ -47,6 +47,16 @@ const categoryConfig: Record<string, { icon: typeof Music; label: string; color:
   outros: { icon: CalendarDays, label: "Outros", color: "bg-muted text-muted-foreground border-border" },
 };
 
+function clampImpact(impact: string): string {
+  if (!impact) return impact;
+  const match = impact.match(/-?\d+(\.\d+)?/);
+  if (!match) return impact;
+  const num = parseFloat(match[0]);
+  const clamped = Math.max(0, Math.min(100, Math.abs(num)));
+  if (clamped === Math.abs(num)) return impact;
+  return `+${Math.round(clamped)}%`;
+}
+
 function getImpactColor(impact: string) {
   const num = parseInt(impact.replace(/[^0-9]/g, ""));
   if (num >= 80) return "text-red-600 bg-red-500/10";
@@ -189,6 +199,7 @@ export default function EventsCalendar({
     if (!data?.events) return [] as EventItem[];
     return data.events
       .filter(isInWindow)
+      .map((e) => ({ ...e, dailyRateImpact: clampImpact(e.dailyRateImpact) }))
       .sort((a, b) => firstDateForSort(a) - firstDateForSort(b));
   }, [data]);
 
@@ -431,6 +442,12 @@ export default function EventsCalendar({
               ))}
             </p>
           )}
+          <p className="text-[11px] text-muted-foreground/70 leading-relaxed border-t border-border/40 pt-3">
+            {t("eventsCalendar.calibrationNote", {
+              defaultValue:
+                "Estimativas de impacto na diária calibradas pela prática de mercado em bairros conectados; imóveis vizinhos aos venues praticam variações maiores. O anfitrião captura o aumento ajustando preços por data (a plataforma exibe o preço total ao hóspede).",
+            })}
+          </p>
         </div>
       )}
     </section>

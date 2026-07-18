@@ -688,6 +688,7 @@
     "emptyWindow": "Nenhum evento encontrado para o período ({{window}}).",
     "showLess": "Mostrar menos",
     "showAll": "Ver todos os {{count}} eventos",
-    "sources": "Fontes"
+    "sources": "Fontes",
+    "calibrationNote": "Estimativas de impacto na diária calibradas pela prática de mercado em bairros conectados; imóveis vizinhos aos venues praticam variações maiores. O anfitrião captura o aumento ajustando preços por data (a plataforma exibe o preço total ao hóspede)."
   }
 }

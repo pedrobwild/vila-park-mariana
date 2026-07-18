@@ -7,7 +7,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const CACHE_KEY = "sp_events_v2_jul2026_jul2027";
+const CACHE_KEY = "sp_events_v3_jul2026_jul2027_tiered";
 const CACHE_TTL_HOURS = 72; // events don't change often
 
 function getSupabaseAdmin() {
@@ -47,6 +47,17 @@ Retorne um JSON válido (sem markdown, sem backticks) com esta estrutura:
   "topMonths": ["Mês 1", "Mês 2", "Mês 3"],
   "estimatedAnnualBoost": "+XX% de aumento estimado na receita anual com eventos vs período normal"
 }
+
+CALIBRAÇÃO OBRIGATÓRIA DE "dailyRateImpact" POR TIER (aplicada à Vila Mariana — bairro bem conectado via Metrô Linha 1-Azul, MAS NÃO vizinho dos venues como Interlagos/Autódromo, Allianz Parque, MorumBIS, Anhembi, SP Expo):
+
+- TIER ÂNCORA (GP de F1 em Interlagos, Lollapalooza, The Town se houver edição, Carnaval de SP, turnês/shows internacionais em estádio como MorumBIS/Allianz/Arena Corinthians): "dailyRateImpact" entre "+25%" e "+60%" na Vila Mariana. Observação de mercado: em bairros vizinhos ao venue as diárias sobem +100% a +300% e as buscas no Airbnb tiveram picos de +140% no Lollapalooza 2026 — MAS o número que você retorna é o da Vila Mariana (atenuado pela distância), NÃO o do entorno imediato do venue.
+- TIER GRANDE (CCXP, São Paulo Fashion Week, Bienal do Livro, Festival do Japão, grandes congressos/feiras no SP Expo, Anhembi ou Expo Center Norte): "dailyRateImpact" entre "+10%" e "+30%".
+- TIER MÉDIO (maratona de SP, convenções médias, férias escolares, eventos culturais recorrentes, NBA House sem final): "dailyRateImpact" entre "+5%" e "+15%".
+
+REGRAS DE COERÊNCIA NUMÉRICA:
+- "estimatedDailyRate" DEVE ser coerente com aplicar o "dailyRateImpact" sobre a faixa "normalDailyRate" (ex.: normal R$ 300–400 + 40% ≈ R$ 420–560).
+- Eventos TIER ÂNCORA no intervalo devem puxar os "topMonths" e elevar o "estimatedAnnualBoost" para faixa "+20%" a "+35%". Sem âncoras na janela, mantenha "estimatedAnnualBoost" entre "+8%" e "+18%".
+- Nunca retorne "dailyRateImpact" acima de "+60%" nem abaixo de "+5%" para eventos válidos.
 
 REGRAS OBRIGATÓRIAS:
 - Retorne APENAS o JSON, sem texto antes ou depois
