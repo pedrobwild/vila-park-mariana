@@ -78,6 +78,59 @@ interface Props {
   initialTypologyId?: string;
 }
 
+interface CurrencyFieldProps {
+  id: string;
+  label: string;
+  value: string; // digits-only string
+  onChange: (raw: string) => void;
+  placeholder?: string;
+  hint?: string;
+  error?: string | null;
+}
+
+function CurrencyField({ id, label, value, onChange, placeholder, hint, error }: CurrencyFieldProps) {
+  const display = value ? formatBRL(value) : "";
+  return (
+    <div>
+      <Label htmlFor={id}>{label} (R$)</Label>
+      <div className="relative mt-1.5">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-muted-foreground"
+        >
+          R$
+        </span>
+        <Input
+          id={id}
+          type="text"
+          inputMode="numeric"
+          autoComplete="off"
+          value={display}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${id}-error` : `${id}-hint`}
+          className={cn(
+            "min-h-[46px] pl-10 text-base tabular-nums",
+            error && "border-destructive focus-visible:ring-destructive",
+          )}
+        />
+      </div>
+      {error ? (
+        <p id={`${id}-error`} className="mt-1 flex items-center gap-1.5 text-[12px] text-destructive">
+          <AlertCircle className="h-3.5 w-3.5 shrink-0" /> {error}
+        </p>
+      ) : hint ? (
+        <p id={`${id}-hint`} className="text-[11px] text-muted-foreground mt-1">
+          {hint}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+
+
 export default function InvestorSimulator({ initialTypologyId }: Props) {
   const stored = typeof window !== "undefined" ? simulatorStorage.load() : null;
 
