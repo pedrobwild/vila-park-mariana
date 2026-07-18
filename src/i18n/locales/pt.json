@@ -460,7 +460,148 @@
       "wa": "Falar no WhatsApp",
       "backSim": "Voltar ao simulador"
     },
-    "disclaimer": "Este guia apresenta argumentos de potencial locatício, com base em fundamentos de localização e produto. Não constitui promessa de rentabilidade, valorização ou retorno financeiro. Apenas para reserva — o empreendimento só será comercializado após o Registro de Incorporação Imobiliária."
+    "marketData": {
+      "eyebrow": "Dados de mercado",
+      "title": "Vila Mariana em números",
+      "subtitle": "Referências de mercado para você calibrar suas premissas. Números do empreendimento (preço, condomínio) devem vir do time de vendas.",
+      "seedBadge": "Estimativa de mercado — seed",
+      "source": "Fonte: agregação de anúncios ativos e histórico de plataformas (AirDNA/QuintoAndar/OLX) — estimativa de mercado, não vinculante.",
+      "formulaTitle": "Como lemos esses números",
+      "formulaText": "Yield bruto ≈ (diária × ocupação × 30 × 12) / investimento total. O yield líquido desconta taxas de plataforma, limpeza, condomínio, IPTU e vacância.",
+      "kpi": {
+        "daily": { "label": "Diária média", "note": "Studios mobiliados na Vila Mariana" },
+        "occ": { "label": "Ocupação típica", "note": "Média anual para bem operado" },
+        "price": { "label": "Preço por m²", "note": "Faixa de lançamentos comparáveis" },
+        "listings": { "label": "Anúncios ativos", "note": "Airbnb / temporada · Vila Mariana" }
+      },
+      "cols": {
+        "district": "Bairro",
+        "daily": "Diária",
+        "occ": "Ocupação",
+        "price": "R$/m²",
+        "yield": "Yield estim.",
+        "verdict": "Leitura"
+      },
+      "verdicts": {
+        "vm": "Custo de entrada mais baixo, demanda recorrente por saúde/universidades.",
+        "itaim": "ADR alto, mas ticket de entrada quase 40% acima.",
+        "pinh": "Alta competição; exige operação impecável.",
+        "moema": "Perfil similar, com menos hospitais/universidades como âncoras.",
+        "consol": "Boa mobilidade; percepção de segurança varia por rua.",
+        "rep": "Ticket baixo, mas micro-localização crítica."
+      }
+    },
+    "case": {
+      "eyebrow": "Case ilustrativo",
+      "title": "Como uma unidade se comporta na prática",
+      "subtitle": "Uma simulação didática de compra na planta até o primeiro ano de operação — apenas ilustrativa.",
+      "badge": "Case ilustrativo — não vinculante",
+      "disclaimer": "Números do empreendimento (preço, condomínio, entrega) devem ser confirmados com o time de vendas. Receita e yield dependem de premissas do investidor.",
+      "composition": {
+        "title": "Composição do investimento",
+        "unit": "Unidade (à confirmar com vendas)",
+        "furnish": "Mobília + enxoval + design",
+        "total": "Investimento total estimado"
+      },
+      "timeline": {
+        "title": "Do sinal à primeira reserva",
+        "step": {
+          "1": { "t": "Reserva e sinal", "d": "Entrada na tabela do lançamento com condições da fase de reserva." },
+          "2": { "t": "Fase de obra", "d": "Parcelas durante a construção; possível valorização até a entrega." },
+          "3": { "t": "Chaves e mobília", "d": "Entrega + montagem de decoração e enxoval em 30–45 dias." },
+          "4": { "t": "Anúncio e ramp-up", "d": "Fotos, cadastro em plataformas e curva de reviews nos primeiros 90 dias." },
+          "5": { "t": "Operação madura", "d": "Precificação dinâmica, gestão profissional e reforços em datas âncora." }
+        }
+      },
+      "kpi": {
+        "area": "Área privativa",
+        "location": "Localização",
+        "revenue": "Receita mensal potencial",
+        "yield": "Yield bruto estimado"
+      }
+    },
+    "totalReturn": {
+      "eyebrow": "Retorno total",
+      "title": "Renda + valorização vs. renda fixa",
+      "subtitle": "Combine o fluxo mensal com a valorização anual estimada e compare com benchmarks de renda fixa (Selic, CDI, IFIX, poupança), líquido de IR quando aplicável.",
+      "baseSeed": "Sem dados do simulador, usamos referências de mercado apenas para ilustrar a comparação.",
+      "sliderTitle": "Valorização anual estimada",
+      "sliderHint": "Média histórica da Vila Mariana em ciclos longos costuma ficar entre 4% e 8% a.a., variando conforme mercado.",
+      "chartTitle": "Retorno anual total (renda + valorização) vs. renda fixa",
+      "perYear": "ao ano",
+      "marks": {
+        "region": "Vila Mariana (base)",
+        "cons": "Cenário conservador",
+        "opt": "Cenário otimista"
+      },
+      "rows": {
+        "studioTotal": "Studio (temporada + valorização)",
+        "studioRent": "Studio (renda tradicional + valorização)"
+      },
+      "conclusion": {
+        "headline": "O imóvel bem operado tende a superar a renda fixa quando somamos renda e valorização.",
+        "horizon": "Horizontes de 5–10 anos suavizam vacância e capturam ciclos de valorização; renda fixa entrega previsibilidade, imóvel entrega proteção real + renda."
+      },
+      "methodology": "Selic/CDI/Poupança líquidos aplicam 15% de IR. IFIX considerado isento. Valores de mercado são referências públicas em março/2026 — não constituem promessa. Rentabilidade do imóvel depende de premissas do próprio investidor."
+    },
+    "scenarios": {
+      "eyebrow": "Cenários",
+      "title": "Conservador · Base · Otimista",
+      "subtitle": "Os cenários usam suas premissas do simulador. Ajuste ocupação e diária para ver a sensibilidade do retorno.",
+      "seedBadge": "Usando referências de mercado — abra o simulador para personalizar",
+      "tabs": {
+        "conservador": "Conservador",
+        "base": "Base",
+        "otimista": "Otimista"
+      },
+      "metrics": {
+        "occ": "Ocupação",
+        "daily": "Diária",
+        "grossM": "Receita bruta/mês",
+        "netM": "Receita líquida/mês",
+        "yield": "Yield líquido",
+        "payback": "Payback"
+      },
+      "paybackYears": "{{n}} anos",
+      "driversTitle": "Alavancas que mais movem o resultado",
+      "impact": { "high": "Alto impacto", "med": "Impacto médio" },
+      "drivers": {
+        "occupancy": {
+          "title": "Ocupação",
+          "note": "Cada +5 pontos de ocupação ≈ +{{v}}/mês de receita bruta."
+        },
+        "adr": {
+          "title": "Diária (ADR)",
+          "note": "Precificação dinâmica captura picos de demanda; fotos e reviews sustentam ADR."
+        },
+        "condo": {
+          "title": "Condomínio + IPTU",
+          "note": "Custo fixo — corrói yield em cenários de menor ocupação."
+        },
+        "ops": {
+          "title": "Operação e gestão",
+          "note": "Gestão profissional aumenta ocupação e reviews; custo fica entre 15% e 25% da receita."
+        }
+      }
+    },
+    "monthlyEvents": {
+      "eyebrow": "Receita × eventos",
+      "title": "Como os grandes eventos movem a receita mensal",
+      "subtitle": "Distribuição mensal de receita, com o incremento estimado por eventos-âncora entre julho/2026 e junho/2027.",
+      "seedBadge": "Usando referências de mercado — abra o simulador para personalizar",
+      "kpi": {
+        "annualBase": "Receita anual (base)",
+        "annualEvents": "Receita anual (c/ eventos)",
+        "extra": "Incremento estimado",
+        "yield": "Yield bruto / líquido",
+        "yieldSub": "estimativa sobre investimento total"
+      },
+      "legend": { "base": "Base", "extra": "Extra por eventos" },
+      "tooltip": { "base": "Base", "extra": "Extra por eventos", "total": "Total" },
+      "avgLine": "Média mensal",
+      "disclaimer": "Incremento estimado a partir dos uplifts de diária calibrados pela edge function sp-events, aplicados sobre a duração dos eventos e a ocupação prevista. Estimativa ilustrativa, não vinculante."
+    },
+
   },
   "investorQuiz": {
     "progress": "Pergunta {{i}} de {{n}}",
