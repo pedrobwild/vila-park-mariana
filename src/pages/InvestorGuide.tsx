@@ -49,10 +49,12 @@ type SectionId =
   | "avaliar"
   | "eventos"
   | "amenities"
+  | "market"
   | "confianca"
   | "faq"
   | "cta";
 
+// All in-page sections observed for active-state tracking and hash sync.
 const sectionIds: SectionId[] = [
   "hero",
   "diagnostico",
@@ -65,7 +67,25 @@ const sectionIds: SectionId[] = [
   "avaliar",
   "eventos",
   "amenities",
+  "market",
   "confianca",
+  "faq",
+  "cta",
+];
+
+// Subset shown in the sticky pill nav (kept short to fit mobile without wrapping).
+const navSectionIds: SectionId[] = [
+  "hero",
+  "diagnostico",
+  "tese",
+  "location",
+  "typologies",
+  "matematica",
+  "simulador",
+  "avaliar",
+  "eventos",
+  "amenities",
+  "market",
   "faq",
   "cta",
 ];
@@ -82,6 +102,7 @@ const sectionLabels: Record<SectionId, string> = {
   avaliar: "Avaliar",
   eventos: "Eventos",
   amenities: "Áreas comuns",
+  market: "Mercado",
   confianca: "Confiança",
   faq: "FAQ",
   cta: "Falar",
@@ -141,40 +162,92 @@ export default function InvestorGuide() {
       : "Guia do Investidor · Vila Park Vila Mariana";
   }, [i18n.language]);
 
-  // Deep link via hash
-  useEffect(() => {
-    const hash = window.location.hash.replace("#", "") as SectionId;
-    if (hash && sectionIds.includes(hash)) {
-      setTimeout(() => document.getElementById(hash)?.scrollIntoView({ behavior: "smooth", block: "start" }), 150);
+  const prefersReducedMotion =
+    typeof window !== "undefined" &&
+    window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+
+  const scrollTo = (id: SectionId, updateHash = true) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+    if (updateHash) {
+      const nextHash = id === "hero" ? " " : `#${id}`;
+      window.history.replaceState(null, "", nextHash);
     }
-  }, []);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible?.target?.id) {
-          const id = visible.target.id as SectionId;
-          setActiveSection(id);
-          if (window.location.hash !== `#${id}`) {
-            window.history.replaceState(null, "", `#${id}`);
-          }
-        }
-      },
-      { rootMargin: "-20% 0px -55% 0px", threshold: [0.15, 0.35, 0.65] },
-    );
-    sectionIds.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-    return () => observer.disconnect();
-  }, []);
-
-  const scrollTo = (id: SectionId) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setActiveSection(id);
   };
+
+  // Deep link via hash — wait one paint so sticky nav + images are laid out,
+  // otherwise scroll-margin resolves against the wrong offset.
+  useEffect(() => {
+    const raw = window.location.hash.replace("#", "");
+    if (!raw) return;
+    const hash = raw as SectionId;
+    if (!sectionIds.includes(hash)) return;
+    let cancelled = false;
+    const run = () => {
+      if (cancelled) return;
+      const el = document.getElementById(hash);
+      if (!el) return;
+      el.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+      setActiveSection(hash);
+    };
+    // Two rAFs + a small timeout to survive layout shifts from lazy content.
+    requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(run, 60)));
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Scroll spy: pick the section whose top is nearest to the sticky-nav offset.
+  // More reliable than intersectionRatio when sections have very different heights.
+  useEffect(() => {
+    const getOffset = () => {
+      // AppNavbar (h-16 = 64px) + sticky pill nav (~52px). Match scroll-mt-32 (128px).
+      return 128;
+    };
+
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      const offset = getOffset() + 8;
+      let currentId: SectionId = "hero";
+      let bestTop = -Infinity;
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const top = el.getBoundingClientRect().top - offset;
+        if (top <= 0 && top > bestTop) {
+          bestTop = top;
+          currentId = id;
+        }
+      }
+      // Near bottom of page → force last section active.
+      if (
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 4
+      ) {
+        currentId = sectionIds[sectionIds.length - 1];
+      }
+      setActiveSection((prev) => (prev === currentId ? prev : currentId));
+    };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+
 
   const locationItems = [
     { icon: Train, titleKey: "investorGuide.location.mobility.title", textKey: "investorGuide.location.mobility.text" },
@@ -278,29 +351,37 @@ export default function InvestorGuide() {
     <div className="min-h-screen bg-background page-enter">
       <AppNavbar />
 
-      <div className="sticky top-16 z-30 glass-nav border-t border-border/40">
+      <nav
+        aria-label="Seções do Guia do Investidor"
+        className="sticky top-16 z-30 glass-nav border-t border-border/40"
+      >
         <div className="max-w-7xl mx-auto px-4 md:px-6 overflow-x-auto scrollbar-none">
-          <div className="flex items-center gap-2 min-w-max py-3">
+          <div className="flex items-center gap-2 min-w-max py-2">
             <span className="font-display font-bold text-base mr-1 shrink-0">Vila Park</span>
             <Separator orientation="vertical" className="h-5 mr-1" />
-            {sectionIds.map((id) => (
-              <button
-                key={id}
-                type="button"
-                onClick={() => scrollTo(id)}
-                className={cn(
-                  "rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
-                  activeSection === id
-                    ? "bg-accent text-accent-foreground"
-                    : "bg-transparent text-muted-foreground hover:text-foreground hover:bg-secondary",
-                )}
-              >
-                {sectionLabels[id]}
-              </button>
-            ))}
+            {navSectionIds.map((id) => {
+              const isActive = activeSection === id;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => scrollTo(id)}
+                  aria-current={isActive ? "true" : undefined}
+                  className={cn(
+                    "inline-flex items-center rounded-full px-3 min-h-[36px] text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                    isActive
+                      ? "bg-accent text-accent-foreground"
+                      : "bg-transparent text-muted-foreground hover:text-foreground hover:bg-secondary",
+                  )}
+                >
+                  {sectionLabels[id]}
+                </button>
+              );
+            })}
           </div>
         </div>
-      </div>
+      </nav>
+
 
       <main className="pb-24">
         {/* HERO */}
