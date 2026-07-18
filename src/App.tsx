@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import RequireAuth from "./components/auth/RequireAuth";
 
 const UrbanFlexInvestorGuide = lazy(() => import("./pages/UrbanFlexInvestorGuide"));
 const InvestorGuide = lazy(() => import("./pages/InvestorGuide"));
@@ -32,9 +33,9 @@ const App = () => (
               {/* Legacy path — redirect to home */}
               <Route path="/urban-flex-bela-cintra" element={<Navigate to="/" replace />} />
               <Route path="/ferramentas" element={<Ferramentas />} />
-              <Route path="/admin/upload" element={<AdminUpload />} />
-              <Route path="/insights" element={<Insights />} />
-              <Route path="/corretor" element={<CorretorPage />} />
+              <Route path="/admin/upload" element={<RequireAuth><AdminUpload /></RequireAuth>} />
+              <Route path="/insights" element={<RequireAuth><Insights /></RequireAuth>} />
+              <Route path="/corretor" element={<RequireAuth><CorretorPage /></RequireAuth>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
