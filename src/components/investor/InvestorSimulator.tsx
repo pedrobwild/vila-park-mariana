@@ -610,7 +610,27 @@ export default function InvestorSimulator({ initialTypologyId }: Props) {
                   <MessageCircle className="mr-2 h-4 w-4" />
                   Quero falar sobre essa tipologia
                 </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="min-h-[46px]"
+                  onClick={handleCopy}
+                  aria-live="polite"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="mr-2 h-4 w-4" />
+                      Resumo copiado
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="mr-2 h-4 w-4" />
+                      Copiar resumo
+                    </>
+                  )}
+                </Button>
               </div>
+
             </>
           )}
         </div>
