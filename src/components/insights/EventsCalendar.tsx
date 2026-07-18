@@ -53,9 +53,14 @@ function getImpactColor(impact: string) {
   return "text-blue-600 bg-blue-500/10";
 }
 
-export default function EventsCalendar({ onDataLoaded }: { onDataLoaded?: (data: EventsData) => void }) {
-  // Hidden for Vila Park (residential, buyer-final)
-  return null;
+interface EventsCalendarProps {
+  onDataLoaded?: (data: EventsData) => void;
+  regionLabel?: string;
+  title?: string;
+  subtitle?: string;
+}
+
+export default function EventsCalendar({ onDataLoaded, regionLabel = "Vila Mariana", title, subtitle }: EventsCalendarProps) {
   const [data, setData] = useState<EventsData | null>(null);
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -99,10 +104,10 @@ export default function EventsCalendar({ onDataLoaded }: { onDataLoaded?: (data:
             Calendário de Eventos SP
           </Badge>
           <h2 className="font-display text-xl md:text-2xl font-bold text-foreground">
-            Grandes Eventos × Impacto nas Diárias
+            {title ?? "Grandes eventos × demanda de locação em SP"}
           </h2>
           <p className="text-muted-foreground text-sm mt-1 max-w-xl">
-            Eventos confirmados e previstos em São Paulo (2025–2027) e quanto cada um impacta o valor da diária na região do Urban Flex.
+            {subtitle ?? `Eventos confirmados e previstos em São Paulo (2025–2027) e como cada um pode impactar a demanda de locação por temporada na região da ${regionLabel}.`}
           </p>
         </div>
         <Button
