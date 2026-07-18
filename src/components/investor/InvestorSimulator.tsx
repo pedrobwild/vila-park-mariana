@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,15 +8,50 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import {
+  AlertCircle,
   Building2,
   Home,
   CalendarDays,
   MessageCircle,
   Info,
+  RotateCcw,
   TrendingUp,
 } from "lucide-react";
 import { TYPOLOGIES, type Typology } from "@/data/propertyData";
 import { WHATSAPP_PHONE } from "@/data/surroundings";
+import { simulatorStorage, type SimulatorPersisted } from "./persistence";
+
+// Limites (cap) por campo — evitam inputs absurdos e travam o teclado numérico.
+const LIMITS = {
+  price: { min: 0, max: 50_000_000, softMin: 100_000, softMax: 20_000_000 },
+  condoIptu: { min: 0, max: 50_000, softMin: 200, softMax: 10_000 },
+  rent: { min: 0, max: 200_000, softMin: 800, softMax: 50_000 },
+  daily: { min: 0, max: 20_000, softMin: 100, softMax: 5_000 },
+} as const;
+
+// Extrai apenas dígitos e aplica cap. Retorna string vazia se não houver dígitos.
+function digitsOnly(input: string, cap: number): string {
+  const only = input.replace(/\D/g, "").replace(/^0+(?=\d)/, "");
+  if (!only) return "";
+  const n = Math.min(Number(only), cap);
+  return String(n);
+}
+
+// Formata para pt-BR com separador de milhar (sem símbolo — já mostramos "R$" no prefixo).
+function formatBRL(digits: string): string {
+  if (!digits) return "";
+  return Number(digits).toLocaleString("pt-BR");
+}
+
+function validate(field: keyof typeof LIMITS, value: string): string | null {
+  if (!value) return null;
+  const n = Number(value);
+  const { softMin, softMax } = LIMITS[field];
+  if (n > 0 && n < softMin) return "Valor muito baixo — confira se digitou certo.";
+  if (n > softMax) return "Valor muito alto — confira se digitou certo.";
+  return null;
+}
+
 
 const CAPEX_LEVELS = [
   { id: "essencial", label: "Essencial", capex: 25000, rateBoost: 1.0, note: "Mobília funcional e enxoval básico." },
@@ -43,16 +78,75 @@ interface Props {
   initialTypologyId?: string;
 }
 
-export default function InvestorSimulator({ initialTypologyId }: Props) {
-  const [typoId, setTypoId] = useState<string>(initialTypologyId ?? TYPOLOGIES[0].id);
-  const [mode, setMode] = useState<Mode>("tradicional");
-  const [capexLevelId, setCapexLevelId] = useState<(typeof CAPEX_LEVELS)[number]["id"]>("premium");
+interface CurrencyFieldProps {
+  id: string;
+  label: string;
+  value: string; // digits-only string
+  onChange: (raw: string) => void;
+  placeholder?: string;
+  hint?: string;
+  error?: string | null;
+}
 
-  const [price, setPrice] = useState<string>("");
-  const [rent, setRent] = useState<string>("");
-  const [daily, setDaily] = useState<string>("");
-  const [occupancy, setOccupancy] = useState<number[]>([70]);
-  const [condoIptu, setCondoIptu] = useState<string>("");
+function CurrencyField({ id, label, value, onChange, placeholder, hint, error }: CurrencyFieldProps) {
+  const display = value ? formatBRL(value) : "";
+  return (
+    <div>
+      <Label htmlFor={id}>{label} (R$)</Label>
+      <div className="relative mt-1.5">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-muted-foreground"
+        >
+          R$
+        </span>
+        <Input
+          id={id}
+          type="text"
+          inputMode="numeric"
+          autoComplete="off"
+          value={display}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${id}-error` : `${id}-hint`}
+          className={cn(
+            "min-h-[46px] pl-10 text-base tabular-nums",
+            error && "border-destructive focus-visible:ring-destructive",
+          )}
+        />
+      </div>
+      {error ? (
+        <p id={`${id}-error`} className="mt-1 flex items-center gap-1.5 text-[12px] text-destructive">
+          <AlertCircle className="h-3.5 w-3.5 shrink-0" /> {error}
+        </p>
+      ) : hint ? (
+        <p id={`${id}-hint`} className="text-[11px] text-muted-foreground mt-1">
+          {hint}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+
+
+export default function InvestorSimulator({ initialTypologyId }: Props) {
+  const stored = typeof window !== "undefined" ? simulatorStorage.load() : null;
+
+  const [typoId, setTypoId] = useState<string>(
+    initialTypologyId ?? stored?.typoId ?? TYPOLOGIES[0].id,
+  );
+  const [mode, setMode] = useState<Mode>((stored?.mode as Mode) ?? "tradicional");
+  const [capexLevelId, setCapexLevelId] = useState<(typeof CAPEX_LEVELS)[number]["id"]>(
+    (stored?.capexLevelId as (typeof CAPEX_LEVELS)[number]["id"]) ?? "premium",
+  );
+
+  const [price, setPrice] = useState<string>(stored?.price ?? "");
+  const [rent, setRent] = useState<string>(stored?.rent ?? "");
+  const [daily, setDaily] = useState<string>(stored?.daily ?? "");
+  const [occupancy, setOccupancy] = useState<number[]>([stored?.occupancy ?? 70]);
+  const [condoIptu, setCondoIptu] = useState<string>(stored?.condoIptu ?? "");
 
   const typo = TYPOLOGIES.find((t) => t.id === typoId) ?? TYPOLOGIES[0];
   const capexLevel = CAPEX_LEVELS.find((c) => c.id === capexLevelId)!;
@@ -61,6 +155,45 @@ export default function InvestorSimulator({ initialTypologyId }: Props) {
   useEffect(() => {
     if (initialTypologyId) setTypoId(initialTypologyId);
   }, [initialTypologyId]);
+
+  // Persistência com debounce leve — evita gravar a cada tecla.
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => {
+      const payload: SimulatorPersisted = {
+        typoId,
+        mode,
+        capexLevelId,
+        price,
+        rent,
+        daily,
+        occupancy: occupancy[0],
+        condoIptu,
+      };
+      simulatorStorage.save(payload);
+    }, 250);
+    return () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+    };
+  }, [typoId, mode, capexLevelId, price, rent, daily, occupancy, condoIptu]);
+
+  const handleReset = () => {
+    simulatorStorage.clear();
+    setPrice("");
+    setRent("");
+    setDaily("");
+    setCondoIptu("");
+    setOccupancy([70]);
+    setCapexLevelId("premium");
+    setMode("tradicional");
+    setTypoId(initialTypologyId ?? TYPOLOGIES[0].id);
+  };
+
+  const priceError = validate("price", price);
+  const condoError = validate("condoIptu", condoIptu);
+  const rentError = validate("rent", rent);
+  const dailyError = validate("daily", daily);
 
   const priceN = Number(price) || 0;
   const rentN = Number(rent) || 0;
@@ -177,21 +310,15 @@ export default function InvestorSimulator({ initialTypologyId }: Props) {
 
         {/* Inputs */}
         <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <Label htmlFor="price">Preço da unidade (R$)</Label>
-            <Input
-              id="price"
-              type="number"
-              inputMode="numeric"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder={`ex.: ${hint?.price ?? 600000}`}
-              className="mt-1.5 min-h-[46px]"
-            />
-            <p className="text-[11px] text-muted-foreground mt-1">
-              Estimativa de mercado — substitua pelo valor real da tabela.
-            </p>
-          </div>
+          <CurrencyField
+            id="price"
+            label="Preço da unidade"
+            value={price}
+            onChange={(v) => setPrice(digitsOnly(v, LIMITS.price.max))}
+            placeholder={formatBRL(String(hint?.price ?? 600000))}
+            hint="Estimativa de mercado — substitua pelo valor real da tabela."
+            error={priceError}
+          />
 
           <div>
             <Label>Nível de mobília / enxoval (capex)</Label>
@@ -202,7 +329,7 @@ export default function InvestorSimulator({ initialTypologyId }: Props) {
                   type="button"
                   onClick={() => setCapexLevelId(c.id)}
                   className={cn(
-                    "rounded-lg border px-2 py-2 text-xs font-medium transition-colors",
+                    "rounded-lg border px-2 py-2 text-xs font-medium transition-colors min-h-[46px]",
                     capexLevelId === c.id
                       ? "border-accent bg-accent/10 text-accent"
                       : "border-border/60 text-muted-foreground hover:border-accent/40",
@@ -216,55 +343,37 @@ export default function InvestorSimulator({ initialTypologyId }: Props) {
             <p className="text-[11px] text-muted-foreground mt-1">{capexLevel.note}</p>
           </div>
 
-          <div>
-            <Label htmlFor="condo">Condomínio + IPTU mensais (R$)</Label>
-            <Input
-              id="condo"
-              type="number"
-              inputMode="numeric"
-              value={condoIptu}
-              onChange={(e) => setCondoIptu(e.target.value)}
-              placeholder={`ex.: ${hint?.condoIptu ?? 1000}`}
-              className="mt-1.5 min-h-[46px]"
-            />
-            <p className="text-[11px] text-muted-foreground mt-1">
-              Placeholder de mercado para a Vila Mariana — confirme os valores oficiais.
-            </p>
-          </div>
+          <CurrencyField
+            id="condo"
+            label="Condomínio + IPTU mensais"
+            value={condoIptu}
+            onChange={(v) => setCondoIptu(digitsOnly(v, LIMITS.condoIptu.max))}
+            placeholder={formatBRL(String(hint?.condoIptu ?? 1000))}
+            hint="Placeholder de mercado para a Vila Mariana — confirme os valores oficiais."
+            error={condoError}
+          />
 
           {mode === "tradicional" ? (
-            <div>
-              <Label htmlFor="rent">Aluguel mensal estimado (R$)</Label>
-              <Input
-                id="rent"
-                type="number"
-                inputMode="numeric"
-                value={rent}
-                onChange={(e) => setRent(e.target.value)}
-                placeholder={`ex.: ${hint?.rent ?? 3000}`}
-                className="mt-1.5 min-h-[46px]"
-              />
-              <p className="text-[11px] text-muted-foreground mt-1">
-                Faixa observada em locações longas no bairro — substitua pela sua estimativa.
-              </p>
-            </div>
+            <CurrencyField
+              id="rent"
+              label="Aluguel mensal estimado"
+              value={rent}
+              onChange={(v) => setRent(digitsOnly(v, LIMITS.rent.max))}
+              placeholder={formatBRL(String(hint?.rent ?? 3000))}
+              hint="Faixa observada em locações longas no bairro — substitua pela sua estimativa."
+              error={rentError}
+            />
           ) : (
             <div className="space-y-4">
-              <div>
-                <Label htmlFor="daily">Diária média (R$)</Label>
-                <Input
-                  id="daily"
-                  type="number"
-                  inputMode="numeric"
-                  value={daily}
-                  onChange={(e) => setDaily(e.target.value)}
-                  placeholder={`ex.: ${hint?.daily ?? 300}`}
-                  className="mt-1.5 min-h-[46px]"
-                />
-                <p className="text-[11px] text-muted-foreground mt-1">
-                  Diária base ({capexLevel.label} = ×{capexLevel.rateBoost.toFixed(2)}).
-                </p>
-              </div>
+              <CurrencyField
+                id="daily"
+                label="Diária média"
+                value={daily}
+                onChange={(v) => setDaily(digitsOnly(v, LIMITS.daily.max))}
+                placeholder={formatBRL(String(hint?.daily ?? 300))}
+                hint={`Diária base (${capexLevel.label} = ×${capexLevel.rateBoost.toFixed(2)}).`}
+                error={dailyError}
+              />
               <div>
                 <div className="flex items-center justify-between">
                   <Label>Ocupação estimada</Label>
@@ -272,16 +381,31 @@ export default function InvestorSimulator({ initialTypologyId }: Props) {
                 </div>
                 <Slider
                   value={occupancy}
-                  onValueChange={setOccupancy}
+                  onValueChange={(v) => setOccupancy([Math.min(95, Math.max(45, v[0] ?? 70))])}
                   min={45}
                   max={95}
                   step={1}
                   className="mt-2"
+                  aria-label="Ocupação estimada em porcentagem"
                 />
+                <p className="text-[11px] text-muted-foreground mt-1">Entre 45% e 95%.</p>
               </div>
             </div>
           )}
         </div>
+
+        <div className="flex justify-end">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleReset}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <RotateCcw className="mr-2 h-3.5 w-3.5" /> Limpar simulação
+          </Button>
+        </div>
+
 
         {/* Result */}
         <div className="rounded-2xl border border-accent/30 bg-accent/5 p-5">

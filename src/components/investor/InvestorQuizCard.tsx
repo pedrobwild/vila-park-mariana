@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { CheckCircle2, ChevronRight, RotateCcw, Sparkles } from "lucide-react";
 import { TYPOLOGIES, type Typology } from "@/data/propertyData";
+import { quizStorage } from "./persistence";
 
 type Q = {
   id: "objective" | "strategy" | "horizon" | "risk";
@@ -84,26 +85,36 @@ function recommend(answers: Answers): { typo: Typology; profile: string; rationa
 }
 
 export default function InvestorQuizCard({ onResult }: { onResult?: (typoId: string) => void }) {
-  const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState<Answers>({});
+  const stored = typeof window !== "undefined" ? quizStorage.load() : null;
+  const [step, setStep] = useState(stored?.step ?? 0);
+  const [answers, setAnswers] = useState<Answers>((stored?.answers as Answers) ?? {});
   const finished = step >= QUESTIONS.length;
   const current = QUESTIONS[step];
+
+  // Emite tipologia persistida ao montar (para pré-selecionar o simulador).
+  useEffect(() => {
+    if (stored?.resultTypoId) onResult?.(stored.resultTypoId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const pick = (v: string) => {
     const next = { ...answers, [current.id]: v };
     setAnswers(next);
-    if (step + 1 >= QUESTIONS.length) {
-      setStep(step + 1);
+    const nextStep = step + 1;
+    setStep(nextStep);
+    if (nextStep >= QUESTIONS.length) {
       const rec = recommend(next);
       onResult?.(rec.typo.id);
+      quizStorage.save({ step: nextStep, answers: next as Record<string, string>, resultTypoId: rec.typo.id });
     } else {
-      setStep(step + 1);
+      quizStorage.save({ step: nextStep, answers: next as Record<string, string> });
     }
   };
 
   const reset = () => {
     setAnswers({});
     setStep(0);
+    quizStorage.clear();
   };
 
   const rec = finished ? recommend(answers) : null;
