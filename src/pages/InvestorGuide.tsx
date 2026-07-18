@@ -9,23 +9,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
-import { PROPERTY } from "@/data/propertyData";
-import { WHATSAPP_PHONE } from "@/data/surroundings";
-import ReservationForm from "@/components/ReservationForm";
-import { POIS } from "@/data/surroundings";
+import { POIS, WHATSAPP_PHONE } from "@/data/surroundings";
 import {
-  ArrowRight,
   Briefcase,
   Building2,
-  Coffee,
   Compass,
   Dumbbell,
   GraduationCap,
-  Hammer,
   KeyRound,
-  MapPin,
   MessageCircle,
-  Phone,
   ShieldCheck,
   ShoppingBag,
   Sparkles,
@@ -34,7 +26,6 @@ import {
   Trees,
   TrendingUp,
   Utensils,
-  XCircle,
 } from "lucide-react";
 
 type SectionId =
@@ -43,14 +34,10 @@ type SectionId =
   | "nearby"
   | "typologies"
   | "amenities"
-  | "progress"
   | "market"
-  | "howItWorks"
-  | "antiChecklist"
-  | "faq"
-  | "contact";
+  | "faq";
 
-const sectionIds: SectionId[] = ["hero", "location", "nearby", "typologies", "amenities", "progress", "market", "howItWorks", "antiChecklist", "faq", "contact"];
+const sectionIds: SectionId[] = ["hero", "location", "nearby", "typologies", "amenities", "market", "faq"];
 
 const sectionLabels: Record<SectionId, string> = {
   hero: "Início",
@@ -58,12 +45,8 @@ const sectionLabels: Record<SectionId, string> = {
   nearby: "Entorno",
   typologies: "Tipologias",
   amenities: "Áreas comuns",
-  progress: "Obra",
   market: "Mercado",
-  howItWorks: "Como funciona",
-  antiChecklist: "Cuidados",
   faq: "FAQ",
-  contact: "Contato",
 };
 
 function SectionLabel({ children }: { children: ReactNode }) {
@@ -202,11 +185,7 @@ export default function InvestorGuide() {
                 </p>
 
                 <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                  <Button size="lg" className="min-h-[46px] bg-accent hover:bg-accent/90 text-accent-foreground" onClick={() => scrollTo("contact")}>
-                    <ArrowRight className="mr-2 h-4 w-4" />
-                    {t("investorGuide.hero.ctaReserve")}
-                  </Button>
-                  <Button size="lg" variant="outline" className="min-h-[46px]" onClick={() => window.open(whatsappLink, "_blank")}>
+                  <Button size="lg" className="min-h-[46px] bg-accent hover:bg-accent/90 text-accent-foreground" onClick={() => window.open(whatsappLink, "_blank")}>
                     <MessageCircle className="mr-2 h-4 w-4" />
                     {t("investorGuide.hero.ctaTalk")}
                   </Button>
@@ -387,61 +366,6 @@ export default function InvestorGuide() {
           </div>
         </section>
 
-        {/* OBRA / PROGRESS */}
-        <section id="progress" className="scroll-mt-32">
-          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
-            <SectionLabel>Obra em andamento</SectionLabel>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3 max-w-3xl">
-              Acompanhe o canteiro em imagens reais.
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mb-8">
-              Registros atualizados do empreendimento — última atualização em <strong>07/07/2026</strong>.
-            </p>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <Card className="card-elevated overflow-hidden border-border/60">
-                <img
-                  src="https://vilaparkmariana.com.br/wp-content/uploads/2026/07/fachada_07_07.jpeg"
-                  alt="Fachada do Vila Park em 07/07/2026"
-                  className="w-full h-64 object-cover"
-                  loading="lazy"
-                />
-                <CardContent className="p-5">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Hammer className="h-4 w-4 text-accent" />
-                    <h3 className="font-semibold text-foreground">Fachada · 07/07/2026</h3>
-                  </div>
-                  <p className="text-sm text-muted-foreground">Avanço da fachada no registro mais recente do canteiro.</p>
-                </CardContent>
-              </Card>
-
-              <Card className="card-elevated overflow-hidden border-border/60">
-                <img
-                  src="https://vilaparkmariana.com.br/wp-content/uploads/2025/06/obras_14_05-1.jpeg"
-                  alt="Obra Vila Park em 14/05/2025"
-                  className="w-full h-64 object-cover"
-                  loading="lazy"
-                />
-                <CardContent className="p-5">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Hammer className="h-4 w-4 text-accent" />
-                    <h3 className="font-semibold text-foreground">Canteiro · 14/05/2025</h3>
-                  </div>
-                  <p className="text-sm text-muted-foreground">Registro anterior do andamento estrutural.</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="mt-6">
-              <a href="/#progress">
-                <Button variant="outline" size="lg" className="min-h-[46px]">
-                  Ver todas as fotos da obra
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </a>
-            </div>
-          </div>
-        </section>
 
         {/* MARKET */}
         <section id="market" className="scroll-mt-32">
@@ -452,55 +376,6 @@ export default function InvestorGuide() {
           </div>
         </section>
 
-        {/* COMO FUNCIONA */}
-        <section id="howItWorks" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
-          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
-            <SectionLabel>{t("investorGuide.howItWorks.eyebrow")}</SectionLabel>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-8">{t("investorGuide.howItWorks.title")}</h2>
-
-            <div className="grid gap-4 md:grid-cols-4">
-              {steps.map((s, i) => (
-                <Card key={s.key} className="card-elevated h-full border-border/60">
-                  <CardContent className="p-5">
-                    <div className="h-8 w-8 rounded-full bg-accent/10 text-accent flex items-center justify-center font-display font-bold mb-3">
-                      {i + 1}
-                    </div>
-                    <h3 className="font-semibold text-foreground mb-2">{t(`investorGuide.howItWorks.${s.key}.title`)}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{t(`investorGuide.howItWorks.${s.key}.text`)}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ANTI-CHECKLIST */}
-        <section id="antiChecklist" className="scroll-mt-32">
-          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
-            <SectionLabel>{t("investorGuide.anti.eyebrow")}</SectionLabel>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-8">{t("investorGuide.anti.title")}</h2>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              {antiItems.map((key) => (
-                <Card key={key} className="card-elevated h-full border-destructive/20">
-                  <CardContent className="p-5 flex items-start gap-3">
-                    <XCircle className="mt-0.5 h-5 w-5 text-destructive shrink-0" />
-                    <p className="text-sm text-foreground leading-relaxed">{t(`investorGuide.anti.${key}`)}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            <div className="mt-6">
-              <a href="/ferramentas">
-                <Button variant="outline" size="lg" className="min-h-[46px]">
-                  {t("investorGuide.anti.ctaSimulate")}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </a>
-            </div>
-          </div>
-        </section>
 
         {/* FAQ */}
         <section id="faq" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
@@ -525,47 +400,9 @@ export default function InvestorGuide() {
           </div>
         </section>
 
-        {/* CONTATO */}
-        <section id="contact" className="scroll-mt-32 border-t border-border/40">
-          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
-            <Card className="overflow-hidden border-accent/15 bg-hero-gradient-subtle">
-              <CardContent className="p-8 md:p-10">
-                <div className="grid gap-8 lg:grid-cols-[1fr_1fr] lg:items-start">
-                  <div>
-                    <SectionLabel>{t("investorGuide.contact.eyebrow")}</SectionLabel>
-                    <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground max-w-3xl">
-                      {t("investorGuide.contact.title")}
-                    </h2>
-                    <p className="mt-4 text-lg text-muted-foreground max-w-2xl leading-relaxed">
-                      {t("investorGuide.contact.subtitle")}
-                    </p>
-
-                    <div className="mt-6 space-y-2 text-sm text-muted-foreground">
-                      <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-accent" />{PROPERTY.address} — {PROPERTY.neighborhood}, {PROPERTY.city}</p>
-                    </div>
-
-                    <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                      <Button size="lg" className="min-h-[48px] bg-accent hover:bg-accent/90 text-accent-foreground" onClick={() => window.open(whatsappLink, "_blank")}>
-                        <MessageCircle className="mr-2 h-4 w-4" />
-                        {t("investorGuide.contact.talk")}
-                      </Button>
-                      <Button size="lg" variant="outline" className="min-h-[48px]" onClick={() => window.location.href = "tel:+5511961007687"}>
-                        <Phone className="mr-2 h-4 w-4" />
-                        Ligar agora
-                      </Button>
-                    </div>
-                  </div>
-
-                  <Card className="border-border/60 bg-background/90 backdrop-blur-sm">
-                    <CardContent className="p-5 md:p-7">
-                      <ReservationForm />
-                    </CardContent>
-                  </Card>
-                </div>
-              </CardContent>
-            </Card>
-
-            <p className="mt-10 text-xs text-muted-foreground leading-relaxed max-w-4xl">
+        <section className="scroll-mt-32 border-t border-border/40">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 py-10">
+            <p className="text-xs text-muted-foreground leading-relaxed max-w-4xl">
               {t("investorGuide.disclaimer")}
             </p>
           </div>
