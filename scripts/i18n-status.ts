@@ -24,6 +24,7 @@ const PT_PATH = resolve(ROOT, "src/i18n/locales/pt.json");
 const EN_PATH = resolve(ROOT, "src/i18n/locales/en.json");
 const OUT_DIR = resolve(ROOT, "docs");
 const OUT_MD = resolve(OUT_DIR, "i18n-status.md");
+const OUT_JSON = resolve(OUT_DIR, "i18n-status.json");
 
 const NAMESPACES = ["investorGuide", "investorQuiz", "investorSim"] as const;
 const PLACEHOLDER_RE = /\{\{\s*([^{}\s,]+?)\s*(?:,[^{}]*)?\}\}/g;
