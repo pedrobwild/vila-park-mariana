@@ -601,7 +601,7 @@
       "avgLine": "Média mensal",
       "disclaimer": "Incremento estimado a partir dos uplifts de diária calibrados pela edge function sp-events, aplicados sobre a duração dos eventos e a ocupação prevista. Estimativa ilustrativa, não vinculante."
     },
-
+    "disclaimer": "Este guia apresenta argumentos de potencial locatício, com base em fundamentos de localização e produto. Não constitui promessa de rentabilidade, valorização ou retorno financeiro. Apenas para reserva — o empreendimento só será comercializado após o Registro de Incorporação Imobiliária."
   },
   "investorQuiz": {
     "progress": "Pergunta {{i}} de {{n}}",
