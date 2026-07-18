@@ -34,14 +34,19 @@ serve(async (req) => {
 
     const query = `Dados atualizados do mercado imobiliário residencial no bairro ${neighborhood}, ${city}, Brasil.
 Inclua:
-1. Valor médio do m² de apartamentos residenciais no bairro ${neighborhood}
-2. Valorização imobiliária do bairro ${neighborhood} nos últimos 12 meses
-3. Perfil demográfico e de moradores do bairro ${neighborhood} (famílias, jovens profissionais, etc.)
-4. Vantagens do bairro ${neighborhood} para morar (proximidade a metrô, parques, comércio, escolas, mobilidade)
-5. Novos lançamentos residenciais e projetos de infraestrutura na região
-6. Tendências do mercado imobiliário residencial em ${neighborhood} para 2025-2026
+1. Valor médio do m² de apartamentos residenciais no bairro ${neighborhood}.
+2. Valorização imobiliária do bairro ${neighborhood} nos últimos 12 meses.
+3. Perfil de morador da ${neighborhood} (famílias, jovens profissionais, estudantes).
+4. Vantagens do bairro ${neighborhood} para morar (mobilidade, parques, comércio, educação).
+5. Novos lançamentos residenciais recentes na região da ${neighborhood} (cite apenas empreendimentos que você consiga verificar em fontes públicas confiáveis; se não tiver certeza, fale genericamente).
+6. Tendências do mercado imobiliário residencial em ${neighborhood} para 2025-2026.
 
-NÃO compare com outros bairros. Foque exclusivamente nos dados do bairro ${neighborhood}. Seja objetivo e use números quando possível.`;
+REGRAS OBRIGATÓRIAS:
+- Responda 100% em português do Brasil. Não misture palavras em inglês.
+- Foque exclusivamente na ${neighborhood} e no seu entorno imediato. Não compare com outros bairros.
+- Só cite POIs (hospitais, escolas, empreendimentos, ruas, praças) se forem verificáveis e realmente localizados na Vila Mariana ou adjacências (Aclimação, Paraíso, Ana Rosa). Em caso de dúvida, use termos genéricos: "hospitais da região", "escolas próximas", "faculdades da região".
+- POIs conhecidos que você PODE ancorar quando fizerem sentido: metrô Vila Mariana (Linha 1-Azul), metrô Ana Rosa (integração 1-Azul e 2-Verde), FMU, ESPM, Belas Artes, Parque da Aclimação, Parque Ibirapuera, Av. Paulista.
+- Nunca invente nomes de hospitais, ruas, condomínios, incorporadoras ou pessoas. Se não souber, omita.`;
 
     const response = await fetch("https://api.perplexity.ai/chat/completions", {
       method: "POST",
@@ -54,7 +59,7 @@ NÃO compare com outros bairros. Foque exclusivamente nos dados do bairro ${neig
         messages: [
           {
             role: "system",
-            content: `Você é um analista de mercado imobiliário residencial especializado no bairro Vila Mariana e região, em São Paulo. Sempre responda em português do Brasil. Seja objetivo, use dados e números reais quando disponíveis. Formate a resposta em seções claras com títulos. O objetivo é fornecer dados que ajudem um comprador final a decidir pela compra de um apartamento no empreendimento residencial "${propertyName}", da incorporadora Matere Bittar, localizado no bairro ${neighborhood}, ${city}. NÃO compare com outros bairros — foque exclusivamente nos dados e vantagens do bairro ${neighborhood}.`,
+            content: `Você é um analista de mercado imobiliário residencial especializado na Vila Mariana e região, em São Paulo. RESPONDA SEMPRE E APENAS EM PORTUGUÊS DO BRASIL — jamais misture palavras em inglês. Seja objetivo e use números apenas quando puder verificá-los em fontes públicas. Formate a resposta em seções curtas com títulos em português. O objetivo é fornecer dados que ajudem um comprador/investidor a avaliar o empreendimento residencial "${propertyName}" (incorporadora Matere Bittar), localizado no bairro ${neighborhood}, ${city}. NÃO compare com outros bairros. NÃO invente hospitais, POIs, ruas, condomínios, incorporadoras ou pessoas — se não tiver certeza, fale genericamente ("hospitais da região", "faculdades próximas"). POIs ancoráveis quando pertinente: metrô Vila Mariana (Linha 1-Azul), metrô Ana Rosa (integração Linhas 1 e 2), FMU, ESPM, Belas Artes, Parque da Aclimação, Parque Ibirapuera, Av. Paulista.`,
           },
           { role: "user", content: query },
         ],
