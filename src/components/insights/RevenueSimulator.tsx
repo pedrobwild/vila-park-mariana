@@ -601,7 +601,7 @@ function YieldComparison({
         )}
 
         <p className="text-[10px] text-muted-foreground/50">
-          Selic e CDI: março/2026. IFIX: média 12m (isento de IR para PF). IR 15% sobre Selic/CDI. Poupança isenta. Yield desconta 25% custos operacionais. Valorização baseada em dados Consolação/Paulista.
+          Vigência das taxas: {BENCHMARK_RATES.vintage}. IFIX: média 12m (isento de IR para PF). IR 15% sobre Selic/CDI. Poupança isenta. Yield desconta 25% custos operacionais. Valorização baseada em dados Consolação/Paulista.
         </p>
       </CardContent>
     </Card>
