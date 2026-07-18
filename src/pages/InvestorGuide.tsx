@@ -194,11 +194,7 @@ export default function InvestorGuide() {
                 </p>
 
                 <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                  <Button size="lg" className="min-h-[46px] bg-accent hover:bg-accent/90 text-accent-foreground" onClick={() => scrollTo("contact")}>
-                    <ArrowRight className="mr-2 h-4 w-4" />
-                    {t("investorGuide.hero.ctaReserve")}
-                  </Button>
-                  <Button size="lg" variant="outline" className="min-h-[46px]" onClick={() => window.open(whatsappLink, "_blank")}>
+                  <Button size="lg" className="min-h-[46px] bg-accent hover:bg-accent/90 text-accent-foreground" onClick={() => window.open(whatsappLink, "_blank")}>
                     <MessageCircle className="mr-2 h-4 w-4" />
                     {t("investorGuide.hero.ctaTalk")}
                   </Button>
