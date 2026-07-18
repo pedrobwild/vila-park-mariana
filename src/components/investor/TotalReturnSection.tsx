@@ -34,16 +34,16 @@ export default function TotalReturnSection() {
 
   const appr = appreciation[0];
   const rows = useMemo(() => {
-    const selicNet = BENCHMARKS.selic * (1 - BENCHMARKS.irFixedIncome);
-    const cdiNet = BENCHMARKS.cdi * (1 - BENCHMARKS.irFixedIncome);
+    const selicNet = netOfIR(BENCHMARK_RATES.selic);
+    const cdiNet = netOfIR(BENCHMARK_RATES.cdi);
     const total = Math.max(-100, netYieldPct + appr);
     return [
       { key: "studioTotal", label: t("investorGuide.totalReturn.rows.studioTotal"), pct: total, highlight: true },
       { key: "studioRent", label: t("investorGuide.totalReturn.rows.studioRent"), pct: netYieldPct },
-      { key: "selic", label: `Selic (${BENCHMARKS.selic}% a.a.)`, pct: selicNet },
-      { key: "cdi", label: `CDI (${BENCHMARKS.cdi}% a.a.)`, pct: cdiNet },
-      { key: "ifix", label: `IFIX (${BENCHMARKS.ifix}% a.a.)`, pct: BENCHMARKS.ifix },
-      { key: "poup", label: `Poupança (${BENCHMARKS.poupanca}% a.a.)`, pct: BENCHMARKS.poupanca },
+      { key: "selic", label: `Selic (${BENCHMARK_RATES.selic}% a.a.)`, pct: selicNet },
+      { key: "cdi", label: `CDI (${BENCHMARK_RATES.cdi}% a.a.)`, pct: cdiNet },
+      { key: "ifix", label: `IFIX (${BENCHMARK_RATES.ifix}% a.a.)`, pct: netOfIR(BENCHMARK_RATES.ifix, true) },
+      { key: "poup", label: `Poupança (${BENCHMARK_RATES.poupanca}% a.a.)`, pct: netOfIR(BENCHMARK_RATES.poupanca, true) },
     ].map((r) => ({ ...r, brl: (base * r.pct) / 100 }));
   }, [netYieldPct, appr, base, t]);
 
