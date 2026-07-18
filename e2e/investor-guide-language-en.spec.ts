@@ -29,7 +29,7 @@ test.describe("Guia do Investidor — troca de idioma para EN", () => {
 
     // NAV — labels de seções em inglês (sectionLabels.*).
     for (const label of ["Start", "Thesis", "Typologies", "Return", "Simulator", "FAQ"]) {
-      await expect(nav.getByRole("link", { name: label }).first()).toBeVisible();
+      await expect(nav.getByRole("button", { name: label, exact: true }).first()).toBeVisible();
     }
 
     // HERO em inglês.
