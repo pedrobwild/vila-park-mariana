@@ -17,7 +17,6 @@ import {
   Briefcase,
   Building2,
   Calculator,
-  Calendar,
   CheckCircle2,
   Compass,
   Dumbbell,
@@ -25,12 +24,10 @@ import {
   KeyRound,
   MessageCircle,
   Quote,
-  Ruler,
   ShieldCheck,
   ShoppingBag,
   Sparkles,
   Sofa,
-  Target,
   Train,
   Trees,
   TrendingUp,
@@ -41,7 +38,6 @@ type SectionId =
   | "hero"
   | "diagnostico"
   | "tese"
-  | "location"
   | "nearby"
   | "typologies"
   | "matematica"
@@ -54,59 +50,15 @@ type SectionId =
   | "faq"
   | "cta";
 
-// All in-page sections observed for active-state tracking and hash sync.
 const sectionIds: SectionId[] = [
-  "hero",
-  "diagnostico",
-  "tese",
-  "location",
-  "nearby",
-  "typologies",
-  "matematica",
-  "simulador",
-  "avaliar",
-  "eventos",
-  "amenities",
-  "market",
-  "confianca",
-  "faq",
-  "cta",
+  "hero", "diagnostico", "tese", "nearby", "typologies", "matematica",
+  "simulador", "avaliar", "eventos", "amenities", "market", "confianca", "faq", "cta",
 ];
 
-// Subset shown in the sticky pill nav (kept short to fit mobile without wrapping).
 const navSectionIds: SectionId[] = [
-  "hero",
-  "diagnostico",
-  "tese",
-  "location",
-  "typologies",
-  "matematica",
-  "simulador",
-  "avaliar",
-  "eventos",
-  "amenities",
-  "market",
-  "faq",
-  "cta",
+  "hero", "diagnostico", "tese", "typologies", "matematica",
+  "simulador", "avaliar", "eventos", "amenities", "market", "faq", "cta",
 ];
-
-const sectionLabels: Record<SectionId, string> = {
-  hero: "Início",
-  diagnostico: "Diagnóstico",
-  tese: "Tese",
-  location: "Localização",
-  nearby: "Entorno",
-  typologies: "Tipologias",
-  matematica: "Retorno",
-  simulador: "Simulador",
-  avaliar: "Avaliar",
-  eventos: "Eventos",
-  amenities: "Áreas comuns",
-  market: "Mercado",
-  confianca: "Confiança",
-  faq: "FAQ",
-  cta: "Falar",
-};
 
 function SectionLabel({ children }: { children: ReactNode }) {
   return (
@@ -114,30 +66,14 @@ function SectionLabel({ children }: { children: ReactNode }) {
   );
 }
 
-function KpiCard({
-  value,
-  label,
-  highlight = false,
-}: {
-  value: string;
-  label: string;
-  highlight?: boolean;
-}) {
+function KpiCard({ value, label, highlight = false }: { value: string; label: string; highlight?: boolean }) {
   return (
-    <Card
-      className={cn(
-        "card-elevated border-border/60 overflow-hidden",
-        highlight && "border-accent/30 bg-accent/5",
-      )}
-    >
+    <Card className={cn("card-elevated border-border/60 overflow-hidden", highlight && "border-accent/30 bg-accent/5")}>
       <CardContent className="p-4 sm:p-5">
-        <p
-          className={cn(
-            "font-display font-bold leading-tight",
-            "text-xl sm:text-2xl xl:text-3xl",
-            highlight ? "text-accent" : "text-foreground",
-          )}
-        >
+        <p className={cn(
+          "font-display font-bold leading-tight text-xl sm:text-2xl xl:text-3xl",
+          highlight ? "text-accent" : "text-foreground",
+        )}>
           {value}
         </p>
         <p className="mt-2 text-sm text-muted-foreground">{label}</p>
@@ -171,14 +107,16 @@ export default function InvestorGuide() {
     if (!el) return;
     el.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
     if (updateHash) {
-      const nextHash = id === "hero" ? " " : `#${id}`;
-      window.history.replaceState(null, "", nextHash);
+      if (id === "hero") {
+        // Clear hash without leaving " " or %20 in the URL.
+        window.history.replaceState(null, "", window.location.pathname + window.location.search);
+      } else {
+        window.history.replaceState(null, "", `#${id}`);
+      }
     }
     setActiveSection(id);
   };
 
-  // Deep link via hash — wait one paint so sticky nav + images are laid out,
-  // otherwise scroll-margin resolves against the wrong offset.
   useEffect(() => {
     const raw = window.location.hash.replace("#", "");
     if (!raw) return;
@@ -192,26 +130,16 @@ export default function InvestorGuide() {
       el.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
       setActiveSection(hash);
     };
-    // Two rAFs + a small timeout to survive layout shifts from lazy content.
     requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(run, 60)));
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Scroll spy: pick the section whose top is nearest to the sticky-nav offset.
-  // More reliable than intersectionRatio when sections have very different heights.
   useEffect(() => {
-    const getOffset = () => {
-      // AppNavbar (h-16 = 64px) + sticky pill nav (~52px). Match scroll-mt-32 (128px).
-      return 128;
-    };
-
     let ticking = false;
     const update = () => {
       ticking = false;
-      const offset = getOffset() + 8;
+      const offset = 128 + 8;
       let currentId: SectionId = "hero";
       let bestTop = -Infinity;
       for (const id of sectionIds) {
@@ -223,22 +151,16 @@ export default function InvestorGuide() {
           currentId = id;
         }
       }
-      // Near bottom of page → force last section active.
-      if (
-        window.innerHeight + window.scrollY >=
-        document.documentElement.scrollHeight - 4
-      ) {
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) {
         currentId = sectionIds[sectionIds.length - 1];
       }
       setActiveSection((prev) => (prev === currentId ? prev : currentId));
     };
-
     const onScroll = () => {
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(update);
     };
-
     update();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
@@ -248,7 +170,7 @@ export default function InvestorGuide() {
     };
   }, []);
 
-
+  // Location pillars (used both as hero titles and as the full "tese" section body).
   const locationItems = [
     { icon: Train, titleKey: "investorGuide.location.mobility.title", textKey: "investorGuide.location.mobility.text" },
     { icon: GraduationCap, titleKey: "investorGuide.location.university.title", textKey: "investorGuide.location.university.text" },
@@ -258,106 +180,34 @@ export default function InvestorGuide() {
 
   const typologyCards = [{ key: "studio" }, { key: "garden" }, { key: "terrace" }];
 
-  const teseItems = [
-    {
-      icon: Train,
-      title: "Bairro consolidado com mobilidade real",
-      text: "Vila Mariana está a 900 m do metrô e a 2,5 km da Av. Paulista — um dos corredores de emprego mais líquidos de SP.",
-    },
-    {
-      icon: GraduationCap,
-      title: "Demanda educacional recorrente",
-      text: "FMU, Belas Artes e ESPM concentram estudantes e professores que buscam locação próxima o ano todo.",
-    },
-    {
-      icon: Building2,
-      title: "Produto residencial escasso e novo",
-      text: "Torre única com 33 unidades — oferta reduzida em uma região onde o estoque de novos residenciais é limitado.",
-    },
-    {
-      icon: Sofa,
-      title: "Áreas comuns entregues equipadas",
-      text: "Térreo e 5º pavimento decorados e mobiliados na entrega, reduzindo custo de preparação para locação.",
-    },
-  ];
-
-  const matematicaItems = [
-    {
-      icon: Calculator,
-      title: "Investimento total",
-      text: "Preço da unidade + capex de mobília/enxoval. Considere reserva para custos de aquisição (ITBI, registro, escritura).",
-    },
-    {
-      icon: TrendingUp,
-      title: "Receita líquida mensal",
-      text: "Aluguel ou diária × ocupação, menos condomínio, IPTU, plataforma (~18%) e limpeza/gestão (~12% no short stay).",
-    },
-    {
-      icon: Target,
-      title: "Yield anual",
-      text: "Receita líquida anual ÷ investimento total. Compare com CDI/IPCA + spread do imobiliário na região.",
-    },
-    {
-      icon: Ruler,
-      title: "Payback e valorização",
-      text: "Tempo para recuperar o investimento com renda + potencial de valorização do imóvel entre planta e entrega.",
-    },
-  ];
-
-  const avaliarItems = [
-    "Distância real até metrô, faculdades e polos de emprego (não em linha reta).",
-    "Andar, orientação solar e vista — impactam diária e velocidade de locação.",
-    "Área privativa útil vs. área total anunciada.",
-    "Condomínio previsto por m² e taxas extras (fundo de obra, reserva).",
-    "Regras internas para locação por temporada (convenção do condomínio).",
-    "Prazo de entrega e histórico da incorporadora responsável.",
-    "Presença de infra para ar-condicionado, gás encanado e pontos de rede.",
-    "Comparáveis (asking price e locação realizada) em raio de 1 km.",
-  ];
-
+  const matematicaItems = ["invest", "revenue", "yield", "payback"] as const;
+  const avaliarItems = t("investorGuide.avaliar.items", { returnObjects: true }) as string[];
   const trustSignals = [
-    { icon: Building2, label: "Torre única, 33 unidades", note: "Oferta enxuta em região consolidada." },
-    { icon: Sofa, label: "Áreas comuns equipadas", note: "Térreo e 5º pav. entregues decorados." },
-    { icon: Train, label: "900 m do metrô", note: "Linha 1-Azul, Vila Mariana." },
-    { icon: ShieldCheck, label: "Matere Bittar Incorporações", note: "Incorporadora responsável pelo empreendimento." },
+    { icon: Building2, key: "units" },
+    { icon: Sofa, key: "amenities" },
+    { icon: Train, key: "metro" },
+    { icon: ShieldCheck, key: "builder" },
   ];
-
+  const amenitiesItems = [
+    { icon: Sofa, key: "leisure" },
+    { icon: Building2, key: "lobby" },
+    { icon: Dumbbell, key: "infra" },
+    { icon: ShieldCheck, key: "ac" },
+  ];
   const faqKeys = ["q1", "q2", "q3", "q4", "q5"];
-
-  const extraFaq = [
-    {
-      q: "Aluguel tradicional ou temporada — qual rende mais na Vila Mariana?",
-      a: "Depende do perfil de gestão e da convenção do condomínio. Temporada tende a ter diárias maiores, mas custos operacionais (plataforma, limpeza) e vacância também são maiores. O simulador acima permite comparar ambos os cenários com os seus próprios números.",
-    },
-    {
-      q: "Qual o custo médio de mobiliar uma unidade?",
-      a: "Para studios e 1 dormitório na Vila Mariana, o capex de mobília e enxoval costuma variar entre R$ 25 mil (essencial), R$ 55 mil (premium) e R$ 95 mil+ (signature). Quanto maior o padrão do enxoval, maior a diária suportada — mas também o tempo de payback do capex.",
-    },
-    {
-      q: "Como avalio se o preço da unidade está em linha com o mercado?",
-      a: "Compare o preço por m² privativo com anúncios ativos e transações recentes em raio de 1 km, priorizando lançamentos com padrão de acabamento equivalente. Descontos por ausência de vaga são normais em produtos como o Vila Park.",
-    },
-    {
-      q: "Preciso ter CNPJ para operar temporada?",
-      a: "Não é obrigatório para começar, mas dependendo do volume e da estratégia tributária, a operação via PJ (Lucro Presumido) costuma ser mais eficiente. Consulte seu contador para modelar tributação e proteção patrimonial.",
-    },
-    {
-      q: "O que muda no meu retorno se eu comprar na planta vs. pronto?",
-      a: "Comprar na planta costuma envolver preço menor por m² e potencial de valorização até a entrega, com contrapartida de tempo sem renda e risco de execução. Pronto entrega renda imediata, mas com preço mais alto e sem ganho de curva.",
-    },
-  ];
+  const extraFaqKeys = ["f1", "f2", "f3", "f4", "f5"];
 
   return (
     <div className="min-h-screen bg-background page-enter">
       <AppNavbar />
 
       <nav
-        aria-label="Seções do Guia do Investidor"
+        aria-label={t("investorGuide.nav.aria")}
         className="sticky top-16 z-30 glass-nav border-t border-border/40"
       >
         <div className="max-w-7xl mx-auto px-4 md:px-6 overflow-x-auto scrollbar-none">
           <div className="flex items-center gap-2 min-w-max py-2">
-            <span className="font-display font-bold text-base mr-1 shrink-0">Vila Park</span>
+            <span className="font-display font-bold text-base mr-1 shrink-0">{t("investorGuide.nav.brand")}</span>
             <Separator orientation="vertical" className="h-5 mr-1" />
             {navSectionIds.map((id) => {
               const isActive = activeSection === id;
@@ -374,14 +224,13 @@ export default function InvestorGuide() {
                       : "bg-transparent text-muted-foreground hover:text-foreground hover:bg-secondary",
                   )}
                 >
-                  {sectionLabels[id]}
+                  {t(`investorGuide.sectionLabels.${id}`)}
                 </button>
               );
             })}
           </div>
         </div>
       </nav>
-
 
       <main className="pb-24">
         {/* HERO */}
@@ -416,7 +265,7 @@ export default function InvestorGuide() {
                     onClick={() => scrollTo("diagnostico")}
                   >
                     <Sparkles className="mr-2 h-4 w-4" />
-                    Fazer diagnóstico do investidor
+                    {t("investorGuide.hero.ctaDiag")}
                   </Button>
                   <Button
                     size="lg"
@@ -430,10 +279,10 @@ export default function InvestorGuide() {
                 </div>
 
                 <div className="mt-10 grid gap-3 grid-cols-2 lg:grid-cols-4">
-                  <KpiCard value="900 m" label="Metrô Vila Mariana" highlight />
-                  <KpiCard value="850 m" label="FMU (universidade)" />
-                  <KpiCard value="2,5 km" label="Av. Paulista" />
-                  <KpiCard value="950 m" label="Parque da Aclimação" />
+                  <KpiCard value="900 m" label={t("investorGuide.hero.kpi.metro")} highlight />
+                  <KpiCard value="850 m" label={t("investorGuide.hero.kpi.fmu")} />
+                  <KpiCard value="2,5 km" label={t("investorGuide.hero.kpi.paulista")} />
+                  <KpiCard value="950 m" label={t("investorGuide.hero.kpi.park")} />
                 </div>
               </motion.div>
 
@@ -448,16 +297,16 @@ export default function InvestorGuide() {
                     <div className="flex items-center justify-between gap-3">
                       <div>
                         <CardTitle className="text-2xl">{t("invest.why.title")}</CardTitle>
-                        <CardDescription className="mt-2">{t("investorGuide.location.title")}</CardDescription>
+                        <CardDescription className="mt-2">{t("investorGuide.hero.cardEyebrow")}</CardDescription>
                       </div>
                       <TrendingUp className="h-8 w-8 text-accent" />
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-5">
+                  <CardContent className="space-y-3">
                     {locationItems.map((item) => (
-                      <div key={item.titleKey} className="flex items-start gap-3 rounded-xl border border-border/60 p-4">
+                      <div key={item.titleKey} className="flex items-start gap-3 rounded-xl border border-border/60 p-3">
                         <item.icon className="mt-0.5 h-4 w-4 text-accent shrink-0" />
-                        <p className="text-sm leading-relaxed text-foreground">{t(item.titleKey)}</p>
+                        <p className="text-sm font-medium leading-relaxed text-foreground">{t(item.titleKey)}</p>
                       </div>
                     ))}
                   </CardContent>
@@ -467,56 +316,26 @@ export default function InvestorGuide() {
           </div>
         </section>
 
-        {/* DIAGNÓSTICO — QUIZ */}
+        {/* DIAGNÓSTICO */}
         <section id="diagnostico" className="scroll-mt-32">
           <div className="max-w-4xl mx-auto px-4 md:px-6 py-16 md:py-20">
-            <SectionLabel>Diagnóstico do investidor</SectionLabel>
+            <SectionLabel>{t("investorGuide.diag.eyebrow")}</SectionLabel>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">
-              Descubra a tipologia do Vila Park mais alinhada ao seu perfil.
+              {t("investorGuide.diag.title")}
             </h2>
-            <p className="text-muted-foreground mb-8 max-w-2xl">
-              Quatro perguntas rápidas sobre objetivo, estratégia e tolerância a risco. Ao final, você vai direto
-              para o simulador com a tipologia sugerida pré-selecionada.
-            </p>
+            <p className="text-muted-foreground mb-8 max-w-2xl">{t("investorGuide.diag.subtitle")}</p>
             <InvestorQuizCard onResult={(id) => setPreferredTypoId(id)} />
           </div>
         </section>
 
-        {/* TESE COMERCIAL */}
+        {/* TESE (merged with location — full pillar texts) */}
         <section id="tese" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
           <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
-            <SectionLabel>Tese de investimento</SectionLabel>
+            <SectionLabel>{t("investorGuide.tese.eyebrow")}</SectionLabel>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3 max-w-3xl">
-              Por que o Vila Park faz sentido para investidores em 2026.
+              {t("investorGuide.tese.title")}
             </h2>
-            <p className="text-muted-foreground max-w-2xl mb-8">
-              Quatro pilares objetivos que sustentam a compra da unidade como ativo de renda e valorização em uma
-              das regiões mais estáveis da capital.
-            </p>
-
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {teseItems.map((item) => (
-                <Card key={item.title} className="card-elevated border-border/60 h-full">
-                  <CardContent className="p-5">
-                    <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center mb-3">
-                      <item.icon className="h-5 w-5 text-accent" />
-                    </div>
-                    <h3 className="font-semibold text-foreground mb-2">{item.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{item.text}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* LOCALIZAÇÃO */}
-        <section id="location" className="scroll-mt-32">
-          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
-            <SectionLabel>{t("investorGuide.location.eyebrow")}</SectionLabel>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-8 max-w-3xl">
-              {t("investorGuide.location.title")}
-            </h2>
+            <p className="text-muted-foreground max-w-2xl mb-8">{t("investorGuide.tese.subtitle")}</p>
 
             <div className="grid gap-4 md:grid-cols-2">
               {locationItems.map((item) => (
@@ -535,30 +354,27 @@ export default function InvestorGuide() {
         </section>
 
         {/* ENTORNO */}
-        <section id="nearby" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
+        <section id="nearby" className="scroll-mt-32">
           <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
-            <SectionLabel>Entorno estratégico</SectionLabel>
+            <SectionLabel>{t("investorGuide.nearby.eyebrow")}</SectionLabel>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3 max-w-3xl">
-              A Vila Mariana joga a favor da sua locação.
+              {t("investorGuide.nearby.title")}
             </h2>
-            <p className="text-muted-foreground max-w-2xl mb-8">
-              Bairro consolidado, com metrô, universidades, polo de empregos e lazer no raio de caminhada — fatores
-              que sustentam a demanda por moradia.
-            </p>
+            <p className="text-muted-foreground max-w-2xl mb-8">{t("investorGuide.nearby.subtitle")}</p>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {[
-                { icon: Train, title: "Mobilidade", items: POIS.filter((p) => p.category === "mobility") },
-                { icon: GraduationCap, title: "Universidades", items: POIS.filter((p) => p.category === "education") },
-                { icon: Trees, title: "Parques e lazer", items: POIS.filter((p) => p.category === "leisure").slice(0, 4) },
-                { icon: ShoppingBag, title: "Serviços e compras", items: POIS.filter((p) => p.category === "services").slice(0, 5) },
-                { icon: Utensils, title: "Gastronomia", items: POIS.filter((p) => p.category === "gastronomy") },
+                { icon: Train, title: t("investorGuide.nearby.groups.mobility"), items: POIS.filter((p) => p.category === "mobility") },
+                { icon: GraduationCap, title: t("investorGuide.nearby.groups.edu"), items: POIS.filter((p) => p.category === "education") },
+                { icon: Trees, title: t("investorGuide.nearby.groups.parks"), items: POIS.filter((p) => p.category === "leisure").slice(0, 4) },
+                { icon: ShoppingBag, title: t("investorGuide.nearby.groups.services"), items: POIS.filter((p) => p.category === "services").slice(0, 5) },
+                { icon: Utensils, title: t("investorGuide.nearby.groups.gastronomy"), items: POIS.filter((p) => p.category === "gastronomy") },
                 {
                   icon: Briefcase,
-                  title: "Polo de empregos",
+                  title: t("investorGuide.nearby.groups.jobs"),
                   items: [
-                    { name: "Av. Paulista", distance: "2,5 km" },
-                    { name: "Região da Paulista", distance: "corredor de escritórios" },
+                    { name: t("investorGuide.nearby.jobsPaulista"), distance: t("investorGuide.nearby.jobsPaulistaDist") },
+                    { name: t("investorGuide.nearby.jobsCorredor"), distance: t("investorGuide.nearby.jobsCorredorDist") },
                   ],
                 },
               ].map((group) => (
@@ -572,10 +388,7 @@ export default function InvestorGuide() {
                     </div>
                     <ul className="space-y-2">
                       {group.items.map((item) => (
-                        <li
-                          key={item.name}
-                          className="flex items-start justify-between gap-3 text-sm border-b border-border/40 pb-2 last:border-0 last:pb-0"
-                        >
+                        <li key={item.name} className="flex items-start justify-between gap-3 text-sm border-b border-border/40 pb-2 last:border-0 last:pb-0">
                           <span className="text-foreground">{item.name}</span>
                           <span className="text-muted-foreground shrink-0">{item.distance}</span>
                         </li>
@@ -588,17 +401,13 @@ export default function InvestorGuide() {
 
             <div className="mt-8 rounded-xl border border-accent/20 bg-accent/5 p-5 flex items-start gap-3">
               <Compass className="mt-0.5 h-5 w-5 text-accent shrink-0" />
-              <p className="text-sm text-foreground leading-relaxed">
-                <strong>Por que isso importa para renda:</strong> imóveis próximos a metrô, universidades e polos de
-                emprego historicamente apresentam menor vacância e giro mais rápido de inquilinos — perfil compatível
-                com o produto Vila Park.
-              </p>
+              <p className="text-sm text-foreground leading-relaxed">{t("investorGuide.nearby.note")}</p>
             </div>
           </div>
         </section>
 
         {/* TIPOLOGIAS */}
-        <section id="typologies" className="scroll-mt-32">
+        <section id="typologies" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
           <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
             <SectionLabel>{t("investorGuide.typologies.eyebrow")}</SectionLabel>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
@@ -628,7 +437,7 @@ export default function InvestorGuide() {
                           scrollTo("simulador");
                         }}
                       >
-                        Simular retorno
+                        {t("investorGuide.typologies.simulate")}
                       </Button>
                     </div>
                   </CardContent>
@@ -645,27 +454,28 @@ export default function InvestorGuide() {
           </div>
         </section>
 
-        {/* MATEMÁTICA DO RETORNO */}
-        <section id="matematica" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
+        {/* MATEMÁTICA */}
+        <section id="matematica" className="scroll-mt-32">
           <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
-            <SectionLabel>Matemática do retorno</SectionLabel>
+            <SectionLabel>{t("investorGuide.matematica.eyebrow")}</SectionLabel>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3 max-w-3xl">
-              Como pensar retorno de forma honesta — sem promessas.
+              {t("investorGuide.matematica.title")}
             </h2>
-            <p className="text-muted-foreground max-w-2xl mb-8">
-              Antes de rodar o simulador, entenda os quatro blocos que compõem qualquer análise de investimento em
-              renda imobiliária.
-            </p>
+            <p className="text-muted-foreground max-w-2xl mb-8">{t("investorGuide.matematica.subtitle")}</p>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {matematicaItems.map((item) => (
-                <Card key={item.title} className="card-elevated border-border/60 h-full">
+              {matematicaItems.map((k) => (
+                <Card key={k} className="card-elevated border-border/60 h-full">
                   <CardContent className="p-5">
                     <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center mb-3">
-                      <item.icon className="h-5 w-5 text-accent" />
+                      <Calculator className="h-5 w-5 text-accent" />
                     </div>
-                    <h3 className="font-semibold text-foreground mb-2">{item.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{item.text}</p>
+                    <h3 className="font-semibold text-foreground mb-2">
+                      {t(`investorGuide.matematica.items.${k}.title`)}
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {t(`investorGuide.matematica.items.${k}.text`)}
+                    </p>
                   </CardContent>
                 </Card>
               ))}
@@ -674,31 +484,27 @@ export default function InvestorGuide() {
         </section>
 
         {/* SIMULADOR */}
-        <section id="simulador" className="scroll-mt-32">
+        <section id="simulador" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
           <div className="max-w-5xl mx-auto px-4 md:px-6 py-16 md:py-20">
-            <SectionLabel>Simulador do investidor</SectionLabel>
+            <SectionLabel>{t("investorGuide.simuladorSection.eyebrow")}</SectionLabel>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">
-              Rode o cenário com os seus números.
+              {t("investorGuide.simuladorSection.title")}
             </h2>
             <p className="text-muted-foreground mb-8 max-w-2xl">
-              Compare aluguel tradicional vs. temporada, ajuste o padrão de mobília e veja yield, payback e receita
-              líquida em tempo real. Valores oficiais devem ser confirmados com o time de vendas.
+              {t("investorGuide.simuladorSection.subtitle")}
             </p>
             <InvestorSimulator initialTypologyId={preferredTypoId} />
           </div>
         </section>
 
-        {/* COMO AVALIAR O ATIVO */}
-        <section id="avaliar" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
+        {/* AVALIAR */}
+        <section id="avaliar" className="scroll-mt-32">
           <div className="max-w-5xl mx-auto px-4 md:px-6 py-16 md:py-20">
-            <SectionLabel>Como avaliar o ativo</SectionLabel>
+            <SectionLabel>{t("investorGuide.avaliar.eyebrow")}</SectionLabel>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3 max-w-3xl">
-              Checklist do investidor antes de bater o martelo.
+              {t("investorGuide.avaliar.title")}
             </h2>
-            <p className="text-muted-foreground max-w-2xl mb-8">
-              Uma boa unidade é escolhida por critérios objetivos. Use este checklist na visita ao stand e na
-              análise da tabela.
-            </p>
+            <p className="text-muted-foreground max-w-2xl mb-8">{t("investorGuide.avaliar.subtitle")}</p>
 
             <Card className="card-elevated border-border/60">
               <CardContent className="p-5 md:p-6">
@@ -715,65 +521,55 @@ export default function InvestorGuide() {
           </div>
         </section>
 
-        {/* EVENTOS & DEMANDA */}
-        <section id="eventos" className="scroll-mt-32">
+        {/* EVENTOS */}
+        <section id="eventos" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
           <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
-            <SectionLabel>Eventos & demanda</SectionLabel>
+            <SectionLabel>{t("investorGuide.eventos.eyebrow")}</SectionLabel>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3 max-w-3xl">
-              Calendário de eventos que aquece a locação em SP.
+              {t("investorGuide.eventos.title")}
             </h2>
-            <p className="text-muted-foreground max-w-2xl mb-8">
-              Feiras, congressos e shows internacionais concentram picos de demanda por temporada. Vila Mariana está
-              a poucos minutos do Ibirapuera, Anhembi e da Paulista.
-            </p>
+            <p className="text-muted-foreground max-w-2xl mb-8">{t("investorGuide.eventos.subtitle")}</p>
             <EventsCalendar
               regionLabel="Vila Mariana"
-              title="Eventos em SP × demanda de locação"
-              subtitle="Eventos confirmados e previstos em São Paulo (2025–2027) e como cada um pode impactar a demanda por temporada na Vila Mariana."
+              title={t("investorGuide.eventos.calendarTitle")}
+              subtitle={t("investorGuide.eventos.calendarSubtitle")}
             />
           </div>
         </section>
 
         {/* ÁREAS COMUNS */}
-        <section id="amenities" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
+        <section id="amenities" className="scroll-mt-32">
           <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
-            <SectionLabel>Áreas comuns entregues equipadas</SectionLabel>
+            <SectionLabel>{t("investorGuide.amenities.eyebrow")}</SectionLabel>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3 max-w-3xl">
-              Térreo e 5º pavimento decorados e mobiliados na entrega.
+              {t("investorGuide.amenities.title")}
             </h2>
-            <p className="text-muted-foreground max-w-2xl mb-8">
-              Áreas comuns finalizadas reduzem o custo de preparação do imóvel para locação e melhoram a percepção
-              de valor do inquilino desde a visita.
-            </p>
+            <p className="text-muted-foreground max-w-2xl mb-8">{t("investorGuide.amenities.subtitle")}</p>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {[
-                { icon: Sofa, title: "Lazer decorado", text: "Espaços mobiliados no térreo e no 5º pavimento, entregues prontos para uso." },
-                { icon: Building2, title: "Lobby de entrada", text: "Portaria e recepção que reforçam a percepção de padrão do empreendimento." },
-                { icon: Dumbbell, title: "Infraestrutura de lazer", text: "Áreas de convivência que ampliam o apelo do apartamento para o inquilino." },
-                { icon: ShieldCheck, title: "Infra para ar-condicionado", text: "Preparação técnica na unidade — um item a menos para o proprietário resolver." },
-              ].map((a) => (
-                <Card key={a.title} className="card-elevated border-border/60 h-full">
+              {amenitiesItems.map((a) => (
+                <Card key={a.key} className="card-elevated border-border/60 h-full">
                   <CardContent className="p-5">
                     <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center mb-3">
                       <a.icon className="h-5 w-5 text-accent" />
                     </div>
-                    <h3 className="font-semibold text-foreground mb-2">{a.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{a.text}</p>
+                    <h3 className="font-semibold text-foreground mb-2">
+                      {t(`investorGuide.amenities.items.${a.key}.title`)}
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {t(`investorGuide.amenities.items.${a.key}.text`)}
+                    </p>
                   </CardContent>
                 </Card>
               ))}
             </div>
 
-            <p className="mt-6 text-xs text-muted-foreground">
-              Imagens e descrições ilustrativas. A decoração é apenas uma sugestão — móveis e utensílios não integram
-              o contrato de compra e venda.
-            </p>
+            <p className="mt-6 text-xs text-muted-foreground">{t("investorGuide.amenities.disclaimer")}</p>
           </div>
         </section>
 
         {/* MARKET */}
-        <section id="market" className="scroll-mt-32">
+        <section id="market" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
           <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
             <SectionLabel>{t("investorGuide.market.eyebrow")}</SectionLabel>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -784,26 +580,23 @@ export default function InvestorGuide() {
         </section>
 
         {/* CONFIANÇA */}
-        <section id="confianca" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
+        <section id="confianca" className="scroll-mt-32">
           <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
-            <SectionLabel>Sinais de confiança</SectionLabel>
+            <SectionLabel>{t("investorGuide.confianca.eyebrow")}</SectionLabel>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3 max-w-3xl">
-              Um produto de raiz, em um bairro de raiz.
+              {t("investorGuide.confianca.title")}
             </h2>
-            <p className="text-muted-foreground max-w-2xl mb-8">
-              Elementos que reduzem a assimetria de informação típica de um lançamento e ajudam o investidor a
-              qualificar a decisão.
-            </p>
+            <p className="text-muted-foreground max-w-2xl mb-8">{t("investorGuide.confianca.subtitle")}</p>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
               {trustSignals.map((s) => (
-                <Card key={s.label} className="card-elevated border-border/60 h-full">
+                <Card key={s.key} className="card-elevated border-border/60 h-full">
                   <CardContent className="p-5">
                     <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center mb-3">
                       <s.icon className="h-5 w-5 text-accent" />
                     </div>
-                    <p className="font-semibold text-foreground">{s.label}</p>
-                    <p className="text-sm text-muted-foreground mt-1">{s.note}</p>
+                    <p className="font-semibold text-foreground">{t(`investorGuide.confianca.items.${s.key}.label`)}</p>
+                    <p className="text-sm text-muted-foreground mt-1">{t(`investorGuide.confianca.items.${s.key}.note`)}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -813,11 +606,10 @@ export default function InvestorGuide() {
               <CardContent className="p-5 md:p-7">
                 <Quote className="h-6 w-6 text-accent mb-3" />
                 <p className="font-display text-lg md:text-xl text-foreground leading-relaxed">
-                  “A Vila Mariana combina três fatores raros em São Paulo: metrô, universidades e bairro residencial
-                  consolidado. Isso segura preço e reduz a chance de vacância prolongada.”
+                  “{t("investorGuide.confianca.quote")}”
                 </p>
                 <p className="mt-3 text-sm text-muted-foreground">
-                  Observação de mercado — não constitui recomendação de investimento.
+                  {t("investorGuide.confianca.quoteNote")}
                 </p>
               </CardContent>
             </Card>
@@ -825,7 +617,7 @@ export default function InvestorGuide() {
         </section>
 
         {/* FAQ */}
-        <section id="faq" className="scroll-mt-32">
+        <section id="faq" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
           <div className="max-w-4xl mx-auto px-4 md:px-6 py-16 md:py-20">
             <SectionLabel>{t("investorGuide.faq.eyebrow")}</SectionLabel>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-8">
@@ -845,11 +637,13 @@ export default function InvestorGuide() {
                       </AccordionContent>
                     </AccordionItem>
                   ))}
-                  {extraFaq.map((f, i) => (
+                  {extraFaqKeys.map((k, i) => (
                     <AccordionItem key={`extra-${i}`} value={`extra-${i}`}>
-                      <AccordionTrigger className="text-left text-base">{f.q}</AccordionTrigger>
+                      <AccordionTrigger className="text-left text-base">
+                        {t(`investorGuide.extraFaq.${k}.q`)}
+                      </AccordionTrigger>
                       <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
-                        {f.a}
+                        {t(`investorGuide.extraFaq.${k}.a`)}
                       </AccordionContent>
                     </AccordionItem>
                   ))}
@@ -859,18 +653,17 @@ export default function InvestorGuide() {
           </div>
         </section>
 
-        {/* CTA FINAL */}
+        {/* CTA */}
         <section id="cta" className="scroll-mt-32 bg-hero-gradient-subtle border-y border-border/40">
           <div className="max-w-4xl mx-auto px-4 md:px-6 py-16 md:py-20 text-center">
             <Badge className="bg-accent/10 text-accent border-accent/20 hover:bg-accent/10 mb-4">
-              Vila Park · Vila Mariana
+              {t("investorGuide.ctaFinal.badge")}
             </Badge>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Pronto para conversar sobre a sua unidade?
+              {t("investorGuide.ctaFinal.title")}
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
-              Fale com o time de vendas para receber tabela, disponibilidade por andar e condições de pagamento
-              atualizadas.
+              {t("investorGuide.ctaFinal.subtitle")}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button
@@ -879,7 +672,7 @@ export default function InvestorGuide() {
                 onClick={() => window.open(whatsappLink, "_blank")}
               >
                 <MessageCircle className="mr-2 h-4 w-4" />
-                Falar no WhatsApp
+                {t("investorGuide.ctaFinal.wa")}
               </Button>
               <Button
                 size="lg"
@@ -888,7 +681,7 @@ export default function InvestorGuide() {
                 onClick={() => scrollTo("simulador")}
               >
                 <Calculator className="mr-2 h-4 w-4" />
-                Voltar ao simulador
+                {t("investorGuide.ctaFinal.backSim")}
               </Button>
             </div>
           </div>
