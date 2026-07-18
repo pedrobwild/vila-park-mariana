@@ -542,7 +542,7 @@
         "headline": "O imóvel bem operado tende a superar a renda fixa quando somamos renda e valorização.",
         "horizon": "Horizontes de 5–10 anos suavizam vacância e capturam ciclos de valorização; renda fixa entrega previsibilidade, imóvel entrega proteção real + renda."
       },
-      "methodology": "Selic/CDI/Poupança líquidos aplicam 15% de IR. IFIX considerado isento. Valores de mercado são referências públicas em março/2026 — não constituem promessa. Rentabilidade do imóvel depende de premissas do próprio investidor."
+      "methodology": "Vigência das taxas: {{vintage}}. Selic/CDI/Poupança líquidos aplicam 15% de IR (Selic/CDI); IFIX e Poupança considerados isentos para PF. Valores de mercado são referências públicas — não constituem promessa. Rentabilidade do imóvel depende de premissas do próprio investidor."
     },
     "scenarios": {
       "eyebrow": "Cenários",
