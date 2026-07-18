@@ -79,15 +79,21 @@ interface Props {
 }
 
 export default function InvestorSimulator({ initialTypologyId }: Props) {
-  const [typoId, setTypoId] = useState<string>(initialTypologyId ?? TYPOLOGIES[0].id);
-  const [mode, setMode] = useState<Mode>("tradicional");
-  const [capexLevelId, setCapexLevelId] = useState<(typeof CAPEX_LEVELS)[number]["id"]>("premium");
+  const stored = typeof window !== "undefined" ? simulatorStorage.load() : null;
 
-  const [price, setPrice] = useState<string>("");
-  const [rent, setRent] = useState<string>("");
-  const [daily, setDaily] = useState<string>("");
-  const [occupancy, setOccupancy] = useState<number[]>([70]);
-  const [condoIptu, setCondoIptu] = useState<string>("");
+  const [typoId, setTypoId] = useState<string>(
+    initialTypologyId ?? stored?.typoId ?? TYPOLOGIES[0].id,
+  );
+  const [mode, setMode] = useState<Mode>((stored?.mode as Mode) ?? "tradicional");
+  const [capexLevelId, setCapexLevelId] = useState<(typeof CAPEX_LEVELS)[number]["id"]>(
+    (stored?.capexLevelId as (typeof CAPEX_LEVELS)[number]["id"]) ?? "premium",
+  );
+
+  const [price, setPrice] = useState<string>(stored?.price ?? "");
+  const [rent, setRent] = useState<string>(stored?.rent ?? "");
+  const [daily, setDaily] = useState<string>(stored?.daily ?? "");
+  const [occupancy, setOccupancy] = useState<number[]>([stored?.occupancy ?? 70]);
+  const [condoIptu, setCondoIptu] = useState<string>(stored?.condoIptu ?? "");
 
   const typo = TYPOLOGIES.find((t) => t.id === typoId) ?? TYPOLOGIES[0];
   const capexLevel = CAPEX_LEVELS.find((c) => c.id === capexLevelId)!;
@@ -96,6 +102,45 @@ export default function InvestorSimulator({ initialTypologyId }: Props) {
   useEffect(() => {
     if (initialTypologyId) setTypoId(initialTypologyId);
   }, [initialTypologyId]);
+
+  // Persistência com debounce leve — evita gravar a cada tecla.
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => {
+      const payload: SimulatorPersisted = {
+        typoId,
+        mode,
+        capexLevelId,
+        price,
+        rent,
+        daily,
+        occupancy: occupancy[0],
+        condoIptu,
+      };
+      simulatorStorage.save(payload);
+    }, 250);
+    return () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+    };
+  }, [typoId, mode, capexLevelId, price, rent, daily, occupancy, condoIptu]);
+
+  const handleReset = () => {
+    simulatorStorage.clear();
+    setPrice("");
+    setRent("");
+    setDaily("");
+    setCondoIptu("");
+    setOccupancy([70]);
+    setCapexLevelId("premium");
+    setMode("tradicional");
+    setTypoId(initialTypologyId ?? TYPOLOGIES[0].id);
+  };
+
+  const priceError = validate("price", price);
+  const condoError = validate("condoIptu", condoIptu);
+  const rentError = validate("rent", rent);
+  const dailyError = validate("daily", daily);
 
   const priceN = Number(price) || 0;
   const rentN = Number(rent) || 0;
