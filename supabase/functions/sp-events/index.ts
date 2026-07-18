@@ -7,7 +7,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const CACHE_KEY = "sp_events_v1";
+const CACHE_KEY = "sp_events_v2_jul2026_jul2027";
 const CACHE_TTL_HOURS = 72; // events don't change often
 
 function getSupabaseAdmin() {
