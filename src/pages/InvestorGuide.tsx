@@ -162,40 +162,92 @@ export default function InvestorGuide() {
       : "Guia do Investidor · Vila Park Vila Mariana";
   }, [i18n.language]);
 
-  // Deep link via hash
-  useEffect(() => {
-    const hash = window.location.hash.replace("#", "") as SectionId;
-    if (hash && sectionIds.includes(hash)) {
-      setTimeout(() => document.getElementById(hash)?.scrollIntoView({ behavior: "smooth", block: "start" }), 150);
+  const prefersReducedMotion =
+    typeof window !== "undefined" &&
+    window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+
+  const scrollTo = (id: SectionId, updateHash = true) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+    if (updateHash) {
+      const nextHash = id === "hero" ? " " : `#${id}`;
+      window.history.replaceState(null, "", nextHash);
     }
-  }, []);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible?.target?.id) {
-          const id = visible.target.id as SectionId;
-          setActiveSection(id);
-          if (window.location.hash !== `#${id}`) {
-            window.history.replaceState(null, "", `#${id}`);
-          }
-        }
-      },
-      { rootMargin: "-20% 0px -55% 0px", threshold: [0.15, 0.35, 0.65] },
-    );
-    sectionIds.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-    return () => observer.disconnect();
-  }, []);
-
-  const scrollTo = (id: SectionId) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setActiveSection(id);
   };
+
+  // Deep link via hash — wait one paint so sticky nav + images are laid out,
+  // otherwise scroll-margin resolves against the wrong offset.
+  useEffect(() => {
+    const raw = window.location.hash.replace("#", "");
+    if (!raw) return;
+    const hash = raw as SectionId;
+    if (!sectionIds.includes(hash)) return;
+    let cancelled = false;
+    const run = () => {
+      if (cancelled) return;
+      const el = document.getElementById(hash);
+      if (!el) return;
+      el.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+      setActiveSection(hash);
+    };
+    // Two rAFs + a small timeout to survive layout shifts from lazy content.
+    requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(run, 60)));
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Scroll spy: pick the section whose top is nearest to the sticky-nav offset.
+  // More reliable than intersectionRatio when sections have very different heights.
+  useEffect(() => {
+    const getOffset = () => {
+      // AppNavbar (h-16 = 64px) + sticky pill nav (~52px). Match scroll-mt-32 (128px).
+      return 128;
+    };
+
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      const offset = getOffset() + 8;
+      let currentId: SectionId = "hero";
+      let bestTop = -Infinity;
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const top = el.getBoundingClientRect().top - offset;
+        if (top <= 0 && top > bestTop) {
+          bestTop = top;
+          currentId = id;
+        }
+      }
+      // Near bottom of page → force last section active.
+      if (
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 4
+      ) {
+        currentId = sectionIds[sectionIds.length - 1];
+      }
+      setActiveSection((prev) => (prev === currentId ? prev : currentId));
+    };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+
 
   const locationItems = [
     { icon: Train, titleKey: "investorGuide.location.mobility.title", textKey: "investorGuide.location.mobility.text" },
