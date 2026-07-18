@@ -409,47 +409,9 @@ export default function InvestorGuide() {
           </div>
         </section>
 
-        {/* CONTATO */}
-        <section id="contact" className="scroll-mt-32 border-t border-border/40">
-          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
-            <Card className="overflow-hidden border-accent/15 bg-hero-gradient-subtle">
-              <CardContent className="p-8 md:p-10">
-                <div className="grid gap-8 lg:grid-cols-[1fr_1fr] lg:items-start">
-                  <div>
-                    <SectionLabel>{t("investorGuide.contact.eyebrow")}</SectionLabel>
-                    <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground max-w-3xl">
-                      {t("investorGuide.contact.title")}
-                    </h2>
-                    <p className="mt-4 text-lg text-muted-foreground max-w-2xl leading-relaxed">
-                      {t("investorGuide.contact.subtitle")}
-                    </p>
-
-                    <div className="mt-6 space-y-2 text-sm text-muted-foreground">
-                      <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-accent" />{PROPERTY.address} — {PROPERTY.neighborhood}, {PROPERTY.city}</p>
-                    </div>
-
-                    <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                      <Button size="lg" className="min-h-[48px] bg-accent hover:bg-accent/90 text-accent-foreground" onClick={() => window.open(whatsappLink, "_blank")}>
-                        <MessageCircle className="mr-2 h-4 w-4" />
-                        {t("investorGuide.contact.talk")}
-                      </Button>
-                      <Button size="lg" variant="outline" className="min-h-[48px]" onClick={() => window.location.href = "tel:+5511961007687"}>
-                        <Phone className="mr-2 h-4 w-4" />
-                        Ligar agora
-                      </Button>
-                    </div>
-                  </div>
-
-                  <Card className="border-border/60 bg-background/90 backdrop-blur-sm">
-                    <CardContent className="p-5 md:p-7">
-                      <ReservationForm />
-                    </CardContent>
-                  </Card>
-                </div>
-              </CardContent>
-            </Card>
-
-            <p className="mt-10 text-xs text-muted-foreground leading-relaxed max-w-4xl">
+        <section className="scroll-mt-32 border-t border-border/40">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 py-10">
+            <p className="text-xs text-muted-foreground leading-relaxed max-w-4xl">
               {t("investorGuide.disclaimer")}
             </p>
           </div>
