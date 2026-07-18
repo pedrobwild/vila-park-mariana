@@ -542,7 +542,7 @@
         "headline": "A well-operated property tends to beat fixed income when we add rent and appreciation.",
         "horizon": "5–10 year horizons smooth vacancy and capture appreciation cycles; fixed income offers predictability, real estate offers real protection + income."
       },
-      "methodology": "Selic/CDI/Savings shown net of 15% income tax. IFIX considered tax-exempt. Market values are public references from March/2026 — not a promise. Property returns depend on the investor's own assumptions."
+      "methodology": "Rate vintage: {{vintage}}. Selic/CDI shown net of 15% income tax. IFIX and Savings considered tax-exempt for individuals. Market values are public references — not a promise. Property returns depend on the investor's own assumptions."
     },
     "scenarios": {
       "eyebrow": "Scenarios",
