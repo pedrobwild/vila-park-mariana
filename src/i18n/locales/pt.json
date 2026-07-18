@@ -173,6 +173,10 @@
     "years": "anos",
     "dash": "—"
   },
+  "notFound": {
+    "title": "Página não encontrada",
+    "back": "Voltar para o início"
+  },
   "market": {
     "eyebrow": "Dados de mercado",
     "title": "Dados de Mercado · Vila Mariana",

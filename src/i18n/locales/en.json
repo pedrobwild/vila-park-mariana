@@ -173,6 +173,10 @@
     "years": "years",
     "dash": "—"
   },
+  "notFound": {
+    "title": "Page not found",
+    "back": "Return to home"
+  },
   "market": {
     "eyebrow": "Market data",
     "title": "Market Data · Vila Mariana",
