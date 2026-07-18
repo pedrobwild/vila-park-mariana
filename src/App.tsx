@@ -34,8 +34,8 @@ const App = () => (
               <Route path="/urban-flex-bela-cintra" element={<Navigate to="/" replace />} />
               <Route path="/ferramentas" element={<Ferramentas />} />
               <Route path="/admin/upload" element={<RequireAuth><AdminUpload /></RequireAuth>} />
-              <Route path="/insights" element={<RequireAuth><Insights /></RequireAuth>} />
-              <Route path="/corretor" element={<RequireAuth><CorretorPage /></RequireAuth>} />
+              <Route path="/insights" element={<Insights />} />
+              <Route path="/corretor" element={<CorretorPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
