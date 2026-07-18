@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { CheckCircle2, ChevronRight, RotateCcw, Sparkles } from "lucide-react";
 import { TYPOLOGIES, type Typology } from "@/data/propertyData";
+import { quizStorage } from "./persistence";
 
 type Q = {
   id: "objective" | "strategy" | "horizon" | "risk";
