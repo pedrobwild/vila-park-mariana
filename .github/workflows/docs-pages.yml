@@ -56,3 +56,41 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Verify Pages site is live
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          set -euo pipefail
+          if [ -z "${PAGE_URL:-}" ]; then
+            echo "::error::deploy-pages did not return a page_url — Jekyll build/deploy failed."
+            exit 1
+          fi
+          echo "Validating $PAGE_URL"
+          # Retry up to 5x to absorb CDN propagation lag right after deploy.
+          attempt=0
+          max=5
+          until [ $attempt -ge $max ]; do
+            attempt=$((attempt+1))
+            status=$(curl -sS -o /tmp/pages-index.html -w "%{http_code}" -L --max-time 30 "$PAGE_URL" || echo "000")
+            echo "Attempt $attempt/$max — HTTP $status"
+            if [ "$status" = "200" ]; then
+              break
+            fi
+            if [ $attempt -lt $max ]; then sleep 10; fi
+          done
+          if [ "$status" != "200" ]; then
+            echo "::error::Pages site returned HTTP $status after $max attempts."
+            exit 1
+          fi
+          if ! grep -qi "i18n" /tmp/pages-index.html; then
+            echo "::error::Pages site is reachable but content check failed (expected 'i18n' marker in landing page)."
+            head -c 500 /tmp/pages-index.html || true
+            exit 1
+          fi
+          echo "✅ Pages site is live at $PAGE_URL"
+          echo "### ✅ GitHub Pages deployment verified" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- URL: $PAGE_URL" >> "$GITHUB_STEP_SUMMARY"
+          echo "- HTTP status: $status" >> "$GITHUB_STEP_SUMMARY"
+
