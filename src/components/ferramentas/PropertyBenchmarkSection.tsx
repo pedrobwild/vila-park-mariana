@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { BarChart3 } from "lucide-react";
 import SectionBlock from "@/components/guide/SectionBlock";
 import { PROPERTY, TYPOLOGIES, calcFinancials } from "@/data/propertyData";
+import { BENCHMARK_RATES } from "@/data/benchmarkRates";
 
 const BENCHMARKS = [
   {
@@ -17,28 +18,28 @@ const BENCHMARKS = [
   {
     id: "selic",
     label: "Selic (Tesouro)",
-    yieldAnnual: 14.75,
-    description: "Taxa básica — 14,75% mar/2026 (Copom)",
+    yieldAnnual: BENCHMARK_RATES.selic,
+    description: `Taxa básica — ${BENCHMARK_RATES.selic}% ${BENCHMARK_RATES.vintage}`,
     color: "bg-emerald-500",
   },
   {
     id: "cdi",
     label: "CDB 100% CDI",
-    yieldAnnual: 14.65,
+    yieldAnnual: BENCHMARK_RATES.cdi,
     description: "Aplicação bancária atrelada ao CDI",
     color: "bg-emerald-400",
   },
   {
     id: "fii",
     label: "FIIs (média IFIX)",
-    yieldAnnual: 11.2,
+    yieldAnnual: BENCHMARK_RATES.ifix,
     description: "Dividend yield médio 12 meses dos FIIs",
     color: "bg-sky-500",
   },
   {
     id: "poupanca",
     label: "Poupança",
-    yieldAnnual: 7.6,
+    yieldAnnual: BENCHMARK_RATES.poupanca,
     description: "Rendimento com Selic acima de 8,5%",
     color: "bg-muted-foreground/60",
   },
