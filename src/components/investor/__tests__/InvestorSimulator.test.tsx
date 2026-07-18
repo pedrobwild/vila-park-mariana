@@ -30,7 +30,7 @@ describe("InvestorSimulator — fluxo de caixa negativo", () => {
     expect(alert.textContent ?? "").toMatch(/prejuízo|negativ|deficit/i);
 
     // Métricas: net mensal deve estar destacado como destructive
-    const netMonthLabel = screen.getByText(/Líquido\/mês|Net\/month/i);
+    const netMonthLabel = screen.getByText(/Líquido \/ mês|Net \/ month/i);
     const netMonthValue = netMonthLabel.nextElementSibling as HTMLElement;
     expect(netMonthValue.className).toMatch(/text-destructive/);
     expect(netMonthValue.textContent ?? "").toContain("-");
