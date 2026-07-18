@@ -6,6 +6,11 @@ import AppNavbar from "@/components/AppNavbar";
 import InvestorQuizCard from "@/components/investor/InvestorQuizCard";
 import InvestorSimulator from "@/components/investor/InvestorSimulator";
 import EventsCalendar from "@/components/insights/EventsCalendar";
+import MarketDataSection from "@/components/investor/MarketDataSection";
+import IllustrativeCaseSection from "@/components/investor/IllustrativeCaseSection";
+import TotalReturnSection from "@/components/investor/TotalReturnSection";
+import ScenariosSection from "@/components/investor/ScenariosSection";
+import MonthlyRevenueEventsSection from "@/components/investor/MonthlyRevenueEventsSection";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -43,7 +48,12 @@ type SectionId =
   | "matematica"
   | "simulador"
   | "avaliar"
+  | "marketData"
+  | "case"
+  | "totalReturn"
+  | "scenarios"
   | "eventos"
+  | "monthlyEvents"
   | "amenities"
   | "market"
   | "confianca"
@@ -52,12 +62,14 @@ type SectionId =
 
 const sectionIds: SectionId[] = [
   "hero", "diagnostico", "tese", "nearby", "typologies", "matematica",
-  "simulador", "avaliar", "eventos", "amenities", "market", "confianca", "faq", "cta",
+  "simulador", "avaliar", "marketData", "case", "totalReturn", "scenarios",
+  "eventos", "monthlyEvents", "amenities", "market", "confianca", "faq", "cta",
 ];
 
 const navSectionIds: SectionId[] = [
   "hero", "diagnostico", "tese", "typologies", "matematica",
-  "simulador", "avaliar", "eventos", "amenities", "market", "faq", "cta",
+  "simulador", "avaliar", "marketData", "case", "totalReturn", "scenarios",
+  "eventos", "monthlyEvents", "amenities", "market", "faq", "cta",
 ];
 
 function SectionLabel({ children }: { children: ReactNode }) {
