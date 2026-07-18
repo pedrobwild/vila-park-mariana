@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,15 +8,50 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import {
+  AlertCircle,
   Building2,
   Home,
   CalendarDays,
   MessageCircle,
   Info,
+  RotateCcw,
   TrendingUp,
 } from "lucide-react";
 import { TYPOLOGIES, type Typology } from "@/data/propertyData";
 import { WHATSAPP_PHONE } from "@/data/surroundings";
+import { simulatorStorage, type SimulatorPersisted } from "./persistence";
+
+// Limites (cap) por campo — evitam inputs absurdos e travam o teclado numérico.
+const LIMITS = {
+  price: { min: 0, max: 50_000_000, softMin: 100_000, softMax: 20_000_000 },
+  condoIptu: { min: 0, max: 50_000, softMin: 200, softMax: 10_000 },
+  rent: { min: 0, max: 200_000, softMin: 800, softMax: 50_000 },
+  daily: { min: 0, max: 20_000, softMin: 100, softMax: 5_000 },
+} as const;
+
+// Extrai apenas dígitos e aplica cap. Retorna string vazia se não houver dígitos.
+function digitsOnly(input: string, cap: number): string {
+  const only = input.replace(/\D/g, "").replace(/^0+(?=\d)/, "");
+  if (!only) return "";
+  const n = Math.min(Number(only), cap);
+  return String(n);
+}
+
+// Formata para pt-BR com separador de milhar (sem símbolo — já mostramos "R$" no prefixo).
+function formatBRL(digits: string): string {
+  if (!digits) return "";
+  return Number(digits).toLocaleString("pt-BR");
+}
+
+function validate(field: keyof typeof LIMITS, value: string): string | null {
+  if (!value) return null;
+  const n = Number(value);
+  const { softMin, softMax } = LIMITS[field];
+  if (n > 0 && n < softMin) return "Valor muito baixo — confira se digitou certo.";
+  if (n > softMax) return "Valor muito alto — confira se digitou certo.";
+  return null;
+}
+
 
 const CAPEX_LEVELS = [
   { id: "essencial", label: "Essencial", capex: 25000, rateBoost: 1.0, note: "Mobília funcional e enxoval básico." },
