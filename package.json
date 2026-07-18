@@ -13,7 +13,8 @@
     "test:watch": "vitest",
     "bench:merge-weekly": "tsx scripts/bench-merge-weekly.ts",
     "i18n:report": "tsx scripts/i18n-parity-report.ts",
-    "i18n:check": "tsx scripts/i18n-parity-report.ts --strict"
+    "i18n:check": "tsx scripts/i18n-parity-report.ts --strict",
+    "i18n:status": "tsx scripts/i18n-status.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
