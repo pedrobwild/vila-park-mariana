@@ -5,16 +5,10 @@ import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { useSimulatorLive, deriveSimInputs, computeSeasonal, fmtBRL, fmtPct } from "./useSimulatorLive";
+import { BENCHMARK_RATES, netOfIR } from "@/data/benchmarkRates";
 
-// Reference rates — March 2026 vintage. Single source; adjust here if scenario changes.
-export const BENCHMARKS = {
-  vintage: "03/2026",
-  selic: 12.1,
-  cdi: 12.0,
-  ifix: 10.8,
-  poupanca: 7.7,
-  irFixedIncome: 0.15, // 15% on Selic/CDI (long-tenor investor bracket)
-} as const;
+// Rótulo curto legado — mantido como alias para compatibilidade com testes/import.
+export const BENCHMARKS = BENCHMARK_RATES;
 
 const DEFAULT_BASE = 500_000;
 
