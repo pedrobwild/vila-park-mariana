@@ -199,6 +199,7 @@ export default function EventsCalendar({
     if (!data?.events) return [] as EventItem[];
     return data.events
       .filter(isInWindow)
+      .map((e) => ({ ...e, dailyRateImpact: clampImpact(e.dailyRateImpact) }))
       .sort((a, b) => firstDateForSort(a) - firstDateForSort(b));
   }, [data]);
 
@@ -441,6 +442,12 @@ export default function EventsCalendar({
               ))}
             </p>
           )}
+          <p className="text-[11px] text-muted-foreground/70 leading-relaxed border-t border-border/40 pt-3">
+            {t("eventsCalendar.calibrationNote", {
+              defaultValue:
+                "Estimativas de impacto na diária calibradas pela prática de mercado em bairros conectados; imóveis vizinhos aos venues praticam variações maiores. O anfitrião captura o aumento ajustando preços por data (a plataforma exibe o preço total ao hóspede).",
+            })}
+          </p>
         </div>
       )}
     </section>

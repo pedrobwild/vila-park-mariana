@@ -688,6 +688,7 @@
     "emptyWindow": "No events found for the selected window ({{window}}).",
     "showLess": "Show less",
     "showAll": "Show all {{count}} events",
-    "sources": "Sources"
+    "sources": "Sources",
+    "calibrationNote": "Nightly-rate impact estimates are calibrated to market practice in well-connected neighborhoods; listings next to the venues see larger swings. The host captures the uplift by adjusting per-date pricing (guests see the total price on the platform)."
   }
 }
