@@ -192,6 +192,34 @@ function render(reports: NsHealth[]): string {
   return md.join("\n");
 }
 
+function buildJson(reports: NsHealth[]) {
+  const totalIssues = reports.reduce((s, r) => s + issueCount(r), 0);
+  const overall = totalIssues === 0 ? "healthy" : totalIssues <= 3 ? "warning" : "critical";
+  return {
+    schemaVersion: 1,
+    generatedAt: new Date().toISOString(),
+    commit: safeGit("rev-parse --short HEAD"),
+    branch: safeGit("rev-parse --abbrev-ref HEAD"),
+    sources: {
+      pt: "src/i18n/locales/pt.json",
+      en: "src/i18n/locales/en.json",
+    },
+    overall: {
+      status: overall,
+      totalIssues,
+    },
+    namespaces: reports.map((r) => ({
+      namespace: r.ns,
+      status: statusBadge(issueCount(r)).replace(/^\S+\s/, ""),
+      issues: issueCount(r),
+      totalKeys: { pt: r.totalKeysPt, en: r.totalKeysEn },
+      missingInEn: r.missingInEn,
+      missingInPt: r.missingInPt,
+      placeholderMismatches: r.placeholderMismatches,
+    })),
+  };
+}
+
 function main(): void {
   const pt = flatten(loadJson(PT_PATH));
   const en = flatten(loadJson(EN_PATH));
@@ -199,7 +227,10 @@ function main(): void {
   mkdirSync(OUT_DIR, { recursive: true });
   const md = render(reports);
   writeFileSync(OUT_MD, md, "utf8");
+  const json = buildJson(reports);
+  writeFileSync(OUT_JSON, JSON.stringify(json, null, 2) + "\n", "utf8");
   console.log(`i18n status page written to: ${OUT_MD}`);
+  console.log(`i18n status JSON written to: ${OUT_JSON}`);
 }
 
 main();
