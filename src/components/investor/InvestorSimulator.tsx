@@ -257,21 +257,15 @@ export default function InvestorSimulator({ initialTypologyId }: Props) {
 
         {/* Inputs */}
         <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <Label htmlFor="price">Preço da unidade (R$)</Label>
-            <Input
-              id="price"
-              type="number"
-              inputMode="numeric"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder={`ex.: ${hint?.price ?? 600000}`}
-              className="mt-1.5 min-h-[46px]"
-            />
-            <p className="text-[11px] text-muted-foreground mt-1">
-              Estimativa de mercado — substitua pelo valor real da tabela.
-            </p>
-          </div>
+          <CurrencyField
+            id="price"
+            label="Preço da unidade"
+            value={price}
+            onChange={(v) => setPrice(digitsOnly(v, LIMITS.price.max))}
+            placeholder={formatBRL(String(hint?.price ?? 600000))}
+            hint="Estimativa de mercado — substitua pelo valor real da tabela."
+            error={priceError}
+          />
 
           <div>
             <Label>Nível de mobília / enxoval (capex)</Label>
@@ -282,7 +276,7 @@ export default function InvestorSimulator({ initialTypologyId }: Props) {
                   type="button"
                   onClick={() => setCapexLevelId(c.id)}
                   className={cn(
-                    "rounded-lg border px-2 py-2 text-xs font-medium transition-colors",
+                    "rounded-lg border px-2 py-2 text-xs font-medium transition-colors min-h-[46px]",
                     capexLevelId === c.id
                       ? "border-accent bg-accent/10 text-accent"
                       : "border-border/60 text-muted-foreground hover:border-accent/40",
@@ -296,55 +290,37 @@ export default function InvestorSimulator({ initialTypologyId }: Props) {
             <p className="text-[11px] text-muted-foreground mt-1">{capexLevel.note}</p>
           </div>
 
-          <div>
-            <Label htmlFor="condo">Condomínio + IPTU mensais (R$)</Label>
-            <Input
-              id="condo"
-              type="number"
-              inputMode="numeric"
-              value={condoIptu}
-              onChange={(e) => setCondoIptu(e.target.value)}
-              placeholder={`ex.: ${hint?.condoIptu ?? 1000}`}
-              className="mt-1.5 min-h-[46px]"
-            />
-            <p className="text-[11px] text-muted-foreground mt-1">
-              Placeholder de mercado para a Vila Mariana — confirme os valores oficiais.
-            </p>
-          </div>
+          <CurrencyField
+            id="condo"
+            label="Condomínio + IPTU mensais"
+            value={condoIptu}
+            onChange={(v) => setCondoIptu(digitsOnly(v, LIMITS.condoIptu.max))}
+            placeholder={formatBRL(String(hint?.condoIptu ?? 1000))}
+            hint="Placeholder de mercado para a Vila Mariana — confirme os valores oficiais."
+            error={condoError}
+          />
 
           {mode === "tradicional" ? (
-            <div>
-              <Label htmlFor="rent">Aluguel mensal estimado (R$)</Label>
-              <Input
-                id="rent"
-                type="number"
-                inputMode="numeric"
-                value={rent}
-                onChange={(e) => setRent(e.target.value)}
-                placeholder={`ex.: ${hint?.rent ?? 3000}`}
-                className="mt-1.5 min-h-[46px]"
-              />
-              <p className="text-[11px] text-muted-foreground mt-1">
-                Faixa observada em locações longas no bairro — substitua pela sua estimativa.
-              </p>
-            </div>
+            <CurrencyField
+              id="rent"
+              label="Aluguel mensal estimado"
+              value={rent}
+              onChange={(v) => setRent(digitsOnly(v, LIMITS.rent.max))}
+              placeholder={formatBRL(String(hint?.rent ?? 3000))}
+              hint="Faixa observada em locações longas no bairro — substitua pela sua estimativa."
+              error={rentError}
+            />
           ) : (
             <div className="space-y-4">
-              <div>
-                <Label htmlFor="daily">Diária média (R$)</Label>
-                <Input
-                  id="daily"
-                  type="number"
-                  inputMode="numeric"
-                  value={daily}
-                  onChange={(e) => setDaily(e.target.value)}
-                  placeholder={`ex.: ${hint?.daily ?? 300}`}
-                  className="mt-1.5 min-h-[46px]"
-                />
-                <p className="text-[11px] text-muted-foreground mt-1">
-                  Diária base ({capexLevel.label} = ×{capexLevel.rateBoost.toFixed(2)}).
-                </p>
-              </div>
+              <CurrencyField
+                id="daily"
+                label="Diária média"
+                value={daily}
+                onChange={(v) => setDaily(digitsOnly(v, LIMITS.daily.max))}
+                placeholder={formatBRL(String(hint?.daily ?? 300))}
+                hint={`Diária base (${capexLevel.label} = ×${capexLevel.rateBoost.toFixed(2)}).`}
+                error={dailyError}
+              />
               <div>
                 <div className="flex items-center justify-between">
                   <Label>Ocupação estimada</Label>
@@ -352,16 +328,31 @@ export default function InvestorSimulator({ initialTypologyId }: Props) {
                 </div>
                 <Slider
                   value={occupancy}
-                  onValueChange={setOccupancy}
+                  onValueChange={(v) => setOccupancy([Math.min(95, Math.max(45, v[0] ?? 70))])}
                   min={45}
                   max={95}
                   step={1}
                   className="mt-2"
+                  aria-label="Ocupação estimada em porcentagem"
                 />
+                <p className="text-[11px] text-muted-foreground mt-1">Entre 45% e 95%.</p>
               </div>
             </div>
           )}
         </div>
+
+        <div className="flex justify-end">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleReset}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <RotateCcw className="mr-2 h-3.5 w-3.5" /> Limpar simulação
+          </Button>
+        </div>
+
 
         {/* Result */}
         <div className="rounded-2xl border border-accent/30 bg-accent/5 p-5">
