@@ -351,29 +351,37 @@ export default function InvestorGuide() {
     <div className="min-h-screen bg-background page-enter">
       <AppNavbar />
 
-      <div className="sticky top-16 z-30 glass-nav border-t border-border/40">
+      <nav
+        aria-label="Seções do Guia do Investidor"
+        className="sticky top-16 z-30 glass-nav border-t border-border/40"
+      >
         <div className="max-w-7xl mx-auto px-4 md:px-6 overflow-x-auto scrollbar-none">
-          <div className="flex items-center gap-2 min-w-max py-3">
+          <div className="flex items-center gap-2 min-w-max py-2">
             <span className="font-display font-bold text-base mr-1 shrink-0">Vila Park</span>
             <Separator orientation="vertical" className="h-5 mr-1" />
-            {sectionIds.map((id) => (
-              <button
-                key={id}
-                type="button"
-                onClick={() => scrollTo(id)}
-                className={cn(
-                  "rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
-                  activeSection === id
-                    ? "bg-accent text-accent-foreground"
-                    : "bg-transparent text-muted-foreground hover:text-foreground hover:bg-secondary",
-                )}
-              >
-                {sectionLabels[id]}
-              </button>
-            ))}
+            {navSectionIds.map((id) => {
+              const isActive = activeSection === id;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => scrollTo(id)}
+                  aria-current={isActive ? "true" : undefined}
+                  className={cn(
+                    "inline-flex items-center rounded-full px-3 min-h-[36px] text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                    isActive
+                      ? "bg-accent text-accent-foreground"
+                      : "bg-transparent text-muted-foreground hover:text-foreground hover:bg-secondary",
+                  )}
+                >
+                  {sectionLabels[id]}
+                </button>
+              );
+            })}
           </div>
         </div>
-      </div>
+      </nav>
+
 
       <main className="pb-24">
         {/* HERO */}
