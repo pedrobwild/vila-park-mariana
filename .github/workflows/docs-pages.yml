@@ -11,9 +11,10 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
+  pull-requests: write
 
 concurrency:
   group: pages
@@ -93,4 +94,88 @@ jobs:
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "- URL: $PAGE_URL" >> "$GITHUB_STEP_SUMMARY"
           echo "- HTTP status: $status" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Checkout repo for README sync
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync README with real Pages URL
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          # Normalize: strip trailing slash from base URL, then build status page URL.
+          BASE_URL="${PAGE_URL%/}"
+          STATUS_URL="${BASE_URL}/i18n-status"
+          echo "Base Pages URL: $BASE_URL"
+          echo "Status page URL: $STATUS_URL"
+
+          README="README.md"
+          if [ ! -f "$README" ]; then
+            echo "::warning::README.md not found — skipping sync."
+            exit 0
+          fi
+
+          # Rewrite the i18n status link (placeholder OR previously-published URL)
+          # and drop the manual "após o primeiro deploy" notice once resolved.
+          python3 - "$README" "$STATUS_URL" <<'PY'
+          import re, sys, pathlib
+          path, status_url = sys.argv[1], sys.argv[2]
+          p = pathlib.Path(path)
+          text = p.read_text(encoding="utf-8")
+          original = text
+
+          # Replace the markdown link target for "i18n status page".
+          text = re.sub(
+              r'(\[i18n status page\]\()[^)]+(\))',
+              lambda m: f"{m.group(1)}{status_url}{m.group(2)}",
+              text,
+              count=1,
+          )
+
+          # Remove the transitional "> Após o primeiro deploy..." note (blockquote block).
+          text = re.sub(
+              r'\n\s*>\s*Após o primeiro deploy[^\n]*(?:\n\s*>[^\n]*)*\n?',
+              '\n',
+              text,
+          )
+
+          if text != original:
+              p.write_text(text, encoding="utf-8")
+              print("README updated.")
+          else:
+              print("README already in sync — nothing to do.")
+          PY
+
+          if git diff --quiet -- "$README"; then
+            echo "No README changes to commit."
+            echo "- README already pointed at \`$STATUS_URL\`" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$README"
+          git commit -m "docs(readme): sync GitHub Pages URL ($STATUS_URL) [skip ci]"
+
+          # Push straight to the default branch. Fall back to a PR if branch protection blocks it.
+          if git push origin "HEAD:${GITHUB_REF_NAME}" 2>/tmp/push.err; then
+            echo "✅ README pushed to ${GITHUB_REF_NAME}."
+            echo "- README synced on \`${GITHUB_REF_NAME}\` → [$STATUS_URL]($STATUS_URL)" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::warning::Direct push failed, opening a PR instead."
+            cat /tmp/push.err || true
+            BRANCH="chore/readme-pages-url-${GITHUB_RUN_ID}"
+            git checkout -b "$BRANCH"
+            git push origin "$BRANCH"
+            gh pr create \
+              --title "docs(readme): sync GitHub Pages URL" \
+              --body "Automated update from \`Deploy docs to GitHub Pages\` (run #${GITHUB_RUN_NUMBER}).\n\nPages URL: $STATUS_URL" \
+              --base "${GITHUB_REF_NAME}" \
+              --head "$BRANCH"
+            echo "- README PR opened for \`$STATUS_URL\`" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
 
