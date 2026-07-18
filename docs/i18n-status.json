@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-18T08:52:45.769Z",
+  "commit": "d3e6d86",
+  "branch": "edit/edt-87c61fae-ed74-4843-82d5-6d424964e781",
+  "sources": {
+    "pt": "src/i18n/locales/pt.json",
+    "en": "src/i18n/locales/en.json"
+  },
+  "overall": {
+    "status": "healthy",
+    "totalIssues": 0
+  },
+  "namespaces": [
+    {
+      "namespace": "investorGuide",
+      "status": "healthy",
+      "issues": 0,
+      "totalKeys": {
+        "pt": 156,
+        "en": 156
+      },
+      "missingInEn": [],
+      "missingInPt": [],
+      "placeholderMismatches": []
+    },
+    {
+      "namespace": "investorQuiz",
+      "status": "healthy",
+      "issues": 0,
+      "totalKeys": {
+        "pt": 43,
+        "en": 43
+      },
+      "missingInEn": [],
+      "missingInPt": [],
+      "placeholderMismatches": []
+    },
+    {
+      "namespace": "investorSim",
+      "status": "healthy",
+      "issues": 0,
+      "totalKeys": {
+        "pt": 81,
+        "en": 81
+      },
+      "missingInEn": [],
+      "missingInPt": [],
+      "placeholderMismatches": []
+    }
+  ]
+}
