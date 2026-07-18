@@ -2,6 +2,13 @@
 
 TODO: Document your project here
 
+## Documentation
+
+- **[i18n status page](https://<owner>.github.io/<repo>/i18n-status)** — Saúde de paridade i18n (pt/en) por namespace, atualizada automaticamente. Fonte: [`docs/i18n-status.md`](./docs/i18n-status.md). Regenerar localmente: `npm run i18n:status`.
+
+  > Após o primeiro deploy do workflow `Deploy docs to GitHub Pages`, substitua `<owner>/<repo>` pelo caminho real do repositório (o link exato aparece no summary do job, em `page_url`). Habilite Pages em **Settings → Pages → Source: GitHub Actions**.
+
+
 ## Performance test tuning — `mergeWeekly`
 
 The chart-data merge function powering `MultiBrokerWeeklySparkline` has an
