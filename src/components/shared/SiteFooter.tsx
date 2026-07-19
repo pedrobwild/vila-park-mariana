@@ -25,7 +25,6 @@ export default function SiteFooter() {
             <ul className="space-y-2">
               <li><Link to="/oportunidades" className="text-muted-foreground hover:text-foreground transition-colors">{t("nav.opportunities", "Oportunidades")}</Link></li>
               <li><Link to="/guia-investidor" className="text-muted-foreground hover:text-foreground transition-colors">{t("nav.guideInvestor")}</Link></li>
-              <li><Link to="/guia-comprador" className="text-muted-foreground hover:text-foreground transition-colors">{t("nav.guideBuyer")}</Link></li>
               <li><Link to="/ferramentas" className="text-muted-foreground hover:text-foreground transition-colors">{t("nav.ferramentas")}</Link></li>
             </ul>
           </nav>
