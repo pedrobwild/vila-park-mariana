@@ -19,6 +19,7 @@ import { PROPERTY } from "@/data/propertyData";
 import { WHATSAPP_PHONE } from "@/data/surroundings";
 import NeighborhoodSection from "@/components/shared/NeighborhoodSection";
 import SiteFooter from "@/components/shared/SiteFooter";
+import { trackGlobal } from "@/hooks/useGuideAnalytics";
 
 const PlantasSection = lazy(() => import("@/components/PlantasSection"));
 
@@ -209,7 +210,11 @@ export default function Index() {
             transition={{ duration: 0.7, delay: 0.65 }}
             className="mt-6 md:mt-10 flex flex-col sm:flex-row gap-3"
           >
-            <a href="#tipologias" className="w-full sm:w-auto">
+            <a
+              href="#tipologias"
+              className="w-full sm:w-auto"
+              onClick={() => trackGlobal("cta_click", { id: "hero_ctaPrimary", target: "#tipologias", location: "home:hero" })}
+            >
               <Button size="lg" className="min-h-[52px] w-full sm:w-auto text-base bg-accent hover:bg-accent/90 text-accent-foreground font-bold shadow-lg shadow-accent/25 active:scale-[0.97] transition-transform">
                 <Eye className="mr-2 h-5 w-5" />
                 {t("hero.ctaPrimary")}
