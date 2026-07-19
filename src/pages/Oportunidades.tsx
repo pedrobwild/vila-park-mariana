@@ -301,9 +301,27 @@ export default function Oportunidades() {
                 </div>
               ))}
             </div>
+
+            <div className="rounded-lg border border-border bg-card p-6 text-center space-y-3">
+              <p className="font-display font-semibold">Interessou por alguma unidade?</p>
+              <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                Fale com o time Vila Park e receba condições, disponibilidade atualizada e agende uma visita.
+              </p>
+              <a
+                href={`https://api.whatsapp.com/send?phone=${WHATSAPP_PHONE}&text=${encodeURIComponent("Olá! Tenho interesse em uma unidade no Vila Park Vila Mariana.")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block"
+              >
+                <Button size="lg" className="gap-2 min-h-[44px]">
+                  <MessageCircle className="h-4 w-4" /> Falar no WhatsApp
+                </Button>
+              </a>
+            </div>
           </>
         )}
       </main>
+
 
       <Dialog open={!!lightbox} onOpenChange={(o) => !o && setLightbox(null)}>
         <DialogContent className="max-w-3xl">
