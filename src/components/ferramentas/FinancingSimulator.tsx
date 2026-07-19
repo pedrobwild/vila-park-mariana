@@ -162,7 +162,8 @@ function Fieldset({ title, children, id }: { title: string; children: React.Reac
 function FieldError({ msg, id }: { msg?: string; id?: string }) {
   if (!msg) return null;
   return (
-    <p id={id} role="alert" className="text-xs text-destructive mt-1">
+    <p id={id} role="alert" className="text-xs text-destructive mt-1 flex items-center gap-1">
+      <AlertTriangle className="h-3 w-3 shrink-0" aria-hidden="true" />
       {msg}
     </p>
   );
