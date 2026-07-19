@@ -110,6 +110,8 @@ export const BANK_PRESETS = [
   { id: "itau", label: "Itaú", annualRate: 11.6 },
   { id: "santander", label: "Santander", annualRate: 11.69 },
   { id: "bradesco", label: "Bradesco", annualRate: 11.7 },
+  { id: "inter-bonificada", label: "Banco Inter — SBPE Bonificada", annualRate: 9.4 },
+  { id: "inter-procotista", label: "Banco Inter — Pró-Cotista FGTS", annualRate: 9.0 },
 ] as const;
 
 export const ACQUISITION_COSTS = {
