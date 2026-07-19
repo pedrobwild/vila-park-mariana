@@ -68,6 +68,27 @@ export function monthlyToAnnual(monthly: number): number {
   return Math.pow(1 + monthly, 12) - 1;
 }
 
+/** Nominal a.a. (%) → mensal (fração). Regra brasileira: divide por 12. */
+export function nominalAnnualToMonthly(nominalPct: number): number {
+  return nominalPct / 100 / 12;
+}
+
+/** Nominal a.a. (%) → efetiva a.a. (%). Ex.: 10 → ~10,4713%. */
+export function nominalToEffectiveAnnual(nominalPct: number): number {
+  const im = nominalAnnualToMonthly(nominalPct);
+  return (Math.pow(1 + im, 12) - 1) * 100;
+}
+
+/** Retorna a taxa mensal efetiva conforme o tipo declarado. */
+export function monthlyRateFromAnnual(annualPct: number, type: "efetiva" | "nominal" = "efetiva"): number {
+  return type === "nominal" ? nominalAnnualToMonthly(annualPct) : annualToMonthly(annualPct);
+}
+
+/** Retorna a taxa efetiva a.a. (%) equivalente, para ordenação/comparação. */
+export function effectiveAnnualPct(annualPct: number, type: "efetiva" | "nominal" = "efetiva"): number {
+  return type === "nominal" ? nominalToEffectiveAnnual(annualPct) : annualPct;
+}
+
 /**
  * Rough MIP monthly rate (fraction of outstanding balance) based on age.
  * Approximates real bank tables (younger = cheaper).
