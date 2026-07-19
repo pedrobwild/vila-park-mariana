@@ -16,7 +16,7 @@ const AdminUpload = lazy(() => import("./pages/AdminUpload"));
 const Insights = lazy(() => import("./pages/Insights"));
 const CorretorPage = lazy(() => import("./pages/CorretorPage"));
 const Login = lazy(() => import("./pages/Login"));
-const Comercial = lazy(() => import("./pages/Comercial"));
+const Admin = lazy(() => import("./pages/Admin"));
 const Oportunidades = lazy(() => import("./pages/Oportunidades"));
 import RequireAdmin from "./components/auth/RequireAdmin";
 
