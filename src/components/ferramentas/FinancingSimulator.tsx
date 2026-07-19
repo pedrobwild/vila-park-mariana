@@ -756,11 +756,17 @@ export default function FinancingSimulator() {
 
 function Kpi({ label, value, hint, highlight }: { label: string; value: string; hint?: string; highlight?: boolean }) {
   return (
-    <div className={`rounded-lg p-3 ${highlight ? "bg-primary/10 border border-primary/30" : "bg-muted/40"}`}>
+    <div
+      className={`rounded-lg p-3 ${
+        highlight
+          ? "bg-card border border-accent/40 border-l-4 border-l-accent shadow-sm"
+          : "bg-card border border-border/60"
+      }`}
+    >
       <p className="text-[11px] text-muted-foreground uppercase tracking-wide flex items-center gap-1">
-        {label} {hint && <InfoHint text={hint} />}
+        {label} {hint && <InfoHint text={hint} label={label} />}
       </p>
-      <p className={`font-display font-bold mt-1 ${highlight ? "text-primary text-lg" : "text-foreground text-base"}`}>{value}</p>
+      <p className={`font-display font-bold mt-1 ${highlight ? "text-accent text-lg" : "text-foreground text-base"}`}>{value}</p>
     </div>
   );
 }
