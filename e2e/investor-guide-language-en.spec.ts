@@ -35,7 +35,7 @@ test.describe("Guia do Investidor — troca de idioma para EN", () => {
     // HERO em inglês.
     await expect(page.getByText("Investor Guide", { exact: true }).first()).toBeVisible();
     await expect(
-      page.getByRole("button", { name: /Take the investor diagnostic/i }).first(),
+      page.getByRole("button", { name: /Discover my investor profile/i }).first(),
     ).toBeVisible();
 
     // Card do QUIZ em inglês (primeira pergunta + progresso).
