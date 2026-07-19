@@ -15,11 +15,11 @@ import MobileQuickNav from "@/components/MobileQuickNav";
 import ReservationForm from "@/components/ReservationForm";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
 import { PROPERTY } from "@/data/propertyData";
-import { POIS, CATEGORY_ORDER, WHATSAPP_PHONE, type PoiCategory } from "@/data/surroundings";
+import { WHATSAPP_PHONE } from "@/data/surroundings";
+import NeighborhoodSection from "@/components/shared/NeighborhoodSection";
+import SiteFooter from "@/components/shared/SiteFooter";
 
 const PlantasSection = lazy(() => import("@/components/PlantasSection"));
-const MarketIntelSection = lazy(() => import("@/components/MarketIntelSection"));
-const VilaMarianaYieldSection = lazy(() => import("@/components/VilaMarianaYieldSection"));
 
 const HERO_IMG = "https://vilaparkmariana.com.br/wp-content/uploads/2023/03/frente-fachada-noite-vila-park-mariana.jpg";
 
@@ -37,13 +37,6 @@ const PROGRESS_MAY_2025 = [
 ];
 const PROGRESS_JUL_2026 = "https://vilaparkmariana.com.br/wp-content/uploads/2026/07/fachada_07_07.jpeg";
 
-const CATEGORY_META: Record<PoiCategory, { icon: typeof Trees; key: string }> = {
-  mobility: { icon: Train, key: "surroundings.mobility" },
-  leisure: { icon: Trees, key: "surroundings.leisure" },
-  education: { icon: GraduationCap, key: "surroundings.education" },
-  services: { icon: ShoppingBag, key: "surroundings.services" },
-  gastronomy: { icon: UtensilsCrossed, key: "surroundings.gastronomy" },
-};
 
 function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
   const ref = useRef(null);
@@ -128,15 +121,6 @@ export default function Index() {
     { key: "terrace", img: GALLERY[3].url },
     { key: "studio", img: GALLERY[0].url },
   ];
-
-  const poisByCategory = useMemo(() => {
-    const map = new Map<PoiCategory, typeof POIS>();
-    for (const p of POIS) {
-      if (!map.has(p.category)) map.set(p.category, []);
-      map.get(p.category)!.push(p);
-    }
-    return map;
-  }, []);
 
   return (
     <main className="min-h-screen bg-background">
@@ -357,30 +341,33 @@ export default function Index() {
         </div>
       </section>
 
-      {/* DADOS DE MERCADO */}
+      {/* DADOS DE MERCADO — teaser premium */}
       <section className="border-b border-border/40 bg-muted/25">
-        <div className="max-w-7xl mx-auto px-5 md:px-6 py-12 md:py-24">
+        <div className="max-w-7xl mx-auto px-5 md:px-6 py-14 md:py-20">
           <FadeIn>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent mb-3">{t("market.eyebrow")}</p>
-            <h2 className="font-display text-2xl md:text-4xl font-bold text-foreground max-w-2xl">{t("market.title")}</h2>
+            <p className="eyebrow mb-3">{t("market.eyebrow")}</p>
+            <h2 className="font-display text-3xl md:text-4xl font-medium text-foreground max-w-2xl tracking-tight">{t("market.title")}</h2>
             <p className="mt-3 text-muted-foreground max-w-2xl">{t("market.subtitle")}</p>
           </FadeIn>
 
-          <FadeIn delay={0.08} className="mt-8">
-            <Suspense fallback={<div className="min-h-[300px]" />}>
-              <VilaMarianaYieldSection />
-            </Suspense>
+          <FadeIn delay={0.08} className="mt-10">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-10 max-w-3xl">
+              {[
+                { v: "900 m", l: t("hero.trust.metro") },
+                { v: "33", l: t("hero.trust.units") },
+                { v: "1.600 m²", l: t("hero.trust.area") },
+              ].map((k) => (
+                <div key={k.l}>
+                  <p className="font-display text-4xl md:text-5xl font-medium tabular leading-none text-foreground">{k.v}</p>
+                  <p className="mt-2 text-xs uppercase tracking-[0.14em] font-medium text-muted-foreground">{k.l}</p>
+                </div>
+              ))}
+            </div>
           </FadeIn>
 
-          <FadeIn delay={0.15} className="mt-10">
-            <Suspense fallback={<div className="min-h-[200px]" />}>
-              <MarketIntelSection />
-            </Suspense>
-          </FadeIn>
-
-          <FadeIn delay={0.15} className="mt-4 flex flex-col sm:flex-row gap-3">
+          <FadeIn delay={0.15} className="mt-10 flex flex-col sm:flex-row gap-3">
             <Link to="/guia-investidor">
-              <Button size="lg" variant="outline" className="min-h-[48px] w-full sm:w-auto">
+              <Button size="lg" className="min-h-[48px] w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground">
                 {t("market.ctaGuide")}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -432,63 +419,12 @@ export default function Index() {
         </div>
       </section>
 
-      {/* ENTORNO */}
-      <section id="comparativo" className="border-b border-border/40 bg-background">
-        <div className="max-w-7xl mx-auto px-5 md:px-6 py-12 md:py-24">
-          <FadeIn>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary/80 mb-3">{t("surroundings.eyebrow")}</p>
-            <h2 className="font-display text-2xl md:text-4xl font-bold text-foreground max-w-2xl">{t("surroundings.title")}</h2>
-            <p className="mt-3 text-muted-foreground max-w-2xl">{t("surroundings.subtitle")}</p>
-          </FadeIn>
+      {/* ENTORNO — shared component */}
+      <div id="comparativo" className="border-b border-border/40 bg-background">
+        <NeighborhoodSection variant="compact" />
+      </div>
 
-          <div className="mt-8 grid gap-6 lg:grid-cols-2">
-            {CATEGORY_ORDER.map((cat) => {
-              const items = poisByCategory.get(cat) ?? [];
-              if (!items.length) return null;
-              const meta = CATEGORY_META[cat];
-              return (
-                <FadeIn key={cat}>
-                  <Card className="h-full border-border/60">
-                    <CardContent className="p-5">
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className="h-9 w-9 rounded-lg bg-accent/10 flex items-center justify-center">
-                          <meta.icon className="h-4 w-4 text-accent" />
-                        </div>
-                        <h3 className="font-display text-base font-bold text-foreground">{t(meta.key)}</h3>
-                      </div>
-                      <ul className="grid gap-2">
-                        {items.map((p) => (
-                          <li key={p.name} className="flex items-center justify-between gap-3 text-sm">
-                            <span className="text-foreground">{p.name}</span>
-                            <span className="text-muted-foreground tabular-nums whitespace-nowrap">{p.distance}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                </FadeIn>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-
-      {/* FOOTER */}
-      <footer className="border-t border-border/40 bg-muted/25">
-        <div className="max-w-7xl mx-auto px-5 md:px-6 py-8 md:py-10 pb-24 md:pb-10">
-          <div className="flex flex-col gap-4 md:flex-row md:justify-between md:items-center text-[13px] md:text-sm text-muted-foreground">
-            <p>{t("footer.rights")}</p>
-            <nav aria-label={t("footer.ariaLabel")} className="flex items-center gap-5">
-              <Link to="/ferramentas" className="hover:text-foreground transition-colors min-h-[44px] flex items-center">{t("footer.tools")}</Link>
-              <Link to="/guia-investidor" className="hover:text-foreground transition-colors min-h-[44px] flex items-center">{t("footer.guideInvestor")}</Link>
-            </nav>
-          </div>
-          <p className="mt-6 text-[11px] leading-relaxed text-muted-foreground/70 max-w-4xl">
-            {t("footer.disclaimer")}
-          </p>
-        </div>
-      </footer>
+      <SiteFooter />
 
       {/* STICKY MOBILE CTA */}
       <AnimatePresence>

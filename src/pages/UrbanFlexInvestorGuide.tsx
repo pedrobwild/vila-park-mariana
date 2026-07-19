@@ -1,5 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
-import MarketIntelSection from "@/components/MarketIntelSection";
+import SiteFooter from "@/components/shared/SiteFooter";
+import NeighborhoodSection from "@/components/shared/NeighborhoodSection";
+import { WHATSAPP_PHONE } from "@/data/surroundings";
 import { motion } from "framer-motion";
 import AppNavbar from "@/components/AppNavbar";
 import { cn } from "@/lib/utils";
@@ -178,11 +180,10 @@ const faqItems = [
   },
 ];
 
-const whatsappLink =
-  "https://wa.me/5511961007687?text=Ol%C3%A1!%20Vi%20o%20Guia%20do%20Comprador%20do%20Vila%20Park%20Vila%20Mariana%20e%20quero%20mais%20informa%C3%A7%C3%B5es.";
+const whatsappLink = `https://api.whatsapp.com/send?phone=${WHATSAPP_PHONE}&text=${encodeURIComponent("Olá! Vi o Guia do Comprador do Vila Park Vila Mariana e quero mais informações.")}`;
 
 function SectionLabel({ children }: { children: ReactNode }) {
-  return <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[hsl(24,90%,50%)]/80 mb-3">{children}</p>;
+  return <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[hsl(var(--accent))]/80 mb-3">{children}</p>;
 }
 
 function KpiCard({ value, label, highlight = false }: { value: string; label: string; highlight?: boolean }) {
@@ -276,7 +277,7 @@ export default function UrbanFlexInvestorGuide() {
                 className={cn(
                   "rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
                   activeSection === section.id
-                    ? "bg-[hsl(24,90%,50%)] text-white"
+                    ? "bg-[hsl(var(--accent))] text-white"
                     : "bg-transparent text-muted-foreground hover:text-foreground hover:bg-secondary",
                 )}
               >
@@ -299,7 +300,7 @@ export default function UrbanFlexInvestorGuide() {
                 transition={{ duration: 0.5 }}
               >
                 <div className="flex flex-wrap gap-2 mb-5">
-                  <Badge className="bg-[hsl(24,90%,50%)]/10 text-[hsl(24,90%,50%)] border-[hsl(24,90%,50%)]/20 hover:bg-[hsl(24,90%,50%)]/10">Vila Park</Badge>
+                  <Badge className="bg-[hsl(var(--accent))]/10 text-[hsl(var(--accent))] border-[hsl(var(--accent))]/20 hover:bg-[hsl(var(--accent))]/10">Vila Park</Badge>
                   <Badge variant="outline">Vila Mariana</Badge>
                   <Badge variant="outline">Guia do Comprador</Badge>
                 </div>
@@ -315,7 +316,7 @@ export default function UrbanFlexInvestorGuide() {
                 </p>
 
                 <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                  <Button size="lg" className="min-h-[46px] bg-[hsl(24,90%,50%)] hover:bg-[hsl(24,90%,44%)] text-white" onClick={() => scrollTo("contato")}>
+                  <Button size="lg" className="min-h-[46px] bg-[hsl(var(--accent))] hover:bg-[hsl(var(--accent-strong))] text-white" onClick={() => scrollTo("contato")}>
                     <ArrowRight className="mr-2 h-4 w-4" />
                     Fazer minha reserva
                   </Button>
@@ -354,7 +355,7 @@ export default function UrbanFlexInvestorGuide() {
                   <CardContent className="space-y-5">
                     {[
                       "Localização na Vila Mariana, a 900m do metrô, com fácil acesso a educação, saúde, comércio e lazer.",
-                      "Preço acessível para um bairro consolidado e bem servido de infraestrutura urbana.",
+                      "Custo de entrada inteligente em um bairro consolidado e bem servido de infraestrutura urbana.",
                       "Áreas comuns entregues decoradas e mobiliadas, no térreo e no 5º pavimento, prontas para uso.",
                       "Arquitetura contemporânea e infraestrutura preparada para ar-condicionado nas unidades.",
                     ].map((item) => (
@@ -469,7 +470,7 @@ export default function UrbanFlexInvestorGuide() {
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {[
-                { icon: Store, title: "Preço acessível", text: "Uma oportunidade de morar na Vila Mariana com um investimento inicial mais acessível." },
+                { icon: Store, title: "Custo de entrada inteligente", text: "Uma oportunidade de morar na Vila Mariana com investimento inicial otimizado para o bairro." },
                 { icon: TrainFront, title: "Mobilidade", text: "A 900 metros da estação de metrô Vila Mariana, facilitando o deslocamento pela cidade." },
                 { icon: Sofa, title: "Lazer decorado e equipado", text: "Áreas comuns entregues decoradas e mobiliadas, no térreo e no 5º pavimento." },
                 { icon: Building2, title: "Arquitetura contemporânea", text: "Projeto com identidade visual moderna, pensado para o morador atual." },
@@ -488,38 +489,9 @@ export default function UrbanFlexInvestorGuide() {
           </div>
         </section>
 
-        {/* ═══════ LOCALIZAÇÃO ═══════ */}
+        {/* ═══════ LOCALIZAÇÃO — shared ═══════ */}
         <section id="localizacao" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
-          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
-            <SectionLabel>Localização</SectionLabel>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">Tudo perto, do metrô ao Ibirapuera</h2>
-            <p className="text-muted-foreground max-w-2xl mb-8">
-              A Vila Mariana reúne mobilidade, lazer, educação, serviços e gastronomia a poucos minutos de casa.
-            </p>
-
-            <div className="grid gap-6 md:grid-cols-2">
-              {nearbyByCategory.map((group) => (
-                <Card key={group.category} className="card-elevated border-border/60">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center gap-2">
-                      <group.icon className="h-5 w-5 text-primary" />
-                      <CardTitle className="text-lg">{group.category}</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <ul className="space-y-2">
-                      {group.points.map((point) => (
-                        <li key={point.name} className="flex items-center justify-between gap-3 text-sm border-b border-border/40 last:border-b-0 py-1.5">
-                          <span className="text-foreground">{point.name}</span>
-                          <span className="text-muted-foreground whitespace-nowrap">{point.distance}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
+          <NeighborhoodSection variant="full" />
         </section>
 
         {/* ═══════ OBRA ═══════ */}
@@ -559,12 +531,7 @@ export default function UrbanFlexInvestorGuide() {
           </div>
         </section>
 
-        {/* Inteligência de mercado */}
-        <section className="scroll-mt-32 border-t border-border/40 bg-muted/25">
-          <div className="max-w-7xl mx-auto px-4 md:px-6">
-            <MarketIntelSection />
-          </div>
-        </section>
+        {/* Inteligência de mercado removida — pertence ao Guia do Investidor */}
 
         {/* ═══════ ETAPAS ATÉ A RESERVA ═══════ */}
         <section id="etapas" className="scroll-mt-32">
@@ -633,7 +600,7 @@ export default function UrbanFlexInvestorGuide() {
                     </p>
 
                     <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                      <Button size="lg" className="min-h-[48px] bg-[hsl(24,90%,50%)] hover:bg-[hsl(24,90%,44%)] text-white" onClick={() => window.open(whatsappLink, "_blank")}>
+                      <Button size="lg" className="min-h-[48px] bg-[hsl(var(--accent))] hover:bg-[hsl(var(--accent-strong))] text-white" onClick={() => window.open(whatsappLink, "_blank")}>
                         <MessageCircle className="mr-2 h-4 w-4" />
                         Falar com a equipe comercial
                       </Button>
@@ -674,7 +641,7 @@ export default function UrbanFlexInvestorGuide() {
                           onChange={(e) => setFormMessage(e.target.value)}
                           rows={4}
                         />
-                        <Button type="submit" className="w-full min-h-[46px] bg-[hsl(24,90%,50%)] hover:bg-[hsl(24,90%,44%)] text-white">
+                        <Button type="submit" className="w-full min-h-[46px] bg-[hsl(var(--accent))] hover:bg-[hsl(var(--accent-strong))] text-white">
                           Enviar
                         </Button>
                       </form>
@@ -693,6 +660,7 @@ export default function UrbanFlexInvestorGuide() {
           </div>
         </section>
       </main>
+      <SiteFooter />
     </div>
   );
 }
