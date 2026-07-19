@@ -247,6 +247,7 @@ export default function FinancingSimulator() {
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
   const simCodeRef = useRef<string>(generateSimCode());
   const [reportEmittedAt, setReportEmittedAt] = useState<Date>(new Date());
   const resultsRef = useRef<HTMLDivElement>(null);
