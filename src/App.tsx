@@ -40,6 +40,9 @@ const App = () => (
               <Route path="/admin/upload" element={<RequireAuth><AdminUpload /></RequireAuth>} />
               <Route path="/insights" element={<Insights />} />
               <Route path="/corretor" element={<CorretorPage />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/oportunidades" element={<Oportunidades />} />
+              <Route path="/comercial" element={<RequireAdmin><Comercial /></RequireAdmin>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
