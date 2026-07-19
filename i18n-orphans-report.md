@@ -1,0 +1,70 @@
+# i18n orphan-key report
+
+- Declared keys: **511** (pt: 511, en: 511)
+- Scanned files: **171**
+- Orphan keys: **58**
+- Missing in locales: **2**
+
+## Orphan keys (58)
+- `common.back`
+- `common.close`
+- `common.loading`
+- `common.years`
+- `finalCta.subtitle`
+- `finalCta.talk`
+- `finalCta.title`
+- `finalCta.viewPlans`
+- `footer.guide`
+- `footer.guideInvestor`
+- `footer.tools`
+- `hero.headlineMobileA`
+- `hero.headlineMobileB`
+- `invest.why.jobs.desc`
+- `invest.why.jobs.title`
+- `invest.why.mobility.desc`
+- `invest.why.mobility.title`
+- `invest.why.product.desc`
+- `invest.why.product.title`
+- `invest.why.university.desc`
+- `invest.why.university.title`
+- `investorGuide.case.timeline.step.1.d`
+- `investorGuide.case.timeline.step.1.t`
+- `investorGuide.case.timeline.step.2.d`
+- `investorGuide.case.timeline.step.2.t`
+- `investorGuide.case.timeline.step.3.d`
+- `investorGuide.case.timeline.step.3.t`
+- `investorGuide.case.timeline.step.4.d`
+- `investorGuide.case.timeline.step.4.t`
+- `investorGuide.case.timeline.step.5.d`
+- `investorGuide.case.timeline.step.5.t`
+- `investorGuide.hero.ctaReserve`
+- `investorGuide.hero.kpi.address`
+- `investorGuide.hero.kpi.units`
+- `investorGuide.location.eyebrow`
+- `investorGuide.location.jobs.text`
+- `investorGuide.location.jobs.title`
+- `investorGuide.location.mobility.text`
+- `investorGuide.location.mobility.title`
+- `investorGuide.location.product.text`
+- `investorGuide.location.product.title`
+- `investorGuide.location.title`
+- `investorGuide.location.university.text`
+- `investorGuide.location.university.title`
+- `investorGuide.market.eyebrow`
+- `investorGuide.market.title`
+- `investorGuide.marketData.eyebrow`
+- `investorGuide.marketData.subtitle`
+- `investorGuide.marketData.title`
+- `investorSim.result.prompt.temp`
+- `investorSim.result.prompt.trad`
+- `surroundings.education`
+- `surroundings.gastronomy`
+- `surroundings.leisure`
+- `surroundings.mobility`
+- `surroundings.services`
+- `why.items.returnValidated.descFallback`
+- `why.source`
+
+## Missing in locales (2)
+- `investorGuide.case.timeline.step`
+- `investorGuide.sectionLabels.nearby`
