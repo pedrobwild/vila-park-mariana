@@ -275,7 +275,7 @@ export default function BankComparator({
                               {SITUATION_LABEL[row.rate.situation]}
                             </Badge>
                             <div className="text-[10px] text-muted-foreground mt-0.5">
-                              {new Date(row.rate.consultedAt).toLocaleDateString("pt-BR")}
+                              {formatConsultDate(row.rate.consultedAt)}
                             </div>
                           </TableCell>
                           <TableCell className="text-right tabular-nums">
