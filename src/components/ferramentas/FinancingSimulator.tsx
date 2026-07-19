@@ -737,7 +737,7 @@ export default function FinancingSimulator() {
                       aria-readonly={!rateIsManual}
                       value={rateInput}
                       onChange={(e) => setRateInput(e.target.value)}
-                      placeholder={rateIsManual ? "11,50" : ""}
+                      placeholder={rateIsManual ? "0,00" : ""}
                       className={[
                         "pr-20 h-11 font-semibold tabular-nums text-right",
                         rateIsManual ? "" : "cursor-default bg-muted/40",
