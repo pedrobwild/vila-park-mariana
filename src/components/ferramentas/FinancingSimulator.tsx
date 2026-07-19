@@ -52,6 +52,8 @@ import {
   simulateWithExtras,
   type AmortSystem,
 } from "@/lib/financing";
+import BankComparator from "./BankComparator";
+import FinancingGuide from "./FinancingGuide";
 
 /** Enlarged touch target for slider thumbs (WCAG 44x44). */
 const SLIDER_TOUCH =
