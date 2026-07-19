@@ -8,6 +8,8 @@
     "insights": "Painel",
     "ferramentas": "Ferramentas",
     "urbanFlex": "Guia do Comprador",
+    "opportunities": "Oportunidades",
+    "talkSpecialist": "Falar com especialista",
     "back": "Voltar",
     "menu": "Menu",
     "guidesGroup": "Guias",
@@ -24,12 +26,12 @@
   "hero": {
     "badgeMobile": "Vila Park · Vila Mariana",
     "badgeDesktop": "Vila Park · R. Baltazar Lisboa, 543 — Vila Mariana",
-    "headlineMobileA": "Seu apê a 900 m do metrô Vila Mariana.",
-    "headlineMobileB": "Qualidade de vida com preço acessível.",
-    "headlineDesktopA": "Seu apê a 900 m do metrô Vila Mariana.",
-    "headlineDesktopB": "Qualidade de vida com preço acessível.",
-    "subMobile": "Torre única, 10 pavimentos e 33 apartamentos. Garden, terraço descoberto e 1 dorm./studio.",
-    "subDesktop": "Torre única com 10 pavimentos e 33 apartamentos (garden privativo, terraço descoberto e 1 dorm./studio). Áreas de lazer no térreo e no 5º pavimento. A 900 m do metrô Vila Mariana e 950 m do Parque da Aclimação.",
+    "headlineMobileA": "Viva a 900 m do metrô Vila Mariana.",
+    "headlineMobileB": "Torre única, apenas 33 apartamentos.",
+    "headlineDesktopA": "Viva a 900 m do metrô Vila Mariana.",
+    "headlineDesktopB": "Torre única, apenas 33 apartamentos.",
+    "subMobile": "Torre única com 10 pavimentos e áreas comuns entregues decoradas e mobiliadas.",
+    "subDesktop": "Torre única com 10 pavimentos e 33 apartamentos. Áreas comuns entregues decoradas e mobiliadas no térreo e no 5º pavimento, a 900 m do metrô Vila Mariana.",
     "ctaPrimary": "Ver plantas e tipologias",
     "trust": {
       "floors": "Pavimentos",
@@ -155,11 +157,21 @@
     "talk": "Falar no WhatsApp",
     "viewPlans": "Ver plantas"
   },
+  "keyFacts": {
+    "floors": "Pavimentos",
+    "units": "Apartamentos",
+    "area": "Construídos",
+    "metro": "Do metrô Vila Mariana"
+  },
   "footer": {
     "rights": "© 2026 Vila Park — Vila Mariana · Matere Bittar Incorporações",
     "ariaLabel": "Links do rodapé",
+    "navigate": "Navegar",
+    "contact": "Contato",
+    "talkSpecialist": "Falar com especialista",
     "tools": "Ferramentas",
     "guide": "Guia do Investidor",
+    "guideInvestor": "Guia do Investidor",
     "disclaimer": "Apenas para reserva. O empreendimento só será comercializado após o Registro de Incorporação Imobiliária. Imagens ilustrativas sujeitas a alterações. As plantas apresentadas são meramente ilustrativas, sendo que a decoração é apenas uma sugestão. Os móveis e utensílios contemplados não farão parte do contrato de compra e venda do imóvel. Os acabamentos serão entregues conforme o memorial descritivo."
   },
   "whatsapp": {

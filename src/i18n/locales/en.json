@@ -8,6 +8,8 @@
     "insights": "Dashboard",
     "ferramentas": "Tools",
     "urbanFlex": "Buyer Guide",
+    "opportunities": "Opportunities",
+    "talkSpecialist": "Talk to a specialist",
     "back": "Back",
     "menu": "Menu",
     "guidesGroup": "Guides",
@@ -24,12 +26,12 @@
   "hero": {
     "badgeMobile": "Vila Park · Vila Mariana",
     "badgeDesktop": "Vila Park · R. Baltazar Lisboa, 543 — Vila Mariana",
-    "headlineMobileA": "Your home 900 m from Vila Mariana subway.",
-    "headlineMobileB": "Quality of life at an accessible price.",
-    "headlineDesktopA": "Your home 900 m from Vila Mariana subway.",
-    "headlineDesktopB": "Quality of life at an accessible price.",
-    "subMobile": "Single tower, 10 floors, 33 apartments — garden, open terrace and 1-bedroom/studio.",
-    "subDesktop": "Single tower with 10 floors and 33 apartments (private garden, open terrace and 1-bedroom/studio). Amenities on the ground and 5th floors. 900 m from Vila Mariana subway and 950 m from Aclimação Park.",
+    "headlineMobileA": "Live 900 m from Vila Mariana subway.",
+    "headlineMobileB": "A single tower, only 33 apartments.",
+    "headlineDesktopA": "Live 900 m from Vila Mariana subway.",
+    "headlineDesktopB": "A single tower, only 33 apartments.",
+    "subMobile": "Single tower, 10 floors, with common areas delivered decorated and furnished.",
+    "subDesktop": "Single tower with 10 floors and 33 apartments. Common areas delivered decorated and furnished on the ground and 5th floors, 900 m from Vila Mariana subway.",
     "ctaPrimary": "See floor plans and typologies",
     "trust": {
       "floors": "Floors",
@@ -155,11 +157,21 @@
     "talk": "Chat on WhatsApp",
     "viewPlans": "View floor plans"
   },
+  "keyFacts": {
+    "floors": "Floors",
+    "units": "Apartments",
+    "area": "Built",
+    "metro": "From Vila Mariana subway"
+  },
   "footer": {
     "rights": "© 2026 Vila Park — Vila Mariana · Matere Bittar Incorporações",
     "ariaLabel": "Footer links",
+    "navigate": "Navigate",
+    "contact": "Contact",
+    "talkSpecialist": "Talk to a specialist",
     "tools": "Tools",
     "guide": "Investor Guide",
+    "guideInvestor": "Investor Guide",
     "disclaimer": "Reservation only. The property will only be marketed after the Real Estate Incorporation Registration. Illustrative images subject to change. Floor plans are illustrative and decoration is merely a suggestion. Furniture and items shown are not part of the purchase contract. Finishes will be delivered as per the descriptive memorial."
   },
   "whatsapp": {
