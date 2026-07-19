@@ -223,16 +223,16 @@ interface Snapshot {
 export default function FinancingSimulator() {
   // ---- Form state ----
   const [typologyId, setTypologyId] = useState<string>("custom");
-  const [propertyValue, setPropertyValue] = useState<number>(650_000);
+  const [propertyValue, setPropertyValue] = useState<number>(0);
   const [downPct, setDownPct] = useState<number>(20);
   const [downOverride, setDownOverride] = useState<number | null>(null);
   const [termMonths, setTermMonths] = useState<number>(360);
   const [financedPulse, setFinancedPulse] = useState(false);
 
-  const [bankId, setBankId] = useState<string>("caixa-sbpe");
-  const [rateInput, setRateInput] = useState<string>("11,19");
+  const [bankId, setBankId] = useState<string>("");
+  const [rateInput, setRateInput] = useState<string>("");
   const [system, setSystem] = useState<AmortSystem>("SAC");
-  const [buyerAge, setBuyerAge] = useState<number>(35);
+  const [buyerAge, setBuyerAge] = useState<number>(0);
   const [monthlyIncome, setMonthlyIncome] = useState<number>(0);
   const [fgts, setFgts] = useState<number>(0);
   const [extraAnnual, setExtraAnnual] = useState<number>(0);
