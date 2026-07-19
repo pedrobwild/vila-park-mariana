@@ -9,6 +9,7 @@ import {
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 import AppNavbar from "@/components/AppNavbar";
 import MobileQuickNav from "@/components/MobileQuickNav";
@@ -425,6 +426,74 @@ export default function Index() {
       <div id="comparativo" className="border-b border-border/40 bg-background">
         <NeighborhoodSection variant="compact" />
       </div>
+
+      {/* ETAPAS — Como funciona a reserva */}
+      <section id="etapas" className="border-b border-border/40 bg-background scroll-mt-24">
+        <div className="max-w-7xl mx-auto px-5 md:px-6 py-14 md:py-24">
+          <FadeIn>
+            <p className="eyebrow mb-3">{t("home.etapas.eyebrow")}</p>
+            <h2 className="font-display text-3xl md:text-4xl font-medium text-foreground max-w-2xl tracking-tight">
+              {t("home.etapas.title")}
+            </h2>
+            <p className="mt-3 text-muted-foreground max-w-2xl">{t("home.etapas.subtitle")}</p>
+          </FadeIn>
+
+          <div className="mt-10 grid gap-0 md:grid-cols-4 md:gap-0 divide-y md:divide-y-0 md:divide-x divide-border/60">
+            {(t("home.etapas.items", { returnObjects: true }) as Array<{ title: string; desc: string }>).map((item, i) => (
+              <FadeIn key={item.title} delay={i * 0.06} className="p-6 md:px-8 first:pl-0 last:pr-0">
+                <p className="font-display text-4xl md:text-5xl font-medium text-accent leading-none tabular">
+                  {String(i + 1).padStart(2, "0")}
+                </p>
+                <h3 className="mt-4 text-base font-semibold text-foreground">{item.title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+              </FadeIn>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ geral */}
+      <section id="faq" className="border-b border-border/40 bg-muted/25 scroll-mt-24">
+        <div className="max-w-4xl mx-auto px-5 md:px-6 py-14 md:py-24">
+          <FadeIn>
+            <p className="eyebrow mb-3">{t("home.faq.eyebrow")}</p>
+            <h2 className="font-display text-3xl md:text-4xl font-medium text-foreground tracking-tight">
+              {t("home.faq.title")}
+            </h2>
+          </FadeIn>
+
+          <FadeIn delay={0.1} className="mt-8">
+            <Accordion type="single" collapsible className="w-full">
+              {(t("home.faq.items", { returnObjects: true }) as Array<{ q: string; a: string }>).map((item, i) => (
+                <AccordionItem key={i} value={`faq-${i}`}>
+                  <AccordionTrigger className="text-left text-base font-medium">
+                    {item.q}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground leading-relaxed">
+                    {item.a}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* RESERVA */}
+      <section id="reserva" className="border-b border-border/40 bg-background scroll-mt-24">
+        <div className="max-w-3xl mx-auto px-5 md:px-6 py-14 md:py-24">
+          <FadeIn>
+            <p className="eyebrow mb-3">{t("reservation.eyebrow")}</p>
+            <h2 className="font-display text-3xl md:text-4xl font-medium text-foreground tracking-tight">
+              {t("reservation.title")}
+            </h2>
+            <p className="mt-3 text-muted-foreground">{t("reservation.subtitle")}</p>
+          </FadeIn>
+          <FadeIn delay={0.1} className="mt-8">
+            <ReservationForm />
+          </FadeIn>
+        </div>
+      </section>
 
       <SiteFooter />
 
