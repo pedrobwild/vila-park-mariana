@@ -269,9 +269,9 @@ export default function Oportunidades() {
 
             <div className="rounded-xl border border-border bg-card p-8 md:p-10 text-center space-y-4">
               <p className="eyebrow">Próximo passo</p>
-              <p className="font-display text-2xl md:text-3xl font-medium">Interessou por alguma unidade?</p>
+              <p className="font-display text-2xl md:text-3xl font-medium">Encontrou a unidade ideal?</p>
               <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                Fale com o time Vila Park e receba condições, disponibilidade atualizada e agende uma visita.
+                Fale com um especialista e receba condições, disponibilidade atualizada e agendamento de visita.
               </p>
               <a
                 href={`https://api.whatsapp.com/send?phone=${WHATSAPP_PHONE}&text=${encodeURIComponent("Olá! Tenho interesse em uma unidade no Vila Park Vila Mariana.")}`}
