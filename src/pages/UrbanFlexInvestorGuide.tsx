@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import SiteFooter from "@/components/shared/SiteFooter";
 import NeighborhoodSection from "@/components/shared/NeighborhoodSection";
 import { WHATSAPP_PHONE } from "@/data/surroundings";
+import { generalFaq } from "@/data/faq";
 import { motion } from "framer-motion";
 import AppNavbar from "@/components/AppNavbar";
 import { cn } from "@/lib/utils";
