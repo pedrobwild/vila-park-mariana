@@ -15,6 +15,10 @@ const Ferramentas = lazy(() => import("./pages/Ferramentas"));
 const AdminUpload = lazy(() => import("./pages/AdminUpload"));
 const Insights = lazy(() => import("./pages/Insights"));
 const CorretorPage = lazy(() => import("./pages/CorretorPage"));
+const Login = lazy(() => import("./pages/Login"));
+const Comercial = lazy(() => import("./pages/Comercial"));
+const Oportunidades = lazy(() => import("./pages/Oportunidades"));
+import RequireAdmin from "./components/auth/RequireAdmin";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +40,9 @@ const App = () => (
               <Route path="/admin/upload" element={<RequireAuth><AdminUpload /></RequireAuth>} />
               <Route path="/insights" element={<Insights />} />
               <Route path="/corretor" element={<CorretorPage />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/oportunidades" element={<Oportunidades />} />
+              <Route path="/comercial" element={<RequireAdmin><Comercial /></RequireAdmin>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

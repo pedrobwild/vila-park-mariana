@@ -14,6 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
+      custom_field_definitions: {
+        Row: {
+          created_at: string
+          field_type: Database["public"]["Enums"]["custom_field_type"]
+          id: string
+          label: string
+          options: Json
+          sort_order: number
+          updated_at: string
+          visible_public: boolean
+        }
+        Insert: {
+          created_at?: string
+          field_type: Database["public"]["Enums"]["custom_field_type"]
+          id?: string
+          label: string
+          options?: Json
+          sort_order?: number
+          updated_at?: string
+          visible_public?: boolean
+        }
+        Update: {
+          created_at?: string
+          field_type?: Database["public"]["Enums"]["custom_field_type"]
+          id?: string
+          label?: string
+          options?: Json
+          sort_order?: number
+          updated_at?: string
+          visible_public?: boolean
+        }
+        Relationships: []
+      }
+      custom_field_values: {
+        Row: {
+          created_at: string
+          field_id: string
+          id: string
+          unit_id: string
+          updated_at: string
+          value: Json | null
+        }
+        Insert: {
+          created_at?: string
+          field_id: string
+          id?: string
+          unit_id: string
+          updated_at?: string
+          value?: Json | null
+        }
+        Update: {
+          created_at?: string
+          field_id?: string
+          id?: string
+          unit_id?: string
+          updated_at?: string
+          value?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_field_values_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "custom_field_definitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "custom_field_values_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       elephant_insights_cache: {
         Row: {
           amanda_name: string | null
@@ -56,15 +131,89 @@ export type Database = {
         }
         Relationships: []
       }
+      units: {
+        Row: {
+          area_m2: number
+          block: string
+          code: string
+          created_at: string
+          id: string
+          planta_mime: string | null
+          planta_url: string | null
+          price_brl: number
+          status: Database["public"]["Enums"]["unit_status"]
+          updated_at: string
+        }
+        Insert: {
+          area_m2: number
+          block: string
+          code: string
+          created_at?: string
+          id?: string
+          planta_mime?: string | null
+          planta_url?: string | null
+          price_brl: number
+          status?: Database["public"]["Enums"]["unit_status"]
+          updated_at?: string
+        }
+        Update: {
+          area_m2?: number
+          block?: string
+          code?: string
+          created_at?: string
+          id?: string
+          planta_mime?: string | null
+          planta_url?: string | null
+          price_brl?: number
+          status?: Database["public"]["Enums"]["unit_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin"
+      custom_field_type:
+        | "text"
+        | "currency"
+        | "number"
+        | "date"
+        | "boolean"
+        | "select"
+      unit_status: "disponivel" | "reservado" | "vendido"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -191,6 +340,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin"],
+      custom_field_type: [
+        "text",
+        "currency",
+        "number",
+        "date",
+        "boolean",
+        "select",
+      ],
+      unit_status: ["disponivel", "reservado", "vendido"],
+    },
   },
 } as const

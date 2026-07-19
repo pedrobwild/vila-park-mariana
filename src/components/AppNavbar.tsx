@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { TrendingUp, Wrench, ArrowLeft, Menu, Sparkles } from "lucide-react";
+import { TrendingUp, Wrench, ArrowLeft, Menu, Sparkles, Building2 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ export default function AppNavbar() {
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   const navLinks = [
+    { to: "/oportunidades", label: "Oportunidades", icon: Building2 },
     { to: "/insights", label: t("nav.insights"), icon: Sparkles },
     { to: "/ferramentas", label: t("nav.ferramentas"), icon: Wrench },
   ];
