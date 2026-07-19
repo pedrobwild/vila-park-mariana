@@ -285,7 +285,7 @@ export default function UrbanFlexInvestorGuide() {
                   </Button>
                   <Button size="lg" variant="outline" className="min-h-[46px]" onClick={() => window.open(whatsappLink, "_blank")}>
                     <MessageCircle className="mr-2 h-4 w-4" />
-                    Falar com a equipe
+                    Falar com especialista
                   </Button>
                 </div>
 
