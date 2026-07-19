@@ -1,13 +1,11 @@
 /**
- * Fonte única de verdade para a base de taxas de instituições financeiras
- * usadas no comparativo do Simulador de Financiamento.
+ * Base de taxas de instituições financeiras para financiamento imobiliário.
+ * Data de referência: 19/07/2026. Fonte: consulta pública nas páginas dos bancos,
+ * simuladores oficiais e comparadores. Ver campos `situation` e `note` para nuances.
  *
- * ATUALIZAÇÃO: 19/07/2026 (consulta pública em canais oficiais e comparadores).
- * IMPORTANTE:
- *  - `annualRateType`: "efetiva" (padrão SBPE) ou "nominal" (padrão MCMV).
- *  - Toda comparação/ordenação usa a taxa efetiva a.a. equivalente.
- *  - Bancos sem taxa pública ficam com `annualRate: null` e situação
- *    "personalizada" ou "nao_localizada".
+ * IMPORTANTE: taxas "efetiva" a.a. convertem para mensal via (1+i)^(1/12)-1.
+ * Taxas "nominal" a.a. convertem via nominal/12 (regra brasileira). Toda ordenação
+ * e comparação deve usar a taxa efetiva a.a. equivalente.
  */
 
 export type RateLayer = "anunciada" | "simulada" | "media_bcb";
@@ -18,9 +16,9 @@ export type RateSituation =
   | "promocional"
   | "historica"
   | "nao_localizada";
-export type RateConfidence = "alta" | "media" | "baixa";
+export type Confidence = "alta" | "media" | "baixa";
 export type RateType = "efetiva" | "nominal";
-export type RateIndexer = "TR" | "IPCA" | "poupanca" | "fixa";
+export type Indexer = "TR" | "IPCA" | "poupanca" | "fixa";
 export type ModalityGroup = "TR" | "IPCA" | "poupanca" | "MCMV" | "PRO_COTISTA";
 
 export interface InstitutionRate {
@@ -28,28 +26,26 @@ export interface InstitutionRate {
   bank: string;
   product: string;
   modality: ModalityGroup;
-  /** Anual em % (ex.: 11.19). null quando não divulgada publicamente. */
+  /** Taxa anunciada. `null` quando não localizada / apenas via simulação individual. */
   annualRate: number | null;
   annualRateType: RateType;
-  indexer: RateIndexer;
-  /** Componente extra estimado do indexador variável (ex.: TR≈0, poupança≈6.17). Só para nota educacional. */
-  indexerFloatingPct?: number;
+  indexer: Indexer;
   layer: RateLayer;
   situation: RateSituation;
-  confidence: RateConfidence;
-  consultedAt: string; // ISO date
-  maxLtvPct: number; // % financiável
+  confidence: Confidence;
+  consultedAt: string; // ISO
+  conditions: string;
+  note?: string;
+  maxLtvPct: number;
   maxTermMonths: number;
-  conditions: string; // texto curto
-  note?: string; // observação/ressalva curta
 }
 
 export const INSTITUTION_RATES: InstitutionRate[] = [
-  // ============ Caixa ============
+  // ============ + TR ============
   {
     id: "caixa-sbpe",
     bank: "Caixa",
-    product: "SBPE + TR",
+    product: "SBPE Poupança-Caixa",
     modality: "TR",
     annualRate: 11.19,
     annualRateType: "efetiva",
@@ -58,10 +54,159 @@ export const INSTITUTION_RATES: InstitutionRate[] = [
     situation: "publicada_sem_vigencia",
     confidence: "media",
     consultedAt: "2026-07-19",
+    conditions: "'A partir de' 11,19% a.a. + TR. Depende de relacionamento e análise.",
     maxLtvPct: 80,
     maxTermMonths: 420,
-    conditions: "Taxa 'a partir de' — depende de relacionamento e análise.",
   },
+  {
+    id: "itau-sbpe",
+    bank: "Itaú",
+    product: "SBPE",
+    modality: "TR",
+    annualRate: 11.6,
+    annualRateType: "efetiva",
+    indexer: "TR",
+    layer: "anunciada",
+    situation: "publicada_sem_vigencia",
+    confidence: "media",
+    consultedAt: "2026-07-19",
+    conditions: "'A partir de' 11,60% a.a. + TR. Personnalité 11,70%, Uniclass 11,90%.",
+    note: "Condição depende do segmento; valide no simulador oficial.",
+    maxLtvPct: 80,
+    maxTermMonths: 420,
+  },
+  {
+    id: "santander-sbpe",
+    bank: "Santander",
+    product: "SBPE",
+    modality: "TR",
+    annualRate: 11.69,
+    annualRateType: "efetiva",
+    indexer: "TR",
+    layer: "anunciada",
+    situation: "publicada_sem_vigencia",
+    confidence: "media",
+    consultedAt: "2026-07-19",
+    conditions: "Divulgada via comparadores. Oficial só via simulação individual.",
+    maxLtvPct: 80,
+    maxTermMonths: 420,
+  },
+  {
+    id: "bradesco-sbpe",
+    bank: "Bradesco",
+    product: "SBPE",
+    modality: "TR",
+    annualRate: 11.7,
+    annualRateType: "efetiva",
+    indexer: "TR",
+    layer: "anunciada",
+    situation: "publicada_sem_vigencia",
+    confidence: "media",
+    consultedAt: "2026-07-19",
+    conditions: "Taxa-padrão do simulador; sujeita a negociação com o gerente.",
+    maxLtvPct: 80,
+    maxTermMonths: 420,
+  },
+  {
+    id: "inter-bonificada",
+    bank: "Banco Inter",
+    product: "SBPE Bonificada",
+    modality: "TR",
+    annualRate: 9.4,
+    annualRateType: "efetiva",
+    indexer: "TR",
+    layer: "anunciada",
+    situation: "promocional",
+    confidence: "media",
+    consultedAt: "2026-07-19",
+    conditions: "Campanha bonificada — confirmar vigência.",
+    note: "Confirmar campanha antes de simular.",
+    maxLtvPct: 80,
+    maxTermMonths: 420,
+  },
+  {
+    id: "bb-sbpe",
+    bank: "Banco do Brasil",
+    product: "SBPE",
+    modality: "TR",
+    annualRate: null,
+    annualRateType: "efetiva",
+    indexer: "TR",
+    layer: "simulada",
+    situation: "personalizada",
+    confidence: "baixa",
+    consultedAt: "2026-07-19",
+    conditions: "Taxa personalizada por análise. Pode incluir ITBI/cartório no financiamento.",
+    maxLtvPct: 80,
+    maxTermMonths: 420,
+  },
+  {
+    id: "banrisul-sbpe",
+    bank: "Banrisul",
+    product: "SFH",
+    modality: "TR",
+    annualRate: null,
+    annualRateType: "efetiva",
+    indexer: "TR",
+    layer: "simulada",
+    situation: "personalizada",
+    confidence: "baixa",
+    consultedAt: "2026-07-19",
+    conditions: "Simulador oficial. SFH até imóvel R$ 2,25 mi; regra idade+prazo ≤ 80 anos.",
+    maxLtvPct: 90,
+    maxTermMonths: 420,
+  },
+  {
+    id: "brb-sbpe",
+    bank: "BRB",
+    product: "SBPE",
+    modality: "TR",
+    annualRate: null,
+    annualRateType: "efetiva",
+    indexer: "TR",
+    layer: "simulada",
+    situation: "personalizada",
+    confidence: "baixa",
+    consultedAt: "2026-07-19",
+    conditions: "Taxa via simulação; pode financiar ITBI/cartório em algumas modalidades.",
+    maxLtvPct: 90,
+    maxTermMonths: 420,
+  },
+  {
+    id: "sicoob-sbpe",
+    bank: "Sicoob",
+    product: "SBPE",
+    modality: "TR",
+    annualRate: null,
+    annualRateType: "efetiva",
+    indexer: "TR",
+    layer: "simulada",
+    situation: "nao_localizada",
+    confidence: "baixa",
+    consultedAt: "2026-07-19",
+    conditions:
+      "Taxa não divulgada publicamente (varia por cooperativa). Necessária simulação individual. Financia ITBI+cartório conforme análise.",
+    maxLtvPct: 90,
+    maxTermMonths: 420,
+  },
+  {
+    id: "sicredi-sbpe",
+    bank: "Sicredi",
+    product: "SBPE",
+    modality: "TR",
+    annualRate: null,
+    annualRateType: "efetiva",
+    indexer: "TR",
+    layer: "simulada",
+    situation: "nao_localizada",
+    confidence: "baixa",
+    consultedAt: "2026-07-19",
+    conditions: "Taxa não divulgada publicamente (varia por cooperativa). Necessária simulação individual.",
+    maxLtvPct: 90,
+    maxTermMonths: 420,
+  },
+
+  // ============ MCMV ============
   {
     id: "caixa-mcmv",
     bank: "Caixa",
@@ -74,12 +219,10 @@ export const INSTITUTION_RATES: InstitutionRate[] = [
     situation: "vigente_confirmada",
     confidence: "alta",
     consultedAt: "2026-07-19",
+    conditions: "Imóvel ≤ R$ 600 mil, renda familiar ≤ R$ 13 mil, até 420m, entrada ≥ 20%.",
     maxLtvPct: 90,
     maxTermMonths: 420,
-    conditions: "Imóvel ≤ R$ 600 mil, renda familiar ≤ R$ 13 mil, entrada ≥ 20%.",
   },
-
-  // ============ Banco do Brasil ============
   {
     id: "bb-mcmv",
     bank: "Banco do Brasil",
@@ -92,136 +235,16 @@ export const INSTITUTION_RATES: InstitutionRate[] = [
     situation: "vigente_confirmada",
     confidence: "alta",
     consultedAt: "2026-07-19",
+    conditions: "Composição de até 3 rendas. Mesmos limites de imóvel e renda do MCMV Classe Média.",
     maxLtvPct: 90,
     maxTermMonths: 420,
-    conditions: "Composição até 3 rendas. ITBI/cartório podem entrar no financiamento (análise).",
-  },
-  {
-    id: "bb-sbpe",
-    bank: "Banco do Brasil",
-    product: "SBPE + TR",
-    modality: "TR",
-    annualRate: null,
-    annualRateType: "efetiva",
-    indexer: "TR",
-    layer: "simulada",
-    situation: "personalizada",
-    confidence: "media",
-    consultedAt: "2026-07-19",
-    maxLtvPct: 80,
-    maxTermMonths: 420,
-    conditions: "Taxa não divulgada publicamente. Necessária simulação individual.",
   },
 
-  // ============ Itaú ============
-  {
-    id: "itau-sbpe",
-    bank: "Itaú",
-    product: "SBPE + TR",
-    modality: "TR",
-    annualRate: 11.6,
-    annualRateType: "efetiva",
-    indexer: "TR",
-    layer: "anunciada",
-    situation: "publicada_sem_vigencia",
-    confidence: "media",
-    consultedAt: "2026-07-19",
-    maxLtvPct: 80,
-    maxTermMonths: 420,
-    conditions: "Taxa 'a partir de'. Segmento Personnalité 11,70% e Uniclass 11,90%.",
-    note: "Divergência entre páginas oficiais (11,70% vs 13,69%); valide no simulador do banco.",
-  },
-  {
-    id: "itau-poupanca",
-    bank: "Itaú",
-    product: "Poupança + juros",
-    modality: "poupanca",
-    annualRate: 8.32,
-    annualRateType: "efetiva",
-    indexer: "poupanca",
-    indexerFloatingPct: 6.17,
-    layer: "anunciada",
-    situation: "publicada_sem_vigencia",
-    confidence: "media",
-    consultedAt: "2026-07-19",
-    maxLtvPct: 80,
-    maxTermMonths: 420,
-    conditions: "Componente variável limitado a 6,17% a.a.",
-  },
-
-  // ============ Santander ============
-  {
-    id: "santander-sbpe",
-    bank: "Santander",
-    product: "SBPE + TR",
-    modality: "TR",
-    annualRate: 11.69,
-    annualRateType: "efetiva",
-    indexer: "TR",
-    layer: "anunciada",
-    situation: "publicada_sem_vigencia",
-    confidence: "media",
-    consultedAt: "2026-07-19",
-    maxLtvPct: 80,
-    maxTermMonths: 420,
-    conditions: "Taxa divulgada em comparadores; a taxa oficial vem da simulação personalizada.",
-  },
-
-  // ============ Bradesco ============
-  {
-    id: "bradesco-sbpe",
-    bank: "Bradesco",
-    product: "SBPE + TR",
-    modality: "TR",
-    annualRate: 11.7,
-    annualRateType: "efetiva",
-    indexer: "TR",
-    layer: "anunciada",
-    situation: "publicada_sem_vigencia",
-    confidence: "media",
-    consultedAt: "2026-07-19",
-    maxLtvPct: 80,
-    maxTermMonths: 420,
-    conditions: "Taxa-padrão do simulador; a condição final vem da negociação com o gerente.",
-  },
-
-  // ============ Banco Inter ============
-  {
-    id: "inter-ipca",
-    bank: "Banco Inter",
-    product: "Residencial + IPCA",
-    modality: "IPCA",
-    annualRate: 9.99,
-    annualRateType: "efetiva",
-    indexer: "IPCA",
-    layer: "anunciada",
-    situation: "publicada_sem_vigencia",
-    confidence: "media",
-    consultedAt: "2026-07-19",
-    maxLtvPct: 80,
-    maxTermMonths: 420,
-    conditions: "Parcela e saldo variam com o IPCA.",
-  },
-  {
-    id: "inter-tr-promo",
-    bank: "Banco Inter",
-    product: "Bonificada + TR",
-    modality: "TR",
-    annualRate: 9.4,
-    annualRateType: "efetiva",
-    indexer: "TR",
-    layer: "anunciada",
-    situation: "promocional",
-    confidence: "media",
-    consultedAt: "2026-07-19",
-    maxLtvPct: 80,
-    maxTermMonths: 420,
-    conditions: "Campanha promocional — confirmar vigência.",
-  },
+  // ============ Pró-Cotista ============
   {
     id: "inter-procotista",
     bank: "Banco Inter",
-    product: "Pró-Cotista FGTS + TR",
+    product: "Pró-Cotista FGTS",
     modality: "PRO_COTISTA",
     annualRate: 9.0,
     annualRateType: "efetiva",
@@ -230,112 +253,72 @@ export const INSTITUTION_RATES: InstitutionRate[] = [
     situation: "publicada_sem_vigencia",
     confidence: "media",
     consultedAt: "2026-07-19",
+    conditions: "3+ anos de FGTS, sem imóvel/financiamento SFH. Renda familiar até R$ 12 mil (usado).",
     maxLtvPct: 80,
     maxTermMonths: 420,
-    conditions: "Renda familiar ≤ R$ 12 mil (usado); 3+ anos de FGTS; sem imóvel/financiamento SFH.",
   },
 
-  // ============ Sicoob ============
+  // ============ IPCA ============
   {
-    id: "sicoob-sbpe",
-    bank: "Sicoob",
-    product: "Habitacional cooperativo",
-    modality: "TR",
-    annualRate: null,
+    id: "inter-ipca",
+    bank: "Banco Inter",
+    product: "Residencial IPCA",
+    modality: "IPCA",
+    annualRate: 9.99,
     annualRateType: "efetiva",
-    indexer: "TR",
-    layer: "simulada",
-    situation: "nao_localizada",
-    confidence: "baixa",
-    consultedAt: "2026-07-19",
-    maxLtvPct: 90,
-    maxTermMonths: 420,
-    conditions:
-      "Taxa varia por cooperativa. Financia ITBI/cartório (análise) e compõe até 3 rendas sem vínculo familiar.",
-    note: "Taxa não divulgada publicamente. Necessária simulação individual.",
-  },
-  // ============ Sicredi ============
-  {
-    id: "sicredi-sbpe",
-    bank: "Sicredi",
-    product: "Habitacional cooperativo",
-    modality: "TR",
-    annualRate: null,
-    annualRateType: "efetiva",
-    indexer: "TR",
-    layer: "simulada",
-    situation: "nao_localizada",
-    confidence: "baixa",
-    consultedAt: "2026-07-19",
-    maxLtvPct: 90,
-    maxTermMonths: 420,
-    conditions: "Taxa varia por cooperativa.",
-    note: "Taxa não divulgada publicamente. Necessária simulação individual.",
-  },
-
-  // ============ Banrisul ============
-  {
-    id: "banrisul-sfh",
-    bank: "Banrisul",
-    product: "SFH + TR",
-    modality: "TR",
-    annualRate: null,
-    annualRateType: "efetiva",
-    indexer: "TR",
-    layer: "simulada",
-    situation: "personalizada",
+    indexer: "IPCA",
+    layer: "anunciada",
+    situation: "publicada_sem_vigencia",
     confidence: "media",
     consultedAt: "2026-07-19",
-    maxLtvPct: 90,
+    conditions: "9,99% a.a. + IPCA; parcela e saldo corrigidos pela inflação.",
+    maxLtvPct: 80,
     maxTermMonths: 420,
-    conditions: "Imóvel até R$ 2,25 mi. Regra idade + prazo ≤ 80 anos.",
-    note: "Taxa por simulação personalizada.",
   },
 
-  // ============ BRB ============
+  // ============ Poupança ============
   {
-    id: "brb-sfh",
-    bank: "BRB",
-    product: "Habitacional + TR",
-    modality: "TR",
-    annualRate: null,
+    id: "itau-poupanca",
+    bank: "Itaú",
+    product: "Linha Poupança",
+    modality: "poupanca",
+    annualRate: 8.32,
     annualRateType: "efetiva",
-    indexer: "TR",
-    layer: "simulada",
-    situation: "personalizada",
+    indexer: "poupanca",
+    layer: "anunciada",
+    situation: "publicada_sem_vigencia",
     confidence: "media",
     consultedAt: "2026-07-19",
-    maxLtvPct: 90,
+    conditions: "8,32% a.a. + poupança (componente variável limitado a 6,17%).",
+    maxLtvPct: 80,
     maxTermMonths: 420,
-    conditions: "Financia ITBI/cartório em algumas modalidades. Taxa por simulação personalizada.",
   },
 ];
 
 export const MODALITY_LABEL: Record<ModalityGroup, string> = {
-  TR: "SBPE + TR",
-  IPCA: "SBPE + IPCA",
-  poupanca: "SBPE + Poupança",
+  TR: "+ TR",
+  IPCA: "+ IPCA",
+  poupanca: "+ Poupança",
   MCMV: "MCMV",
-  PRO_COTISTA: "Pró-Cotista FGTS",
+  PRO_COTISTA: "Pró-Cotista",
 };
 
 export const SITUATION_LABEL: Record<RateSituation, string> = {
   vigente_confirmada: "Vigente confirmada",
   publicada_sem_vigencia: "Publicada",
-  personalizada: "Personalizada (simulação)",
+  personalizada: "Personalizada",
   promocional: "Promocional",
   historica: "Histórica",
   nao_localizada: "Não localizada",
 };
 
-/** Cor discreta do badge por situação (tokens semânticos). */
 export function situationBadgeClass(s: RateSituation): string {
   switch (s) {
     case "vigente_confirmada":
-      return "bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border-emerald-600/40";
+      return "bg-emerald-500/10 text-emerald-700 border-emerald-500/40";
     case "promocional":
     case "publicada_sem_vigencia":
-      return "bg-amber-500/15 text-amber-800 dark:text-amber-300 border-amber-600/40";
+      return "bg-amber-500/10 text-amber-700 border-amber-500/40";
     case "personalizada":
     case "nao_localizada":
     case "historica":
@@ -344,8 +327,7 @@ export function situationBadgeClass(s: RateSituation): string {
   }
 }
 
-/** Nível numérico de previsibilidade (maior = mais previsível). */
-export const PREDICTABILITY_RANK: Record<RateIndexer, number> = {
+export const PREDICTABILITY_RANK: Record<Indexer, number> = {
   fixa: 4,
   TR: 3,
   poupanca: 2,
