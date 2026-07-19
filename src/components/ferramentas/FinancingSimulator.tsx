@@ -555,7 +555,7 @@ export default function FinancingSimulator() {
                     <Label htmlFor="pv">Valor do imóvel</Label>
                     <span className="text-sm font-semibold text-foreground tabular-nums">{BRL(propertyValue)}</span>
                   </div>
-                  <CurrencyInput id="pv" value={propertyValue} onChange={setPropertyValue} placeholder="650000" invalid={!!errors.propertyValue} />
+                  <CurrencyInput id="pv" value={propertyValue} onChange={setPropertyValue} placeholder="0" invalid={!!errors.propertyValue} />
                   <Slider
                     value={[propertyValue]}
                     min={200_000}
