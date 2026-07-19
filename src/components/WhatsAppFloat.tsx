@@ -11,9 +11,12 @@ export default function WhatsAppFloat() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={t("whatsapp.float")}
-      className="fixed bottom-4 right-4 z-40 h-14 w-14 rounded-full bg-[#25D366] text-white shadow-xl shadow-black/20 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+      className="group fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full bg-foreground/95 text-background pl-3 pr-3 py-3 min-h-[48px] min-w-[48px] shadow-md shadow-black/15 ring-1 ring-white/10 backdrop-blur-sm hover:bg-foreground transition-all"
     >
-      <MessageCircle className="h-7 w-7" />
+      <MessageCircle className="h-5 w-5 shrink-0" />
+      <span className="hidden md:inline-block max-w-0 overflow-hidden whitespace-nowrap text-sm font-medium tracking-tight opacity-0 transition-all duration-200 group-hover:max-w-[120px] group-hover:opacity-100 group-hover:ml-0.5">
+        WhatsApp
+      </span>
     </a>
   );
 }
