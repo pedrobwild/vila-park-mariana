@@ -137,6 +137,7 @@ export default function FinancingSimulator() {
   const [system, setSystem] = useState<AmortSystem>("SAC");
   const [buyerAge, setBuyerAge] = useState<number>(35);
   const [monthlyIncome, setMonthlyIncome] = useState<number>(0);
+  const [eligibleProCotista, setEligibleProCotista] = useState<boolean>(false);
   const [fgts, setFgts] = useState<number>(0);
   const [extraAnnual, setExtraAnnual] = useState<number>(0);
   const [extraStrategy, setExtraStrategy] = useState<"reduce-term" | "reduce-installment">("reduce-term");
