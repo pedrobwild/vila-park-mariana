@@ -516,45 +516,6 @@ export default function FinancingSimulator() {
                   </span>
                 </AccordionTrigger>
                 <AccordionContent className="px-6 pb-6 space-y-5">
-                  {/* Bank */}
-                  <div className="space-y-1.5">
-                    <Label>Banco (presets jul/2026)</Label>
-                    <Select value={bankId} onValueChange={(v) => {
-                      setBankId(v);
-                      const p = BANK_PRESETS.find((b) => b.id === v);
-                      if (p) setAnnualRate(p.annualRate);
-                    }}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {BANK_PRESETS.map((b) => (
-                          <SelectItem key={b.id} value={b.id}>{b.label} — {PCT_PT(b.annualRate)} a.a. + TR</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  {/* Rate */}
-                  <div className="space-y-1.5">
-                    <Label htmlFor="rate" className="flex items-center gap-1.5">
-                      Taxa de juros efetiva (a.a.)
-                      <InfoHint text="Juros efetivos anuais + TR. Convertemos para mensal equivalente." />
-                    </Label>
-                    <Input id="rate" type="number" step="0.01" value={annualRate}
-                      onChange={(e) => setAnnualRate(parseFloat(e.target.value) || 0)} />
-                  </div>
-                  {/* Age */}
-                  <div className="space-y-1.5">
-                    <Label htmlFor="age" className="flex items-center gap-1.5">
-                      Idade do comprador
-                      <InfoHint text="Usada para estimar o MIP (seguro por morte/invalidez). Quanto mais jovem, mais barato." />
-                    </Label>
-                    <Input id="age" type="number" min={18} max={80} value={buyerAge}
-                      onChange={(e) => setBuyerAge(clamp(parseInt(e.target.value) || 35, 18, 80))} />
-                  </div>
-                  {/* Income */}
-                  <div className="space-y-1.5">
-                    <Label htmlFor="income">Renda familiar mensal (opcional)</Label>
-                    <CurrencyInput id="income" value={monthlyIncome} onChange={setMonthlyIncome} placeholder="15000" />
-                  </div>
                   {/* FGTS */}
                   <div className="space-y-1.5">
                     <Label htmlFor="fgts" className="flex items-center gap-1.5">
