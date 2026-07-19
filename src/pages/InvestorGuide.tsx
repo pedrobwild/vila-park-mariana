@@ -50,6 +50,7 @@ type SectionId =
   | "matematica"
   | "simulador"
   | "avaliar"
+  | "mercado"
   | "marketData"
   | "case"
   | "totalReturn"
@@ -64,14 +65,17 @@ type SectionId =
 
 const sectionIds: SectionId[] = [
   "hero", "diagnostico", "tese", "nearby", "typologies", "matematica",
-  "simulador", "avaliar", "marketData", "case", "totalReturn", "scenarios",
+  "simulador", "avaliar", "mercado", "marketData", "case", "totalReturn", "scenarios",
   "eventos", "monthlyEvents", "amenities", "market", "confianca", "faq", "cta",
 ];
 
+// Nav consolidada em 10 chips. As demais seções continuam existindo no body
+// (case, totalReturn, scenarios, monthlyEvents, avaliar, amenities, confianca)
+// mas foram removidas do menu para reduzir carga cognitiva. "Retorno" rola
+// para #matematica e "Mercado" para a seção consolidada #mercado.
 const navSectionIds: SectionId[] = [
-  "hero", "diagnostico", "tese", "typologies", "matematica",
-  "simulador", "avaliar", "marketData", "case", "totalReturn", "scenarios",
-  "eventos", "monthlyEvents", "amenities", "market", "faq", "cta",
+  "hero", "diagnostico", "tese", "typologies", "simulador",
+  "matematica", "mercado", "eventos", "faq", "cta",
 ];
 
 function SectionLabel({ children }: { children: ReactNode }) {
