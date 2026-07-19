@@ -380,7 +380,7 @@ export default function FinancingSimulator() {
                     <Sparkles className="h-4 w-4" /> Você pode se enquadrar no MCMV Faixa 4
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Imóvel até R$ 600 mil + renda familiar até R$ 13 mil dão acesso a taxas de {mcmv.suggestedRateMin.toFixed(1)}% a {mcmv.suggestedRateMax.toFixed(1)}% a.a. (regras 2026).
+                    Imóvel até R$ 600 mil + renda familiar até R$ 13 mil dão acesso a taxas de {PCT_PT(mcmv.suggestedRateMin, 1)} a {PCT_PT(mcmv.suggestedRateMax, 1)} a.a. (regras 2026).
                   </p>
                   <Button variant="outline" size="sm" className="mt-2 h-8" onClick={() => setAnnualRate(10.25)}>
                     Aplicar taxa 10,25% a.a.
