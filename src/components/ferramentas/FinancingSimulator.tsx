@@ -111,6 +111,7 @@ function CurrencyInput({
   placeholder,
   className,
   invalid,
+  "aria-describedby": ariaDescribedBy,
 }: {
   id: string;
   value: number;
@@ -118,6 +119,7 @@ function CurrencyInput({
   placeholder?: string;
   className?: string;
   invalid?: boolean;
+  "aria-describedby"?: string;
 }) {
   const [text, setText] = useState(fmtBRL(value));
   useEffect(() => {
@@ -130,6 +132,7 @@ function CurrencyInput({
         id={id}
         inputMode="numeric"
         aria-invalid={invalid || undefined}
+        aria-describedby={ariaDescribedBy}
         className={[
           "pl-9 pr-3 h-11 text-right tabular-nums",
           invalid ? "border-destructive focus-visible:ring-destructive" : "",
