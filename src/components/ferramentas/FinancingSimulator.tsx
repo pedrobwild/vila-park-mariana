@@ -762,6 +762,16 @@ export default function FinancingSimulator() {
           </Card>
         </div>
 
+  const handleReset = () => {
+    setSnapshot(null);
+    setErrors({});
+    // scroll back to form (top of simulator)
+    const formEl = document.getElementById("simulator-form");
+    if (formEl) {
+      formEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
         {/* ------- Results ------- */}
         <div className="lg:col-span-3 space-y-4" ref={resultsRef}>
           {snapshot ? (
@@ -769,6 +779,7 @@ export default function FinancingSimulator() {
               snap={snapshot}
               stale={stale}
               onRegenerate={handleGenerate}
+              onReset={handleReset}
               reportOpen={reportOpen}
               setReportOpen={setReportOpen}
               simCode={simCodeRef.current}
