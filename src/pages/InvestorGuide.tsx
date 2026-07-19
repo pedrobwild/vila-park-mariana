@@ -582,36 +582,6 @@ export default function InvestorGuide() {
         </section>
 
 
-        {/* ÁREAS COMUNS */}
-        <section id="amenities" className="scroll-mt-32">
-          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
-            <SectionLabel>{t("investorGuide.amenities.eyebrow")}</SectionLabel>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3 max-w-3xl">
-              {t("investorGuide.amenities.title")}
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mb-8">{t("investorGuide.amenities.subtitle")}</p>
-
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {amenitiesItems.map((a) => (
-                <Card key={a.key} className="card-elevated border-border/60 h-full">
-                  <CardContent className="p-5">
-                    <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center mb-3">
-                      <a.icon className="h-5 w-5 text-accent" />
-                    </div>
-                    <h3 className="font-semibold text-foreground mb-2">
-                      {t(`investorGuide.amenities.items.${a.key}.title`)}
-                    </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {t(`investorGuide.amenities.items.${a.key}.text`)}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            <p className="mt-6 text-xs text-muted-foreground">{t("investorGuide.amenities.disclaimer")}</p>
-          </div>
-        </section>
 
         {/* MARKET — mesclado em #mercado; ancora legacy renderizada dentro daquela seção */}
 
