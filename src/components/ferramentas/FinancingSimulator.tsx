@@ -1033,6 +1033,27 @@ export default function FinancingSimulator() {
           )}
         </div>
       </div>
+
+      {/* Reset confirmation dialog */}
+      <Dialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Descartar simulação?</DialogTitle>
+            <DialogDescription>
+              Todos os campos preenchidos e o resultado gerado serão apagados. Essa ação não pode ser desfeita.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
+            <Button variant="outline" className="w-full sm:w-auto" onClick={() => setShowResetConfirm(false)}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" className="w-full sm:w-auto gap-2" onClick={handleReset}>
+              <RotateCcw className="h-4 w-4" aria-hidden="true" />
+              Descartar e refazer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
