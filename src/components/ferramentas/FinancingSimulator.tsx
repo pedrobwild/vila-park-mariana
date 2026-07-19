@@ -684,6 +684,19 @@ export default function FinancingSimulator() {
             </TabsContent>
           </Tabs>
 
+          <BankComparator
+            propertyValue={propertyValue}
+            downPayment={downPayment}
+            termMonths={termMonths}
+            system={system}
+            buyerAge={buyerAge}
+            monthlyIncome={monthlyIncome}
+            eligibleProCotista={eligibleProCotista}
+            onToggleProCotista={setEligibleProCotista}
+          />
+
+          <FinancingGuide />
+
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-3">
             <Button size="lg" className="flex-1 min-h-[48px] gap-2" onClick={() => setReportOpen(true)}>
