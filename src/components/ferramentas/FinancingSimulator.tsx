@@ -42,6 +42,7 @@ import {
   BRL,
   BRL2,
   PCT,
+  PCT_PT,
   acquisitionCosts,
   checkMCMV,
   incomeFit,
@@ -50,6 +51,10 @@ import {
   simulateWithExtras,
   type AmortSystem,
 } from "@/lib/financing";
+
+/** Enlarged touch target for slider thumbs (WCAG 44x44). */
+const SLIDER_TOUCH =
+  "[&_[role=slider]]:h-5 [&_[role=slider]]:w-5 [&_[role=slider]]:relative [&_[role=slider]]:after:content-[''] [&_[role=slider]]:after:absolute [&_[role=slider]]:after:-inset-3";
 
 /* ---------- helpers ---------- */
 
