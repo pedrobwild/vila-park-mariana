@@ -524,6 +524,7 @@ export default function FinancingSimulator() {
   };
 
   const handleReset = () => {
+    setShowResetConfirm(false);
     // Remove persisted state so the form comes back empty on next visit
     try {
       localStorage.removeItem("vp_financing_sim_v1");
