@@ -138,8 +138,14 @@ export interface MCMVCheck {
 export function checkMCMV(propertyValue: number, monthlyIncome?: number): MCMVCheck {
   const suggestedRateMin = 10.0;
   const suggestedRateMax = 10.5;
+  if (propertyValue <= 0) {
+    return { eligible: false, reason: "Informe o valor do imóvel", suggestedRateMin, suggestedRateMax };
+  }
   if (propertyValue > 600_000) {
     return { eligible: false, reason: "Imóvel acima de R$ 600.000", suggestedRateMin, suggestedRateMax };
+  }
+  if (monthlyIncome !== undefined && monthlyIncome <= 0) {
+    return { eligible: false, reason: "Informe a renda familiar", suggestedRateMin, suggestedRateMax };
   }
   if (monthlyIncome !== undefined && monthlyIncome > 13_000) {
     return { eligible: false, reason: "Renda familiar acima de R$ 13.000", suggestedRateMin, suggestedRateMax };

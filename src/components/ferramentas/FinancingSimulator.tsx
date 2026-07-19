@@ -223,16 +223,16 @@ interface Snapshot {
 export default function FinancingSimulator() {
   // ---- Form state ----
   const [typologyId, setTypologyId] = useState<string>("custom");
-  const [propertyValue, setPropertyValue] = useState<number>(650_000);
+  const [propertyValue, setPropertyValue] = useState<number>(0);
   const [downPct, setDownPct] = useState<number>(20);
   const [downOverride, setDownOverride] = useState<number | null>(null);
   const [termMonths, setTermMonths] = useState<number>(360);
   const [financedPulse, setFinancedPulse] = useState(false);
 
-  const [bankId, setBankId] = useState<string>("caixa-sbpe");
-  const [rateInput, setRateInput] = useState<string>("11,19");
+  const [bankId, setBankId] = useState<string>("");
+  const [rateInput, setRateInput] = useState<string>("");
   const [system, setSystem] = useState<AmortSystem>("SAC");
-  const [buyerAge, setBuyerAge] = useState<number>(35);
+  const [buyerAge, setBuyerAge] = useState<number>(0);
   const [monthlyIncome, setMonthlyIncome] = useState<number>(0);
   const [fgts, setFgts] = useState<number>(0);
   const [extraAnnual, setExtraAnnual] = useState<number>(0);
@@ -553,9 +553,11 @@ export default function FinancingSimulator() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="pv">Valor do imóvel</Label>
-                    <span className="text-sm font-semibold text-foreground tabular-nums">{BRL(propertyValue)}</span>
+                    <span className="text-sm font-semibold text-foreground tabular-nums">
+                      {propertyValue > 0 ? BRL(propertyValue) : "—"}
+                    </span>
                   </div>
-                  <CurrencyInput id="pv" value={propertyValue} onChange={setPropertyValue} placeholder="650000" invalid={!!errors.propertyValue} />
+                  <CurrencyInput id="pv" value={propertyValue} onChange={setPropertyValue} invalid={!!errors.propertyValue} />
                   <Slider
                     value={[propertyValue]}
                     min={200_000}
@@ -577,7 +579,7 @@ export default function FinancingSimulator() {
                       <InfoHint text="Pelas regras SFH, a entrada mínima é 20% do valor do imóvel (LTV 80%)." label="Entrada" />
                     </Label>
                     <span className="text-sm font-semibold text-foreground tabular-nums">
-                      {BRL(downPayment)} · {downPctActual.toFixed(0)}%
+                      {propertyValue > 0 ? `${BRL(downPayment)} · ${downPctActual.toFixed(0)}%` : "—"}
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
@@ -695,7 +697,7 @@ export default function FinancingSimulator() {
                   </Label>
                   <Select value={bankId} onValueChange={(v) => setBankId(v)}>
                     <SelectTrigger id="bank" className="h-11" aria-invalid={!!errors.bankId || undefined}>
-                      <SelectValue />
+                      <SelectValue placeholder="Selecione um banco/linha" />
                     </SelectTrigger>
                     <SelectContent className="max-h-80">
                       {INSTITUTION_RATES.map((r) => (
@@ -737,7 +739,7 @@ export default function FinancingSimulator() {
                       aria-readonly={!rateIsManual}
                       value={rateInput}
                       onChange={(e) => setRateInput(e.target.value)}
-                      placeholder={rateIsManual ? "11,50" : ""}
+                      placeholder={rateIsManual ? "0,00" : ""}
                       className={[
                         "pr-20 h-11 font-semibold tabular-nums text-right",
                         rateIsManual ? "" : "cursor-default bg-muted/40",
@@ -817,10 +819,13 @@ export default function FinancingSimulator() {
                       type="number"
                       min={18}
                       max={80}
-                      value={buyerAge}
+                      value={buyerAge || ""}
                       aria-invalid={!!errors.buyerAge || undefined}
                       className={["h-11 text-right tabular-nums", errors.buyerAge ? "border-destructive focus-visible:ring-destructive" : ""].join(" ")}
-                      onChange={(e) => setBuyerAge(clamp(parseInt(e.target.value) || 0, 0, 120))}
+                      onChange={(e) => {
+                        const raw = e.target.value;
+                        setBuyerAge(raw === "" ? 0 : clamp(parseInt(raw) || 0, 0, 120));
+                      }}
                     />
                     <FieldError msg={errors.buyerAge} />
                   </div>
@@ -829,7 +834,7 @@ export default function FinancingSimulator() {
                       Renda familiar
                       <InfoHint text="Renda familiar mensal bruta. Comprometimento máx. de 30% da renda com a 1ª parcela." label="Renda" />
                     </Label>
-                    <CurrencyInput id="income" value={monthlyIncome} onChange={setMonthlyIncome} placeholder="15000" invalid={!!errors.monthlyIncome} />
+                    <CurrencyInput id="income" value={monthlyIncome} onChange={setMonthlyIncome} placeholder="0" invalid={!!errors.monthlyIncome} />
                     <FieldError msg={errors.monthlyIncome} />
                   </div>
                 </div>
