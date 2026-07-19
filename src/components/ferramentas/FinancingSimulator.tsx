@@ -506,9 +506,40 @@ export default function FinancingSimulator() {
     }, 80);
   };
 
+  const resetFormToEmpty = () => {
+    setTypologyId("custom");
+    setPropertyValue(0);
+    setDownPct(0);
+    setDownOverride(null);
+    setTermMonths(0);
+    setBankId("");
+    setRateInput("");
+    setSystem("SAC");
+    setBuyerAge(0);
+    setMonthlyIncome(0);
+    setFgts(0);
+    setExtraAnnual(0);
+    setExtraStrategy("reduce-term");
+  };
+
   const handleReset = () => {
+    // Remove persisted state so the form comes back empty on next visit
+    try {
+      localStorage.removeItem("vp_financing_sim_v1");
+    } catch {
+      /* ignore */
+    }
+    // Also clear shareable link from URL so it is not restored on refresh
+    if (window.location.search.includes("sim=")) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("sim");
+      window.history.replaceState({}, "", url.toString());
+    }
     setSnapshot(null);
     setErrors({});
+    simCodeRef.current = generateSimCode();
+    setReportEmittedAt(new Date());
+    resetFormToEmpty();
     formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
