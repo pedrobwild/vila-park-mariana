@@ -45,7 +45,6 @@ type SectionId =
   | "hero"
   | "diagnostico"
   | "tese"
-  | "nearby"
   | "typologies"
   | "matematica"
   | "simulador"
@@ -57,26 +56,26 @@ type SectionId =
   | "scenarios"
   | "eventos"
   | "monthlyEvents"
-  | "amenities"
   | "market"
   | "confianca"
   | "faq"
   | "cta";
 
 const sectionIds: SectionId[] = [
-  "hero", "diagnostico", "tese", "nearby", "typologies", "matematica",
+  "hero", "diagnostico", "tese", "typologies", "matematica",
   "simulador", "avaliar", "mercado", "marketData", "case", "totalReturn", "scenarios",
-  "eventos", "monthlyEvents", "amenities", "market", "confianca", "faq", "cta",
+  "eventos", "monthlyEvents", "market", "confianca", "faq", "cta",
 ];
 
 // Nav consolidada em 10 chips. As demais seções continuam existindo no body
-// (case, totalReturn, scenarios, monthlyEvents, avaliar, amenities, confianca)
-// mas foram removidas do menu para reduzir carga cognitiva. "Retorno" rola
-// para #matematica e "Mercado" para a seção consolidada #mercado.
+// (case, totalReturn, scenarios, monthlyEvents, avaliar, confianca) mas foram
+// removidas do menu para reduzir carga cognitiva. "Retorno" rola para
+// #matematica e "Mercado" para a seção consolidada #mercado.
 const navSectionIds: SectionId[] = [
   "hero", "diagnostico", "tese", "typologies", "simulador",
   "matematica", "mercado", "eventos", "faq", "cta",
 ];
+
 
 function SectionLabel({ children }: { children: ReactNode }) {
   return (
@@ -206,12 +205,6 @@ export default function InvestorGuide() {
     { icon: Sofa, key: "amenities" },
     { icon: Train, key: "metro" },
     { icon: ShieldCheck, key: "builder" },
-  ];
-  const amenitiesItems = [
-    { icon: Sofa, key: "leisure" },
-    { icon: Building2, key: "lobby" },
-    { icon: Dumbbell, key: "infra" },
-    { icon: ShieldCheck, key: "ac" },
   ];
   const faqKeys = ["q1", "q2", "q3", "q4", "q5"];
   const extraFaqKeys = ["f1", "f2", "f3", "f4", "f5"];
@@ -369,19 +362,21 @@ export default function InvestorGuide() {
                 </Card>
               ))}
             </div>
-          </div>
-        </section>
 
-        {/* ENTORNO — shared */}
-        <section id="nearby" className="scroll-mt-32">
-          <NeighborhoodSection variant="full" />
-          <div className="max-w-7xl mx-auto px-4 md:px-6 -mt-6 pb-16">
-            <div className="rounded-xl border border-accent/20 bg-accent/5 p-5 flex items-start gap-3">
-              <Compass className="mt-0.5 h-5 w-5 text-accent shrink-0" />
-              <p className="text-sm text-foreground leading-relaxed">{t("investorGuide.nearby.note")}</p>
+            {/* Callout: entorno (movido de #nearby) */}
+            <div className="mt-8 rounded-xl border border-border/60 bg-background p-5">
+              <p className="eyebrow mb-2">{t("investorGuide.sectionLabels.nearby", "Entorno")}</p>
+              <p className="text-sm text-foreground leading-relaxed">{t("investorGuide.tese.entornoNote")}</p>
+              <a
+                href="/#comparativo"
+                className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-accent hover:underline"
+              >
+                {t("investorGuide.tese.entornoLink", "Ver entorno completo")} →
+              </a>
             </div>
           </div>
         </section>
+
 
         {/* TIPOLOGIAS */}
         <section id="typologies" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
