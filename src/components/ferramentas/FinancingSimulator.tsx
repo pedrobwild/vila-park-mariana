@@ -959,6 +959,13 @@ function ResultsView({ snap, stale, onRegenerate, onReset, reportOpen, setReport
         </div>
       )}
 
+      <div className="flex items-center justify-end">
+        <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={onReset}>
+          <RotateCcw className="h-3.5 w-3.5" />
+          Refazer
+        </Button>
+      </div>
+
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Kpi label="1ª parcela" value={BRL(active.firstInstallment)} highlight />
