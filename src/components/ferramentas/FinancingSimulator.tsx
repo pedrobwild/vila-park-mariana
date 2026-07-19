@@ -511,13 +511,17 @@ export default function FinancingSimulator() {
           <div className="grid md:grid-cols-2 gap-3">
             <Card className="border-border/60">
               <CardHeader className="pb-2"><CardTitle className="text-base">Análise de renda</CardTitle></CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className="space-y-3">
                 <p className="text-sm">Renda mínima necessária: <span className="font-semibold text-foreground">{BRL(requiredMonthly)}</span> <span className="text-xs text-muted-foreground">(comprometimento máx. 30%)</span></p>
+                <div className="space-y-1.5">
+                  <Label htmlFor="income-inline" className="text-xs">Sua renda familiar (opcional)</Label>
+                  <CurrencyInput id="income-inline" value={monthlyIncome} onChange={setMonthlyIncome} placeholder="15000" />
+                </div>
                 {fit && (
                   <Badge className={
-                    fit === "ok" ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30" :
-                    fit === "tight" ? "bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30" :
-                    "bg-destructive/15 text-destructive border-destructive/30"
+                    fit === "ok" ? "bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border-emerald-600/40" :
+                    fit === "tight" ? "bg-amber-500/15 text-amber-800 dark:text-amber-300 border-amber-600/40" :
+                    "bg-destructive/15 text-destructive border-destructive/40"
                   } variant="outline">
                     {fit === "ok" ? "Cabe no seu orçamento" : fit === "tight" ? "Apertado, próximo do limite" : "Acima do limite bancário"}
                   </Badge>
