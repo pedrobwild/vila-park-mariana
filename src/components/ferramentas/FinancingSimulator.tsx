@@ -363,13 +363,15 @@ export default function FinancingSimulator() {
                 ].join(" ")}
               >
                 <div className="flex items-center justify-between">
-                  <Label className="text-xs text-muted-foreground font-normal flex items-center">
+                  <Label className="text-xs text-muted-foreground font-normal flex items-center gap-1.5">
+                    <RefreshCw className="h-3 w-3 text-primary" aria-hidden="true" />
                     Valor financiado
-                    <InfoHint text="Calculado automaticamente: valor do imóvel menos entrada (inclui FGTS, quando informado)." />
+                    <InfoHint text="Calculado automaticamente: valor do imóvel menos entrada (inclui FGTS, quando informado). Atualiza em tempo real ao mudar o imóvel ou a entrada." />
                   </Label>
                   <span
                     className={[
-                      "text-sm font-semibold tabular-nums",
+                      "text-sm font-semibold tabular-nums transition-colors duration-300",
+                      financedPulse ? "text-primary" : "",
                       financedAmountInvalid ? "text-destructive" : "text-foreground",
                     ].join(" ")}
                   >
