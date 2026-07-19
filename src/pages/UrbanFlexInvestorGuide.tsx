@@ -182,7 +182,7 @@ const whatsappLink =
   "https://wa.me/5511961007687?text=Ol%C3%A1!%20Vi%20o%20Guia%20do%20Comprador%20do%20Vila%20Park%20Vila%20Mariana%20e%20quero%20mais%20informa%C3%A7%C3%B5es.";
 
 function SectionLabel({ children }: { children: ReactNode }) {
-  return <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[hsl(24,90%,50%)]/80 mb-3">{children}</p>;
+  return <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[hsl(var(--accent))]/80 mb-3">{children}</p>;
 }
 
 function KpiCard({ value, label, highlight = false }: { value: string; label: string; highlight?: boolean }) {
@@ -276,7 +276,7 @@ export default function UrbanFlexInvestorGuide() {
                 className={cn(
                   "rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
                   activeSection === section.id
-                    ? "bg-[hsl(24,90%,50%)] text-white"
+                    ? "bg-[hsl(var(--accent))] text-white"
                     : "bg-transparent text-muted-foreground hover:text-foreground hover:bg-secondary",
                 )}
               >
@@ -299,7 +299,7 @@ export default function UrbanFlexInvestorGuide() {
                 transition={{ duration: 0.5 }}
               >
                 <div className="flex flex-wrap gap-2 mb-5">
-                  <Badge className="bg-[hsl(24,90%,50%)]/10 text-[hsl(24,90%,50%)] border-[hsl(24,90%,50%)]/20 hover:bg-[hsl(24,90%,50%)]/10">Vila Park</Badge>
+                  <Badge className="bg-[hsl(var(--accent))]/10 text-[hsl(var(--accent))] border-[hsl(var(--accent))]/20 hover:bg-[hsl(var(--accent))]/10">Vila Park</Badge>
                   <Badge variant="outline">Vila Mariana</Badge>
                   <Badge variant="outline">Guia do Comprador</Badge>
                 </div>
@@ -315,7 +315,7 @@ export default function UrbanFlexInvestorGuide() {
                 </p>
 
                 <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                  <Button size="lg" className="min-h-[46px] bg-[hsl(24,90%,50%)] hover:bg-[hsl(24,90%,44%)] text-white" onClick={() => scrollTo("contato")}>
+                  <Button size="lg" className="min-h-[46px] bg-[hsl(var(--accent))] hover:bg-[hsl(var(--accent-strong))] text-white" onClick={() => scrollTo("contato")}>
                     <ArrowRight className="mr-2 h-4 w-4" />
                     Fazer minha reserva
                   </Button>
@@ -633,7 +633,7 @@ export default function UrbanFlexInvestorGuide() {
                     </p>
 
                     <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                      <Button size="lg" className="min-h-[48px] bg-[hsl(24,90%,50%)] hover:bg-[hsl(24,90%,44%)] text-white" onClick={() => window.open(whatsappLink, "_blank")}>
+                      <Button size="lg" className="min-h-[48px] bg-[hsl(var(--accent))] hover:bg-[hsl(var(--accent-strong))] text-white" onClick={() => window.open(whatsappLink, "_blank")}>
                         <MessageCircle className="mr-2 h-4 w-4" />
                         Falar com a equipe comercial
                       </Button>
@@ -674,7 +674,7 @@ export default function UrbanFlexInvestorGuide() {
                           onChange={(e) => setFormMessage(e.target.value)}
                           rows={4}
                         />
-                        <Button type="submit" className="w-full min-h-[46px] bg-[hsl(24,90%,50%)] hover:bg-[hsl(24,90%,44%)] text-white">
+                        <Button type="submit" className="w-full min-h-[46px] bg-[hsl(var(--accent))] hover:bg-[hsl(var(--accent-strong))] text-white">
                           Enviar
                         </Button>
                       </form>
