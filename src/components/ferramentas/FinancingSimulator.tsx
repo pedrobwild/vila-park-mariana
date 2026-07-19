@@ -344,16 +344,33 @@ export default function FinancingSimulator() {
               </div>
 
               {/* Financed amount (auto) */}
-              <div className="space-y-1 rounded-lg border border-border/60 bg-muted/30 px-3 py-2.5">
+              <div
+                className={[
+                  "space-y-1 rounded-lg border px-3 py-2.5",
+                  financedAmountInvalid
+                    ? "border-destructive bg-destructive/10"
+                    : "border-border/60 bg-muted/30",
+                ].join(" ")}
+              >
                 <div className="flex items-center justify-between">
                   <Label className="text-xs text-muted-foreground font-normal flex items-center">
                     Valor financiado
                     <InfoHint text="Calculado automaticamente: valor do imóvel menos entrada (inclui FGTS, quando informado)." />
                   </Label>
-                  <span className="text-sm font-semibold text-foreground tabular-nums">
-                    {BRL(Math.max(propertyValue - downPayment, 0))}
+                  <span
+                    className={[
+                      "text-sm font-semibold tabular-nums",
+                      financedAmountInvalid ? "text-destructive" : "text-foreground",
+                    ].join(" ")}
+                  >
+                    {BRL(financedAmount)}
                   </span>
                 </div>
+                {financedAmountInvalid && (
+                  <p className="text-xs text-destructive">
+                    A entrada não pode ser igual ou maior que o valor do imóvel. Reduza a entrada ou o FGTS para financiar um valor positivo.
+                  </p>
+                )}
               </div>
 
 
