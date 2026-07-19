@@ -332,3 +332,9 @@ function WinnerCard({ title, value, caption, note }: { title: string; value: str
     </div>
   );
 }
+
+/** Formata uma data ISO (YYYY-MM-DD) como dd/mm/aaaa sem shift de fuso. */
+export function formatConsultDate(iso: string): string {
+  const [y, m, d] = iso.split("-");
+  return `${d}/${m}/${y}`;
+}
