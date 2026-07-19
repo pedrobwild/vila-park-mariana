@@ -557,7 +557,7 @@ export default function FinancingSimulator() {
                       {propertyValue > 0 ? BRL(propertyValue) : "—"}
                     </span>
                   </div>
-                  <CurrencyInput id="pv" value={propertyValue} onChange={setPropertyValue} placeholder="0" invalid={!!errors.propertyValue} />
+                  <CurrencyInput id="pv" value={propertyValue} onChange={setPropertyValue} invalid={!!errors.propertyValue} />
                   <Slider
                     value={[propertyValue]}
                     min={200_000}
