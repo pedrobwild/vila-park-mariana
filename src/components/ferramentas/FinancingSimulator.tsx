@@ -1116,7 +1116,11 @@ function ResultsView({ snap, stale, onRegenerate, onReset, onCopyLink, reportOpe
         </div>
       )}
 
-      <div className="flex items-center justify-end">
+      <div className="flex items-center justify-end gap-2">
+        <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={onCopyLink}>
+          <Link2 className="h-3.5 w-3.5" />
+          Copiar link
+        </Button>
         <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={onReset}>
           <RotateCcw className="h-3.5 w-3.5" />
           Refazer
