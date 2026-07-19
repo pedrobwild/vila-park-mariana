@@ -22,6 +22,7 @@ import {
   TrendingDown,
   Sparkles,
   RefreshCw,
+  RotateCcw,
   CheckCircle2,
   AlertTriangle,
   Play,
@@ -371,8 +372,17 @@ export default function FinancingSimulator() {
     }, 60);
   };
 
+  const handleReset = () => {
+    setSnapshot(null);
+    setErrors({});
+    const formEl = document.getElementById("simulator-form");
+    if (formEl) {
+      formEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   return (
-    <section className="scroll-mt-24 py-12 md:py-16">
+    <section id="simulator-form" className="scroll-mt-24 py-12 md:py-16">
       <header className="mb-6">
         <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2">
           <Calculator className="h-6 w-6 text-primary" />
@@ -769,6 +779,7 @@ export default function FinancingSimulator() {
               snap={snapshot}
               stale={stale}
               onRegenerate={handleGenerate}
+              onReset={handleReset}
               reportOpen={reportOpen}
               setReportOpen={setReportOpen}
               simCode={simCodeRef.current}
@@ -809,13 +820,14 @@ interface ResultsProps {
   snap: Snapshot;
   stale: boolean;
   onRegenerate: () => void;
+  onReset: () => void;
   reportOpen: boolean;
   setReportOpen: (v: boolean) => void;
   simCode: string;
   reportEmittedAt: Date;
 }
 
-function ResultsView({ snap, stale, onRegenerate, reportOpen, setReportOpen, simCode, reportEmittedAt }: ResultsProps) {
+function ResultsView({ snap, stale, onRegenerate, onReset, reportOpen, setReportOpen, simCode, reportEmittedAt }: ResultsProps) {
   const {
     propertyValue,
     downPayment,
@@ -946,6 +958,13 @@ function ResultsView({ snap, stale, onRegenerate, reportOpen, setReportOpen, sim
           </Button>
         </div>
       )}
+
+      <div className="flex items-center justify-end">
+        <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={onReset}>
+          <RotateCcw className="h-3.5 w-3.5" />
+          Refazer
+        </Button>
+      </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
