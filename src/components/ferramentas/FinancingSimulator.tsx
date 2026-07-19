@@ -608,6 +608,7 @@ export default function FinancingSimulator() {
                       id="dp"
                       value={downOverride ?? Math.round((propertyValue * downPct) / 100)}
                       invalid={!!errors.dp}
+                      aria-describedby={errors.dp ? "dp-error" : undefined}
                       onChange={(v) => {
                         const maxDown = Math.max(propertyValue - fgts, 0);
                         const clamped = clamp(v, 0, maxDown);
@@ -626,6 +627,7 @@ export default function FinancingSimulator() {
                           setDownOverride(null);
                         }}
                         className="pr-8 h-11 text-right tabular-nums"
+                        aria-describedby={errors.dp ? "dp-error" : undefined}
                       />
                       <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">%</span>
                     </div>
@@ -640,12 +642,14 @@ export default function FinancingSimulator() {
                       setDownOverride(null);
                     }}
                     className={SLIDER_TOUCH}
+                    aria-invalid={!!errors.dp || undefined}
+                    aria-describedby={errors.dp ? "dp-error" : undefined}
                   />
                   <div className="flex justify-between text-[11px] text-muted-foreground px-0.5">
                     <span>20% (mín. SFH)</span>
                     <span>80%</span>
                   </div>
-                  <FieldError msg={errors.dp} />
+                  <FieldError id="dp-error" msg={errors.dp} />
                 </div>
 
                 {/* Financed amount (auto) */}
