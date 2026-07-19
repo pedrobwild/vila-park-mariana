@@ -7,13 +7,10 @@
   "nav": {
     "insights": "Dashboard",
     "ferramentas": "Tools",
-    "urbanFlex": "Buyer Guide",
     "opportunities": "Opportunities",
     "talkSpecialist": "Talk to a specialist",
     "back": "Back",
     "menu": "Menu",
-    "guidesGroup": "Guides",
-    "guideBuyer": "Buyer Guide",
     "guideInvestor": "Investor Guide"
   },
   "quickNav": {
@@ -118,39 +115,6 @@
     "error": "Couldn't send. Try again or reach us directly on WhatsApp.",
     "whatsapp": "Chat on WhatsApp"
   },
-  "guide": {
-    "badge": "Buyer Guide",
-    "titleA": "Buyer Guide.",
-    "titleB": "Everything before you reserve.",
-    "subtitle": "Location, typologies, amenities and the steps to reserve your unit.",
-    "cta": "Open the Buyer Guide",
-    "items": {
-      "quiz": {
-        "title": "Location",
-        "desc": "How Vila Mariana's surroundings enhance daily life."
-      },
-      "simulator": {
-        "title": "Financing",
-        "desc": "Simulate installments, down payment and term."
-      },
-      "neighborhood": {
-        "title": "Surroundings",
-        "desc": "Parks, subway, universities and services nearby."
-      },
-      "choice": {
-        "title": "Typologies",
-        "desc": "Garden, terrace and 1-bedroom: which one fits you."
-      },
-      "readiness": {
-        "title": "Reservation",
-        "desc": "Step by step from the form to the sales contact."
-      },
-      "income": {
-        "title": "Amenities",
-        "desc": "Furnished leisure on the ground and 5th floors."
-      }
-    }
-  },
   "finalCta": {
     "title": "Reserve your unit at Vila Park.",
     "subtitle": "Talk to the Vila Park team and receive floor plans, conditions and the full descriptive memorial.",
@@ -225,7 +189,6 @@
       "hero": "Start",
       "diagnostico": "Diagnostic",
       "tese": "Thesis",
-      "nearby": "Surroundings",
       "typologies": "Typologies",
       "matematica": "Return",
       "simulador": "Simulator",
@@ -237,7 +200,6 @@
       "scenarios": "Scenarios",
       "eventos": "Events",
       "monthlyEvents": "Monthly revenue",
-      "amenities": "Amenities",
       "market": "Market",
       "confianca": "Trust",
       "faq": "FAQ",
@@ -297,25 +259,9 @@
     "tese": {
       "eyebrow": "Investment thesis",
       "title": "Why Vila Mariana sustains demand for Vila Park.",
-      "subtitle": "Four objective pillars, grounded in location data, that support the unit as an income and appreciation asset."
-    },
-    "nearby": {
-      "eyebrow": "Strategic surroundings",
-      "title": "Vila Mariana works in favor of your rental.",
-      "subtitle": "A consolidated neighborhood with subway, universities, an employment hub and leisure within walking distance — fundamentals that sustain housing demand.",
-      "groups": {
-        "mobility": "Mobility",
-        "edu": "Universities",
-        "parks": "Parks & leisure",
-        "services": "Services & shopping",
-        "gastronomy": "Dining",
-        "jobs": "Employment hub"
-      },
-      "jobsPaulista": "Av. Paulista",
-      "jobsPaulistaDist": "2.5 km",
-      "jobsCorredor": "Paulista area",
-      "jobsCorredorDist": "office corridor",
-      "note": "Why this matters for income: properties near subway, universities and employment hubs have historically shown lower vacancy and faster tenant turnover — a profile compatible with the Vila Park product."
+      "subtitle": "Four objective pillars, grounded in location data, that support the unit as an income and appreciation asset.",
+      "entornoNote": "Why this matters for income: properties near subway, universities and employment hubs have historically shown lower vacancy and faster tenant turnover — a profile compatible with the Vila Park product.",
+      "entornoLink": "See full surroundings"
     },
     "typologies": {
       "eyebrow": "Typologies",
@@ -385,30 +331,6 @@
       "subtitle": "Fairs, congresses and international shows concentrate short-stay demand peaks. Vila Mariana is just minutes from Ibirapuera, Anhembi and Paulista.",
       "calendarTitle": "SP events × rental demand",
       "calendarSubtitle": "Confirmed and forecast events in São Paulo between July 2026 and July 2027 and how each may impact short-stay demand around Vila Mariana."
-    },
-    "amenities": {
-      "eyebrow": "Common areas delivered fully equipped",
-      "title": "Ground floor and 5th floor decorated and furnished at delivery.",
-      "subtitle": "Finished common areas reduce the cost of preparing the property for rental and improve tenant value perception from the first visit.",
-      "items": {
-        "leisure": {
-          "title": "Decorated leisure",
-          "text": "Furnished spaces on the ground and 5th floors, delivered ready to use."
-        },
-        "lobby": {
-          "title": "Entry lobby",
-          "text": "Reception and lobby that reinforce the property's standard perception."
-        },
-        "infra": {
-          "title": "Leisure infrastructure",
-          "text": "Living areas that broaden the apartment's appeal to tenants."
-        },
-        "ac": {
-          "title": "A/C infrastructure",
-          "text": "Technical preparation in the unit — one less item for the owner to handle."
-        }
-      },
-      "disclaimer": "Illustrative images and descriptions. Decoration is a suggestion only — furniture and items are not part of the purchase contract."
     },
     "market": {
       "eyebrow": "Market data",
@@ -491,10 +413,22 @@
       "formulaTitle": "How to read these numbers",
       "formulaText": "Gross yield ≈ (nightly × occupancy × 30 × 12) / total investment. Net yield deducts platform fees, cleaning, HOA, property tax and vacancy.",
       "kpi": {
-        "daily": { "label": "Average nightly", "note": "Furnished studios in Vila Mariana" },
-        "occ": { "label": "Typical occupancy", "note": "Annual average for well-run units" },
-        "price": { "label": "Price per m²", "note": "Range for comparable launches" },
-        "listings": { "label": "Active listings", "note": "Airbnb / short-stay · Vila Mariana" }
+        "daily": {
+          "label": "Average nightly",
+          "note": "Furnished studios in Vila Mariana"
+        },
+        "occ": {
+          "label": "Typical occupancy",
+          "note": "Annual average for well-run units"
+        },
+        "price": {
+          "label": "Price per m²",
+          "note": "Range for comparable launches"
+        },
+        "listings": {
+          "label": "Active listings",
+          "note": "Airbnb / short-stay · Vila Mariana"
+        }
       },
       "cols": {
         "district": "District",
@@ -528,11 +462,26 @@
       "timeline": {
         "title": "From deposit to first booking",
         "step": {
-          "1": { "t": "Reservation and deposit", "d": "Launch-phase pricing with reservation conditions." },
-          "2": { "t": "Construction phase", "d": "Installments during construction; potential appreciation until delivery." },
-          "3": { "t": "Keys and furnishing", "d": "Delivery + décor and linens setup in 30–45 days." },
-          "4": { "t": "Listing and ramp-up", "d": "Photos, platform onboarding and review curve in the first 90 days." },
-          "5": { "t": "Mature operation", "d": "Dynamic pricing, professional management and event-driven surges." }
+          "1": {
+            "t": "Reservation and deposit",
+            "d": "Launch-phase pricing with reservation conditions."
+          },
+          "2": {
+            "t": "Construction phase",
+            "d": "Installments during construction; potential appreciation until delivery."
+          },
+          "3": {
+            "t": "Keys and furnishing",
+            "d": "Delivery + décor and linens setup in 30–45 days."
+          },
+          "4": {
+            "t": "Listing and ramp-up",
+            "d": "Photos, platform onboarding and review curve in the first 90 days."
+          },
+          "5": {
+            "t": "Mature operation",
+            "d": "Dynamic pricing, professional management and event-driven surges."
+          }
         }
       },
       "kpi": {
@@ -586,7 +535,10 @@
       },
       "paybackYears": "{{n}} years",
       "driversTitle": "Levers that most move the outcome",
-      "impact": { "high": "High impact", "med": "Medium impact" },
+      "impact": {
+        "high": "High impact",
+        "med": "Medium impact"
+      },
       "drivers": {
         "occupancy": {
           "title": "Occupancy",
@@ -618,8 +570,15 @@
         "yield": "Gross / net yield",
         "yieldSub": "estimate over total investment"
       },
-      "legend": { "base": "Base", "extra": "Extra from events" },
-      "tooltip": { "base": "Base", "extra": "Extra from events", "total": "Total" },
+      "legend": {
+        "base": "Base",
+        "extra": "Extra from events"
+      },
+      "tooltip": {
+        "base": "Base",
+        "extra": "Extra from events",
+        "total": "Total"
+      },
       "avgLine": "Monthly average",
       "disclaimer": "Uplift estimated from nightly-rate boosts calibrated by the sp-events edge function, applied over event duration and expected occupancy. Illustrative estimate, non-binding."
     },
@@ -858,5 +817,68 @@
     "showAll": "Show all {{count}} events",
     "sources": "Sources",
     "calibrationNote": "Nightly-rate impact estimates are calibrated to market practice in well-connected neighborhoods; listings next to the venues see larger swings. The host captures the uplift by adjusting per-date pricing (guests see the total price on the platform)."
+  },
+  "home": {
+    "etapas": {
+      "eyebrow": "Reservation",
+      "title": "How the reservation works",
+      "subtitle": "A clear step-by-step, from first contact to contract signing.",
+      "items": [
+        {
+          "title": "Request via form or WhatsApp",
+          "desc": "Send your details and the typology of interest — with no commitment."
+        },
+        {
+          "title": "The Vila Park team gets in touch",
+          "desc": "We share up-to-date conditions, availability and full materials."
+        },
+        {
+          "title": "Sale under the Real Estate Incorporation Registration",
+          "desc": "Marketing only starts after the registry filing of the incorporation."
+        },
+        {
+          "title": "Contract formalization",
+          "desc": "Signature, down payment and defined financial schedule."
+        }
+      ]
+    },
+    "faq": {
+      "eyebrow": "Frequently asked questions",
+      "title": "Most common questions",
+      "items": [
+        {
+          "q": "Where is Vila Park located?",
+          "a": "The property is at R. Baltazar Lisboa, 543, in the Vila Mariana neighborhood of São Paulo, about 900 meters from Vila Mariana subway station."
+        },
+        {
+          "q": "How many apartments does the development have?",
+          "a": "Vila Park is a single tower with 10 floors and 33 apartments, totaling 1,600 sqm of built area."
+        },
+        {
+          "q": "Does the apartment have a parking spot?",
+          "a": "No. The development was designed without parking spots, focused on walking and public transit — Vila Mariana subway is just 900 meters away."
+        },
+        {
+          "q": "Which typologies are available?",
+          "a": "Vila Park offers 1-bedroom/studio apartments, units with a private garden and units with an open terrace."
+        },
+        {
+          "q": "Are the common areas ready?",
+          "a": "Common areas will be delivered decorated and furnished, on the ground and 5th floors, ready for immediate use."
+        },
+        {
+          "q": "What is the construction stage?",
+          "a": "Construction is in progress, with the latest update recorded on 07/07/2026. For a detailed schedule, contact the Vila Park team."
+        },
+        {
+          "q": "How do I reserve a unit?",
+          "a": "Fill out the reservation form on this page or reach the Vila Park team on WhatsApp. The team will contact you to share conditions and continue the process under the Real Estate Incorporation Registration."
+        },
+        {
+          "q": "Can I install air conditioning?",
+          "a": "Yes. Units come with infrastructure prepared for air conditioning installation."
+        }
+      ]
+    }
   }
 }

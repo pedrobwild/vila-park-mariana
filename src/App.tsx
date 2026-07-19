@@ -9,7 +9,7 @@ import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import RequireAuth from "./components/auth/RequireAuth";
 
-const UrbanFlexInvestorGuide = lazy(() => import("./pages/UrbanFlexInvestorGuide"));
+
 const InvestorGuide = lazy(() => import("./pages/InvestorGuide"));
 const Ferramentas = lazy(() => import("./pages/Ferramentas"));
 const AdminUpload = lazy(() => import("./pages/AdminUpload"));
@@ -32,7 +32,7 @@ const App = () => (
           <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Carregando…</div>}>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/guia-comprador" element={<UrbanFlexInvestorGuide />} />
+              <Route path="/guia-comprador" element={<Navigate to="/" replace />} />
               <Route path="/guia-investidor" element={<InvestorGuide />} />
               {/* Legacy path — redirect to home */}
               <Route path="/urban-flex-bela-cintra" element={<Navigate to="/" replace />} />

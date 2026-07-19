@@ -28,7 +28,6 @@ export default function AppNavbar() {
   const navLinks = [
     { to: "/oportunidades", label: t("nav.opportunities", "Oportunidades") },
     { to: "/guia-investidor", label: t("nav.guideInvestor") },
-    { to: "/guia-comprador", label: t("nav.guideBuyer") },
     { to: "/ferramentas", label: t("nav.ferramentas") },
     { to: "/insights", label: t("nav.insights") },
   ];
