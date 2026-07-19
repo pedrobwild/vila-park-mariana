@@ -371,6 +371,7 @@ export default function InvestorGuide() {
               <a
                 href="/#comparativo"
                 className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-accent hover:underline"
+                onClick={() => trackGlobal("cta_click", { id: "entorno_ver_completo", target: "/#comparativo", location: "guia-investidor:tese" })}
               >
                 {t("investorGuide.tese.entornoLink", "Ver entorno completo")} →
               </a>
