@@ -28,7 +28,9 @@ import {
   Play,
   ClipboardList,
   Loader2,
+  Link2,
 } from "lucide-react";
+import { toast } from "sonner";
 import { z } from "zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -247,42 +249,82 @@ export default function FinancingSimulator() {
 
   // ---- Restore from localStorage on mount ----
   useEffect(() => {
+    // 1) Try URL param ?sim=<base64> first (shareable link takes precedence)
+    let fromUrl = false;
     try {
-      const raw = localStorage.getItem("vp_financing_sim_v1");
-      if (raw) {
-        const s = JSON.parse(raw) as {
-          form?: Partial<{
-            typologyId: string; propertyValue: number; downPct: number;
-            downOverride: number | null; termMonths: number; bankId: string;
-            rateInput: string; system: AmortSystem; buyerAge: number;
-            monthlyIncome: number; fgts: number; extraAnnual: number;
-            extraStrategy: "reduce-term" | "reduce-installment";
-          }>;
-          snapshot?: Snapshot | null;
-          simCode?: string;
-          reportEmittedAt?: string;
-        };
-        if (s.form) {
-          if (s.form.typologyId !== undefined) setTypologyId(s.form.typologyId);
-          if (s.form.propertyValue !== undefined) setPropertyValue(s.form.propertyValue);
-          if (s.form.downPct !== undefined) setDownPct(s.form.downPct);
-          if (s.form.downOverride !== undefined) setDownOverride(s.form.downOverride);
-          if (s.form.termMonths !== undefined) setTermMonths(s.form.termMonths);
-          if (s.form.bankId !== undefined) setBankId(s.form.bankId);
-          if (s.form.rateInput !== undefined) setRateInput(s.form.rateInput);
-          if (s.form.system !== undefined) setSystem(s.form.system);
-          if (s.form.buyerAge !== undefined) setBuyerAge(s.form.buyerAge);
-          if (s.form.monthlyIncome !== undefined) setMonthlyIncome(s.form.monthlyIncome);
-          if (s.form.fgts !== undefined) setFgts(s.form.fgts);
-          if (s.form.extraAnnual !== undefined) setExtraAnnual(s.form.extraAnnual);
-          if (s.form.extraStrategy !== undefined) setExtraStrategy(s.form.extraStrategy);
+      const params = new URLSearchParams(window.location.search);
+      const simParam = params.get("sim");
+      if (simParam) {
+        const decoded = JSON.parse(
+          decodeURIComponent(escape(atob(simParam.replace(/-/g, "+").replace(/_/g, "/"))))
+        ) as { form?: any; snapshot?: Snapshot | null };
+        if (decoded.form) {
+          const f = decoded.form;
+          if (f.typologyId !== undefined) setTypologyId(f.typologyId);
+          if (f.propertyValue !== undefined) setPropertyValue(f.propertyValue);
+          if (f.downPct !== undefined) setDownPct(f.downPct);
+          if (f.downOverride !== undefined) setDownOverride(f.downOverride);
+          if (f.termMonths !== undefined) setTermMonths(f.termMonths);
+          if (f.bankId !== undefined) setBankId(f.bankId);
+          if (f.rateInput !== undefined) setRateInput(f.rateInput);
+          if (f.system !== undefined) setSystem(f.system);
+          if (f.buyerAge !== undefined) setBuyerAge(f.buyerAge);
+          if (f.monthlyIncome !== undefined) setMonthlyIncome(f.monthlyIncome);
+          if (f.fgts !== undefined) setFgts(f.fgts);
+          if (f.extraAnnual !== undefined) setExtraAnnual(f.extraAnnual);
+          if (f.extraStrategy !== undefined) setExtraStrategy(f.extraStrategy);
         }
-        if (s.snapshot) setSnapshot(s.snapshot);
-        if (s.simCode) simCodeRef.current = s.simCode;
-        if (s.reportEmittedAt) setReportEmittedAt(new Date(s.reportEmittedAt));
+        if (decoded.snapshot) setSnapshot(decoded.snapshot);
+        fromUrl = true;
+        // Clean URL so refresh keeps the state via localStorage but URL stays tidy
+        const url = new URL(window.location.href);
+        url.searchParams.delete("sim");
+        window.history.replaceState({}, "", url.toString());
+        toast.success("Simulação carregada do link compartilhado");
       }
     } catch {
-      /* ignore corrupted state */
+      toast.error("Não foi possível carregar o link da simulação");
+    }
+
+    // 2) Fallback to localStorage
+    if (!fromUrl) {
+      try {
+        const raw = localStorage.getItem("vp_financing_sim_v1");
+        if (raw) {
+          const s = JSON.parse(raw) as {
+            form?: Partial<{
+              typologyId: string; propertyValue: number; downPct: number;
+              downOverride: number | null; termMonths: number; bankId: string;
+              rateInput: string; system: AmortSystem; buyerAge: number;
+              monthlyIncome: number; fgts: number; extraAnnual: number;
+              extraStrategy: "reduce-term" | "reduce-installment";
+            }>;
+            snapshot?: Snapshot | null;
+            simCode?: string;
+            reportEmittedAt?: string;
+          };
+          if (s.form) {
+            if (s.form.typologyId !== undefined) setTypologyId(s.form.typologyId);
+            if (s.form.propertyValue !== undefined) setPropertyValue(s.form.propertyValue);
+            if (s.form.downPct !== undefined) setDownPct(s.form.downPct);
+            if (s.form.downOverride !== undefined) setDownOverride(s.form.downOverride);
+            if (s.form.termMonths !== undefined) setTermMonths(s.form.termMonths);
+            if (s.form.bankId !== undefined) setBankId(s.form.bankId);
+            if (s.form.rateInput !== undefined) setRateInput(s.form.rateInput);
+            if (s.form.system !== undefined) setSystem(s.form.system);
+            if (s.form.buyerAge !== undefined) setBuyerAge(s.form.buyerAge);
+            if (s.form.monthlyIncome !== undefined) setMonthlyIncome(s.form.monthlyIncome);
+            if (s.form.fgts !== undefined) setFgts(s.form.fgts);
+            if (s.form.extraAnnual !== undefined) setExtraAnnual(s.form.extraAnnual);
+            if (s.form.extraStrategy !== undefined) setExtraStrategy(s.form.extraStrategy);
+          }
+          if (s.snapshot) setSnapshot(s.snapshot);
+          if (s.simCode) simCodeRef.current = s.simCode;
+          if (s.reportEmittedAt) setReportEmittedAt(new Date(s.reportEmittedAt));
+        }
+      } catch {
+        /* ignore corrupted state */
+      }
     }
     hydratedRef.current = true;
   }, []);
@@ -872,6 +914,28 @@ export default function FinancingSimulator() {
               stale={stale}
               onRegenerate={handleGenerate}
               onReset={handleReset}
+              onCopyLink={() => {
+                try {
+                  const payload = {
+                    form: {
+                      typologyId, propertyValue, downPct, downOverride, termMonths,
+                      bankId, rateInput, system, buyerAge, monthlyIncome, fgts,
+                      extraAnnual, extraStrategy,
+                    },
+                    snapshot,
+                  };
+                  const json = JSON.stringify(payload);
+                  const b64 = btoa(unescape(encodeURIComponent(json)))
+                    .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+                  const url = `${window.location.origin}${window.location.pathname}?sim=${b64}`;
+                  navigator.clipboard.writeText(url).then(
+                    () => toast.success("Link copiado! Cole no WhatsApp ou onde quiser."),
+                    () => toast.error("Não foi possível copiar o link")
+                  );
+                } catch {
+                  toast.error("Não foi possível gerar o link");
+                }
+              }}
               reportOpen={reportOpen}
               setReportOpen={setReportOpen}
               simCode={simCodeRef.current}
@@ -913,13 +977,14 @@ interface ResultsProps {
   stale: boolean;
   onRegenerate: () => void;
   onReset: () => void;
+  onCopyLink: () => void;
   reportOpen: boolean;
   setReportOpen: (v: boolean) => void;
   simCode: string;
   reportEmittedAt: Date;
 }
 
-function ResultsView({ snap, stale, onRegenerate, onReset, reportOpen, setReportOpen, simCode, reportEmittedAt }: ResultsProps) {
+function ResultsView({ snap, stale, onRegenerate, onReset, onCopyLink, reportOpen, setReportOpen, simCode, reportEmittedAt }: ResultsProps) {
   const {
     propertyValue,
     downPayment,
@@ -1051,7 +1116,11 @@ function ResultsView({ snap, stale, onRegenerate, onReset, reportOpen, setReport
         </div>
       )}
 
-      <div className="flex items-center justify-end">
+      <div className="flex items-center justify-end gap-2">
+        <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={onCopyLink}>
+          <Link2 className="h-3.5 w-3.5" />
+          Copiar link
+        </Button>
         <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={onReset}>
           <RotateCcw className="h-3.5 w-3.5" />
           Refazer
