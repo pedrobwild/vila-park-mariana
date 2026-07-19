@@ -7,9 +7,13 @@ export interface FinancingInput {
   propertyValue: number;
   downPayment: number; // includes FGTS
   termMonths: number; // 12..420
-  annualRate: number; // effective a.a. as percent, e.g. 11.19
+  annualRate: number; // a.a. as percent, e.g. 11.19
+  /** Interpreta annualRate como "efetiva" (default) ou "nominal". */
+  annualRateType?: "efetiva" | "nominal";
   /** Optional buyer age (years) for MIP insurance calculation */
   buyerAgeYears?: number;
+  /** Override direto da taxa MIP mensal (fração do saldo). Se ausente, usa mipRateForAge. */
+  mipMonthlyRate?: number;
   /** DFI insurance monthly rate over property value (fraction). Default 0.00025 (~0,025% a.m.) */
   dfiMonthlyRate?: number;
   /** Fixed monthly admin fee (BRL). Default 25 */
