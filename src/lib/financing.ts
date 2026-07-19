@@ -50,6 +50,9 @@ export const BRL2 = (v: number) =>
   v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 export const PCT = (v: number, digits = 2) =>
   `${(v * 100).toLocaleString("pt-BR", { minimumFractionDigits: digits, maximumFractionDigits: digits })}%`;
+/** Format a percentage value already in percent units (e.g. 11.19 → "11,19%"). */
+export const PCT_PT = (v: number, digits = 2) =>
+  `${v.toLocaleString("pt-BR", { minimumFractionDigits: digits, maximumFractionDigits: digits })}%`;
 
 /** Convert annual effective rate (percent) to monthly effective rate (fraction). */
 export function annualToMonthly(annualPct: number): number {

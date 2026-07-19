@@ -42,6 +42,7 @@ import {
   BRL,
   BRL2,
   PCT,
+  PCT_PT,
   acquisitionCosts,
   checkMCMV,
   incomeFit,
@@ -50,6 +51,10 @@ import {
   simulateWithExtras,
   type AmortSystem,
 } from "@/lib/financing";
+
+/** Enlarged touch target for slider thumbs (WCAG 44x44). */
+const SLIDER_TOUCH =
+  "[&_[role=slider]]:h-5 [&_[role=slider]]:w-5 [&_[role=slider]]:relative [&_[role=slider]]:after:content-[''] [&_[role=slider]]:after:absolute [&_[role=slider]]:after:-inset-3";
 
 /* ---------- helpers ---------- */
 
@@ -61,13 +66,17 @@ const num = (s: string) => {
 };
 const fmtBRL = (v: number) => (v > 0 ? v.toLocaleString("pt-BR") : "");
 
-function InfoHint({ text }: { text: string }) {
+function InfoHint({ text, label }: { text: string; label?: string }) {
   return (
     <TooltipProvider delayDuration={100}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <button type="button" aria-label="Mais informações" className="inline-flex text-muted-foreground hover:text-foreground">
-            <Info className="h-3.5 w-3.5" />
+          <button
+            type="button"
+            aria-label={label ? `Mais informações: ${label}` : "Mais informações"}
+            className="inline-flex text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+          >
+            <Info className="h-3.5 w-3.5" aria-hidden="true" />
           </button>
         </TooltipTrigger>
         <TooltipContent className="max-w-xs text-xs leading-relaxed">{text}</TooltipContent>
@@ -243,7 +252,7 @@ export default function FinancingSimulator() {
 
       <div className="grid lg:grid-cols-5 gap-6">
         {/* ------- Inputs ------- */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-4 lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:pr-1">
           <Card className="border-border/60">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
@@ -287,8 +296,10 @@ export default function FinancingSimulator() {
                   max={3_000_000}
                   step={10_000}
                   onValueChange={(v) => setPropertyValue(v[0])}
+                  className={SLIDER_TOUCH}
                 />
               </div>
+
 
               {/* Down payment */}
               <div className="space-y-2">
@@ -310,7 +321,12 @@ export default function FinancingSimulator() {
                     setDownPct(v[0]);
                     setDownOverride(null);
                   }}
+                  className={SLIDER_TOUCH}
                 />
+                <div className="flex justify-between text-[11px] text-muted-foreground px-0.5">
+                  <span>20% (mín. SFH)</span>
+                  <span>80%</span>
+                </div>
                 <CurrencyInput
                   id="dp"
                   value={downOverride ?? Math.round((propertyValue * downPct) / 100)}
@@ -336,7 +352,12 @@ export default function FinancingSimulator() {
                   max={420}
                   step={12}
                   onValueChange={(v) => setTermMonths(v[0])}
+                  className={SLIDER_TOUCH}
                 />
+                <div className="flex justify-between text-[11px] text-muted-foreground px-0.5">
+                  <span>5 anos (60 meses)</span>
+                  <span>35 anos (420 meses)</span>
+                </div>
               </div>
 
               {/* System */}
@@ -359,7 +380,7 @@ export default function FinancingSimulator() {
                     <Sparkles className="h-4 w-4" /> Você pode se enquadrar no MCMV Faixa 4
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Imóvel até R$ 600 mil + renda familiar até R$ 13 mil dão acesso a taxas de {mcmv.suggestedRateMin.toFixed(1)}% a {mcmv.suggestedRateMax.toFixed(1)}% a.a. (regras 2026).
+                    Imóvel até R$ 600 mil + renda familiar até R$ 13 mil dão acesso a taxas de {PCT_PT(mcmv.suggestedRateMin, 1)} a {PCT_PT(mcmv.suggestedRateMax, 1)} a.a. (regras 2026).
                   </p>
                   <Button variant="outline" size="sm" className="mt-2 h-8" onClick={() => setAnnualRate(10.25)}>
                     Aplicar taxa 10,25% a.a.
@@ -390,7 +411,7 @@ export default function FinancingSimulator() {
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
                         {BANK_PRESETS.map((b) => (
-                          <SelectItem key={b.id} value={b.id}>{b.label} — {b.annualRate.toFixed(2)}% a.a. + TR</SelectItem>
+                          <SelectItem key={b.id} value={b.id}>{b.label} — {PCT_PT(b.annualRate)} a.a. + TR</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -490,13 +511,17 @@ export default function FinancingSimulator() {
           <div className="grid md:grid-cols-2 gap-3">
             <Card className="border-border/60">
               <CardHeader className="pb-2"><CardTitle className="text-base">Análise de renda</CardTitle></CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className="space-y-3">
                 <p className="text-sm">Renda mínima necessária: <span className="font-semibold text-foreground">{BRL(requiredMonthly)}</span> <span className="text-xs text-muted-foreground">(comprometimento máx. 30%)</span></p>
+                <div className="space-y-1.5">
+                  <Label htmlFor="income-inline" className="text-xs">Sua renda familiar (opcional)</Label>
+                  <CurrencyInput id="income-inline" value={monthlyIncome} onChange={setMonthlyIncome} placeholder="15000" />
+                </div>
                 {fit && (
                   <Badge className={
-                    fit === "ok" ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30" :
-                    fit === "tight" ? "bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30" :
-                    "bg-destructive/15 text-destructive border-destructive/30"
+                    fit === "ok" ? "bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border-emerald-600/40" :
+                    fit === "tight" ? "bg-amber-500/15 text-amber-800 dark:text-amber-300 border-amber-600/40" :
+                    "bg-destructive/15 text-destructive border-destructive/40"
                   } variant="outline">
                     {fit === "ok" ? "Cabe no seu orçamento" : fit === "tight" ? "Apertado, próximo do limite" : "Acima do limite bancário"}
                   </Badge>
@@ -534,8 +559,9 @@ export default function FinancingSimulator() {
                     <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => (v / 1000).toFixed(0) + "k"} />
                     <RTooltip formatter={(v: number) => BRL(v)} />
                     <Legend />
-                    <Line type="monotone" dataKey="SAC" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
-                    <Line type="monotone" dataKey="PRICE" stroke="hsl(var(--muted-foreground))" strokeWidth={2} dot={false} />
+                    <Line type="monotone" dataKey="SAC" stroke="hsl(var(--accent))" strokeWidth={2.5} dot={false} />
+                    <Line type="monotone" dataKey="PRICE" stroke="hsl(215 12% 55%)" strokeWidth={2} strokeDasharray="5 4" dot={false} />
+
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent></Card>
@@ -622,7 +648,7 @@ export default function FinancingSimulator() {
                 <li>• Valor do imóvel: <strong className="text-foreground">{BRL(propertyValue)}</strong></li>
                 <li>• Entrada: <strong className="text-foreground">{BRL(downPayment)}</strong> ({((downPayment / propertyValue) * 100).toFixed(0)}%){fgts > 0 && ` — incluindo ${BRL(fgts)} de FGTS`}</li>
                 <li>• Prazo: <strong className="text-foreground">{inputBase.termMonths} meses</strong> · Sistema: <strong className="text-foreground">{system}</strong></li>
-                <li>• Taxa: <strong className="text-foreground">{annualRate.toFixed(2)}% a.a.</strong> · Idade: {buyerAge} anos</li>
+                <li>• Taxa: <strong className="text-foreground">{PCT_PT(annualRate)} a.a.</strong> · Idade: {buyerAge} anos</li>
                 <li>• Seguros: MIP + DFI + tarifa administrativa (R$ 25/mês)</li>
               </ul>
             </section>
@@ -706,15 +732,67 @@ export default function FinancingSimulator() {
                 <TableRow key={row.n}>
                   <TableCell>{row.n}</TableCell>
                   <TableCell className="text-right">{BRL2(row.payment)}</TableCell>
-                  <TableCell className="text-right text-muted-foreground">{BRL2(row.interest)}</TableCell>
+                  <TableCell className="text-right text-foreground/80">{BRL2(row.interest)}</TableCell>
                   <TableCell className="text-right">{BRL2(row.amortization)}</TableCell>
-                  <TableCell className="text-right text-muted-foreground">{BRL2(row.mip + row.dfi + row.admin)}</TableCell>
+                  <TableCell className="text-right text-foreground/80">{BRL2(row.mip + row.dfi + row.admin)}</TableCell>
                   <TableCell className="text-right font-semibold">{BRL2(row.fullPayment)}</TableCell>
                   <TableCell className="text-right">{BRL(row.balance)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
+        </CardContent>
+        <CardContent className="pt-0">
+          <Accordion type="single" collapsible>
+            <AccordionItem value="all" className="border-none">
+              <AccordionTrigger className="py-2 text-sm hover:no-underline">
+                Ver todas as parcelas (por ano)
+              </AccordionTrigger>
+              <AccordionContent>
+                <Accordion type="multiple" className="space-y-1">
+                  {Array.from({ length: Math.ceil(active.schedule.length / 12) }).map((_, yi) => {
+                    const year = yi + 1;
+                    const rows = active.schedule.slice(yi * 12, yi * 12 + 12);
+                    const totalYear = rows.reduce((a, r) => a + r.fullPayment, 0);
+                    return (
+                      <AccordionItem key={year} value={`y${year}`} className="border border-border/50 rounded-md">
+                        <AccordionTrigger className="px-3 py-2 text-sm hover:no-underline">
+                          <span className="flex-1 text-left">Ano {year}</span>
+                          <span className="text-xs text-muted-foreground mr-2">{BRL(totalYear)}</span>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-2 overflow-x-auto">
+                          <Table>
+                            <TableHeader><TableRow>
+                              <TableHead>Nº</TableHead>
+                              <TableHead className="text-right">Parcela</TableHead>
+                              <TableHead className="text-right">Juros</TableHead>
+                              <TableHead className="text-right">Amortização</TableHead>
+                              <TableHead className="text-right">Seg.+tarifa</TableHead>
+                              <TableHead className="text-right">Total</TableHead>
+                              <TableHead className="text-right">Saldo</TableHead>
+                            </TableRow></TableHeader>
+                            <TableBody>
+                              {rows.map((row) => (
+                                <TableRow key={row.n}>
+                                  <TableCell>{row.n}</TableCell>
+                                  <TableCell className="text-right">{BRL2(row.payment)}</TableCell>
+                                  <TableCell className="text-right text-foreground/80">{BRL2(row.interest)}</TableCell>
+                                  <TableCell className="text-right">{BRL2(row.amortization)}</TableCell>
+                                  <TableCell className="text-right text-foreground/80">{BRL2(row.mip + row.dfi + row.admin)}</TableCell>
+                                  <TableCell className="text-right font-semibold">{BRL2(row.fullPayment)}</TableCell>
+                                  <TableCell className="text-right">{BRL(row.balance)}</TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </AccordionContent>
+                      </AccordionItem>
+                    );
+                  })}
+                </Accordion>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </CardContent>
       </Card>
 
@@ -724,8 +802,11 @@ export default function FinancingSimulator() {
           body * { visibility: hidden; }
           .print-report, .print-report * { visibility: visible; }
           .print-report { position: absolute; left: 0; top: 0; width: 100%; padding: 24px; }
+          .print-report .max-h-80,
+          .print-report [class*="max-h-"] { max-height: none !important; overflow: visible !important; }
         }
       `}</style>
+
     </section>
   );
 }
@@ -734,11 +815,17 @@ export default function FinancingSimulator() {
 
 function Kpi({ label, value, hint, highlight }: { label: string; value: string; hint?: string; highlight?: boolean }) {
   return (
-    <div className={`rounded-lg p-3 ${highlight ? "bg-primary/10 border border-primary/30" : "bg-muted/40"}`}>
+    <div
+      className={`rounded-lg p-3 ${
+        highlight
+          ? "bg-card border border-accent/40 border-l-4 border-l-accent shadow-sm"
+          : "bg-card border border-border/60"
+      }`}
+    >
       <p className="text-[11px] text-muted-foreground uppercase tracking-wide flex items-center gap-1">
-        {label} {hint && <InfoHint text={hint} />}
+        {label} {hint && <InfoHint text={hint} label={label} />}
       </p>
-      <p className={`font-display font-bold mt-1 ${highlight ? "text-primary text-lg" : "text-foreground text-base"}`}>{value}</p>
+      <p className={`font-display font-bold mt-1 ${highlight ? "text-accent text-lg" : "text-foreground text-base"}`}>{value}</p>
     </div>
   );
 }
