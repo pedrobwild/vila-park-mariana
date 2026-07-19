@@ -819,13 +819,14 @@ interface ResultsProps {
   snap: Snapshot;
   stale: boolean;
   onRegenerate: () => void;
+  onReset: () => void;
   reportOpen: boolean;
   setReportOpen: (v: boolean) => void;
   simCode: string;
   reportEmittedAt: Date;
 }
 
-function ResultsView({ snap, stale, onRegenerate, reportOpen, setReportOpen, simCode, reportEmittedAt }: ResultsProps) {
+function ResultsView({ snap, stale, onRegenerate, onReset, reportOpen, setReportOpen, simCode, reportEmittedAt }: ResultsProps) {
   const {
     propertyValue,
     downPayment,
