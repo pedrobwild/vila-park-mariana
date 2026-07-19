@@ -265,8 +265,8 @@ export interface ExtraAmortResult {
 export function simulateWithExtras(inp: ExtraAmortInput): ExtraAmortResult {
   const baseline = simulate(inp.system, inp.base);
   const { base, extras, strategy, system } = inp;
-  const i = annualToMonthly(base.annualRate);
-  const mipRate = mipRateForAge(base.buyerAgeYears ?? 35);
+  const i = monthlyRateFromAnnual(base.annualRate, base.annualRateType ?? "efetiva");
+  const mipRate = base.mipMonthlyRate ?? mipRateForAge(base.buyerAgeYears ?? 35);
   const dfi = base.propertyValue * (base.dfiMonthlyRate ?? 0.00025);
   const admin = base.adminFee ?? 25;
 
