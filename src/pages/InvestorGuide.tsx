@@ -366,53 +366,11 @@ export default function InvestorGuide() {
           </div>
         </section>
 
-        {/* ENTORNO */}
+        {/* ENTORNO — shared */}
         <section id="nearby" className="scroll-mt-32">
-          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
-            <SectionLabel>{t("investorGuide.nearby.eyebrow")}</SectionLabel>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3 max-w-3xl">
-              {t("investorGuide.nearby.title")}
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mb-8">{t("investorGuide.nearby.subtitle")}</p>
-
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {[
-                { icon: Train, title: t("investorGuide.nearby.groups.mobility"), items: POIS.filter((p) => p.category === "mobility") },
-                { icon: GraduationCap, title: t("investorGuide.nearby.groups.edu"), items: POIS.filter((p) => p.category === "education") },
-                { icon: Trees, title: t("investorGuide.nearby.groups.parks"), items: POIS.filter((p) => p.category === "leisure").slice(0, 4) },
-                { icon: ShoppingBag, title: t("investorGuide.nearby.groups.services"), items: POIS.filter((p) => p.category === "services").slice(0, 5) },
-                { icon: Utensils, title: t("investorGuide.nearby.groups.gastronomy"), items: POIS.filter((p) => p.category === "gastronomy") },
-                {
-                  icon: Briefcase,
-                  title: t("investorGuide.nearby.groups.jobs"),
-                  items: [
-                    { name: t("investorGuide.nearby.jobsPaulista"), distance: t("investorGuide.nearby.jobsPaulistaDist") },
-                    { name: t("investorGuide.nearby.jobsCorredor"), distance: t("investorGuide.nearby.jobsCorredorDist") },
-                  ],
-                },
-              ].map((group) => (
-                <Card key={group.title} className="card-elevated border-border/60 h-full">
-                  <CardContent className="p-5">
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="h-9 w-9 rounded-lg bg-accent/10 flex items-center justify-center">
-                        <group.icon className="h-4 w-4 text-accent" />
-                      </div>
-                      <h3 className="font-semibold text-foreground">{group.title}</h3>
-                    </div>
-                    <ul className="space-y-2">
-                      {group.items.map((item) => (
-                        <li key={item.name} className="flex items-start justify-between gap-3 text-sm border-b border-border/40 pb-2 last:border-0 last:pb-0">
-                          <span className="text-foreground">{item.name}</span>
-                          <span className="text-muted-foreground shrink-0">{item.distance}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            <div className="mt-8 rounded-xl border border-accent/20 bg-accent/5 p-5 flex items-start gap-3">
+          <NeighborhoodSection variant="full" />
+          <div className="max-w-7xl mx-auto px-4 md:px-6 -mt-6 pb-16">
+            <div className="rounded-xl border border-accent/20 bg-accent/5 p-5 flex items-start gap-3">
               <Compass className="mt-0.5 h-5 w-5 text-accent shrink-0" />
               <p className="text-sm text-foreground leading-relaxed">{t("investorGuide.nearby.note")}</p>
             </div>
