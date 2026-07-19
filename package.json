@@ -14,7 +14,9 @@
     "bench:merge-weekly": "tsx scripts/bench-merge-weekly.ts",
     "i18n:report": "tsx scripts/i18n-parity-report.ts",
     "i18n:check": "tsx scripts/i18n-parity-report.ts --strict",
-    "i18n:status": "tsx scripts/i18n-status.ts"
+    "i18n:status": "tsx scripts/i18n-status.ts",
+    "i18n:orphans": "tsx scripts/i18n-orphans.ts",
+    "i18n:orphans:check": "tsx scripts/i18n-orphans.ts --strict"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
