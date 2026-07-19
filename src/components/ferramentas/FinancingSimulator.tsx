@@ -914,6 +914,28 @@ export default function FinancingSimulator() {
               stale={stale}
               onRegenerate={handleGenerate}
               onReset={handleReset}
+              onCopyLink={() => {
+                try {
+                  const payload = {
+                    form: {
+                      typologyId, propertyValue, downPct, downOverride, termMonths,
+                      bankId, rateInput, system, buyerAge, monthlyIncome, fgts,
+                      extraAnnual, extraStrategy,
+                    },
+                    snapshot,
+                  };
+                  const json = JSON.stringify(payload);
+                  const b64 = btoa(unescape(encodeURIComponent(json)))
+                    .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+                  const url = `${window.location.origin}${window.location.pathname}?sim=${b64}`;
+                  navigator.clipboard.writeText(url).then(
+                    () => toast.success("Link copiado! Cole no WhatsApp ou onde quiser."),
+                    () => toast.error("Não foi possível copiar o link")
+                  );
+                } catch {
+                  toast.error("Não foi possível gerar o link");
+                }
+              }}
               reportOpen={reportOpen}
               setReportOpen={setReportOpen}
               simCode={simCodeRef.current}
