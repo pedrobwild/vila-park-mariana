@@ -507,7 +507,7 @@ export default function FinancingSimulator() {
   };
 
   return (
-    <section id="simulator-form" className="scroll-mt-24 py-12 md:py-16">
+    <section id="simulator-form" ref={formRef} className="scroll-mt-24 py-12 md:py-16">
       <header className="mb-6">
         <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2">
           <Calculator className="h-6 w-6 text-primary" />
