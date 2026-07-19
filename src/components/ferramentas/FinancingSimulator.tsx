@@ -500,10 +500,15 @@ export default function FinancingSimulator() {
   const handleReset = () => {
     setSnapshot(null);
     setErrors({});
-    const formEl = document.getElementById("simulator-form");
-    if (formEl) {
-      formEl.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const handleStart = () => {
+    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setTimeout(() => {
+      const el = document.getElementById("typology");
+      if (el) el.focus();
+    }, 400);
   };
 
   return (
