@@ -143,14 +143,14 @@ export default function Oportunidades() {
         )}
 
         {loading ? (
-          <div className="text-center py-24 text-muted-foreground">Carregando…</div>
+          <div className="text-center py-24 text-muted-foreground">Carregando unidades…</div>
         ) : units.length === 0 ? (
           <div className="text-center py-24 rounded-xl border border-dashed border-border bg-muted/20 space-y-5">
             <Building2 className="h-10 w-10 mx-auto text-muted-foreground" strokeWidth={1.5} />
             <div className="space-y-2">
               <p className="font-display text-2xl">Novas oportunidades em breve</p>
               <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                Ainda não há unidades publicadas. Fale com o time Vila Park para conhecer disponibilidades e reservas antecipadas.
+                As unidades desta fase ainda não foram publicadas. Fale com um especialista para conhecer disponibilidade e reservas antecipadas.
               </p>
             </div>
             <a
