@@ -59,10 +59,12 @@ export default function AppNavbar() {
             <Button variant={pathname === "/guia-investidor" ? "secondary" : "ghost"} size="sm" className="h-7">{t("nav.guideInvestor")}</Button>
           </Link>
           <LanguageSwitcher variant="compact" className="ml-1" />
+          <AuthMenu />
         </div>
 
         <div className="flex items-center gap-1 sm:hidden">
           <LanguageSwitcher variant="icon" />
+          <AuthMenu />
           {!(isHome && isMobile) && (
             <Button
               variant="ghost"
