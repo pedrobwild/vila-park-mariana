@@ -359,7 +359,7 @@ export default function FinancingSimulator() {
                   <Label htmlFor="financed" className="flex items-center gap-1.5">
                     <RefreshCw className="h-3 w-3 text-primary" aria-hidden="true" />
                     Valor financiado
-                    <InfoHint text="Calculado automaticamente: valor do imóvel menos entrada (inclui FGTS, quando informado). Atualiza em tempo real ao mudar o imóvel ou a entrada." />
+                    <InfoHint text="Valor financiado = valor do imóvel − entrada. O FGTS, quando informado, compõe a entrada e reduz o valor financiado." />
                   </Label>
                   <span className="text-xs text-muted-foreground">automático</span>
                 </div>
