@@ -120,7 +120,8 @@ export default function AppNavbar() {
               <TrendingUp className="h-4 w-4 shrink-0" />
               {t("nav.guideInvestor")}
             </Link>
-            <div className="pt-3 mt-3 border-t border-border/40">
+            <div className="pt-3 mt-3 border-t border-border/40 space-y-2">
+              <AuthMenu variant="mobile" onNavigate={() => setMobileOpen(false)} />
               <LanguageSwitcher variant="full" className="w-full justify-start" />
             </div>
           </nav>
