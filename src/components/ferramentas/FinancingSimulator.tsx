@@ -644,7 +644,7 @@ export default function FinancingSimulator() {
                 <li>• Valor do imóvel: <strong className="text-foreground">{BRL(propertyValue)}</strong></li>
                 <li>• Entrada: <strong className="text-foreground">{BRL(downPayment)}</strong> ({((downPayment / propertyValue) * 100).toFixed(0)}%){fgts > 0 && ` — incluindo ${BRL(fgts)} de FGTS`}</li>
                 <li>• Prazo: <strong className="text-foreground">{inputBase.termMonths} meses</strong> · Sistema: <strong className="text-foreground">{system}</strong></li>
-                <li>• Taxa: <strong className="text-foreground">{annualRate.toFixed(2)}% a.a.</strong> · Idade: {buyerAge} anos</li>
+                <li>• Taxa: <strong className="text-foreground">{PCT_PT(annualRate)} a.a.</strong> · Idade: {buyerAge} anos</li>
                 <li>• Seguros: MIP + DFI + tarifa administrativa (R$ 25/mês)</li>
               </ul>
             </section>
