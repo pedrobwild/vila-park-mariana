@@ -226,12 +226,12 @@ interface Snapshot {
 /* ---------- main ---------- */
 
 export default function FinancingSimulator() {
-  // ---- Form state ----
+  // ---- Form state (empty by default) ----
   const [typologyId, setTypologyId] = useState<string>("custom");
   const [propertyValue, setPropertyValue] = useState<number>(0);
-  const [downPct, setDownPct] = useState<number>(20);
+  const [downPct, setDownPct] = useState<number>(0);
   const [downOverride, setDownOverride] = useState<number | null>(null);
-  const [termMonths, setTermMonths] = useState<number>(360);
+  const [termMonths, setTermMonths] = useState<number>(0);
   const [financedPulse, setFinancedPulse] = useState(false);
 
   const [bankId, setBankId] = useState<string>("");
