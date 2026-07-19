@@ -558,14 +558,14 @@ export default function UrbanFlexInvestorGuide() {
                       Faça sua reserva no Vila Park
                     </h2>
                     <p className="mt-4 text-lg text-muted-foreground max-w-2xl leading-relaxed">
-                      Preencha o formulário ao lado ou fale com a equipe comercial para tirar dúvidas, conhecer as
+                      Preencha o formulário ao lado ou fale com um especialista para tirar dúvidas, conhecer as
                       tipologias disponíveis e dar o próximo passo.
                     </p>
 
                     <div className="mt-8 flex flex-col sm:flex-row gap-3">
                       <Button size="lg" className="min-h-[48px] bg-[hsl(var(--accent))] hover:bg-[hsl(var(--accent-strong))] text-white" onClick={() => window.open(whatsappLink, "_blank")}>
                         <MessageCircle className="mr-2 h-4 w-4" />
-                        Falar com a equipe comercial
+                        Falar com especialista
                       </Button>
                       <Button size="lg" variant="outline" className="min-h-[48px]" onClick={() => window.location.href = "tel:+5511961007687"}>
                         <Phone className="mr-2 h-4 w-4" />
