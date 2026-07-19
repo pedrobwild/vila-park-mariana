@@ -489,38 +489,9 @@ export default function UrbanFlexInvestorGuide() {
           </div>
         </section>
 
-        {/* ═══════ LOCALIZAÇÃO ═══════ */}
+        {/* ═══════ LOCALIZAÇÃO — shared ═══════ */}
         <section id="localizacao" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
-          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
-            <SectionLabel>Localização</SectionLabel>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">Tudo perto, do metrô ao Ibirapuera</h2>
-            <p className="text-muted-foreground max-w-2xl mb-8">
-              A Vila Mariana reúne mobilidade, lazer, educação, serviços e gastronomia a poucos minutos de casa.
-            </p>
-
-            <div className="grid gap-6 md:grid-cols-2">
-              {nearbyByCategory.map((group) => (
-                <Card key={group.category} className="card-elevated border-border/60">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center gap-2">
-                      <group.icon className="h-5 w-5 text-primary" />
-                      <CardTitle className="text-lg">{group.category}</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <ul className="space-y-2">
-                      {group.points.map((point) => (
-                        <li key={point.name} className="flex items-center justify-between gap-3 text-sm border-b border-border/40 last:border-b-0 py-1.5">
-                          <span className="text-foreground">{point.name}</span>
-                          <span className="text-muted-foreground whitespace-nowrap">{point.distance}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
+          <NeighborhoodSection variant="full" />
         </section>
 
         {/* ═══════ OBRA ═══════ */}
@@ -560,12 +531,7 @@ export default function UrbanFlexInvestorGuide() {
           </div>
         </section>
 
-        {/* Inteligência de mercado */}
-        <section className="scroll-mt-32 border-t border-border/40 bg-muted/25">
-          <div className="max-w-7xl mx-auto px-4 md:px-6">
-            <MarketIntelSection />
-          </div>
-        </section>
+        {/* Inteligência de mercado removida — pertence ao Guia do Investidor */}
 
         {/* ═══════ ETAPAS ATÉ A RESERVA ═══════ */}
         <section id="etapas" className="scroll-mt-32">
