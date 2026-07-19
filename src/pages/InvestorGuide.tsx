@@ -498,15 +498,26 @@ export default function InvestorGuide() {
           </div>
         </section>
 
-        {/* MARKET DATA */}
-        <section id="marketData" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
-          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
-            <SectionLabel>{t("investorGuide.marketData.eyebrow")}</SectionLabel>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3 max-w-3xl">
-              {t("investorGuide.marketData.title")}
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mb-8">{t("investorGuide.marketData.subtitle")}</p>
-            <MarketDataSection />
+        {/* MERCADO — consolida marketData + market numa seção única */}
+        <section id="mercado" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20 space-y-14">
+            <div>
+              <SectionLabel>{t("investorGuide.sectionLabels.mercado")}</SectionLabel>
+              <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3 max-w-3xl">
+                {t("investorGuide.mercado.title")}
+              </h2>
+              <p className="text-muted-foreground max-w-2xl">{t("investorGuide.mercado.subtitle")}</p>
+            </div>
+
+            {/* anchor legacy: #marketData */}
+            <div id="marketData" className="scroll-mt-32">
+              <MarketDataSection />
+            </div>
+
+            {/* anchor legacy: #market */}
+            <div id="market" className="scroll-mt-32">
+              <MarketIntelSection />
+            </div>
           </div>
         </section>
 
