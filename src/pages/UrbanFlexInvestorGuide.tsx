@@ -355,7 +355,7 @@ export default function UrbanFlexInvestorGuide() {
                   <CardContent className="space-y-5">
                     {[
                       "Localização na Vila Mariana, a 900m do metrô, com fácil acesso a educação, saúde, comércio e lazer.",
-                      "Preço acessível para um bairro consolidado e bem servido de infraestrutura urbana.",
+                      "Custo de entrada inteligente em um bairro consolidado e bem servido de infraestrutura urbana.",
                       "Áreas comuns entregues decoradas e mobiliadas, no térreo e no 5º pavimento, prontas para uso.",
                       "Arquitetura contemporânea e infraestrutura preparada para ar-condicionado nas unidades.",
                     ].map((item) => (
@@ -470,7 +470,7 @@ export default function UrbanFlexInvestorGuide() {
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {[
-                { icon: Store, title: "Preço acessível", text: "Uma oportunidade de morar na Vila Mariana com um investimento inicial mais acessível." },
+                { icon: Store, title: "Custo de entrada inteligente", text: "Uma oportunidade de morar na Vila Mariana com investimento inicial otimizado para o bairro." },
                 { icon: TrainFront, title: "Mobilidade", text: "A 900 metros da estação de metrô Vila Mariana, facilitando o deslocamento pela cidade." },
                 { icon: Sofa, title: "Lazer decorado e equipado", text: "Áreas comuns entregues decoradas e mobiliadas, no térreo e no 5º pavimento." },
                 { icon: Building2, title: "Arquitetura contemporânea", text: "Projeto com identidade visual moderna, pensado para o morador atual." },
