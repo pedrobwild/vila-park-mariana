@@ -730,6 +730,7 @@ export default function InvestorGuide() {
           </div>
         </section>
       </main>
+      <SiteFooter />
     </div>
   );
 }
