@@ -30,8 +30,8 @@
     "headlineMobileB": "Torre única, apenas 33 apartamentos.",
     "headlineDesktopA": "Viva a 900 m do metrô Vila Mariana.",
     "headlineDesktopB": "Torre única, apenas 33 apartamentos.",
-    "subMobile": "Torre única com 10 pavimentos e áreas comuns entregues decoradas e mobiliadas.",
-    "subDesktop": "Torre única com 10 pavimentos e 33 apartamentos. Áreas comuns entregues decoradas e mobiliadas no térreo e no 5º pavimento, a 900 m do metrô Vila Mariana.",
+    "subMobile": "Garden, terraço ou studio — áreas comuns entregues decoradas e mobiliadas.",
+    "subDesktop": "Garden privativo, terraço descoberto ou 1 dorm./studio — com áreas comuns entregues decoradas e mobiliadas no térreo e no 5º pavimento.",
     "ctaPrimary": "Ver plantas e tipologias",
     "trust": {
       "floors": "Pavimentos",
@@ -42,7 +42,7 @@
   },
   "why": {
     "eyebrow": "Por que o Vila Park",
-    "title": "Localização, mobilidade e preço acessível para morar bem em Vila Mariana.",
+    "title": "Localização, mobilidade e áreas comuns prontas para viver bem na Vila Mariana.",
     "items": {
       "location": {
         "title": "A 900 m do metrô",
@@ -105,17 +105,17 @@
   },
   "reservation": {
     "eyebrow": "Reserva",
-    "title": "Preencha e garanta sua reserva.",
-    "subtitle": "Nosso time comercial entra em contato para confirmar disponibilidade e enviar o material completo.",
-    "name": "Nome",
+    "title": "Reserve sua unidade.",
+    "subtitle": "O time Vila Park entra em contato para confirmar disponibilidade e enviar o material completo.",
+    "name": "Nome completo",
     "email": "E-mail",
-    "phone": "Telefone",
+    "phone": "Telefone (WhatsApp)",
     "message": "Mensagem",
     "messagePlaceholder": "Conte um pouco do que procura (tipologia, prazo, forma de pagamento)…",
-    "submit": "Enviar reserva",
+    "submit": "Solicitar reserva",
     "sending": "Enviando…",
-    "success": "Reserva recebida — nosso time entra em contato em breve.",
-    "error": "Não foi possível enviar. Tente novamente ou fale por WhatsApp.",
+    "success": "Tudo certo — abrimos o WhatsApp para você concluir com o time Vila Park.",
+    "error": "Não foi possível enviar. Tente de novo ou fale direto no WhatsApp.",
     "whatsapp": "Falar no WhatsApp"
   },
   "guide": {
@@ -153,7 +153,7 @@
   },
   "finalCta": {
     "title": "Reserve a sua unidade no Vila Park.",
-    "subtitle": "Fale com o time comercial e receba plantas, condições e o memorial descritivo completo.",
+    "subtitle": "Fale com o time Vila Park e receba plantas, condições e o memorial descritivo completo.",
     "talk": "Falar no WhatsApp",
     "viewPlans": "Ver plantas"
   },
@@ -187,6 +187,7 @@
   },
   "notFound": {
     "title": "Página não encontrada",
+    "hint": "O endereço pode ter mudado ou não existe mais.",
     "back": "Voltar para o início"
   },
   "market": {
@@ -252,12 +253,12 @@
     },
     "hero": {
       "badge": "Guia do Investidor",
-      "titleA": "Vila Park · Um ativo residencial",
+      "titleA": "Vila Park. Um ativo raro",
       "titleB": "na Vila Mariana.",
       "subtitle": "Um guia com informações práticas para quem avalia o Vila Park como opção de investimento residencial na Vila Mariana.",
       "ctaReserve": "Fazer minha reserva",
       "ctaTalk": "Falar com a equipe",
-      "ctaDiag": "Fazer diagnóstico do investidor",
+      "ctaDiag": "Descobrir meu perfil de investidor",
       "kpi": {
         "metro": "Do metrô Vila Mariana",
         "address": "Endereço · Vila Mariana",
@@ -300,7 +301,7 @@
     },
     "nearby": {
       "eyebrow": "Entorno estratégico",
-      "title": "A Vila Mariana joga a favor da sua locação.",
+      "title": "A Vila Mariana trabalha a favor da sua locação.",
       "subtitle": "Bairro consolidado, com metrô, universidades, polo de empregos e lazer no raio de caminhada — fatores que sustentam a demanda por moradia.",
       "groups": {
         "mobility": "Mobilidade",
@@ -365,7 +366,7 @@
     },
     "avaliar": {
       "eyebrow": "Como avaliar o ativo",
-      "title": "Checklist do investidor antes de bater o martelo.",
+      "title": "Checklist do investidor antes de decidir.",
       "subtitle": "Uma boa unidade é escolhida por critérios objetivos. Use este checklist na visita ao stand e na análise da tabela.",
       "items": [
         "Distância real até metrô, faculdades e polos de emprego (não em linha reta).",
@@ -477,8 +478,8 @@
     "ctaFinal": {
       "badge": "Vila Park · Vila Mariana",
       "title": "Pronto para conversar sobre a sua unidade?",
-      "subtitle": "Fale com o time de vendas para receber tabela, disponibilidade por andar e condições de pagamento atualizadas.",
-      "wa": "Falar no WhatsApp",
+      "subtitle": "Fale com o time Vila Park para receber tabela, disponibilidade por andar e condições de pagamento atualizadas.",
+      "wa": "Falar com especialista",
       "backSim": "Voltar ao simulador"
     },
     "marketData": {

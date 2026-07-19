@@ -285,7 +285,7 @@ export default function UrbanFlexInvestorGuide() {
                   </Button>
                   <Button size="lg" variant="outline" className="min-h-[46px]" onClick={() => window.open(whatsappLink, "_blank")}>
                     <MessageCircle className="mr-2 h-4 w-4" />
-                    Falar com a equipe
+                    Falar com especialista
                   </Button>
                 </div>
 
@@ -558,14 +558,14 @@ export default function UrbanFlexInvestorGuide() {
                       Faça sua reserva no Vila Park
                     </h2>
                     <p className="mt-4 text-lg text-muted-foreground max-w-2xl leading-relaxed">
-                      Preencha o formulário ao lado ou fale com a equipe comercial para tirar dúvidas, conhecer as
+                      Preencha o formulário ao lado ou fale com um especialista para tirar dúvidas, conhecer as
                       tipologias disponíveis e dar o próximo passo.
                     </p>
 
                     <div className="mt-8 flex flex-col sm:flex-row gap-3">
                       <Button size="lg" className="min-h-[48px] bg-[hsl(var(--accent))] hover:bg-[hsl(var(--accent-strong))] text-white" onClick={() => window.open(whatsappLink, "_blank")}>
                         <MessageCircle className="mr-2 h-4 w-4" />
-                        Falar com a equipe comercial
+                        Falar com especialista
                       </Button>
                       <Button size="lg" variant="outline" className="min-h-[48px]" onClick={() => window.location.href = "tel:+5511961007687"}>
                         <Phone className="mr-2 h-4 w-4" />
@@ -578,34 +578,50 @@ export default function UrbanFlexInvestorGuide() {
                     <CardContent className="p-5">
                       <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground mb-4">Formulário de reserva</p>
                       <form className="space-y-3" onSubmit={handleSubmit}>
-                        <Input
-                          placeholder="Nome"
-                          value={formName}
-                          onChange={(e) => setFormName(e.target.value)}
-                          required
-                        />
-                        <Input
-                          type="email"
-                          placeholder="E-mail"
-                          value={formEmail}
-                          onChange={(e) => setFormEmail(e.target.value)}
-                          required
-                        />
-                        <Input
-                          type="tel"
-                          placeholder="Telefone"
-                          value={formPhone}
-                          onChange={(e) => setFormPhone(e.target.value)}
-                          required
-                        />
-                        <Textarea
-                          placeholder="Mensagem"
-                          value={formMessage}
-                          onChange={(e) => setFormMessage(e.target.value)}
-                          rows={4}
-                        />
+                        <div className="space-y-1.5">
+                          <label htmlFor="uf-name" className="text-sm font-medium text-foreground">Nome completo</label>
+                          <Input
+                            id="uf-name"
+                            placeholder="Como devemos te chamar"
+                            value={formName}
+                            onChange={(e) => setFormName(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label htmlFor="uf-email" className="text-sm font-medium text-foreground">E-mail</label>
+                          <Input
+                            id="uf-email"
+                            type="email"
+                            placeholder="voce@email.com"
+                            value={formEmail}
+                            onChange={(e) => setFormEmail(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label htmlFor="uf-phone" className="text-sm font-medium text-foreground">Telefone (WhatsApp)</label>
+                          <Input
+                            id="uf-phone"
+                            type="tel"
+                            placeholder="(11) 90000-0000"
+                            value={formPhone}
+                            onChange={(e) => setFormPhone(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label htmlFor="uf-message" className="text-sm font-medium text-foreground">Mensagem</label>
+                          <Textarea
+                            id="uf-message"
+                            placeholder="Conte um pouco do que procura (tipologia, prazo, forma de pagamento)…"
+                            value={formMessage}
+                            onChange={(e) => setFormMessage(e.target.value)}
+                            rows={4}
+                          />
+                        </div>
                         <Button type="submit" className="w-full min-h-[46px] bg-[hsl(var(--accent))] hover:bg-[hsl(var(--accent-strong))] text-white">
-                          Enviar
+                          Enviar pedido de reserva
                         </Button>
                       </form>
                     </CardContent>

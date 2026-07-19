@@ -10,8 +10,8 @@ import { WHATSAPP_PHONE } from "@/data/surroundings";
 
 const schema = z.object({
   name: z.string().trim().min(2, "Informe seu nome").max(100),
-  email: z.string().trim().email("E-mail inválido").max(255),
-  phone: z.string().trim().min(8, "Informe um telefone válido").max(30),
+  email: z.string().trim().email("E-mail inválido — confira o endereço digitado.").max(255),
+  phone: z.string().trim().min(8, "Informe um telefone com DDD").max(30),
   message: z.string().trim().max(1000).optional(),
 });
 

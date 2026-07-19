@@ -30,8 +30,8 @@
     "headlineMobileB": "A single tower, only 33 apartments.",
     "headlineDesktopA": "Live 900 m from Vila Mariana subway.",
     "headlineDesktopB": "A single tower, only 33 apartments.",
-    "subMobile": "Single tower, 10 floors, with common areas delivered decorated and furnished.",
-    "subDesktop": "Single tower with 10 floors and 33 apartments. Common areas delivered decorated and furnished on the ground and 5th floors, 900 m from Vila Mariana subway.",
+    "subMobile": "Garden, terrace or studio — common areas delivered decorated and furnished.",
+    "subDesktop": "Private garden, open terrace or 1-bedroom/studio — with common areas delivered decorated and furnished on the ground and 5th floors.",
     "ctaPrimary": "See floor plans and typologies",
     "trust": {
       "floors": "Floors",
@@ -42,7 +42,7 @@
   },
   "why": {
     "eyebrow": "Why Vila Park",
-    "title": "Location, mobility and accessible pricing to live well in Vila Mariana.",
+    "title": "Location, mobility and ready-to-use amenities for living well in Vila Mariana.",
     "items": {
       "location": {
         "title": "900 m from the subway",
@@ -105,17 +105,17 @@
   },
   "reservation": {
     "eyebrow": "Reservation",
-    "title": "Fill in and secure your reservation.",
-    "subtitle": "Our sales team will confirm availability and send you the full material.",
-    "name": "Name",
+    "title": "Reserve your unit.",
+    "subtitle": "The Vila Park team will contact you to confirm availability and send the full material.",
+    "name": "Full name",
     "email": "Email",
-    "phone": "Phone",
+    "phone": "Phone (WhatsApp)",
     "message": "Message",
     "messagePlaceholder": "Tell us a bit of what you're looking for (typology, timing, payment)…",
-    "submit": "Submit reservation",
+    "submit": "Request reservation",
     "sending": "Sending…",
-    "success": "Reservation received — our team will contact you shortly.",
-    "error": "Couldn't send. Please try again or reach us on WhatsApp.",
+    "success": "All set — we've opened WhatsApp so you can finish with the Vila Park team.",
+    "error": "Couldn't send. Try again or reach us directly on WhatsApp.",
     "whatsapp": "Chat on WhatsApp"
   },
   "guide": {
@@ -153,7 +153,7 @@
   },
   "finalCta": {
     "title": "Reserve your unit at Vila Park.",
-    "subtitle": "Talk to our team and receive floor plans, conditions and the full descriptive memorial.",
+    "subtitle": "Talk to the Vila Park team and receive floor plans, conditions and the full descriptive memorial.",
     "talk": "Chat on WhatsApp",
     "viewPlans": "View floor plans"
   },
@@ -187,6 +187,7 @@
   },
   "notFound": {
     "title": "Page not found",
+    "hint": "This address may have changed or no longer exists.",
     "back": "Return to home"
   },
   "market": {
@@ -252,12 +253,12 @@
     },
     "hero": {
       "badge": "Investor Guide",
-      "titleA": "Vila Park · A residential asset",
+      "titleA": "Vila Park. A rare asset",
       "titleB": "in Vila Mariana.",
       "subtitle": "A guide with practical information for those evaluating Vila Park as a residential investment option in Vila Mariana.",
       "ctaReserve": "Make my reservation",
       "ctaTalk": "Talk to the team",
-      "ctaDiag": "Take the investor diagnostic",
+      "ctaDiag": "Discover my investor profile",
       "kpi": {
         "metro": "From Vila Mariana subway",
         "address": "Address · Vila Mariana",
@@ -365,7 +366,7 @@
     },
     "avaliar": {
       "eyebrow": "How to evaluate the asset",
-      "title": "Investor checklist before making the call.",
+      "title": "Investor checklist before deciding.",
       "subtitle": "A good unit is chosen by objective criteria. Use this checklist at the sales stand and when analyzing the price sheet.",
       "items": [
         "Actual walking distance to subway, universities and employment hubs (not straight line).",
@@ -477,8 +478,8 @@
     "ctaFinal": {
       "badge": "Vila Park · Vila Mariana",
       "title": "Ready to talk about your unit?",
-      "subtitle": "Talk to the sales team for the price sheet, per-floor availability and updated payment conditions.",
-      "wa": "Chat on WhatsApp",
+      "subtitle": "Talk to the Vila Park team for the price sheet, per-floor availability and updated payment conditions.",
+      "wa": "Talk to a specialist",
       "backSim": "Back to simulator"
     },
     "marketData": {
