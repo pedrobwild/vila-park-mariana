@@ -7,9 +7,13 @@ export interface FinancingInput {
   propertyValue: number;
   downPayment: number; // includes FGTS
   termMonths: number; // 12..420
-  annualRate: number; // effective a.a. as percent, e.g. 11.19
+  annualRate: number; // a.a. as percent, e.g. 11.19
+  /** Interpreta annualRate como "efetiva" (default) ou "nominal". */
+  annualRateType?: "efetiva" | "nominal";
   /** Optional buyer age (years) for MIP insurance calculation */
   buyerAgeYears?: number;
+  /** Override direto da taxa MIP mensal (fração do saldo). Se ausente, usa mipRateForAge. */
+  mipMonthlyRate?: number;
   /** DFI insurance monthly rate over property value (fraction). Default 0.00025 (~0,025% a.m.) */
   dfiMonthlyRate?: number;
   /** Fixed monthly admin fee (BRL). Default 25 */
@@ -62,6 +66,27 @@ export function annualToMonthly(annualPct: number): number {
 /** Convert monthly effective rate (fraction) to annual (fraction). */
 export function monthlyToAnnual(monthly: number): number {
   return Math.pow(1 + monthly, 12) - 1;
+}
+
+/** Nominal a.a. (%) → mensal (fração). Regra brasileira: divide por 12. */
+export function nominalAnnualToMonthly(nominalPct: number): number {
+  return nominalPct / 100 / 12;
+}
+
+/** Nominal a.a. (%) → efetiva a.a. (%). Ex.: 10 → ~10,4713%. */
+export function nominalToEffectiveAnnual(nominalPct: number): number {
+  const im = nominalAnnualToMonthly(nominalPct);
+  return (Math.pow(1 + im, 12) - 1) * 100;
+}
+
+/** Retorna a taxa mensal efetiva conforme o tipo declarado. */
+export function monthlyRateFromAnnual(annualPct: number, type: "efetiva" | "nominal" = "efetiva"): number {
+  return type === "nominal" ? nominalAnnualToMonthly(annualPct) : annualToMonthly(annualPct);
+}
+
+/** Retorna a taxa efetiva a.a. (%) equivalente, para ordenação/comparação. */
+export function effectiveAnnualPct(annualPct: number, type: "efetiva" | "nominal" = "efetiva"): number {
+  return type === "nominal" ? nominalToEffectiveAnnual(annualPct) : annualPct;
 }
 
 /**
@@ -131,14 +156,16 @@ export function simulate(system: AmortSystem, input: FinancingInput): FinancingR
     downPayment,
     termMonths: n,
     annualRate,
+    annualRateType = "efetiva",
     buyerAgeYears = 35,
+    mipMonthlyRate,
     dfiMonthlyRate = 0.00025,
     adminFee = 25,
   } = input;
 
   const financedAmount = Math.max(propertyValue - downPayment, 0);
-  const i = annualToMonthly(annualRate);
-  const mipRate = mipRateForAge(buyerAgeYears);
+  const i = monthlyRateFromAnnual(annualRate, annualRateType);
+  const mipRate = mipMonthlyRate ?? mipRateForAge(buyerAgeYears);
   const dfi = propertyValue * dfiMonthlyRate;
 
   const schedule: InstallmentRow[] = [];
@@ -238,8 +265,8 @@ export interface ExtraAmortResult {
 export function simulateWithExtras(inp: ExtraAmortInput): ExtraAmortResult {
   const baseline = simulate(inp.system, inp.base);
   const { base, extras, strategy, system } = inp;
-  const i = annualToMonthly(base.annualRate);
-  const mipRate = mipRateForAge(base.buyerAgeYears ?? 35);
+  const i = monthlyRateFromAnnual(base.annualRate, base.annualRateType ?? "efetiva");
+  const mipRate = base.mipMonthlyRate ?? mipRateForAge(base.buyerAgeYears ?? 35);
   const dfi = base.propertyValue * (base.dfiMonthlyRate ?? 0.00025);
   const admin = base.adminFee ?? 25;
 

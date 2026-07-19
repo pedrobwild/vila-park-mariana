@@ -52,6 +52,8 @@ import {
   simulateWithExtras,
   type AmortSystem,
 } from "@/lib/financing";
+import BankComparator from "./BankComparator";
+import FinancingGuide from "./FinancingGuide";
 
 /** Enlarged touch target for slider thumbs (WCAG 44x44). */
 const SLIDER_TOUCH =
@@ -135,6 +137,7 @@ export default function FinancingSimulator() {
   const [system, setSystem] = useState<AmortSystem>("SAC");
   const [buyerAge, setBuyerAge] = useState<number>(35);
   const [monthlyIncome, setMonthlyIncome] = useState<number>(0);
+  const [eligibleProCotista, setEligibleProCotista] = useState<boolean>(false);
   const [fgts, setFgts] = useState<number>(0);
   const [extraAnnual, setExtraAnnual] = useState<number>(0);
   const [extraStrategy, setExtraStrategy] = useState<"reduce-term" | "reduce-installment">("reduce-term");
@@ -680,6 +683,19 @@ export default function FinancingSimulator() {
               </CardContent></Card>
             </TabsContent>
           </Tabs>
+
+          <BankComparator
+            propertyValue={propertyValue}
+            downPayment={downPayment}
+            termMonths={termMonths}
+            system={system}
+            buyerAge={buyerAge}
+            monthlyIncome={monthlyIncome}
+            eligibleProCotista={eligibleProCotista}
+            onToggleProCotista={setEligibleProCotista}
+          />
+
+          <FinancingGuide />
 
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-3">

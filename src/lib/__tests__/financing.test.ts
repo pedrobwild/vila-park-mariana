@@ -2,6 +2,9 @@ import { describe, it, expect } from "vitest";
 import {
   annualToMonthly,
   monthlyToAnnual,
+  nominalAnnualToMonthly,
+  nominalToEffectiveAnnual,
+  monthlyRateFromAnnual,
   simulate,
   simulateWithExtras,
   checkMCMV,
@@ -126,3 +129,60 @@ describe("financing – extra amortization", () => {
     expect(r.withExtra.schedule[20].payment).toBeLessThan(r.baseline.schedule[20].payment);
   });
 });
+
+describe("financing – nominal vs effective conversions", () => {
+  it("MCMV 10% nominal a.a. → ~0,8333% a.m. e ~10,4713% efetiva a.a.", () => {
+    expect(nominalAnnualToMonthly(10)).toBeCloseTo(0.008333333, 8);
+    expect(nominalToEffectiveAnnual(10)).toBeCloseTo(10.4713067, 4);
+  });
+  it("monthlyRateFromAnnual respeita tipo declarado", () => {
+    expect(monthlyRateFromAnnual(10, "nominal")).toBeCloseTo(0.008333333, 8);
+    expect(monthlyRateFromAnnual(10, "efetiva")).toBeCloseTo(annualToMonthly(10), 10);
+  });
+});
+
+describe("financing – anchor case (imóvel R$ 500k, 20%, 11,5% ef., 360m)", () => {
+  const input = {
+    propertyValue: 500_000,
+    downPayment: 100_000,
+    termMonths: 360,
+    annualRate: 11.5,
+  };
+  it("SAC sem seguros: 1ª ≈ 4756,10 · última ≈ 1121,24 · juros totais ≈ 657.920", () => {
+    const r = simulate("SAC", {
+      ...input,
+      mipMonthlyRate: 0,
+      dfiMonthlyRate: 0,
+      adminFee: 0,
+    });
+    expect(r.firstPayment).toBeCloseTo(4756.1, 0);
+    expect(r.lastPayment).toBeCloseTo(1121.24, 0);
+    expect(r.totalInterest).toBeGreaterThan(657_500);
+    expect(r.totalInterest).toBeLessThan(658_500);
+    expect(r.totalPaid).toBeCloseTo(1_057_920, -2);
+  });
+  it("Price sem seguros: parcela ≈ 3789,65 · juros totais ≈ 964.274", () => {
+    const r = simulate("PRICE", {
+      ...input,
+      mipMonthlyRate: 0,
+      dfiMonthlyRate: 0,
+      adminFee: 0,
+    });
+    expect(r.firstPayment).toBeCloseTo(3789.65, 0);
+    expect(r.totalInterest).toBeGreaterThan(963_500);
+    expect(r.totalInterest).toBeLessThan(964_800);
+  });
+  it("SAC com seguros (MIP 0,025% a.m., DFI 0,008% a.m., tarifa R$25): 1ª ≈ 4921", () => {
+    const r = simulate("SAC", {
+      ...input,
+      mipMonthlyRate: 0.00025,
+      dfiMonthlyRate: 0.00008,
+      adminFee: 25,
+    });
+    expect(r.firstInstallment).toBeCloseTo(4921.1, 0);
+    // CET a.a. entre 12,0% e 12,6%
+    expect(r.cetAnnual).toBeGreaterThan(0.12);
+    expect(r.cetAnnual).toBeLessThan(0.126);
+  });
+});
+
