@@ -290,8 +290,14 @@ export default function FinancingSimulator() {
   const selectedRate: InstitutionRate | undefined = INSTITUTION_RATES.find((r) => r.id === bankId);
   const rateIsManual = !selectedRate || selectedRate.annualRate === null;
 
-  // sync rateInput when selecting a bank with a public rate
+  // sync rateInput when selecting a bank with a public rate (skip once after hydration
+  // so the restored manual rate is preserved)
+  const skipBankSyncRef = useRef(true);
   useEffect(() => {
+    if (skipBankSyncRef.current) {
+      skipBankSyncRef.current = false;
+      return;
+    }
     if (selectedRate && selectedRate.annualRate !== null) {
       setRateInput(selectedRate.annualRate.toString().replace(".", ","));
     } else {
@@ -299,6 +305,30 @@ export default function FinancingSimulator() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bankId]);
+
+  // ---- Persist to localStorage ----
+  useEffect(() => {
+    if (!hydratedRef.current) return;
+    try {
+      const payload = {
+        form: {
+          typologyId, propertyValue, downPct, downOverride, termMonths,
+          bankId, rateInput, system, buyerAge, monthlyIncome, fgts,
+          extraAnnual, extraStrategy,
+        },
+        snapshot,
+        simCode: simCodeRef.current,
+        reportEmittedAt: reportEmittedAt.toISOString(),
+      };
+      localStorage.setItem("vp_financing_sim_v1", JSON.stringify(payload));
+    } catch {
+      /* quota / private mode — ignore */
+    }
+  }, [
+    typologyId, propertyValue, downPct, downOverride, termMonths,
+    bankId, rateInput, system, buyerAge, monthlyIncome, fgts,
+    extraAnnual, extraStrategy, snapshot, reportEmittedAt,
+  ]);
 
   const downPayment = useMemo(() => {
     const base = downOverride ?? Math.round((propertyValue * downPct) / 100);
