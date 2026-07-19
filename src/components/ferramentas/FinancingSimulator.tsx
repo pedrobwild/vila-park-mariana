@@ -144,6 +144,9 @@ export default function FinancingSimulator() {
     return clamp(base + fgts, 0, propertyValue);
   }, [downOverride, downPct, propertyValue, fgts]);
 
+  const financedAmount = useMemo(() => Math.max(propertyValue - downPayment, 0), [propertyValue, downPayment]);
+  const financedAmountInvalid = financedAmount <= 0;
+
   const ltvOk = propertyValue > 0 && (propertyValue - downPayment) / propertyValue <= 0.8;
   const mcmv = useMemo(() => checkMCMV(propertyValue, monthlyIncome || undefined), [propertyValue, monthlyIncome]);
 
