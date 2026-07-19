@@ -570,7 +570,13 @@ export default function FinancingSimulator() {
                       {propertyValue > 0 ? BRL(propertyValue) : "—"}
                     </span>
                   </div>
-                  <CurrencyInput id="pv" value={propertyValue} onChange={setPropertyValue} invalid={!!errors.propertyValue} />
+                  <CurrencyInput
+                    id="pv"
+                    value={propertyValue}
+                    onChange={setPropertyValue}
+                    invalid={!!errors.propertyValue}
+                    aria-describedby={errors.propertyValue ? "pv-error" : undefined}
+                  />
                   <Slider
                     value={[propertyValue]}
                     min={200_000}
@@ -578,8 +584,10 @@ export default function FinancingSimulator() {
                     step={10_000}
                     onValueChange={(v) => setPropertyValue(v[0])}
                     className={SLIDER_TOUCH}
+                    aria-invalid={!!errors.propertyValue || undefined}
+                    aria-describedby={errors.propertyValue ? "pv-error" : undefined}
                   />
-                  <FieldError msg={errors.propertyValue} />
+                  <FieldError id="pv-error" msg={errors.propertyValue} />
                 </div>
               </Fieldset>
 
