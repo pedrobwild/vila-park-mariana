@@ -229,6 +229,7 @@
       "matematica": "Return",
       "simulador": "Simulator",
       "avaliar": "Evaluate",
+      "mercado": "Market",
       "marketData": "Market data",
       "case": "Case",
       "totalReturn": "Total return",
@@ -239,7 +240,11 @@
       "market": "Market",
       "confianca": "Trust",
       "faq": "FAQ",
-      "cta": "Talk"
+      "cta": "Contact"
+    },
+    "mercado": {
+      "title": "The Vila Mariana market",
+      "subtitle": "Price, occupancy and demand references around the property — combined with a macro read of the neighborhood to help you calibrate your assumptions."
     },
     "nav": {
       "aria": "Investor Guide sections",
