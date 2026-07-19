@@ -144,6 +144,9 @@ export default function FinancingSimulator() {
     return clamp(base + fgts, 0, propertyValue);
   }, [downOverride, downPct, propertyValue, fgts]);
 
+  const financedAmount = useMemo(() => Math.max(propertyValue - downPayment, 0), [propertyValue, downPayment]);
+  const financedAmountInvalid = financedAmount <= 0;
+
   const ltvOk = propertyValue > 0 && (propertyValue - downPayment) / propertyValue <= 0.8;
   const mcmv = useMemo(() => checkMCMV(propertyValue, monthlyIncome || undefined), [propertyValue, monthlyIncome]);
 
@@ -331,8 +334,10 @@ export default function FinancingSimulator() {
                   id="dp"
                   value={downOverride ?? Math.round((propertyValue * downPct) / 100)}
                   onChange={(v) => {
-                    setDownOverride(v);
-                    setDownPct(clamp((v / Math.max(propertyValue, 1)) * 100, 0, 100));
+                    const maxDown = Math.max(propertyValue - fgts, 0);
+                    const clamped = clamp(v, 0, maxDown);
+                    setDownOverride(clamped);
+                    setDownPct(clamp((clamped / Math.max(propertyValue, 1)) * 100, 0, 100));
                   }}
                 />
                 {!ltvOk && (
@@ -341,16 +346,33 @@ export default function FinancingSimulator() {
               </div>
 
               {/* Financed amount (auto) */}
-              <div className="space-y-1 rounded-lg border border-border/60 bg-muted/30 px-3 py-2.5">
+              <div
+                className={[
+                  "space-y-1 rounded-lg border px-3 py-2.5",
+                  financedAmountInvalid
+                    ? "border-destructive bg-destructive/10"
+                    : "border-border/60 bg-muted/30",
+                ].join(" ")}
+              >
                 <div className="flex items-center justify-between">
                   <Label className="text-xs text-muted-foreground font-normal flex items-center">
                     Valor financiado
                     <InfoHint text="Calculado automaticamente: valor do imóvel menos entrada (inclui FGTS, quando informado)." />
                   </Label>
-                  <span className="text-sm font-semibold text-foreground tabular-nums">
-                    {BRL(Math.max(propertyValue - downPayment, 0))}
+                  <span
+                    className={[
+                      "text-sm font-semibold tabular-nums",
+                      financedAmountInvalid ? "text-destructive" : "text-foreground",
+                    ].join(" ")}
+                  >
+                    {BRL(financedAmount)}
                   </span>
                 </div>
+                {financedAmountInvalid && (
+                  <p className="text-xs text-destructive">
+                    A entrada não pode ser igual ou maior que o valor do imóvel. Reduza a entrada ou o FGTS para financiar um valor positivo.
+                  </p>
+                )}
               </div>
 
 
@@ -460,7 +482,15 @@ export default function FinancingSimulator() {
                       FGTS na entrada (opcional)
                       <InfoHint text="Somamos ao valor da entrada. Regras: 3 anos de contribuição e imóvel em SP até R$ 1,5 mi." />
                     </Label>
-                    <CurrencyInput id="fgts" value={fgts} onChange={setFgts} />
+                    <CurrencyInput
+                      id="fgts"
+                      value={fgts}
+                      onChange={(v) => {
+                        const base = downOverride ?? Math.round((propertyValue * downPct) / 100);
+                        const maxFgts = Math.max(propertyValue - base, 0);
+                        setFgts(clamp(v, 0, maxFgts));
+                      }}
+                    />
                   </div>
                   {/* Extra */}
                   <div className="space-y-2 rounded-lg border border-border/60 p-3">
