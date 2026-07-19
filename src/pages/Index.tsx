@@ -513,7 +513,11 @@ export default function Index() {
             className="fixed bottom-0 inset-x-0 z-40 bg-background/90 backdrop-blur-xl border-t border-border/40 px-5 pt-2.5"
             style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 8px) + 10px)" }}
           >
-            <a href="#reserva" className="block">
+            <a
+              href="#reserva"
+              className="block"
+              onClick={() => trackGlobal("cta_click", { id: "sticky_reserva", target: "#reserva", location: "home:sticky-mobile" })}
+            >
               <Button size="lg" className="w-full min-h-[50px] text-[15px] bg-accent hover:bg-accent/90 text-accent-foreground font-bold shadow-lg shadow-accent/25">
                 <Eye className="mr-2 h-5 w-5" />
                 {t("reservation.submit")}

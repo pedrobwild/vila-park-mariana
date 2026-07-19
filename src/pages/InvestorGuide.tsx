@@ -40,6 +40,7 @@ import {
   TrendingUp,
   Utensils,
 } from "lucide-react";
+import { trackGlobal } from "@/hooks/useGuideAnalytics";
 
 type SectionId =
   | "hero"
