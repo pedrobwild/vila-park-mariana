@@ -618,16 +618,7 @@ export default function InvestorGuide() {
           </div>
         </section>
 
-        {/* MARKET */}
-        <section id="market" className="scroll-mt-32 bg-muted/25 border-y border-border/40">
-          <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
-            <SectionLabel>{t("investorGuide.market.eyebrow")}</SectionLabel>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-              {t("investorGuide.market.title")}
-            </h2>
-            <MarketIntelSection />
-          </div>
-        </section>
+        {/* MARKET — mesclado em #mercado; ancora legacy renderizada dentro daquela seção */}
 
         {/* CONFIANÇA */}
         <section id="confianca" className="scroll-mt-32">
