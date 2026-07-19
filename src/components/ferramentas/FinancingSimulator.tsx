@@ -788,7 +788,7 @@ export default function FinancingSimulator() {
                   <FieldError id="rate-error" msg={errors.annualRate} />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2" id="system">
                   <Label className="flex items-center gap-1.5">
                     Sistema de amortização
                     <InfoHint text="SAC: parcelas decrescem, paga menos juros total. Price: parcelas fixas, mais previsível." label="Sistema" />
@@ -796,7 +796,12 @@ export default function FinancingSimulator() {
                   <div
                     role="tablist"
                     aria-label="Sistema de amortização"
-                    className="inline-flex w-full rounded-md border border-border/60 bg-muted/30 p-0.5"
+                    aria-invalid={!!errors.system || undefined}
+                    aria-describedby={errors.system ? "system-error" : undefined}
+                    className={[
+                      "inline-flex w-full rounded-md border bg-muted/30 p-0.5",
+                      errors.system ? "border-destructive" : "border-border/60",
+                    ].join(" ")}
                   >
                     {(["SAC", "PRICE"] as const).map((opt) => {
                       const selected = system === opt;
@@ -824,6 +829,7 @@ export default function FinancingSimulator() {
                       );
                     })}
                   </div>
+                  <FieldError id="system-error" msg={errors.system} />
                 </div>
 
                 {mcmvForm.eligible && (
