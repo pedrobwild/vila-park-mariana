@@ -1000,7 +1000,7 @@ export default function FinancingSimulator() {
               snap={snapshot}
               stale={stale}
               onRegenerate={handleGenerate}
-              onReset={handleReset}
+              onReset={() => setShowResetConfirm(true)}
               onCopyLink={() => {
                 try {
                   const payload = {
