@@ -7,13 +7,10 @@
   "nav": {
     "insights": "Painel",
     "ferramentas": "Ferramentas",
-    "urbanFlex": "Guia do Comprador",
     "opportunities": "Oportunidades",
     "talkSpecialist": "Falar com especialista",
     "back": "Voltar",
     "menu": "Menu",
-    "guidesGroup": "Guias",
-    "guideBuyer": "Guia do Comprador",
     "guideInvestor": "Guia do Investidor"
   },
   "quickNav": {
@@ -118,39 +115,6 @@
     "error": "Não foi possível enviar. Tente de novo ou fale direto no WhatsApp.",
     "whatsapp": "Falar no WhatsApp"
   },
-  "guide": {
-    "badge": "Guia do Comprador",
-    "titleA": "Guia do Comprador.",
-    "titleB": "Tudo antes de reservar.",
-    "subtitle": "Localização, tipologias, áreas comuns e as etapas até a reserva.",
-    "cta": "Acessar o Guia do Comprador",
-    "items": {
-      "quiz": {
-        "title": "Localização",
-        "desc": "Como o entorno da Vila Mariana valoriza o dia a dia."
-      },
-      "simulator": {
-        "title": "Financiamento",
-        "desc": "Simule parcela, entrada e prazo para o seu bolso."
-      },
-      "neighborhood": {
-        "title": "Entorno",
-        "desc": "Parques, metrô, universidades e serviços próximos."
-      },
-      "choice": {
-        "title": "Tipologias",
-        "desc": "Garden, terraço e 1 dormitório: qual combina com você."
-      },
-      "readiness": {
-        "title": "Reserva",
-        "desc": "Passo a passo do formulário ao contato comercial."
-      },
-      "income": {
-        "title": "Áreas comuns",
-        "desc": "Lazer decorado e mobiliado no térreo e no 5º pavimento."
-      }
-    }
-  },
   "finalCta": {
     "title": "Reserve a sua unidade no Vila Park.",
     "subtitle": "Fale com o time Vila Park e receba plantas, condições e o memorial descritivo completo.",
@@ -225,7 +189,6 @@
       "hero": "Início",
       "diagnostico": "Diagnóstico",
       "tese": "Tese",
-      "nearby": "Entorno",
       "typologies": "Tipologias",
       "matematica": "Retorno",
       "simulador": "Simulador",
@@ -237,7 +200,6 @@
       "scenarios": "Cenários",
       "eventos": "Eventos",
       "monthlyEvents": "Receita mensal",
-      "amenities": "Áreas comuns",
       "market": "Mercado",
       "confianca": "Confiança",
       "faq": "FAQ",
@@ -297,25 +259,9 @@
     "tese": {
       "eyebrow": "Tese de investimento",
       "title": "Por que a Vila Mariana sustenta a demanda pelo Vila Park.",
-      "subtitle": "Quatro pilares objetivos, com dados de localização, que sustentam a unidade como ativo de renda e valorização."
-    },
-    "nearby": {
-      "eyebrow": "Entorno estratégico",
-      "title": "A Vila Mariana trabalha a favor da sua locação.",
-      "subtitle": "Bairro consolidado, com metrô, universidades, polo de empregos e lazer no raio de caminhada — fatores que sustentam a demanda por moradia.",
-      "groups": {
-        "mobility": "Mobilidade",
-        "edu": "Universidades",
-        "parks": "Parques e lazer",
-        "services": "Serviços e compras",
-        "gastronomy": "Gastronomia",
-        "jobs": "Polo de empregos"
-      },
-      "jobsPaulista": "Av. Paulista",
-      "jobsPaulistaDist": "2,5 km",
-      "jobsCorredor": "Região da Paulista",
-      "jobsCorredorDist": "corredor de escritórios",
-      "note": "Por que isso importa para renda: imóveis próximos a metrô, universidades e polos de emprego historicamente apresentam menor vacância e giro mais rápido de inquilinos — perfil compatível com o produto Vila Park."
+      "subtitle": "Quatro pilares objetivos, com dados de localização, que sustentam a unidade como ativo de renda e valorização.",
+      "entornoNote": "Por que isso importa para renda: imóveis próximos a metrô, universidades e polos de emprego historicamente apresentam menor vacância e giro mais rápido de inquilinos — perfil compatível com o produto Vila Park.",
+      "entornoLink": "Ver entorno completo"
     },
     "typologies": {
       "eyebrow": "Tipologias",
@@ -385,30 +331,6 @@
       "subtitle": "Feiras, congressos e shows internacionais concentram picos de demanda por temporada. Vila Mariana está a poucos minutos do Ibirapuera, Anhembi e da Paulista.",
       "calendarTitle": "Eventos em SP × demanda de locação",
       "calendarSubtitle": "Eventos confirmados e previstos em São Paulo entre julho/2026 e julho/2027 e como cada um pode impactar a demanda por temporada na Vila Mariana."
-    },
-    "amenities": {
-      "eyebrow": "Áreas comuns entregues equipadas",
-      "title": "Térreo e 5º pavimento decorados e mobiliados na entrega.",
-      "subtitle": "Áreas comuns finalizadas reduzem o custo de preparação do imóvel para locação e melhoram a percepção de valor do inquilino desde a visita.",
-      "items": {
-        "leisure": {
-          "title": "Lazer decorado",
-          "text": "Espaços mobiliados no térreo e no 5º pavimento, entregues prontos para uso."
-        },
-        "lobby": {
-          "title": "Lobby de entrada",
-          "text": "Portaria e recepção que reforçam a percepção de padrão do empreendimento."
-        },
-        "infra": {
-          "title": "Infraestrutura de lazer",
-          "text": "Áreas de convivência que ampliam o apelo do apartamento para o inquilino."
-        },
-        "ac": {
-          "title": "Infra para ar-condicionado",
-          "text": "Preparação técnica na unidade — um item a menos para o proprietário resolver."
-        }
-      },
-      "disclaimer": "Imagens e descrições ilustrativas. A decoração é apenas uma sugestão — móveis e utensílios não integram o contrato de compra e venda."
     },
     "market": {
       "eyebrow": "Dados de mercado",
@@ -491,10 +413,22 @@
       "formulaTitle": "Como lemos esses números",
       "formulaText": "Yield bruto ≈ (diária × ocupação × 30 × 12) / investimento total. O yield líquido desconta taxas de plataforma, limpeza, condomínio, IPTU e vacância.",
       "kpi": {
-        "daily": { "label": "Diária média", "note": "Studios mobiliados na Vila Mariana" },
-        "occ": { "label": "Ocupação típica", "note": "Média anual para bem operado" },
-        "price": { "label": "Preço por m²", "note": "Faixa de lançamentos comparáveis" },
-        "listings": { "label": "Anúncios ativos", "note": "Airbnb / temporada · Vila Mariana" }
+        "daily": {
+          "label": "Diária média",
+          "note": "Studios mobiliados na Vila Mariana"
+        },
+        "occ": {
+          "label": "Ocupação típica",
+          "note": "Média anual para bem operado"
+        },
+        "price": {
+          "label": "Preço por m²",
+          "note": "Faixa de lançamentos comparáveis"
+        },
+        "listings": {
+          "label": "Anúncios ativos",
+          "note": "Airbnb / temporada · Vila Mariana"
+        }
       },
       "cols": {
         "district": "Bairro",
@@ -528,11 +462,26 @@
       "timeline": {
         "title": "Do sinal à primeira reserva",
         "step": {
-          "1": { "t": "Reserva e sinal", "d": "Entrada na tabela do lançamento com condições da fase de reserva." },
-          "2": { "t": "Fase de obra", "d": "Parcelas durante a construção; possível valorização até a entrega." },
-          "3": { "t": "Chaves e mobília", "d": "Entrega + montagem de decoração e enxoval em 30–45 dias." },
-          "4": { "t": "Anúncio e ramp-up", "d": "Fotos, cadastro em plataformas e curva de reviews nos primeiros 90 dias." },
-          "5": { "t": "Operação madura", "d": "Precificação dinâmica, gestão profissional e reforços em datas âncora." }
+          "1": {
+            "t": "Reserva e sinal",
+            "d": "Entrada na tabela do lançamento com condições da fase de reserva."
+          },
+          "2": {
+            "t": "Fase de obra",
+            "d": "Parcelas durante a construção; possível valorização até a entrega."
+          },
+          "3": {
+            "t": "Chaves e mobília",
+            "d": "Entrega + montagem de decoração e enxoval em 30–45 dias."
+          },
+          "4": {
+            "t": "Anúncio e ramp-up",
+            "d": "Fotos, cadastro em plataformas e curva de reviews nos primeiros 90 dias."
+          },
+          "5": {
+            "t": "Operação madura",
+            "d": "Precificação dinâmica, gestão profissional e reforços em datas âncora."
+          }
         }
       },
       "kpi": {
@@ -586,7 +535,10 @@
       },
       "paybackYears": "{{n}} anos",
       "driversTitle": "Alavancas que mais movem o resultado",
-      "impact": { "high": "Alto impacto", "med": "Impacto médio" },
+      "impact": {
+        "high": "Alto impacto",
+        "med": "Impacto médio"
+      },
       "drivers": {
         "occupancy": {
           "title": "Ocupação",
@@ -618,8 +570,15 @@
         "yield": "Yield bruto / líquido",
         "yieldSub": "estimativa sobre investimento total"
       },
-      "legend": { "base": "Base", "extra": "Extra por eventos" },
-      "tooltip": { "base": "Base", "extra": "Extra por eventos", "total": "Total" },
+      "legend": {
+        "base": "Base",
+        "extra": "Extra por eventos"
+      },
+      "tooltip": {
+        "base": "Base",
+        "extra": "Extra por eventos",
+        "total": "Total"
+      },
       "avgLine": "Média mensal",
       "disclaimer": "Incremento estimado a partir dos uplifts de diária calibrados pela edge function sp-events, aplicados sobre a duração dos eventos e a ocupação prevista. Estimativa ilustrativa, não vinculante."
     },
@@ -858,5 +817,68 @@
     "showAll": "Ver todos os {{count}} eventos",
     "sources": "Fontes",
     "calibrationNote": "Estimativas de impacto na diária calibradas pela prática de mercado em bairros conectados; imóveis vizinhos aos venues praticam variações maiores. O anfitrião captura o aumento ajustando preços por data (a plataforma exibe o preço total ao hóspede)."
+  },
+  "home": {
+    "etapas": {
+      "eyebrow": "Reserva",
+      "title": "Como funciona a reserva",
+      "subtitle": "Um passo a passo objetivo, do primeiro contato à formalização.",
+      "items": [
+        {
+          "title": "Solicite pelo formulário ou WhatsApp",
+          "desc": "Envie seus dados e a tipologia de interesse — sem compromisso."
+        },
+        {
+          "title": "O time Vila Park entra em contato",
+          "desc": "Apresentamos condições atualizadas, disponibilidade e materiais completos."
+        },
+        {
+          "title": "Comercialização conforme o Registro de Incorporação",
+          "desc": "A venda só ocorre após o registro cartorial da incorporação imobiliária."
+        },
+        {
+          "title": "Formalização do contrato",
+          "desc": "Assinatura, pagamento da entrada e cronograma financeiro definido."
+        }
+      ]
+    },
+    "faq": {
+      "eyebrow": "Dúvidas frequentes",
+      "title": "Perguntas mais comuns",
+      "items": [
+        {
+          "q": "Onde fica o Vila Park?",
+          "a": "O empreendimento fica na R. Baltazar Lisboa, 543, no bairro Vila Mariana, em São Paulo, a cerca de 900 metros da estação de metrô Vila Mariana."
+        },
+        {
+          "q": "Quantos apartamentos tem o empreendimento?",
+          "a": "O Vila Park é uma torre única, com 10 pavimentos e 33 apartamentos, totalizando 1.600 m² de área construída."
+        },
+        {
+          "q": "O apartamento tem vaga de garagem?",
+          "a": "Não. O empreendimento foi projetado sem vagas de garagem, com foco em mobilidade a pé e por transporte público — a estação de metrô Vila Mariana fica a apenas 900 metros."
+        },
+        {
+          "q": "Quais tipologias estão disponíveis?",
+          "a": "O Vila Park oferece apartamentos de 1 dormitório/studio, unidades com garden privativo e unidades com terraço descoberto."
+        },
+        {
+          "q": "As áreas comuns já estão prontas?",
+          "a": "As áreas comuns serão entregues decoradas e mobiliadas, no térreo e no 5º pavimento, para uso imediato dos moradores."
+        },
+        {
+          "q": "Em que fase está a obra?",
+          "a": "A obra está em andamento, com última atualização registrada em 07/07/2026. Para informações detalhadas sobre o cronograma, fale com a equipe Vila Park."
+        },
+        {
+          "q": "Como faço para reservar uma unidade?",
+          "a": "Preencha o formulário de reserva nesta página ou fale com a equipe Vila Park pelo WhatsApp. O time entrará em contato para apresentar as condições e dar sequência ao processo, conforme o Registro de Incorporação Imobiliária."
+        },
+        {
+          "q": "Posso instalar ar-condicionado no apartamento?",
+          "a": "Sim. As unidades contam com infraestrutura preparada para instalação de ar-condicionado."
+        }
+      ]
+    }
   }
 }
