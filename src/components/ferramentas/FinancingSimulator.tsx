@@ -22,6 +22,7 @@ import {
   TrendingDown,
   Sparkles,
   RefreshCw,
+  RotateCcw,
   CheckCircle2,
   AlertTriangle,
   Play,
