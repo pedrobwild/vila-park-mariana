@@ -354,29 +354,39 @@ export default function FinancingSimulator() {
               </div>
 
               {/* Financed amount (auto) */}
-              <div
-                className={[
-                  "space-y-1 rounded-lg border px-3 py-2.5",
-                  financedAmountInvalid
-                    ? "border-destructive bg-destructive/10"
-                    : "border-border/60 bg-muted/30",
-                ].join(" ")}
-              >
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label className="text-xs text-muted-foreground font-normal flex items-center gap-1.5">
+                  <Label htmlFor="financed" className="flex items-center gap-1.5">
                     <RefreshCw className="h-3 w-3 text-primary" aria-hidden="true" />
                     Valor financiado
                     <InfoHint text="Calculado automaticamente: valor do imóvel menos entrada (inclui FGTS, quando informado). Atualiza em tempo real ao mudar o imóvel ou a entrada." />
                   </Label>
+                  <span className="text-xs text-muted-foreground">automático</span>
+                </div>
+                <div className="relative">
                   <span
                     className={[
-                      "text-sm font-semibold tabular-nums transition-colors duration-300",
-                      financedPulse ? "text-primary" : "",
-                      financedAmountInvalid ? "text-destructive" : "text-foreground",
+                      "absolute left-3 top-1/2 -translate-y-1/2 text-sm",
+                      financedAmountInvalid ? "text-destructive" : "text-muted-foreground",
                     ].join(" ")}
                   >
-                    {BRL(financedAmount)}
+                    R$
                   </span>
+                  <Input
+                    id="financed"
+                    readOnly
+                    aria-readonly="true"
+                    tabIndex={-1}
+                    inputMode="numeric"
+                    value={fmtBRL(financedAmount)}
+                    className={[
+                      "pl-9 font-semibold tabular-nums cursor-default transition-colors duration-300",
+                      financedAmountInvalid
+                        ? "border-destructive bg-destructive/10 text-destructive focus-visible:ring-destructive"
+                        : "bg-muted/40",
+                      financedPulse && !financedAmountInvalid ? "border-primary/60 text-primary" : "",
+                    ].join(" ")}
+                  />
                 </div>
                 {financedAmountInvalid && (
                   <p className="text-xs text-destructive">
