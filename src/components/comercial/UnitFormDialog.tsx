@@ -142,7 +142,7 @@ export default function UnitFormDialog({ open, onOpenChange, unit, fieldDefs, on
         return;
       }
     } else {
-      const { data, error } = await supabase.from("units").insert(payload).select("id").single();
+      const { data, error } = await supabase.from("units").insert([payload]).select("id").single();
       if (error) {
         toast.error(error.message);
         setSaving(false);
