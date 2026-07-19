@@ -365,13 +365,19 @@ export default function FinancingSimulator() {
     }
 
     setErrors({});
-    simCodeRef.current = generateSimCode();
-    setReportEmittedAt(new Date());
-    setSnapshot(currentSnap);
-    // scroll to results (mobile)
+    setIsLoading(true);
+
+    // small delay so the UI can render the loading state before the synchronous snapshot update
     setTimeout(() => {
-      resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 60);
+      simCodeRef.current = generateSimCode();
+      setReportEmittedAt(new Date());
+      setSnapshot(currentSnap);
+      setIsLoading(false);
+      // scroll to results (mobile)
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 60);
+    }, 80);
   };
 
   const handleReset = () => {
