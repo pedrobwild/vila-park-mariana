@@ -728,9 +728,9 @@ export default function FinancingSimulator() {
                 <TableRow key={row.n}>
                   <TableCell>{row.n}</TableCell>
                   <TableCell className="text-right">{BRL2(row.payment)}</TableCell>
-                  <TableCell className="text-right text-muted-foreground">{BRL2(row.interest)}</TableCell>
+                  <TableCell className="text-right text-foreground/80">{BRL2(row.interest)}</TableCell>
                   <TableCell className="text-right">{BRL2(row.amortization)}</TableCell>
-                  <TableCell className="text-right text-muted-foreground">{BRL2(row.mip + row.dfi + row.admin)}</TableCell>
+                  <TableCell className="text-right text-foreground/80">{BRL2(row.mip + row.dfi + row.admin)}</TableCell>
                   <TableCell className="text-right font-semibold">{BRL2(row.fullPayment)}</TableCell>
                   <TableCell className="text-right">{BRL(row.balance)}</TableCell>
                 </TableRow>
