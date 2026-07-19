@@ -411,7 +411,7 @@ export default function FinancingSimulator() {
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
                         {BANK_PRESETS.map((b) => (
-                          <SelectItem key={b.id} value={b.id}>{b.label} — {b.annualRate.toFixed(2)}% a.a. + TR</SelectItem>
+                          <SelectItem key={b.id} value={b.id}>{b.label} — {PCT_PT(b.annualRate)} a.a. + TR</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
