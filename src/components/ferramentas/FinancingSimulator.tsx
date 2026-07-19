@@ -770,6 +770,8 @@ export default function FinancingSimulator() {
                       value={rateInput}
                       onChange={(e) => setRateInput(e.target.value)}
                       placeholder={rateIsManual ? "0,00" : ""}
+                      aria-invalid={!!errors.annualRate || undefined}
+                      aria-describedby={errors.annualRate ? "rate-error" : undefined}
                       className={[
                         "pr-20 h-11 font-semibold tabular-nums text-right",
                         rateIsManual ? "" : "cursor-default bg-muted/40",
@@ -783,7 +785,7 @@ export default function FinancingSimulator() {
                   {!rateIsManual && (
                     <p className="text-[11px] text-muted-foreground">Taxa fixa da linha selecionada — troque de linha para simular outra.</p>
                   )}
-                  <FieldError msg={errors.annualRate} />
+                  <FieldError id="rate-error" msg={errors.annualRate} />
                 </div>
 
                 <div className="space-y-2">
