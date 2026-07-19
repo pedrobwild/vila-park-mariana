@@ -873,8 +873,15 @@ export default function FinancingSimulator() {
                       Renda familiar
                       <InfoHint text="Renda familiar mensal bruta. Comprometimento máx. de 30% da renda com a 1ª parcela." label="Renda" />
                     </Label>
-                    <CurrencyInput id="income" value={monthlyIncome} onChange={setMonthlyIncome} placeholder="0" invalid={!!errors.monthlyIncome} />
-                    <FieldError msg={errors.monthlyIncome} />
+                    <CurrencyInput
+                      id="income"
+                      value={monthlyIncome}
+                      onChange={setMonthlyIncome}
+                      placeholder="0"
+                      invalid={!!errors.monthlyIncome}
+                      aria-describedby={errors.monthlyIncome ? "income-error" : undefined}
+                    />
+                    <FieldError id="income-error" msg={errors.monthlyIncome} />
                   </div>
                 </div>
               </Fieldset>
