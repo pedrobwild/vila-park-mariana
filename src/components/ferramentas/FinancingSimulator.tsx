@@ -977,13 +977,14 @@ interface ResultsProps {
   stale: boolean;
   onRegenerate: () => void;
   onReset: () => void;
+  onCopyLink: () => void;
   reportOpen: boolean;
   setReportOpen: (v: boolean) => void;
   simCode: string;
   reportEmittedAt: Date;
 }
 
-function ResultsView({ snap, stale, onRegenerate, onReset, reportOpen, setReportOpen, simCode, reportEmittedAt }: ResultsProps) {
+function ResultsView({ snap, stale, onRegenerate, onReset, onCopyLink, reportOpen, setReportOpen, simCode, reportEmittedAt }: ResultsProps) {
   const {
     propertyValue,
     downPayment,
