@@ -1,5 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
-import MarketIntelSection from "@/components/MarketIntelSection";
+import SiteFooter from "@/components/shared/SiteFooter";
+import NeighborhoodSection from "@/components/shared/NeighborhoodSection";
+import { WHATSAPP_PHONE } from "@/data/surroundings";
 import { motion } from "framer-motion";
 import AppNavbar from "@/components/AppNavbar";
 import { cn } from "@/lib/utils";
@@ -178,8 +180,7 @@ const faqItems = [
   },
 ];
 
-const whatsappLink =
-  "https://wa.me/5511961007687?text=Ol%C3%A1!%20Vi%20o%20Guia%20do%20Comprador%20do%20Vila%20Park%20Vila%20Mariana%20e%20quero%20mais%20informa%C3%A7%C3%B5es.";
+const whatsappLink = `https://api.whatsapp.com/send?phone=${WHATSAPP_PHONE}&text=${encodeURIComponent("Olá! Vi o Guia do Comprador do Vila Park Vila Mariana e quero mais informações.")}`;
 
 function SectionLabel({ children }: { children: ReactNode }) {
   return <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[hsl(var(--accent))]/80 mb-3">{children}</p>;
