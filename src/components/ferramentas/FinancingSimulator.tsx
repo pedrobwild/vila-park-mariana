@@ -767,9 +767,20 @@ export default function FinancingSimulator() {
                 size="lg"
                 className="w-full h-12 gap-2 text-base"
                 onClick={handleGenerate}
+                disabled={isLoading}
+                aria-busy={isLoading}
               >
-                <Play className="h-4 w-4" />
-                {snapshot ? "Atualizar simulação" : "Gerar simulação"}
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                    Calculando...
+                  </>
+                ) : (
+                  <>
+                    <Play className="h-4 w-4" aria-hidden="true" />
+                    {snapshot ? "Atualizar simulação" : "Gerar simulação"}
+                  </>
+                )}
               </Button>
               {Object.keys(errors).length > 0 && (
                 <p className="text-xs text-destructive mt-2 flex items-center gap-1">
