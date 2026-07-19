@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import AppNavbar from "@/components/AppNavbar";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -15,7 +16,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Building2, FileText, ImageIcon, Search } from "lucide-react";
+import { Building2, FileText, ImageIcon, MessageCircle, Search } from "lucide-react";
+import { WHATSAPP_PHONE } from "@/data/surroundings";
 import {
   CustomFieldDef,
   Unit,
