@@ -229,6 +229,7 @@
       "matematica": "Retorno",
       "simulador": "Simulador",
       "avaliar": "Avaliar",
+      "mercado": "Mercado",
       "marketData": "Mercado do bairro",
       "case": "Case",
       "totalReturn": "Retorno total",
@@ -239,7 +240,11 @@
       "market": "Mercado",
       "confianca": "Confiança",
       "faq": "FAQ",
-      "cta": "Falar"
+      "cta": "Contato"
+    },
+    "mercado": {
+      "title": "O mercado da Vila Mariana",
+      "subtitle": "Referências de preço, ocupação e demanda no entorno — combinadas com uma leitura macro do bairro para você calibrar suas premissas."
     },
     "nav": {
       "aria": "Seções do Guia do Investidor",
