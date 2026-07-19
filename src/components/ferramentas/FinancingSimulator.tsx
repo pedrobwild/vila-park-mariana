@@ -487,7 +487,7 @@ export default function FinancingSimulator() {
                       value={fgts}
                       onChange={(v) => {
                         const base = downOverride ?? Math.round((propertyValue * downPct) / 100);
-                        const maxFgts = Math.max(propertyValue - base - 1, 0);
+                        const maxFgts = Math.max(propertyValue - base, 0);
                         setFgts(clamp(v, 0, maxFgts));
                       }}
                     />
