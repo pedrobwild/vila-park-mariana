@@ -817,10 +817,13 @@ export default function FinancingSimulator() {
                       type="number"
                       min={18}
                       max={80}
-                      value={buyerAge}
+                      value={buyerAge || ""}
                       aria-invalid={!!errors.buyerAge || undefined}
                       className={["h-11 text-right tabular-nums", errors.buyerAge ? "border-destructive focus-visible:ring-destructive" : ""].join(" ")}
-                      onChange={(e) => setBuyerAge(clamp(parseInt(e.target.value) || 0, 0, 120))}
+                      onChange={(e) => {
+                        const raw = e.target.value;
+                        setBuyerAge(raw === "" ? 0 : clamp(parseInt(raw) || 0, 0, 120));
+                      }}
                     />
                     <FieldError msg={errors.buyerAge} />
                   </div>
