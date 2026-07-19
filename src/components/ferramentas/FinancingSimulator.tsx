@@ -726,7 +726,7 @@ export default function FinancingSimulator() {
                     <InfoHint text="Base de instituições consultada em 19/07/2026. Bancos com taxa 'sob consulta' exigem digitar a taxa manualmente." label="Banco" />
                   </Label>
                   <Select value={bankId} onValueChange={(v) => setBankId(v)}>
-                    <SelectTrigger id="bank" className="h-11" aria-invalid={!!errors.bankId || undefined}>
+                    <SelectTrigger id="bank" className="h-11" aria-invalid={!!errors.bankId || undefined} aria-describedby={errors.bankId ? "bank-error" : undefined}>
                       <SelectValue placeholder="Selecione um banco/linha" />
                     </SelectTrigger>
                     <SelectContent className="max-h-80">
@@ -753,7 +753,7 @@ export default function FinancingSimulator() {
                       </span>
                     </div>
                   )}
-                  <FieldError msg={errors.bankId} />
+                  <FieldError id="bank-error" msg={errors.bankId} />
                 </div>
 
                 <div className="space-y-1.5">
