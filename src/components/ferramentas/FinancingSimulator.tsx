@@ -555,8 +555,9 @@ export default function FinancingSimulator() {
                     <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => (v / 1000).toFixed(0) + "k"} />
                     <RTooltip formatter={(v: number) => BRL(v)} />
                     <Legend />
-                    <Line type="monotone" dataKey="SAC" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
-                    <Line type="monotone" dataKey="PRICE" stroke="hsl(var(--muted-foreground))" strokeWidth={2} dot={false} />
+                    <Line type="monotone" dataKey="SAC" stroke="hsl(var(--accent))" strokeWidth={2.5} dot={false} />
+                    <Line type="monotone" dataKey="PRICE" stroke="hsl(215 12% 55%)" strokeWidth={2} strokeDasharray="5 4" dot={false} />
+
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent></Card>
