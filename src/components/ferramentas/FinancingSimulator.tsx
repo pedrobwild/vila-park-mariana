@@ -443,8 +443,12 @@ export default function FinancingSimulator() {
     const errs: Record<string, string> = {};
 
     // Custom cross-field checks first
-    if (financedAmount <= 0) errs.financed = "A entrada não pode ser igual ou maior que o valor do imóvel.";
-    if (!ltvOk) errs.dp = "Entrada abaixo de 20% — fora das regras do SFH.";
+    if (propertyValue > 0 && financedAmount <= 0) {
+      errs.financed = "A entrada não pode ser igual ou maior que o valor do imóvel.";
+    }
+    if (propertyValue > 0 && !ltvOk) {
+      errs.dp = "Entrada abaixo de 20% — fora das regras do SFH.";
+    }
 
     const parse = schema.safeParse({
       bankId,
@@ -466,7 +470,7 @@ export default function FinancingSimulator() {
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
       // focus first error
-      const order = ["bankId", "annualRate", "propertyValue", "dp", "financed", "termMonths", "buyerAge", "monthlyIncome"];
+      const order = ["bankId", "annualRate", "propertyValue", "dp", "financed", "termMonths", "buyerAge", "monthlyIncome", "system"];
       const firstKey = order.find((k) => errs[k]) ?? Object.keys(errs)[0];
       const idMap: Record<string, string> = {
         bankId: "bank",
@@ -477,6 +481,7 @@ export default function FinancingSimulator() {
         termMonths: "term",
         buyerAge: "age",
         monthlyIncome: "income",
+        system: "system",
       };
       focusField(idMap[firstKey] ?? firstKey);
       return;
