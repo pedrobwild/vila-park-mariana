@@ -249,42 +249,82 @@ export default function FinancingSimulator() {
 
   // ---- Restore from localStorage on mount ----
   useEffect(() => {
+    // 1) Try URL param ?sim=<base64> first (shareable link takes precedence)
+    let fromUrl = false;
     try {
-      const raw = localStorage.getItem("vp_financing_sim_v1");
-      if (raw) {
-        const s = JSON.parse(raw) as {
-          form?: Partial<{
-            typologyId: string; propertyValue: number; downPct: number;
-            downOverride: number | null; termMonths: number; bankId: string;
-            rateInput: string; system: AmortSystem; buyerAge: number;
-            monthlyIncome: number; fgts: number; extraAnnual: number;
-            extraStrategy: "reduce-term" | "reduce-installment";
-          }>;
-          snapshot?: Snapshot | null;
-          simCode?: string;
-          reportEmittedAt?: string;
-        };
-        if (s.form) {
-          if (s.form.typologyId !== undefined) setTypologyId(s.form.typologyId);
-          if (s.form.propertyValue !== undefined) setPropertyValue(s.form.propertyValue);
-          if (s.form.downPct !== undefined) setDownPct(s.form.downPct);
-          if (s.form.downOverride !== undefined) setDownOverride(s.form.downOverride);
-          if (s.form.termMonths !== undefined) setTermMonths(s.form.termMonths);
-          if (s.form.bankId !== undefined) setBankId(s.form.bankId);
-          if (s.form.rateInput !== undefined) setRateInput(s.form.rateInput);
-          if (s.form.system !== undefined) setSystem(s.form.system);
-          if (s.form.buyerAge !== undefined) setBuyerAge(s.form.buyerAge);
-          if (s.form.monthlyIncome !== undefined) setMonthlyIncome(s.form.monthlyIncome);
-          if (s.form.fgts !== undefined) setFgts(s.form.fgts);
-          if (s.form.extraAnnual !== undefined) setExtraAnnual(s.form.extraAnnual);
-          if (s.form.extraStrategy !== undefined) setExtraStrategy(s.form.extraStrategy);
+      const params = new URLSearchParams(window.location.search);
+      const simParam = params.get("sim");
+      if (simParam) {
+        const decoded = JSON.parse(
+          decodeURIComponent(escape(atob(simParam.replace(/-/g, "+").replace(/_/g, "/"))))
+        ) as { form?: any; snapshot?: Snapshot | null };
+        if (decoded.form) {
+          const f = decoded.form;
+          if (f.typologyId !== undefined) setTypologyId(f.typologyId);
+          if (f.propertyValue !== undefined) setPropertyValue(f.propertyValue);
+          if (f.downPct !== undefined) setDownPct(f.downPct);
+          if (f.downOverride !== undefined) setDownOverride(f.downOverride);
+          if (f.termMonths !== undefined) setTermMonths(f.termMonths);
+          if (f.bankId !== undefined) setBankId(f.bankId);
+          if (f.rateInput !== undefined) setRateInput(f.rateInput);
+          if (f.system !== undefined) setSystem(f.system);
+          if (f.buyerAge !== undefined) setBuyerAge(f.buyerAge);
+          if (f.monthlyIncome !== undefined) setMonthlyIncome(f.monthlyIncome);
+          if (f.fgts !== undefined) setFgts(f.fgts);
+          if (f.extraAnnual !== undefined) setExtraAnnual(f.extraAnnual);
+          if (f.extraStrategy !== undefined) setExtraStrategy(f.extraStrategy);
         }
-        if (s.snapshot) setSnapshot(s.snapshot);
-        if (s.simCode) simCodeRef.current = s.simCode;
-        if (s.reportEmittedAt) setReportEmittedAt(new Date(s.reportEmittedAt));
+        if (decoded.snapshot) setSnapshot(decoded.snapshot);
+        fromUrl = true;
+        // Clean URL so refresh keeps the state via localStorage but URL stays tidy
+        const url = new URL(window.location.href);
+        url.searchParams.delete("sim");
+        window.history.replaceState({}, "", url.toString());
+        toast.success("Simulação carregada do link compartilhado");
       }
     } catch {
-      /* ignore corrupted state */
+      toast.error("Não foi possível carregar o link da simulação");
+    }
+
+    // 2) Fallback to localStorage
+    if (!fromUrl) {
+      try {
+        const raw = localStorage.getItem("vp_financing_sim_v1");
+        if (raw) {
+          const s = JSON.parse(raw) as {
+            form?: Partial<{
+              typologyId: string; propertyValue: number; downPct: number;
+              downOverride: number | null; termMonths: number; bankId: string;
+              rateInput: string; system: AmortSystem; buyerAge: number;
+              monthlyIncome: number; fgts: number; extraAnnual: number;
+              extraStrategy: "reduce-term" | "reduce-installment";
+            }>;
+            snapshot?: Snapshot | null;
+            simCode?: string;
+            reportEmittedAt?: string;
+          };
+          if (s.form) {
+            if (s.form.typologyId !== undefined) setTypologyId(s.form.typologyId);
+            if (s.form.propertyValue !== undefined) setPropertyValue(s.form.propertyValue);
+            if (s.form.downPct !== undefined) setDownPct(s.form.downPct);
+            if (s.form.downOverride !== undefined) setDownOverride(s.form.downOverride);
+            if (s.form.termMonths !== undefined) setTermMonths(s.form.termMonths);
+            if (s.form.bankId !== undefined) setBankId(s.form.bankId);
+            if (s.form.rateInput !== undefined) setRateInput(s.form.rateInput);
+            if (s.form.system !== undefined) setSystem(s.form.system);
+            if (s.form.buyerAge !== undefined) setBuyerAge(s.form.buyerAge);
+            if (s.form.monthlyIncome !== undefined) setMonthlyIncome(s.form.monthlyIncome);
+            if (s.form.fgts !== undefined) setFgts(s.form.fgts);
+            if (s.form.extraAnnual !== undefined) setExtraAnnual(s.form.extraAnnual);
+            if (s.form.extraStrategy !== undefined) setExtraStrategy(s.form.extraStrategy);
+          }
+          if (s.snapshot) setSnapshot(s.snapshot);
+          if (s.simCode) simCodeRef.current = s.simCode;
+          if (s.reportEmittedAt) setReportEmittedAt(new Date(s.reportEmittedAt));
+        }
+      } catch {
+        /* ignore corrupted state */
+      }
     }
     hydratedRef.current = true;
   }, []);
