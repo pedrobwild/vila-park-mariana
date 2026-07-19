@@ -695,7 +695,7 @@ export default function FinancingSimulator() {
                   </Label>
                   <Select value={bankId} onValueChange={(v) => setBankId(v)}>
                     <SelectTrigger id="bank" className="h-11" aria-invalid={!!errors.bankId || undefined}>
-                      <SelectValue />
+                      <SelectValue placeholder="Selecione um banco/linha" />
                     </SelectTrigger>
                     <SelectContent className="max-h-80">
                       {INSTITUTION_RATES.map((r) => (
