@@ -27,6 +27,7 @@ import {
   AlertTriangle,
   Play,
   ClipboardList,
+  Loader2,
 } from "lucide-react";
 import { z } from "zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -237,6 +238,7 @@ export default function FinancingSimulator() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const simCodeRef = useRef<string>(generateSimCode());
   const [reportEmittedAt, setReportEmittedAt] = useState<Date>(new Date());
@@ -363,13 +365,19 @@ export default function FinancingSimulator() {
     }
 
     setErrors({});
-    simCodeRef.current = generateSimCode();
-    setReportEmittedAt(new Date());
-    setSnapshot(currentSnap);
-    // scroll to results (mobile)
+    setIsLoading(true);
+
+    // small delay so the UI can render the loading state before the synchronous snapshot update
     setTimeout(() => {
-      resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 60);
+      simCodeRef.current = generateSimCode();
+      setReportEmittedAt(new Date());
+      setSnapshot(currentSnap);
+      setIsLoading(false);
+      // scroll to results (mobile)
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 60);
+    }, 80);
   };
 
   const handleReset = () => {
@@ -759,9 +767,20 @@ export default function FinancingSimulator() {
                 size="lg"
                 className="w-full h-12 gap-2 text-base"
                 onClick={handleGenerate}
+                disabled={isLoading}
+                aria-busy={isLoading}
               >
-                <Play className="h-4 w-4" />
-                {snapshot ? "Atualizar simulação" : "Gerar simulação"}
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                    Calculando...
+                  </>
+                ) : (
+                  <>
+                    <Play className="h-4 w-4" aria-hidden="true" />
+                    {snapshot ? "Atualizar simulação" : "Gerar simulação"}
+                  </>
+                )}
               </Button>
               {Object.keys(errors).length > 0 && (
                 <p className="text-xs text-destructive mt-2 flex items-center gap-1">
