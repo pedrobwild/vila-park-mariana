@@ -128,7 +128,11 @@ export default function UnitFormDialog({ open, onOpenChange, unit, fieldDefs, on
     }
     setSaving(true);
     const payload = {
-      ...parsed.data,
+      code: parsed.data.code,
+      block: parsed.data.block,
+      area_m2: parsed.data.area_m2,
+      price_brl: parsed.data.price_brl,
+      status: parsed.data.status,
       planta_url: plantaUrl,
       planta_mime: plantaMime,
     };
@@ -142,7 +146,7 @@ export default function UnitFormDialog({ open, onOpenChange, unit, fieldDefs, on
         return;
       }
     } else {
-      const { data, error } = await supabase.from("units").insert([payload]).select("id").single();
+      const { data, error } = await supabase.from("units").insert(payload).select("id").single();
       if (error) {
         toast.error(error.message);
         setSaving(false);
