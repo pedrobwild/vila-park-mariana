@@ -114,67 +114,98 @@ export default function Oportunidades() {
           </p>
         </header>
 
-        {/* Filters */}
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-2 rounded-lg border border-border bg-card p-3">
-          <div className="relative col-span-2">
-            <Search className="h-4 w-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+        {/* Filters — only when there are units */}
+        {!loading && units.length > 0 && (
+          <div className="grid grid-cols-2 md:grid-cols-7 gap-2 rounded-lg border border-border bg-card p-3">
+            <div className="relative col-span-2">
+              <Search className="h-4 w-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Buscar código…"
+                className="pl-8"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+              />
+            </div>
+            <Select value={block} onValueChange={setBlock}>
+              <SelectTrigger><SelectValue placeholder="Bloco" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os blocos</SelectItem>
+                {blocks.map((b) => (
+                  <SelectItem key={b} value={b}>{b}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os status</SelectItem>
+                {(["disponivel", "reservado", "vendido"] as UnitStatus[]).map((s) => (
+                  <SelectItem key={s} value={s}>{STATUS_LABEL[s]}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Input
-              placeholder="Buscar código…"
-              className="pl-8"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
+              inputMode="numeric"
+              placeholder="Preço mín."
+              value={minPrice}
+              onChange={(e) => setMinPrice(e.target.value)}
             />
+            <Input
+              inputMode="numeric"
+              placeholder="Preço máx."
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(e.target.value)}
+            />
+            <Select value={sort} onValueChange={(v) => setSort(v as SortOpt)}>
+              <SelectTrigger className="md:ml-auto"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="code">Código (A→Z)</SelectItem>
+                <SelectItem value="price_asc">Menor preço</SelectItem>
+                <SelectItem value="price_desc">Maior preço</SelectItem>
+                <SelectItem value="area_asc">Menor metragem</SelectItem>
+                <SelectItem value="area_desc">Maior metragem</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <Select value={block} onValueChange={setBlock}>
-            <SelectTrigger><SelectValue placeholder="Bloco" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos os blocos</SelectItem>
-              {blocks.map((b) => (
-                <SelectItem key={b} value={b}>{b}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos os status</SelectItem>
-              {(["disponivel", "reservado", "vendido"] as UnitStatus[]).map((s) => (
-                <SelectItem key={s} value={s}>{STATUS_LABEL[s]}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Input
-            inputMode="numeric"
-            placeholder="Preço mín."
-            value={minPrice}
-            onChange={(e) => setMinPrice(e.target.value)}
-          />
-          <Input
-            inputMode="numeric"
-            placeholder="Preço máx."
-            value={maxPrice}
-            onChange={(e) => setMaxPrice(e.target.value)}
-          />
-          <Select value={sort} onValueChange={(v) => setSort(v as SortOpt)}>
-            <SelectTrigger className="col-span-2 md:col-span-1"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="code">Código (A→Z)</SelectItem>
-              <SelectItem value="price_asc">Menor preço</SelectItem>
-              <SelectItem value="price_desc">Maior preço</SelectItem>
-              <SelectItem value="area_asc">Menor metragem</SelectItem>
-              <SelectItem value="area_desc">Maior metragem</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        )}
 
         {loading ? (
           <div className="text-center py-16 text-muted-foreground">Carregando…</div>
+        ) : units.length === 0 ? (
+          <div className="text-center py-20 rounded-lg border border-dashed border-border bg-muted/20 space-y-4">
+            <Building2 className="h-10 w-10 mx-auto text-muted-foreground" />
+            <div className="space-y-1">
+              <p className="font-display text-lg font-semibold">Novas oportunidades em breve</p>
+              <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                Ainda não há unidades publicadas. Fale com o time Vila Park para conhecer disponibilidades e reservas antecipadas.
+              </p>
+            </div>
+            <a
+              href={`https://api.whatsapp.com/send?phone=${WHATSAPP_PHONE}&text=${encodeURIComponent("Olá! Gostaria de saber sobre oportunidades no Vila Park Vila Mariana.")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block"
+            >
+              <Button size="lg" className="gap-2 min-h-[44px]">
+                <MessageCircle className="h-4 w-4" /> Falar com o time Vila Park
+              </Button>
+            </a>
+          </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-20 rounded-lg border border-dashed border-border bg-muted/20">
-            <Building2 className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+          <div className="text-center py-20 rounded-lg border border-dashed border-border bg-muted/20 space-y-3">
+            <Building2 className="h-10 w-10 mx-auto text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
               Nenhuma unidade encontrada com esses filtros.
             </p>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setQ(""); setBlock("all"); setStatus("all");
+                setMinPrice(""); setMaxPrice(""); setSort("code");
+              }}
+            >
+              Limpar filtros
+            </Button>
           </div>
         ) : (
           <>
