@@ -296,8 +296,10 @@ export default function FinancingSimulator() {
                   max={3_000_000}
                   step={10_000}
                   onValueChange={(v) => setPropertyValue(v[0])}
+                  className={SLIDER_TOUCH}
                 />
               </div>
+
 
               {/* Down payment */}
               <div className="space-y-2">
