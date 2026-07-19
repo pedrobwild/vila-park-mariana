@@ -578,34 +578,50 @@ export default function UrbanFlexInvestorGuide() {
                     <CardContent className="p-5">
                       <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground mb-4">Formulário de reserva</p>
                       <form className="space-y-3" onSubmit={handleSubmit}>
-                        <Input
-                          placeholder="Nome"
-                          value={formName}
-                          onChange={(e) => setFormName(e.target.value)}
-                          required
-                        />
-                        <Input
-                          type="email"
-                          placeholder="E-mail"
-                          value={formEmail}
-                          onChange={(e) => setFormEmail(e.target.value)}
-                          required
-                        />
-                        <Input
-                          type="tel"
-                          placeholder="Telefone"
-                          value={formPhone}
-                          onChange={(e) => setFormPhone(e.target.value)}
-                          required
-                        />
-                        <Textarea
-                          placeholder="Mensagem"
-                          value={formMessage}
-                          onChange={(e) => setFormMessage(e.target.value)}
-                          rows={4}
-                        />
+                        <div className="space-y-1.5">
+                          <label htmlFor="uf-name" className="text-sm font-medium text-foreground">Nome completo</label>
+                          <Input
+                            id="uf-name"
+                            placeholder="Como devemos te chamar"
+                            value={formName}
+                            onChange={(e) => setFormName(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label htmlFor="uf-email" className="text-sm font-medium text-foreground">E-mail</label>
+                          <Input
+                            id="uf-email"
+                            type="email"
+                            placeholder="voce@email.com"
+                            value={formEmail}
+                            onChange={(e) => setFormEmail(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label htmlFor="uf-phone" className="text-sm font-medium text-foreground">Telefone (WhatsApp)</label>
+                          <Input
+                            id="uf-phone"
+                            type="tel"
+                            placeholder="(11) 90000-0000"
+                            value={formPhone}
+                            onChange={(e) => setFormPhone(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label htmlFor="uf-message" className="text-sm font-medium text-foreground">Mensagem</label>
+                          <Textarea
+                            id="uf-message"
+                            placeholder="Conte um pouco do que procura (tipologia, prazo, forma de pagamento)…"
+                            value={formMessage}
+                            onChange={(e) => setFormMessage(e.target.value)}
+                            rows={4}
+                          />
+                        </div>
                         <Button type="submit" className="w-full min-h-[46px] bg-[hsl(var(--accent))] hover:bg-[hsl(var(--accent-strong))] text-white">
-                          Enviar
+                          Enviar pedido de reserva
                         </Button>
                       </form>
                     </CardContent>
