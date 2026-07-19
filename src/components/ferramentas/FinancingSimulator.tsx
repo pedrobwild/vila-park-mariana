@@ -678,16 +678,17 @@ export default function FinancingSimulator() {
                       tabIndex={-1}
                       inputMode="numeric"
                       value={fmtBRL(financedAmount)}
+                      aria-describedby={errors.financed ? "financed-error" : undefined}
                       className={[
                         "pl-9 pr-3 h-11 text-right font-semibold tabular-nums cursor-default transition-colors duration-300",
-                        financedAmountInvalid
+                        financedAmountInvalid || errors.financed
                           ? "border-destructive bg-destructive/10 text-destructive focus-visible:ring-destructive"
                           : "bg-muted/40",
                         financedPulse && !financedAmountInvalid ? "border-primary/60 text-primary" : "",
                       ].join(" ")}
                     />
                   </div>
-                  <FieldError msg={errors.financed} />
+                  <FieldError id="financed-error" msg={errors.financed} />
                 </div>
 
                 {/* Term */}
