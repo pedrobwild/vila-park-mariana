@@ -859,13 +859,14 @@ export default function FinancingSimulator() {
                       max={80}
                       value={buyerAge || ""}
                       aria-invalid={!!errors.buyerAge || undefined}
+                      aria-describedby={errors.buyerAge ? "age-error" : undefined}
                       className={["h-11 text-right tabular-nums", errors.buyerAge ? "border-destructive focus-visible:ring-destructive" : ""].join(" ")}
                       onChange={(e) => {
                         const raw = e.target.value;
                         setBuyerAge(raw === "" ? 0 : clamp(parseInt(raw) || 0, 0, 120));
                       }}
                     />
-                    <FieldError msg={errors.buyerAge} />
+                    <FieldError id="age-error" msg={errors.buyerAge} />
                   </div>
                   <div className="space-y-1.5">
                     <Label htmlFor="income" className="flex items-center gap-1.5">
