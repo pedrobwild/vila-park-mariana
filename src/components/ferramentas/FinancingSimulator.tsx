@@ -687,17 +687,21 @@ export default function FinancingSimulator() {
                     </span>
                   </div>
                   <Slider
+                    id="term"
                     value={[termMonths]}
                     min={60}
                     max={420}
                     step={12}
                     onValueChange={(v) => setTermMonths(v[0])}
                     className={SLIDER_TOUCH}
+                    aria-invalid={!!errors.termMonths || undefined}
+                    aria-describedby={errors.termMonths ? "term-error" : undefined}
                   />
                   <div className="flex justify-between text-[11px] text-muted-foreground px-0.5">
                     <span>5 anos (60 meses)</span>
                     <span>35 anos (420 meses)</span>
                   </div>
+                  <FieldError id="term-error" msg={errors.termMonths} />
                 </div>
               </Fieldset>
 
