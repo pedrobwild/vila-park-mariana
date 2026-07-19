@@ -742,6 +742,58 @@ export default function FinancingSimulator() {
             </TableBody>
           </Table>
         </CardContent>
+        <CardContent className="pt-0">
+          <Accordion type="single" collapsible>
+            <AccordionItem value="all" className="border-none">
+              <AccordionTrigger className="py-2 text-sm hover:no-underline">
+                Ver todas as parcelas (por ano)
+              </AccordionTrigger>
+              <AccordionContent>
+                <Accordion type="multiple" className="space-y-1">
+                  {Array.from({ length: Math.ceil(active.schedule.length / 12) }).map((_, yi) => {
+                    const year = yi + 1;
+                    const rows = active.schedule.slice(yi * 12, yi * 12 + 12);
+                    const totalYear = rows.reduce((a, r) => a + r.fullPayment, 0);
+                    return (
+                      <AccordionItem key={year} value={`y${year}`} className="border border-border/50 rounded-md">
+                        <AccordionTrigger className="px-3 py-2 text-sm hover:no-underline">
+                          <span className="flex-1 text-left">Ano {year}</span>
+                          <span className="text-xs text-muted-foreground mr-2">{BRL(totalYear)}</span>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-2 overflow-x-auto">
+                          <Table>
+                            <TableHeader><TableRow>
+                              <TableHead>Nº</TableHead>
+                              <TableHead className="text-right">Parcela</TableHead>
+                              <TableHead className="text-right">Juros</TableHead>
+                              <TableHead className="text-right">Amortização</TableHead>
+                              <TableHead className="text-right">Seg.+tarifa</TableHead>
+                              <TableHead className="text-right">Total</TableHead>
+                              <TableHead className="text-right">Saldo</TableHead>
+                            </TableRow></TableHeader>
+                            <TableBody>
+                              {rows.map((row) => (
+                                <TableRow key={row.n}>
+                                  <TableCell>{row.n}</TableCell>
+                                  <TableCell className="text-right">{BRL2(row.payment)}</TableCell>
+                                  <TableCell className="text-right text-foreground/80">{BRL2(row.interest)}</TableCell>
+                                  <TableCell className="text-right">{BRL2(row.amortization)}</TableCell>
+                                  <TableCell className="text-right text-foreground/80">{BRL2(row.mip + row.dfi + row.admin)}</TableCell>
+                                  <TableCell className="text-right font-semibold">{BRL2(row.fullPayment)}</TableCell>
+                                  <TableCell className="text-right">{BRL(row.balance)}</TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </AccordionContent>
+                      </AccordionItem>
+                    );
+                  })}
+                </Accordion>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </CardContent>
       </Card>
 
       {/* Print styles */}
@@ -750,8 +802,11 @@ export default function FinancingSimulator() {
           body * { visibility: hidden; }
           .print-report, .print-report * { visibility: visible; }
           .print-report { position: absolute; left: 0; top: 0; width: 100%; padding: 24px; }
+          .print-report .max-h-80,
+          .print-report [class*="max-h-"] { max-height: none !important; overflow: visible !important; }
         }
       `}</style>
+
     </section>
   );
 }
