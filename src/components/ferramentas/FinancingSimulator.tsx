@@ -954,7 +954,7 @@ export default function FinancingSimulator() {
               reportEmittedAt={reportEmittedAt}
             />
           ) : (
-            <EmptyResults />
+            <EmptyResults onStart={handleStart} />
           )}
         </div>
       </div>
