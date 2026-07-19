@@ -44,7 +44,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { TYPOLOGIES } from "@/data/propertyData";
 import { WHATSAPP_PHONE } from "@/data/surroundings";
 import {
@@ -247,6 +247,7 @@ export default function FinancingSimulator() {
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
   const simCodeRef = useRef<string>(generateSimCode());
   const [reportEmittedAt, setReportEmittedAt] = useState<Date>(new Date());
   const resultsRef = useRef<HTMLDivElement>(null);
@@ -523,6 +524,7 @@ export default function FinancingSimulator() {
   };
 
   const handleReset = () => {
+    setShowResetConfirm(false);
     // Remove persisted state so the form comes back empty on next visit
     try {
       localStorage.removeItem("vp_financing_sim_v1");
@@ -998,7 +1000,7 @@ export default function FinancingSimulator() {
               snap={snapshot}
               stale={stale}
               onRegenerate={handleGenerate}
-              onReset={handleReset}
+              onReset={() => setShowResetConfirm(true)}
               onCopyLink={() => {
                 try {
                   const payload = {
@@ -1031,6 +1033,27 @@ export default function FinancingSimulator() {
           )}
         </div>
       </div>
+
+      {/* Reset confirmation dialog */}
+      <Dialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Descartar simulação?</DialogTitle>
+            <DialogDescription>
+              Todos os campos preenchidos e o resultado gerado serão apagados. Essa ação não pode ser desfeita.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
+            <Button variant="outline" className="w-full sm:w-auto" onClick={() => setShowResetConfirm(false)}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" className="w-full sm:w-auto gap-2" onClick={handleReset}>
+              <RotateCcw className="h-4 w-4" aria-hidden="true" />
+              Descartar e refazer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
