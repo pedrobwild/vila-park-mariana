@@ -1,0 +1,155 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { ArrowLeft, LogOut, Building2, Lock, Menu } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import UnitsManager from "@/components/admin/UnitsManager";
+
+type SectionKey = "units";
+
+const SECTIONS: Array<{ key: SectionKey; label: string; icon: typeof Building2 }> = [
+  { key: "units", label: "Unidades à venda", icon: Building2 },
+];
+
+const COMING_SOON = ["Leads", "Relatórios", "Configurações"];
+
+function Logo() {
+  return (
+    <span className="flex items-baseline gap-1 font-display text-lg font-bold leading-none">
+      <span className="text-foreground">Vila</span>
+      <span className="text-accent">Park</span>
+      <span className="hidden sm:inline text-xs font-medium text-muted-foreground ml-1">Admin</span>
+    </span>
+  );
+}
+
+export default function Admin() {
+  const { session } = useIsAdmin();
+  const [active, setActive] = useState<SectionKey>("units");
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+  };
+
+  const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => (
+    <nav className="space-y-1 p-3">
+      {SECTIONS.map((s) => {
+        const isActive = active === s.key;
+        return (
+          <button
+            key={s.key}
+            onClick={() => {
+              setActive(s.key);
+              onNavigate?.();
+            }}
+            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm min-h-[44px] transition-colors ${
+              isActive
+                ? "bg-primary text-primary-foreground font-semibold"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+            }`}
+          >
+            <s.icon className="h-4 w-4 shrink-0" />
+            {s.label}
+          </button>
+        );
+      })}
+      <p className="px-3 pt-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+        Em breve
+      </p>
+      {COMING_SOON.map((label) => (
+        <div
+          key={label}
+          className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm text-muted-foreground/60 cursor-not-allowed"
+          aria-disabled="true"
+        >
+          <Lock className="h-4 w-4 shrink-0" />
+          {label}
+        </div>
+      ))}
+    </nav>
+  );
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      <header className="sticky top-0 z-40 glass-nav border-b border-border/40">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 flex items-center justify-between h-16 gap-3">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden h-9 w-9"
+              onClick={() => setMenuOpen(true)}
+              aria-label="Abrir menu"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+            <Link to="/" aria-label="Vila Park — Vila Mariana">
+              <Logo />
+            </Link>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="hidden sm:inline text-xs text-muted-foreground truncate max-w-[180px]">
+              {session?.user.email}
+            </span>
+            <Link to="/">
+              <Button variant="ghost" size="sm" className="h-8">
+                <ArrowLeft className="h-3.5 w-3.5 mr-1" /> <span className="hidden sm:inline">Voltar ao site</span>
+              </Button>
+            </Link>
+            <Button variant="outline" size="sm" className="h-8" onClick={handleLogout}>
+              <LogOut className="h-3.5 w-3.5 mr-1" /> Sair
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      <div className="flex-1 max-w-7xl w-full mx-auto flex">
+        <aside className="hidden md:block w-60 shrink-0 border-r border-border/40">
+          <SidebarContent />
+        </aside>
+
+        <main className="flex-1 min-w-0 px-4 md:px-6 py-6 md:py-8 space-y-6">
+          <div className="md:hidden">
+            <Tabs value={active} onValueChange={(v) => setActive(v as SectionKey)}>
+              <TabsList>
+                {SECTIONS.map((s) => (
+                  <TabsTrigger key={s.key} value={s.key}>
+                    {s.label}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+              <TabsContent value="units" />
+            </Tabs>
+          </div>
+
+          <header>
+            <h1 className="font-display text-2xl md:text-3xl font-bold">
+              {SECTIONS.find((s) => s.key === active)?.label}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Gestão das unidades à venda do Vila Park Mariana.
+            </p>
+          </header>
+
+          {active === "units" && <UnitsManager />}
+        </main>
+      </div>
+
+      <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+        <SheetContent side="left" className="w-64 p-0">
+          <SheetHeader className="px-5 pt-5 pb-4 border-b border-border/40">
+            <SheetTitle>
+              <Logo />
+            </SheetTitle>
+          </SheetHeader>
+          <SidebarContent onNavigate={() => setMenuOpen(false)} />
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
+}

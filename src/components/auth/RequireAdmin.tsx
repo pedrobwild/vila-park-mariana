@@ -1,12 +1,12 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
-import LoginScreen from "./LoginScreen";
 import { Button } from "@/components/ui/button";
 import { ShieldAlert } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function RequireAdmin({ children }: { children: React.ReactNode }) {
   const { session, isAdmin, loading } = useIsAdmin();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -16,7 +16,9 @@ export default function RequireAdmin({ children }: { children: React.ReactNode }
     );
   }
 
-  if (!session) return <LoginScreen />;
+  if (!session) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
 
   if (!isAdmin) {
     return (

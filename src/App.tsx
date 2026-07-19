@@ -16,7 +16,7 @@ const AdminUpload = lazy(() => import("./pages/AdminUpload"));
 const Insights = lazy(() => import("./pages/Insights"));
 const CorretorPage = lazy(() => import("./pages/CorretorPage"));
 const Login = lazy(() => import("./pages/Login"));
-const Comercial = lazy(() => import("./pages/Comercial"));
+const Admin = lazy(() => import("./pages/Admin"));
 const Oportunidades = lazy(() => import("./pages/Oportunidades"));
 import RequireAdmin from "./components/auth/RequireAdmin";
 
@@ -42,7 +42,8 @@ const App = () => (
               <Route path="/corretor" element={<CorretorPage />} />
               <Route path="/login" element={<Login />} />
               <Route path="/oportunidades" element={<Oportunidades />} />
-              <Route path="/comercial" element={<RequireAdmin><Comercial /></RequireAdmin>} />
+              <Route path="/admin" element={<RequireAdmin><Admin /></RequireAdmin>} />
+              <Route path="/comercial" element={<Navigate to="/admin" replace />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

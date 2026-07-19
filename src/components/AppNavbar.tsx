@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import AuthMenu from "@/components/auth/AuthMenu";
 
 function Logo() {
   return (
@@ -58,10 +59,12 @@ export default function AppNavbar() {
             <Button variant={pathname === "/guia-investidor" ? "secondary" : "ghost"} size="sm" className="h-7">{t("nav.guideInvestor")}</Button>
           </Link>
           <LanguageSwitcher variant="compact" className="ml-1" />
+          <AuthMenu />
         </div>
 
         <div className="flex items-center gap-1 sm:hidden">
           <LanguageSwitcher variant="icon" />
+          <AuthMenu />
           {!(isHome && isMobile) && (
             <Button
               variant="ghost"
@@ -117,7 +120,8 @@ export default function AppNavbar() {
               <TrendingUp className="h-4 w-4 shrink-0" />
               {t("nav.guideInvestor")}
             </Link>
-            <div className="pt-3 mt-3 border-t border-border/40">
+            <div className="pt-3 mt-3 border-t border-border/40 space-y-2">
+              <AuthMenu variant="mobile" onNavigate={() => setMobileOpen(false)} />
               <LanguageSwitcher variant="full" className="w-full justify-start" />
             </div>
           </nav>
