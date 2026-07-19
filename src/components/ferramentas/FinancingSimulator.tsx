@@ -66,13 +66,17 @@ const num = (s: string) => {
 };
 const fmtBRL = (v: number) => (v > 0 ? v.toLocaleString("pt-BR") : "");
 
-function InfoHint({ text }: { text: string }) {
+function InfoHint({ text, label }: { text: string; label?: string }) {
   return (
     <TooltipProvider delayDuration={100}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <button type="button" aria-label="Mais informações" className="inline-flex text-muted-foreground hover:text-foreground">
-            <Info className="h-3.5 w-3.5" />
+          <button
+            type="button"
+            aria-label={label ? `Mais informações: ${label}` : "Mais informações"}
+            className="inline-flex text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+          >
+            <Info className="h-3.5 w-3.5" aria-hidden="true" />
           </button>
         </TooltipTrigger>
         <TooltipContent className="max-w-xs text-xs leading-relaxed">{text}</TooltipContent>
