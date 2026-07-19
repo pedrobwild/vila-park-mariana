@@ -371,8 +371,17 @@ export default function FinancingSimulator() {
     }, 60);
   };
 
+  const handleReset = () => {
+    setSnapshot(null);
+    setErrors({});
+    const formEl = document.getElementById("simulator-form");
+    if (formEl) {
+      formEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   return (
-    <section className="scroll-mt-24 py-12 md:py-16">
+    <section id="simulator-form" className="scroll-mt-24 py-12 md:py-16">
       <header className="mb-6">
         <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2">
           <Calculator className="h-6 w-6 text-primary" />
