@@ -542,7 +542,7 @@ export default function FinancingSimulator() {
                       if (t && t.purchasePrice > 0) setPropertyValue(t.purchasePrice);
                     }}
                   >
-                    <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
+                    <SelectTrigger id="typology" className="h-11"><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="custom">Personalizado</SelectItem>
                       {TYPOLOGIES.map((t) => (
