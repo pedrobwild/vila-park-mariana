@@ -243,6 +243,49 @@ export default function FinancingSimulator() {
   const simCodeRef = useRef<string>(generateSimCode());
   const [reportEmittedAt, setReportEmittedAt] = useState<Date>(new Date());
   const resultsRef = useRef<HTMLDivElement>(null);
+  const hydratedRef = useRef(false);
+
+  // ---- Restore from localStorage on mount ----
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("vp_financing_sim_v1");
+      if (raw) {
+        const s = JSON.parse(raw) as {
+          form?: Partial<{
+            typologyId: string; propertyValue: number; downPct: number;
+            downOverride: number | null; termMonths: number; bankId: string;
+            rateInput: string; system: AmortSystem; buyerAge: number;
+            monthlyIncome: number; fgts: number; extraAnnual: number;
+            extraStrategy: "reduce-term" | "reduce-installment";
+          }>;
+          snapshot?: Snapshot | null;
+          simCode?: string;
+          reportEmittedAt?: string;
+        };
+        if (s.form) {
+          if (s.form.typologyId !== undefined) setTypologyId(s.form.typologyId);
+          if (s.form.propertyValue !== undefined) setPropertyValue(s.form.propertyValue);
+          if (s.form.downPct !== undefined) setDownPct(s.form.downPct);
+          if (s.form.downOverride !== undefined) setDownOverride(s.form.downOverride);
+          if (s.form.termMonths !== undefined) setTermMonths(s.form.termMonths);
+          if (s.form.bankId !== undefined) setBankId(s.form.bankId);
+          if (s.form.rateInput !== undefined) setRateInput(s.form.rateInput);
+          if (s.form.system !== undefined) setSystem(s.form.system);
+          if (s.form.buyerAge !== undefined) setBuyerAge(s.form.buyerAge);
+          if (s.form.monthlyIncome !== undefined) setMonthlyIncome(s.form.monthlyIncome);
+          if (s.form.fgts !== undefined) setFgts(s.form.fgts);
+          if (s.form.extraAnnual !== undefined) setExtraAnnual(s.form.extraAnnual);
+          if (s.form.extraStrategy !== undefined) setExtraStrategy(s.form.extraStrategy);
+        }
+        if (s.snapshot) setSnapshot(s.snapshot);
+        if (s.simCode) simCodeRef.current = s.simCode;
+        if (s.reportEmittedAt) setReportEmittedAt(new Date(s.reportEmittedAt));
+      }
+    } catch {
+      /* ignore corrupted state */
+    }
+    hydratedRef.current = true;
+  }, []);
 
   const selectedRate: InstitutionRate | undefined = INSTITUTION_RATES.find((r) => r.id === bankId);
   const rateIsManual = !selectedRate || selectedRate.annualRate === null;
