@@ -111,6 +111,7 @@ function CurrencyInput({
   placeholder,
   className,
   invalid,
+  "aria-describedby": ariaDescribedBy,
 }: {
   id: string;
   value: number;
@@ -118,6 +119,7 @@ function CurrencyInput({
   placeholder?: string;
   className?: string;
   invalid?: boolean;
+  "aria-describedby"?: string;
 }) {
   const [text, setText] = useState(fmtBRL(value));
   useEffect(() => {
@@ -130,6 +132,7 @@ function CurrencyInput({
         id={id}
         inputMode="numeric"
         aria-invalid={invalid || undefined}
+        aria-describedby={ariaDescribedBy}
         className={[
           "pl-9 pr-3 h-11 text-right tabular-nums",
           invalid ? "border-destructive focus-visible:ring-destructive" : "",
@@ -162,7 +165,8 @@ function Fieldset({ title, children, id }: { title: string; children: React.Reac
 function FieldError({ msg, id }: { msg?: string; id?: string }) {
   if (!msg) return null;
   return (
-    <p id={id} role="alert" className="text-xs text-destructive mt-1">
+    <p id={id} role="alert" className="text-xs text-destructive mt-1 flex items-center gap-1">
+      <AlertTriangle className="h-3 w-3 shrink-0" aria-hidden="true" />
       {msg}
     </p>
   );
@@ -420,14 +424,14 @@ export default function FinancingSimulator() {
 
   /* ---- Validation ---- */
   const schema = z.object({
-    bankId: z.string().min(1),
-    propertyValue: z.number().min(50_000, "Informe um valor de imóvel válido (mín. R$ 50.000)."),
-    downPayment: z.number().min(0),
-    termMonths: z.number().min(12).max(420),
+    bankId: z.string().min(1, "Selecione um banco ou linha de financiamento."),
+    propertyValue: z.number().min(50_000, "Informe o valor do imóvel (mín. R$ 50.000)."),
+    downPayment: z.number().min(0, "Entrada não pode ser negativa."),
+    termMonths: z.number().min(12, "Prazo mínimo de 12 meses.").max(420, "Prazo máximo de 420 meses."),
     annualRate: z.number().gt(0, "Informe a taxa de juros anual.").max(30, "Taxa fora do intervalo razoável."),
     buyerAge: z.number().min(18, "Idade mínima 18 anos.").max(80, "Idade máxima 80 anos."),
     monthlyIncome: z.number().gt(0, "Informe a renda familiar mensal."),
-    system: z.enum(["SAC", "PRICE"]),
+    system: z.enum(["SAC", "PRICE"], { required_error: "Selecione o sistema de amortização." }),
   });
 
   const focusField = (id: string) => {
@@ -442,8 +446,12 @@ export default function FinancingSimulator() {
     const errs: Record<string, string> = {};
 
     // Custom cross-field checks first
-    if (financedAmount <= 0) errs.financed = "A entrada não pode ser igual ou maior que o valor do imóvel.";
-    if (!ltvOk) errs.dp = "Entrada abaixo de 20% — fora das regras do SFH.";
+    if (propertyValue > 0 && financedAmount <= 0) {
+      errs.financed = "A entrada não pode ser igual ou maior que o valor do imóvel.";
+    }
+    if (propertyValue > 0 && !ltvOk) {
+      errs.dp = "Entrada abaixo de 20% — fora das regras do SFH.";
+    }
 
     const parse = schema.safeParse({
       bankId,
@@ -465,7 +473,7 @@ export default function FinancingSimulator() {
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
       // focus first error
-      const order = ["bankId", "annualRate", "propertyValue", "dp", "financed", "termMonths", "buyerAge", "monthlyIncome"];
+      const order = ["bankId", "annualRate", "propertyValue", "dp", "financed", "termMonths", "buyerAge", "monthlyIncome", "system"];
       const firstKey = order.find((k) => errs[k]) ?? Object.keys(errs)[0];
       const idMap: Record<string, string> = {
         bankId: "bank",
@@ -476,6 +484,7 @@ export default function FinancingSimulator() {
         termMonths: "term",
         buyerAge: "age",
         monthlyIncome: "income",
+        system: "system",
       };
       focusField(idMap[firstKey] ?? firstKey);
       return;
@@ -564,7 +573,13 @@ export default function FinancingSimulator() {
                       {propertyValue > 0 ? BRL(propertyValue) : "—"}
                     </span>
                   </div>
-                  <CurrencyInput id="pv" value={propertyValue} onChange={setPropertyValue} invalid={!!errors.propertyValue} />
+                  <CurrencyInput
+                    id="pv"
+                    value={propertyValue}
+                    onChange={setPropertyValue}
+                    invalid={!!errors.propertyValue}
+                    aria-describedby={errors.propertyValue ? "pv-error" : undefined}
+                  />
                   <Slider
                     value={[propertyValue]}
                     min={200_000}
@@ -572,8 +587,10 @@ export default function FinancingSimulator() {
                     step={10_000}
                     onValueChange={(v) => setPropertyValue(v[0])}
                     className={SLIDER_TOUCH}
+                    aria-invalid={!!errors.propertyValue || undefined}
+                    aria-describedby={errors.propertyValue ? "pv-error" : undefined}
                   />
-                  <FieldError msg={errors.propertyValue} />
+                  <FieldError id="pv-error" msg={errors.propertyValue} />
                 </div>
               </Fieldset>
 
@@ -594,6 +611,7 @@ export default function FinancingSimulator() {
                       id="dp"
                       value={downOverride ?? Math.round((propertyValue * downPct) / 100)}
                       invalid={!!errors.dp}
+                      aria-describedby={errors.dp ? "dp-error" : undefined}
                       onChange={(v) => {
                         const maxDown = Math.max(propertyValue - fgts, 0);
                         const clamped = clamp(v, 0, maxDown);
@@ -612,6 +630,7 @@ export default function FinancingSimulator() {
                           setDownOverride(null);
                         }}
                         className="pr-8 h-11 text-right tabular-nums"
+                        aria-describedby={errors.dp ? "dp-error" : undefined}
                       />
                       <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">%</span>
                     </div>
@@ -626,12 +645,14 @@ export default function FinancingSimulator() {
                       setDownOverride(null);
                     }}
                     className={SLIDER_TOUCH}
+                    aria-invalid={!!errors.dp || undefined}
+                    aria-describedby={errors.dp ? "dp-error" : undefined}
                   />
                   <div className="flex justify-between text-[11px] text-muted-foreground px-0.5">
                     <span>20% (mín. SFH)</span>
                     <span>80%</span>
                   </div>
-                  <FieldError msg={errors.dp} />
+                  <FieldError id="dp-error" msg={errors.dp} />
                 </div>
 
                 {/* Financed amount (auto) */}
@@ -660,16 +681,17 @@ export default function FinancingSimulator() {
                       tabIndex={-1}
                       inputMode="numeric"
                       value={fmtBRL(financedAmount)}
+                      aria-describedby={errors.financed ? "financed-error" : undefined}
                       className={[
                         "pl-9 pr-3 h-11 text-right font-semibold tabular-nums cursor-default transition-colors duration-300",
-                        financedAmountInvalid
+                        financedAmountInvalid || errors.financed
                           ? "border-destructive bg-destructive/10 text-destructive focus-visible:ring-destructive"
                           : "bg-muted/40",
                         financedPulse && !financedAmountInvalid ? "border-primary/60 text-primary" : "",
                       ].join(" ")}
                     />
                   </div>
-                  <FieldError msg={errors.financed} />
+                  <FieldError id="financed-error" msg={errors.financed} />
                 </div>
 
                 {/* Term */}
@@ -681,17 +703,21 @@ export default function FinancingSimulator() {
                     </span>
                   </div>
                   <Slider
+                    id="term"
                     value={[termMonths]}
                     min={60}
                     max={420}
                     step={12}
                     onValueChange={(v) => setTermMonths(v[0])}
                     className={SLIDER_TOUCH}
+                    aria-invalid={!!errors.termMonths || undefined}
+                    aria-describedby={errors.termMonths ? "term-error" : undefined}
                   />
                   <div className="flex justify-between text-[11px] text-muted-foreground px-0.5">
                     <span>5 anos (60 meses)</span>
                     <span>35 anos (420 meses)</span>
                   </div>
+                  <FieldError id="term-error" msg={errors.termMonths} />
                 </div>
               </Fieldset>
 
@@ -703,7 +729,7 @@ export default function FinancingSimulator() {
                     <InfoHint text="Base de instituições consultada em 19/07/2026. Bancos com taxa 'sob consulta' exigem digitar a taxa manualmente." label="Banco" />
                   </Label>
                   <Select value={bankId} onValueChange={(v) => setBankId(v)}>
-                    <SelectTrigger id="bank" className="h-11" aria-invalid={!!errors.bankId || undefined}>
+                    <SelectTrigger id="bank" className="h-11" aria-invalid={!!errors.bankId || undefined} aria-describedby={errors.bankId ? "bank-error" : undefined}>
                       <SelectValue placeholder="Selecione um banco/linha" />
                     </SelectTrigger>
                     <SelectContent className="max-h-80">
@@ -730,7 +756,7 @@ export default function FinancingSimulator() {
                       </span>
                     </div>
                   )}
-                  <FieldError msg={errors.bankId} />
+                  <FieldError id="bank-error" msg={errors.bankId} />
                 </div>
 
                 <div className="space-y-1.5">
@@ -747,6 +773,8 @@ export default function FinancingSimulator() {
                       value={rateInput}
                       onChange={(e) => setRateInput(e.target.value)}
                       placeholder={rateIsManual ? "0,00" : ""}
+                      aria-invalid={!!errors.annualRate || undefined}
+                      aria-describedby={errors.annualRate ? "rate-error" : undefined}
                       className={[
                         "pr-20 h-11 font-semibold tabular-nums text-right",
                         rateIsManual ? "" : "cursor-default bg-muted/40",
@@ -760,10 +788,10 @@ export default function FinancingSimulator() {
                   {!rateIsManual && (
                     <p className="text-[11px] text-muted-foreground">Taxa fixa da linha selecionada — troque de linha para simular outra.</p>
                   )}
-                  <FieldError msg={errors.annualRate} />
+                  <FieldError id="rate-error" msg={errors.annualRate} />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2" id="system">
                   <Label className="flex items-center gap-1.5">
                     Sistema de amortização
                     <InfoHint text="SAC: parcelas decrescem, paga menos juros total. Price: parcelas fixas, mais previsível." label="Sistema" />
@@ -771,7 +799,12 @@ export default function FinancingSimulator() {
                   <div
                     role="tablist"
                     aria-label="Sistema de amortização"
-                    className="inline-flex w-full rounded-md border border-border/60 bg-muted/30 p-0.5"
+                    aria-invalid={!!errors.system || undefined}
+                    aria-describedby={errors.system ? "system-error" : undefined}
+                    className={[
+                      "inline-flex w-full rounded-md border bg-muted/30 p-0.5",
+                      errors.system ? "border-destructive" : "border-border/60",
+                    ].join(" ")}
                   >
                     {(["SAC", "PRICE"] as const).map((opt) => {
                       const selected = system === opt;
@@ -799,6 +832,7 @@ export default function FinancingSimulator() {
                       );
                     })}
                   </div>
+                  <FieldError id="system-error" msg={errors.system} />
                 </div>
 
                 {mcmvForm.eligible && (
@@ -828,21 +862,29 @@ export default function FinancingSimulator() {
                       max={80}
                       value={buyerAge || ""}
                       aria-invalid={!!errors.buyerAge || undefined}
+                      aria-describedby={errors.buyerAge ? "age-error" : undefined}
                       className={["h-11 text-right tabular-nums", errors.buyerAge ? "border-destructive focus-visible:ring-destructive" : ""].join(" ")}
                       onChange={(e) => {
                         const raw = e.target.value;
                         setBuyerAge(raw === "" ? 0 : clamp(parseInt(raw) || 0, 0, 120));
                       }}
                     />
-                    <FieldError msg={errors.buyerAge} />
+                    <FieldError id="age-error" msg={errors.buyerAge} />
                   </div>
                   <div className="space-y-1.5">
                     <Label htmlFor="income" className="flex items-center gap-1.5">
                       Renda familiar
                       <InfoHint text="Renda familiar mensal bruta. Comprometimento máx. de 30% da renda com a 1ª parcela." label="Renda" />
                     </Label>
-                    <CurrencyInput id="income" value={monthlyIncome} onChange={setMonthlyIncome} placeholder="0" invalid={!!errors.monthlyIncome} />
-                    <FieldError msg={errors.monthlyIncome} />
+                    <CurrencyInput
+                      id="income"
+                      value={monthlyIncome}
+                      onChange={setMonthlyIncome}
+                      placeholder="0"
+                      invalid={!!errors.monthlyIncome}
+                      aria-describedby={errors.monthlyIncome ? "income-error" : undefined}
+                    />
+                    <FieldError id="income-error" msg={errors.monthlyIncome} />
                   </div>
                 </div>
               </Fieldset>
