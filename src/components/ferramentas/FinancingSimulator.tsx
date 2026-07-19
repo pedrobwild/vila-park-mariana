@@ -29,6 +29,7 @@ import {
   ClipboardList,
   Loader2,
   Link2,
+  ArrowDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -245,6 +246,7 @@ export default function FinancingSimulator() {
   const simCodeRef = useRef<string>(generateSimCode());
   const [reportEmittedAt, setReportEmittedAt] = useState<Date>(new Date());
   const resultsRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLElement>(null);
   const hydratedRef = useRef(false);
 
   // ---- Restore from localStorage on mount ----
@@ -498,14 +500,19 @@ export default function FinancingSimulator() {
   const handleReset = () => {
     setSnapshot(null);
     setErrors({});
-    const formEl = document.getElementById("simulator-form");
-    if (formEl) {
-      formEl.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const handleStart = () => {
+    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setTimeout(() => {
+      const el = document.getElementById("typology");
+      if (el) el.focus();
+    }, 400);
   };
 
   return (
-    <section id="simulator-form" className="scroll-mt-24 py-12 md:py-16">
+    <section id="simulator-form" ref={formRef} className="scroll-mt-24 py-12 md:py-16">
       <header className="mb-6">
         <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2">
           <Calculator className="h-6 w-6 text-primary" />
@@ -540,7 +547,7 @@ export default function FinancingSimulator() {
                       if (t && t.purchasePrice > 0) setPropertyValue(t.purchasePrice);
                     }}
                   >
-                    <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
+                    <SelectTrigger id="typology" className="h-11"><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="custom">Personalizado</SelectItem>
                       {TYPOLOGIES.map((t) => (
@@ -947,7 +954,7 @@ export default function FinancingSimulator() {
               reportEmittedAt={reportEmittedAt}
             />
           ) : (
-            <EmptyResults />
+            <EmptyResults onStart={handleStart} />
           )}
         </div>
       </div>
@@ -957,18 +964,45 @@ export default function FinancingSimulator() {
 
 /* ---------- Empty state ---------- */
 
-function EmptyResults() {
+function EmptyResults({ onStart }: { onStart: () => void }) {
   return (
     <Card className="border-dashed border-border/70 bg-muted/10">
-      <CardContent className="py-16 flex flex-col items-center text-center gap-3">
-        <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
-          <ClipboardList className="h-7 w-7 text-primary" aria-hidden="true" />
+      <CardContent className="py-14 md:py-20 flex flex-col items-center text-center gap-4">
+        <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+          <ClipboardList className="h-8 w-8 text-primary" aria-hidden="true" />
         </div>
-        <h3 className="font-display text-lg font-semibold text-foreground">Preencha as premissas ao lado</h3>
-        <p className="text-sm text-muted-foreground max-w-sm">
-          Escolha o banco, o valor do imóvel, a entrada e o prazo. Depois clique em{" "}
-          <strong className="text-foreground">Gerar simulação</strong> para ver KPIs, comparativo entre bancos,
-          gráficos e o relatório completo.
+        <div className="space-y-1 max-w-sm">
+          <h3 className="font-display text-xl font-semibold text-foreground">Preencha os campos ao lado</h3>
+          <p className="text-sm text-muted-foreground">
+            Informe o banco, o valor do imóvel, a entrada e o prazo. Depois clique em{" "}
+            <strong className="text-foreground">Gerar simulação</strong> para ver KPIs, comparativo entre bancos,
+            gráficos e o relatório completo.
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-3 w-full max-w-sm pt-2">
+          <Button size="lg" className="flex-1 gap-2 min-h-[48px]" onClick={onStart}>
+            <Play className="h-4 w-4" aria-hidden="true" />
+            Começar a simulação
+          </Button>
+          <a
+            href={`https://api.whatsapp.com/send?phone=${WHATSAPP_PHONE}&text=${encodeURIComponent(
+              "Olá! Gostaria de simular um financiamento para o Vila Park Vila Mariana."
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1"
+          >
+            <Button size="lg" variant="outline" className="w-full gap-2 min-h-[48px]">
+              <MessageCircle className="h-4 w-4" aria-hidden="true" />
+              Falar com o time
+            </Button>
+          </a>
+        </div>
+
+        <p className="text-xs text-muted-foreground flex items-center gap-1">
+          <ArrowDown className="h-3.5 w-3.5" aria-hidden="true" />
+          Os campos estão logo acima
         </p>
       </CardContent>
     </Card>
