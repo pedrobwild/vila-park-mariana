@@ -579,7 +579,7 @@ export default function FinancingSimulator() {
                       <InfoHint text="Pelas regras SFH, a entrada mínima é 20% do valor do imóvel (LTV 80%)." label="Entrada" />
                     </Label>
                     <span className="text-sm font-semibold text-foreground tabular-nums">
-                      {BRL(downPayment)} · {downPctActual.toFixed(0)}%
+                      {propertyValue > 0 ? `${BRL(downPayment)} · ${downPctActual.toFixed(0)}%` : "—"}
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
