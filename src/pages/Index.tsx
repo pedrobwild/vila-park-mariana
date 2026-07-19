@@ -148,10 +148,12 @@ export default function Index() {
 
         <motion.div style={isMobile ? undefined : { opacity: heroOpacity }} className="relative max-w-7xl mx-auto px-5 md:px-6 pt-24 pb-8 md:pt-36 md:pb-24 w-full">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.1 }}>
-            <Badge className="bg-accent/90 text-accent-foreground border-accent/40 hover:bg-accent backdrop-blur-sm mb-3 md:mb-5 text-[11px] md:text-xs font-bold tracking-wide px-3 py-1.5">
-              <Building2 className="h-3.5 w-3.5 mr-1.5" />
+            <p
+              className="mb-4 md:mb-6 text-[10px] md:text-[11px] font-medium uppercase tracking-[0.28em]"
+              style={{ color: "hsl(var(--primary-foreground) / 0.72)" }}
+            >
               {isMobile ? t("hero.badgeMobile") : t("hero.badgeDesktop")}
-            </Badge>
+            </p>
           </motion.div>
 
           <motion.h1
