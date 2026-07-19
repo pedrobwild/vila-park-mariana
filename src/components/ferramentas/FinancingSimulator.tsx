@@ -482,7 +482,15 @@ export default function FinancingSimulator() {
                       FGTS na entrada (opcional)
                       <InfoHint text="Somamos ao valor da entrada. Regras: 3 anos de contribuição e imóvel em SP até R$ 1,5 mi." />
                     </Label>
-                    <CurrencyInput id="fgts" value={fgts} onChange={setFgts} />
+                    <CurrencyInput
+                      id="fgts"
+                      value={fgts}
+                      onChange={(v) => {
+                        const base = downOverride ?? Math.round((propertyValue * downPct) / 100);
+                        const maxFgts = Math.max(propertyValue - base - 1, 0);
+                        setFgts(clamp(v, 0, maxFgts));
+                      }}
+                    />
                   </div>
                   {/* Extra */}
                   <div className="space-y-2 rounded-lg border border-border/60 p-3">
