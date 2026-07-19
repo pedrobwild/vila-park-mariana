@@ -99,7 +99,7 @@ export default function Oportunidades() {
             <p className="eyebrow mb-3">Vila Park · Vila Mariana</p>
             <h1 className="font-display text-4xl md:text-5xl font-medium tracking-tight">Oportunidades</h1>
             <p className="mt-3 text-muted-foreground max-w-2xl">
-              Unidades disponíveis para compra. Consulte metragens, plantas e valores atualizados.
+              Tabela de unidades do Vila Park — metragens, plantas e valores atualizados.
             </p>
           </div>
           <KeyFactsStrip className="rounded-lg border border-border/60 bg-card" />
