@@ -334,8 +334,10 @@ export default function FinancingSimulator() {
                   id="dp"
                   value={downOverride ?? Math.round((propertyValue * downPct) / 100)}
                   onChange={(v) => {
-                    setDownOverride(v);
-                    setDownPct(clamp((v / Math.max(propertyValue, 1)) * 100, 0, 100));
+                    const maxDown = Math.max(propertyValue - fgts - 1, 0);
+                    const clamped = clamp(v, 0, maxDown);
+                    setDownOverride(clamped);
+                    setDownPct(clamp((clamped / Math.max(propertyValue, 1)) * 100, 0, 100));
                   }}
                 />
                 {!ltvOk && (
