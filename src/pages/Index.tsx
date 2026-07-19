@@ -37,13 +37,6 @@ const PROGRESS_MAY_2025 = [
 ];
 const PROGRESS_JUL_2026 = "https://vilaparkmariana.com.br/wp-content/uploads/2026/07/fachada_07_07.jpeg";
 
-const CATEGORY_META: Record<PoiCategory, { icon: typeof Trees; key: string }> = {
-  mobility: { icon: Train, key: "surroundings.mobility" },
-  leisure: { icon: Trees, key: "surroundings.leisure" },
-  education: { icon: GraduationCap, key: "surroundings.education" },
-  services: { icon: ShoppingBag, key: "surroundings.services" },
-  gastronomy: { icon: UtensilsCrossed, key: "surroundings.gastronomy" },
-};
 
 function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
   const ref = useRef(null);
@@ -129,8 +122,6 @@ export default function Index() {
     { key: "studio", img: GALLERY[0].url },
   ];
 
-  const poisByCategory = useMemo(() => {
-    const map = new Map<PoiCategory, typeof POIS>();
     for (const p of POIS) {
       if (!map.has(p.category)) map.set(p.category, []);
       map.get(p.category)!.push(p);
