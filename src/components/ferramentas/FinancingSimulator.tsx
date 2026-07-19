@@ -321,7 +321,12 @@ export default function FinancingSimulator() {
                     setDownPct(v[0]);
                     setDownOverride(null);
                   }}
+                  className={SLIDER_TOUCH}
                 />
+                <div className="flex justify-between text-[11px] text-muted-foreground px-0.5">
+                  <span>20% (mín. SFH)</span>
+                  <span>80%</span>
+                </div>
                 <CurrencyInput
                   id="dp"
                   value={downOverride ?? Math.round((propertyValue * downPct) / 100)}
