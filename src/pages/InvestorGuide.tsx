@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import MarketIntelSection from "@/components/MarketIntelSection";
 import AppNavbar from "@/components/AppNavbar";
+import SiteFooter from "@/components/shared/SiteFooter";
+import NeighborhoodSection from "@/components/shared/NeighborhoodSection";
 import InvestorQuizCard from "@/components/investor/InvestorQuizCard";
 import InvestorSimulator from "@/components/investor/InvestorSimulator";
 import EventsCalendar from "@/components/insights/EventsCalendar";
