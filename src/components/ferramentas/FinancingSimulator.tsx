@@ -340,6 +340,21 @@ export default function FinancingSimulator() {
                 )}
               </div>
 
+              {/* Financed amount (auto) */}
+              <div className="space-y-1 rounded-lg border border-border/60 bg-muted/30 px-3 py-2.5">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs text-muted-foreground font-normal flex items-center">
+                    Valor financiado
+                    <InfoHint text="Calculado automaticamente: valor do imóvel menos entrada (inclui FGTS, quando informado)." />
+                  </Label>
+                  <span className="text-sm font-semibold text-foreground tabular-nums">
+                    {BRL(Math.max(propertyValue - downPayment, 0))}
+                  </span>
+                </div>
+              </div>
+
+
+
               {/* Term */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
