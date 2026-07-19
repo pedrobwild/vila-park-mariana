@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AreaChart,
   Area,
@@ -22,6 +22,7 @@ import {
   TrendingDown,
   ChevronDown,
   Sparkles,
+  RefreshCw,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -126,6 +127,7 @@ export default function FinancingSimulator() {
   const [downPct, setDownPct] = useState<number>(20);
   const [downOverride, setDownOverride] = useState<number | null>(null);
   const [termMonths, setTermMonths] = useState<number>(360);
+  const [financedPulse, setFinancedPulse] = useState(false);
 
   // advanced
   const [bankId, setBankId] = useState<string>("caixa");
@@ -146,6 +148,12 @@ export default function FinancingSimulator() {
 
   const financedAmount = useMemo(() => Math.max(propertyValue - downPayment, 0), [propertyValue, downPayment]);
   const financedAmountInvalid = financedAmount <= 0;
+
+  useEffect(() => {
+    setFinancedPulse(true);
+    const t = setTimeout(() => setFinancedPulse(false), 400);
+    return () => clearTimeout(t);
+  }, [financedAmount]);
 
   const ltvOk = propertyValue > 0 && (propertyValue - downPayment) / propertyValue <= 0.8;
   const mcmv = useMemo(() => checkMCMV(propertyValue, monthlyIncome || undefined), [propertyValue, monthlyIncome]);
@@ -355,13 +363,15 @@ export default function FinancingSimulator() {
                 ].join(" ")}
               >
                 <div className="flex items-center justify-between">
-                  <Label className="text-xs text-muted-foreground font-normal flex items-center">
+                  <Label className="text-xs text-muted-foreground font-normal flex items-center gap-1.5">
+                    <RefreshCw className="h-3 w-3 text-primary" aria-hidden="true" />
                     Valor financiado
-                    <InfoHint text="Calculado automaticamente: valor do imóvel menos entrada (inclui FGTS, quando informado)." />
+                    <InfoHint text="Calculado automaticamente: valor do imóvel menos entrada (inclui FGTS, quando informado). Atualiza em tempo real ao mudar o imóvel ou a entrada." />
                   </Label>
                   <span
                     className={[
-                      "text-sm font-semibold tabular-nums",
+                      "text-sm font-semibold tabular-nums transition-colors duration-300",
+                      financedPulse ? "text-primary" : "",
                       financedAmountInvalid ? "text-destructive" : "text-foreground",
                     ].join(" ")}
                   >
