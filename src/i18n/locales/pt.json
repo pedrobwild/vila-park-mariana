@@ -187,6 +187,7 @@
   },
   "notFound": {
     "title": "Página não encontrada",
+    "hint": "O endereço pode ter mudado ou não existe mais.",
     "back": "Voltar para o início"
   },
   "market": {
