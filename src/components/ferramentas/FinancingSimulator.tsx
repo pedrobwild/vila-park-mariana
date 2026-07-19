@@ -127,6 +127,7 @@ export default function FinancingSimulator() {
   const [downPct, setDownPct] = useState<number>(20);
   const [downOverride, setDownOverride] = useState<number | null>(null);
   const [termMonths, setTermMonths] = useState<number>(360);
+  const [financedPulse, setFinancedPulse] = useState(false);
 
   // advanced
   const [bankId, setBankId] = useState<string>("caixa");
