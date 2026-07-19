@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import AuthMenu from "@/components/auth/AuthMenu";
 
 function Logo() {
   return (
