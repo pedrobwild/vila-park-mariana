@@ -9,7 +9,7 @@ import {
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+
 import AppNavbar from "@/components/AppNavbar";
 import MobileQuickNav from "@/components/MobileQuickNav";
 import ReservationForm from "@/components/ReservationForm";
