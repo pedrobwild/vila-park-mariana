@@ -421,14 +421,14 @@ export default function FinancingSimulator() {
 
   /* ---- Validation ---- */
   const schema = z.object({
-    bankId: z.string().min(1),
-    propertyValue: z.number().min(50_000, "Informe um valor de imóvel válido (mín. R$ 50.000)."),
-    downPayment: z.number().min(0),
-    termMonths: z.number().min(12).max(420),
+    bankId: z.string().min(1, "Selecione um banco ou linha de financiamento."),
+    propertyValue: z.number().min(50_000, "Informe o valor do imóvel (mín. R$ 50.000)."),
+    downPayment: z.number().min(0, "Entrada não pode ser negativa."),
+    termMonths: z.number().min(12, "Prazo mínimo de 12 meses.").max(420, "Prazo máximo de 420 meses."),
     annualRate: z.number().gt(0, "Informe a taxa de juros anual.").max(30, "Taxa fora do intervalo razoável."),
     buyerAge: z.number().min(18, "Idade mínima 18 anos.").max(80, "Idade máxima 80 anos."),
     monthlyIncome: z.number().gt(0, "Informe a renda familiar mensal."),
-    system: z.enum(["SAC", "PRICE"]),
+    system: z.enum(["SAC", "PRICE"], { required_error: "Selecione o sistema de amortização." }),
   });
 
   const focusField = (id: string) => {
