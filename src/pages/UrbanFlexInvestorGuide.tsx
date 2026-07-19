@@ -660,6 +660,7 @@ export default function UrbanFlexInvestorGuide() {
           </div>
         </section>
       </main>
+      <SiteFooter />
     </div>
   );
 }
