@@ -3,60 +3,56 @@ import { Link } from "react-router-dom";
 import AppNavbar from "@/components/AppNavbar";
 import { GuideDecisionProvider } from "@/hooks/useGuideDecision";
 import FinancingSimulator from "@/components/ferramentas/FinancingSimulator";
+import SiteFooter from "@/components/shared/SiteFooter";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Building2, MessageCircle } from "lucide-react";
+import { ArrowRight, MessageCircle } from "lucide-react";
+import { WHATSAPP_PHONE } from "@/data/surroundings";
 
 export default function Ferramentas() {
   useEffect(() => {
     document.title = "Ferramentas · Vila Park Vila Mariana";
   }, []);
 
+  const wa = `https://api.whatsapp.com/send?phone=${WHATSAPP_PHONE}&text=${encodeURIComponent(
+    "Olá! Simulei o financiamento do Vila Park Vila Mariana e quero saber mais.",
+  )}`;
+
   return (
     <GuideDecisionProvider>
       <AppNavbar />
-      <main className="w-full flex flex-col items-center pb-24 pt-16 lg:pt-8">
-        {/* Header */}
+      <main className="w-full flex flex-col items-center pb-12 pt-8 lg:pt-12">
         <div className="w-full">
-          <div className="max-w-[1280px] mx-auto px-5 lg:px-10 pt-8 pb-4">
-            <div className="flex items-center gap-2 mb-3">
-              <Building2 className="h-5 w-5 text-primary" />
-              <span className="text-sm font-semibold text-primary">Vila Park Vila Mariana</span>
-            </div>
-            <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-2">
-              Ferramentas do Comprador
+          <div className="max-w-[1280px] mx-auto px-5 lg:px-10 pt-4 pb-6">
+            <p className="eyebrow mb-3">Vila Park · Vila Mariana</p>
+            <h1 className="font-display text-4xl md:text-5xl font-medium text-foreground mb-3 tracking-tight">
+              Ferramentas do comprador
             </h1>
-            <p className="text-muted-foreground text-lg font-body max-w-2xl">
-              Simule seu financiamento e entenda todos os custos para planejar a compra do seu novo apartamento
-              com tranquilidade.
+            <p className="text-muted-foreground text-lg max-w-2xl">
+              Simule seu financiamento e entenda todos os custos para planejar a compra do seu apartamento com tranquilidade.
             </p>
           </div>
         </div>
 
-        {/* Simulador de Financiamento */}
         <div className="w-full">
           <div className="max-w-[1280px] mx-auto px-5 lg:px-10">
             <FinancingSimulator />
           </div>
         </div>
 
-        {/* CTA */}
-        <div className="w-full bg-muted/20">
-          <div className="max-w-[1280px] mx-auto px-5 lg:px-10 py-12 text-center">
-            <h2 className="font-display text-2xl font-bold text-foreground mb-3">
+        <div className="w-full bg-muted/30 mt-12">
+          <div className="max-w-[1280px] mx-auto px-5 lg:px-10 py-16 text-center">
+            <p className="eyebrow mb-3">Próximo passo</p>
+            <h2 className="font-display text-3xl md:text-4xl font-medium text-foreground mb-4 tracking-tight">
               Pronto para conhecer o Vila Park?
             </h2>
-            <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
-              Simule seu financiamento e fale com a equipe para conhecer as condições e agendar uma visita.
+            <p className="text-muted-foreground mb-8 max-w-lg mx-auto">
+              Fale com a equipe para conhecer as condições, disponibilidade por andar e agendar uma visita.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <a
-                href="https://wa.me/5511961007687?text=Olá!%20Simulei%20o%20financiamento%20do%20Vila%20Park%20Vila%20Mariana%20e%20quero%20saber%20mais."
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button size="lg" className="min-h-[48px] gap-2 w-full sm:w-auto">
+              <a href={wa} target="_blank" rel="noopener noreferrer">
+                <Button size="lg" className="min-h-[48px] gap-2 w-full sm:w-auto bg-accent hover:bg-accent/90 text-accent-foreground">
                   <MessageCircle className="h-4 w-4" />
-                  Falar no WhatsApp
+                  Falar com especialista
                 </Button>
               </a>
               <Link to="/guia-investidor">
@@ -68,16 +64,8 @@ export default function Ferramentas() {
             </div>
           </div>
         </div>
-
-        {/* Footer */}
-        <div className="w-full">
-          <div className="max-w-[1280px] mx-auto px-5 lg:px-10">
-            <footer className="text-center py-8 text-sm text-muted-foreground font-body">
-              © 2026 Vila Park Vila Mariana · Ferramentas do Comprador
-            </footer>
-          </div>
-        </div>
       </main>
+      <SiteFooter />
     </GuideDecisionProvider>
   );
 }
