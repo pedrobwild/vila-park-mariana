@@ -42,7 +42,8 @@ const App = () => (
               <Route path="/corretor" element={<CorretorPage />} />
               <Route path="/login" element={<Login />} />
               <Route path="/oportunidades" element={<Oportunidades />} />
-              <Route path="/comercial" element={<RequireAdmin><Comercial /></RequireAdmin>} />
+              <Route path="/admin" element={<RequireAdmin><Admin /></RequireAdmin>} />
+              <Route path="/comercial" element={<Navigate to="/admin" replace />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
