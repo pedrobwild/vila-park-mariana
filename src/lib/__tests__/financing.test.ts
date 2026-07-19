@@ -2,6 +2,9 @@ import { describe, it, expect } from "vitest";
 import {
   annualToMonthly,
   monthlyToAnnual,
+  nominalAnnualToMonthly,
+  nominalToEffectiveAnnual,
+  monthlyRateFromAnnual,
   simulate,
   simulateWithExtras,
   checkMCMV,
