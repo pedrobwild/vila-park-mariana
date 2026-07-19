@@ -246,6 +246,7 @@ export default function FinancingSimulator() {
   const simCodeRef = useRef<string>(generateSimCode());
   const [reportEmittedAt, setReportEmittedAt] = useState<Date>(new Date());
   const resultsRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLElement>(null);
   const hydratedRef = useRef(false);
 
   // ---- Restore from localStorage on mount ----
