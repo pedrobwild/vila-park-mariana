@@ -122,13 +122,6 @@ export default function Index() {
     { key: "studio", img: GALLERY[0].url },
   ];
 
-    for (const p of POIS) {
-      if (!map.has(p.category)) map.set(p.category, []);
-      map.get(p.category)!.push(p);
-    }
-    return map;
-  }, []);
-
   return (
     <main className="min-h-screen bg-background">
       <AppNavbar />
