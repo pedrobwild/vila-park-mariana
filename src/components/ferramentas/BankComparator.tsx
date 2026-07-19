@@ -275,7 +275,7 @@ export default function BankComparator({
                               {SITUATION_LABEL[row.rate.situation]}
                             </Badge>
                             <div className="text-[10px] text-muted-foreground mt-0.5">
-                              {new Date(row.rate.consultedAt).toLocaleDateString("pt-BR")}
+                              {formatConsultDate(row.rate.consultedAt)}
                             </div>
                           </TableCell>
                           <TableCell className="text-right tabular-nums">
@@ -331,4 +331,10 @@ function WinnerCard({ title, value, caption, note }: { title: string; value: str
       <p className="text-[10px] text-muted-foreground mt-1 leading-snug">{note}</p>
     </div>
   );
+}
+
+/** Formata uma data ISO (YYYY-MM-DD) como dd/mm/aaaa sem shift de fuso. */
+export function formatConsultDate(iso: string): string {
+  const [y, m, d] = iso.split("-");
+  return `${d}/${m}/${y}`;
 }
