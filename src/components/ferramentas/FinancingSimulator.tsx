@@ -431,6 +431,65 @@ export default function FinancingSimulator() {
                 </Tabs>
               </div>
 
+              {/* Bank */}
+              <div className="space-y-1.5">
+                <Label className="flex items-center gap-1.5">
+                  Banco
+                  <InfoHint text="Presets jul/2026 (SBPE, juros efetivos a.a. + TR). A taxa é definida pela instituição financeira." />
+                </Label>
+                <Select value={bankId} onValueChange={(v) => {
+                  setBankId(v);
+                  const p = BANK_PRESETS.find((b) => b.id === v);
+                  if (p) setAnnualRate(p.annualRate);
+                }}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {BANK_PRESETS.map((b) => (
+                      <SelectItem key={b.id} value={b.id}>{b.label} — {PCT_PT(b.annualRate)} a.a. + TR</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Rate (read-only, defined by the bank) */}
+              <div className="space-y-1.5">
+                <Label htmlFor="rate" className="flex items-center gap-1.5">
+                  Taxa de juros efetiva (a.a.)
+                  <InfoHint text="Juros efetivos anuais + TR, definidos pela instituição financeira selecionada. Convertemos para mensal equivalente." />
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="rate"
+                    readOnly
+                    aria-readonly="true"
+                    tabIndex={-1}
+                    value={PCT_PT(annualRate)}
+                    className="pr-20 font-semibold tabular-nums cursor-default bg-muted/40"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">a.a. + TR</span>
+                </div>
+                <p className="text-[11px] text-muted-foreground">Taxa definida pelo banco — selecione outra instituição para comparar.</p>
+              </div>
+
+              {/* Buyer age */}
+              <div className="space-y-1.5">
+                <Label htmlFor="age" className="flex items-center gap-1.5">
+                  Idade do comprador
+                  <InfoHint text="Usada para estimar o MIP (seguro por morte/invalidez). Quanto mais jovem, mais barato." />
+                </Label>
+                <Input id="age" type="number" min={18} max={80} value={buyerAge}
+                  onChange={(e) => setBuyerAge(clamp(parseInt(e.target.value) || 35, 18, 80))} />
+              </div>
+
+              {/* Monthly income */}
+              <div className="space-y-1.5">
+                <Label htmlFor="income" className="flex items-center gap-1.5">
+                  Renda familiar mensal
+                  <InfoHint text="Usada para verificar comprometimento máximo de 30% da renda e enquadramento no MCMV." />
+                </Label>
+                <CurrencyInput id="income" value={monthlyIncome} onChange={setMonthlyIncome} placeholder="15000" />
+              </div>
+
               {mcmv.eligible && (
                 <div className="rounded-lg border border-primary/40 bg-primary/5 p-3">
                   <p className="text-sm font-semibold text-primary flex items-center gap-1.5">
