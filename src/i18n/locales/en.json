@@ -187,6 +187,7 @@
   },
   "notFound": {
     "title": "Page not found",
+    "hint": "This address may have changed or no longer exists.",
     "back": "Return to home"
   },
   "market": {
