@@ -226,12 +226,12 @@ interface Snapshot {
 /* ---------- main ---------- */
 
 export default function FinancingSimulator() {
-  // ---- Form state ----
+  // ---- Form state (empty by default) ----
   const [typologyId, setTypologyId] = useState<string>("custom");
   const [propertyValue, setPropertyValue] = useState<number>(0);
-  const [downPct, setDownPct] = useState<number>(20);
+  const [downPct, setDownPct] = useState<number>(0);
   const [downOverride, setDownOverride] = useState<number | null>(null);
-  const [termMonths, setTermMonths] = useState<number>(360);
+  const [termMonths, setTermMonths] = useState<number>(0);
   const [financedPulse, setFinancedPulse] = useState(false);
 
   const [bankId, setBankId] = useState<string>("");
@@ -506,9 +506,40 @@ export default function FinancingSimulator() {
     }, 80);
   };
 
+  const resetFormToEmpty = () => {
+    setTypologyId("custom");
+    setPropertyValue(0);
+    setDownPct(0);
+    setDownOverride(null);
+    setTermMonths(0);
+    setBankId("");
+    setRateInput("");
+    setSystem("SAC");
+    setBuyerAge(0);
+    setMonthlyIncome(0);
+    setFgts(0);
+    setExtraAnnual(0);
+    setExtraStrategy("reduce-term");
+  };
+
   const handleReset = () => {
+    // Remove persisted state so the form comes back empty on next visit
+    try {
+      localStorage.removeItem("vp_financing_sim_v1");
+    } catch {
+      /* ignore */
+    }
+    // Also clear shareable link from URL so it is not restored on refresh
+    if (window.location.search.includes("sim=")) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("sim");
+      window.history.replaceState({}, "", url.toString());
+    }
     setSnapshot(null);
     setErrors({});
+    simCodeRef.current = generateSimCode();
+    setReportEmittedAt(new Date());
+    resetFormToEmpty();
     formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
