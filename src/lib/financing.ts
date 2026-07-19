@@ -156,14 +156,16 @@ export function simulate(system: AmortSystem, input: FinancingInput): FinancingR
     downPayment,
     termMonths: n,
     annualRate,
+    annualRateType = "efetiva",
     buyerAgeYears = 35,
+    mipMonthlyRate,
     dfiMonthlyRate = 0.00025,
     adminFee = 25,
   } = input;
 
   const financedAmount = Math.max(propertyValue - downPayment, 0);
-  const i = annualToMonthly(annualRate);
-  const mipRate = mipRateForAge(buyerAgeYears);
+  const i = monthlyRateFromAnnual(annualRate, annualRateType);
+  const mipRate = mipMonthlyRate ?? mipRateForAge(buyerAgeYears);
   const dfi = propertyValue * dfiMonthlyRate;
 
   const schedule: InstallmentRow[] = [];
