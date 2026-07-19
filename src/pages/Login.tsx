@@ -13,11 +13,8 @@ export default function Login() {
   useEffect(() => {
     if (loading || !session) return;
     const from = (location.state as LocationState)?.from?.pathname;
-    if (isAdmin) {
-      navigate(from && from !== "/login" ? from : "/admin", { replace: true });
-    }
-    // If logged in but not admin, LoginScreen/RequireAdmin will show restricted state on /admin.
-    // Keep them on /login (LoginScreen shown) unless they came from an admin path.
+    const target = isAdmin ? (from && from !== "/login" ? from : "/admin") : "/admin";
+    navigate(target, { replace: true });
   }, [session, isAdmin, loading, navigate, location.state]);
 
   return <LoginScreen />;
