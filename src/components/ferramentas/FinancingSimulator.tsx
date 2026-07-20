@@ -79,8 +79,12 @@ const RATES_CONSULT_DATE = "2026-07-19";
 
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
 const num = (s: string) => {
-  const cleaned = s.replace(/[^\d,.-]/g, "").replace(/\.(?=\d{3}(\D|$))/g, "").replace(",", ".");
-  const n = parseFloat(cleaned);
+  // Currency inputs here are whole BRL integers. Strip any non-digit
+  // (thousand separators, R$, spaces) so typing 5+ digits keeps working
+  // even after the field re-formats to "10.000".
+  const digits = s.replace(/\D/g, "");
+  if (!digits) return 0;
+  const n = parseInt(digits, 10);
   return isNaN(n) ? 0 : n;
 };
 const fmtBRL = (v: number) => (v > 0 ? v.toLocaleString("pt-BR") : "");
@@ -122,9 +126,10 @@ function CurrencyInput({
   "aria-describedby"?: string;
 }) {
   const [text, setText] = useState(fmtBRL(value));
+  const [focused, setFocused] = useState(false);
   useEffect(() => {
-    setText(fmtBRL(value));
-  }, [value]);
+    if (!focused) setText(fmtBRL(value));
+  }, [value, focused]);
   return (
     <div className="relative">
       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">R$</span>
@@ -140,12 +145,18 @@ function CurrencyInput({
         ].join(" ")}
         placeholder={placeholder}
         value={text}
-        onFocus={() => setText(value ? String(value) : "")}
+        onFocus={() => {
+          setFocused(true);
+          setText(value ? String(value) : "");
+        }}
         onChange={(e) => {
           setText(e.target.value);
           onChange(num(e.target.value));
         }}
-        onBlur={() => setText(fmtBRL(value))}
+        onBlur={() => {
+          setFocused(false);
+          setText(fmtBRL(value));
+        }}
       />
     </div>
   );
