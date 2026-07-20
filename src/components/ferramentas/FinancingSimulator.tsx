@@ -126,9 +126,10 @@ function CurrencyInput({
   "aria-describedby"?: string;
 }) {
   const [text, setText] = useState(fmtBRL(value));
+  const [focused, setFocused] = useState(false);
   useEffect(() => {
-    setText(fmtBRL(value));
-  }, [value]);
+    if (!focused) setText(fmtBRL(value));
+  }, [value, focused]);
   return (
     <div className="relative">
       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">R$</span>
@@ -144,12 +145,18 @@ function CurrencyInput({
         ].join(" ")}
         placeholder={placeholder}
         value={text}
-        onFocus={() => setText(value ? String(value) : "")}
+        onFocus={() => {
+          setFocused(true);
+          setText(value ? String(value) : "");
+        }}
         onChange={(e) => {
           setText(e.target.value);
           onChange(num(e.target.value));
         }}
-        onBlur={() => setText(fmtBRL(value))}
+        onBlur={() => {
+          setFocused(false);
+          setText(fmtBRL(value));
+        }}
       />
     </div>
   );
