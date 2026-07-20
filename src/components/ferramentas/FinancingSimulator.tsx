@@ -79,8 +79,12 @@ const RATES_CONSULT_DATE = "2026-07-19";
 
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
 const num = (s: string) => {
-  const cleaned = s.replace(/[^\d,.-]/g, "").replace(/\.(?=\d{3}(\D|$))/g, "").replace(",", ".");
-  const n = parseFloat(cleaned);
+  // Currency inputs here are whole BRL integers. Strip any non-digit
+  // (thousand separators, R$, spaces) so typing 5+ digits keeps working
+  // even after the field re-formats to "10.000".
+  const digits = s.replace(/\D/g, "");
+  if (!digits) return 0;
+  const n = parseInt(digits, 10);
   return isNaN(n) ? 0 : n;
 };
 const fmtBRL = (v: number) => (v > 0 ? v.toLocaleString("pt-BR") : "");
