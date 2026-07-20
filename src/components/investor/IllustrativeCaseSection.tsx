@@ -1,17 +1,15 @@
 import { useTranslation } from "react-i18next";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, FileSignature, HardHat, KeyRound, Sofa, Camera, TrendingUp, CheckCircle2 } from "lucide-react";
+import { AlertCircle, FileSignature, HardHat, KeyRound, Camera, TrendingUp } from "lucide-react";
 
 const TIMELINE = [
-  { icon: FileSignature, key: "reserve" },
-  { icon: HardHat, key: "obra" },
-  { icon: KeyRound, key: "keys" },
-  { icon: Sofa, key: "furnish" },
-  { icon: Camera, key: "launch" },
-  { icon: TrendingUp, key: "rampup" },
-  { icon: CheckCircle2, key: "stable" },
-];
+  { icon: FileSignature },
+  { icon: HardHat },
+  { icon: KeyRound },
+  { icon: Camera },
+  { icon: TrendingUp },
+] as const;
 
 export default function IllustrativeCaseSection() {
   const { t } = useTranslation();
@@ -74,17 +72,28 @@ export default function IllustrativeCaseSection() {
         <CardContent className="p-5 md:p-6">
           <p className="font-semibold text-foreground mb-4">{t("investorGuide.case.timeline.title")}</p>
           <ol className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-            {TIMELINE.map((step, i) => (
-              <li key={step.key} className="flex items-start gap-3 rounded-lg border border-border/40 p-3">
-                <div className="h-8 w-8 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
-                  <step.icon className="h-4 w-4 text-accent" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">{t("investorGuide.case.timeline.step", { n: i + 1 })}</p>
-                  <p className="text-sm font-medium text-foreground">{t(`investorGuide.case.timeline.items.${step.key}`)}</p>
-                </div>
-              </li>
-            ))}
+            {TIMELINE.map((step, i) => {
+              const Icon = step.icon;
+              const n = i + 1;
+              return (
+                <li key={n} className="flex items-start gap-3 rounded-lg border border-border/40 p-3">
+                  <div className="h-8 w-8 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
+                    <Icon className="h-4 w-4 text-accent" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground tabular-nums">
+                      {String(n).padStart(2, "0")}
+                    </p>
+                    <p className="text-sm font-medium text-foreground">
+                      {t(`investorGuide.case.timeline.step.${n}.t`)}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                      {t(`investorGuide.case.timeline.step.${n}.d`)}
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
           </ol>
         </CardContent>
       </Card>
