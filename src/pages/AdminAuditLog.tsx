@@ -352,7 +352,7 @@ export default function AdminAuditLog() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+              onClick={() => updateParams({ page: Math.min(totalPages, page + 2) })}
               disabled={loading || page >= totalPages - 1}
             >
               Próxima <ChevronRight className="ml-1 h-4 w-4" />
