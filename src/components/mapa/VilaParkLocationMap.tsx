@@ -614,7 +614,17 @@ function MapContent() {
           {/* Botão "Ver raio completo / Voltar ao entorno" */}
           <button
             type="button"
-            onClick={() => setShowFullRadius((v) => !v)}
+            onClick={() =>
+              setShowFullRadius((v) => {
+                const next = !v;
+                trackGlobal("map_bounds_toggle", {
+                  location: "home:comparativo",
+                  component: "VilaParkLocationMap",
+                  mode: next ? "full_radius" : "nearby",
+                });
+                return next;
+              })
+            }
             className="absolute bottom-3 left-3 z-[2] inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1.5 rounded-full border border-border/70 bg-background/95 backdrop-blur shadow-sm text-foreground hover:border-foreground/40 transition-colors"
           >
             {showFullRadius ? <Minimize2 size={12} strokeWidth={2} /> : <Maximize2 size={12} strokeWidth={2} />}
