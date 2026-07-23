@@ -344,8 +344,8 @@ function MapContent() {
           onClick={() => {
             setFilters([...CATEGORY_ORDER]);
             trackGlobal("map_filter_reset", {
-              location: "home:comparativo",
-              component: "VilaParkLocationMap",
+              ...ANALYTICS_BASE,
+              ...filterEventPayload(CATEGORY_ORDER),
             });
           }}
           aria-pressed={allActive}
