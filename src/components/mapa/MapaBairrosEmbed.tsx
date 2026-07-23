@@ -19,7 +19,7 @@ import NeighborhoodComparison from "@/components/mapa/NeighborhoodComparison";
 
 const MAP_STYLE = "https://api.maptiler.com/maps/019cc06d-fb8e-741d-b158-a17a30e87c08/style.json?key=AI17dHeoeJx6rUC1KlSL";
 
-const CATEGORY_ORDER: PoiCategory[] = ["lazer", "mobilidade", "educacao", "servicos", "gastronomia"];
+const CATEGORY_ORDER: PoiCategory[] = ["leisure", "mobility", "education", "services", "gastronomy"];
 
 export default function MapaBairrosEmbed() {
   const [activeCategories, setActiveCategories] = useState<PoiCategory[]>(CATEGORY_ORDER);

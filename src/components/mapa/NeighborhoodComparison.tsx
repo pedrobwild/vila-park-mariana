@@ -12,7 +12,7 @@ interface NeighborhoodComparisonProps {
   onClose: () => void;
 }
 
-const CATEGORY_ORDER: PoiCategory[] = ["lazer", "mobilidade", "educacao", "servicos", "gastronomia"];
+const CATEGORY_ORDER: PoiCategory[] = ["leisure", "mobility", "education", "services", "gastronomy"];
 
 export default function NeighborhoodComparison({ onClose }: NeighborhoodComparisonProps) {
   return (
