@@ -22,93 +22,15 @@ import {
 } from "@/components/ui/tooltip";
 import { ArrowDown, ArrowUp, Lock, Plus, Trash2 } from "lucide-react";
 import { sortStages, stageBadgeClass, type CrmStageRow } from "@/lib/crm";
+import { notifyCrmError, type CrmAction, type SbErr } from "@/lib/crmErrors";
 
-type SbErr = { message?: string; code?: string; details?: string } | null | undefined;
-
-function friendlyStageError(
+const notifyStage = (
   err: SbErr,
-  ctx: "delete" | "update" | "insert" | "reorder",
-  stage?: CrmStageRow,
-  count?: number,
-): { title: string; description: string } {
-  const raw = (err?.message || "").toLowerCase();
-  const code = err?.code || "";
+  action: CrmAction,
+  dependents?: number,
+) => notifyCrmError(err, { entity: "etapa", action, dependents });
 
-  // Trigger: crm_protect_system_stage
-  if (raw.includes("etapas de sistema") || raw.includes("system")) {
-    return {
-      title: "Etapa protegida",
-      description:
-        "As etapas de sistema (Ganho e Perdido) não podem ser excluídas — elas são exigidas pelo funil.",
-    };
-  }
 
-  // Foreign key violation: deals still reference this stage
-  if (code === "23503" || raw.includes("foreign key") || raw.includes("violates foreign key")) {
-    const n = count ?? 0;
-    return {
-      title: "Etapa em uso",
-      description:
-        n > 0
-          ? `Existem ${n} negócio${n === 1 ? "" : "s"} nesta etapa. Mova-os para outra etapa antes de excluir.`
-          : "Esta etapa ainda está referenciada por negócios. Mova-os para outra etapa antes de excluir.",
-    };
-  }
-
-  // RLS / permission denied
-  if (
-    code === "42501" ||
-    code === "PGRST301" ||
-    raw.includes("row-level security") ||
-    raw.includes("row level security") ||
-    raw.includes("permission denied") ||
-    raw.includes("not authorized")
-  ) {
-    const action =
-      ctx === "delete"
-        ? "excluir"
-        : ctx === "insert"
-        ? "criar"
-        : ctx === "reorder"
-        ? "reordenar"
-        : "editar";
-    return {
-      title: "Sem permissão",
-      description: `Seu perfil não pode ${action} etapas do funil. Apenas administradores Bewild têm essa permissão.`,
-    };
-  }
-
-  // Unique constraint on position
-  if (code === "23505" || raw.includes("duplicate key") || raw.includes("unique")) {
-    return {
-      title: "Conflito de ordem",
-      description: "Duas etapas acabaram com a mesma posição. Recarregue e tente novamente.",
-    };
-  }
-
-  const fallback =
-    ctx === "delete"
-      ? "Não foi possível excluir a etapa."
-      : ctx === "insert"
-      ? "Não foi possível criar a etapa."
-      : ctx === "reorder"
-      ? "Não foi possível reordenar as etapas."
-      : "Não foi possível atualizar a etapa.";
-  return {
-    title: fallback,
-    description: err?.message || "Tente novamente em instantes.",
-  };
-}
-
-function notifyStageError(
-  err: SbErr,
-  ctx: "delete" | "update" | "insert" | "reorder",
-  stage?: CrmStageRow,
-  count?: number,
-) {
-  const { title, description } = friendlyStageError(err, ctx, stage, count);
-  toast.error(title, { description });
-}
 
 interface Props {
   open: boolean;
@@ -148,7 +70,7 @@ export default function StageManagerDialog({
       if (r3.error) throw r3.error;
       await onReload();
     } catch (e) {
-      notifyStageError(e as SbErr, "reorder");
+      notifyStage(e as SbErr, "reordenar");
     } finally {
       setBusy(false);
     }
@@ -192,7 +114,7 @@ export default function StageManagerDialog({
       });
       await onReload();
     } catch (e) {
-      notifyStageError(e as SbErr, "update", stage);
+      notifyStage(e as SbErr, "atualizar");
     } finally {
       setBusy(false);
     }
@@ -208,7 +130,7 @@ export default function StageManagerDialog({
       if (error) throw error;
       await onReload();
     } catch (e) {
-      notifyStageError(e as SbErr, "update", stage);
+      notifyStage(e as SbErr, "atualizar");
     } finally {
       setBusy(false);
     }
@@ -231,7 +153,7 @@ export default function StageManagerDialog({
       setNewLabel("");
       await onReload();
     } catch (e) {
-      notifyStageError(e as SbErr, "insert");
+      notifyStage(e as SbErr, "criar");
     } finally {
       setBusy(false);
     }
@@ -240,16 +162,15 @@ export default function StageManagerDialog({
   const remove = async (stage: CrmStageRow) => {
     const count = dealCountByStage.get(stage.id) ?? 0;
     if (stage.is_system) {
-      notifyStageError(
+      notifyStage(
         { message: "Etapas de sistema não podem ser excluídas" },
-        "delete",
-        stage,
+        "excluir",
         count,
       );
       return;
     }
     if (count > 0) {
-      notifyStageError({ code: "23503" }, "delete", stage, count);
+      notifyStage({ code: "23503" }, "excluir", count);
       return;
     }
     setBusy(true);
@@ -259,7 +180,7 @@ export default function StageManagerDialog({
       toast.success("Etapa excluída.");
       await onReload();
     } catch (e) {
-      notifyStageError(e as SbErr, "delete", stage, count);
+      notifyStage(e as SbErr, "excluir", count);
     } finally {
       setBusy(false);
     }

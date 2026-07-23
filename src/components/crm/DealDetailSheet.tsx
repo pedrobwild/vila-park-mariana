@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { notifyCrmError, type SbErr } from "@/lib/crmErrors";
 import {
   Sheet,
   SheetContent,
@@ -149,7 +150,7 @@ export default function DealDetailSheet({ deal, units, stages, onClose, onReload
       setAddUnitOpen(false);
       await reload();
     } catch (e) {
-      toast.error("Não foi possível adicionar a unidade.");
+      notifyCrmError(e as SbErr, { entity: "unidade do negócio", action: "criar" });
     } finally {
       setBusy(false);
     }
@@ -161,22 +162,41 @@ export default function DealDetailSheet({ deal, units, stages, onClose, onReload
       const { error } = await supabase.from("crm_deal_units").delete().eq("id", id);
       if (error) throw error;
       await reload();
+    } catch (e) {
+      notifyCrmError(e as SbErr, { entity: "unidade do negócio", action: "excluir" });
     } finally {
       setBusy(false);
     }
   };
 
   const setInterest = async (id: string, level: CrmInterest) => {
-    await supabase.from("crm_deal_units").update({ interest_level: level }).eq("id", id);
+    const { error } = await supabase
+      .from("crm_deal_units")
+      .update({ interest_level: level })
+      .eq("id", id);
+    if (error) {
+      notifyCrmError(error as SbErr, { entity: "unidade do negócio", action: "atualizar" });
+      return;
+    }
     await reload();
   };
 
   const setPrimary = async (id: string) => {
     setBusy(true);
     try {
-      await supabase.from("crm_deal_units").update({ is_primary: false }).eq("deal_id", deal.id);
-      await supabase.from("crm_deal_units").update({ is_primary: true }).eq("id", id);
+      const r1 = await supabase
+        .from("crm_deal_units")
+        .update({ is_primary: false })
+        .eq("deal_id", deal.id);
+      if (r1.error) throw r1.error;
+      const r2 = await supabase
+        .from("crm_deal_units")
+        .update({ is_primary: true })
+        .eq("id", id);
+      if (r2.error) throw r2.error;
       await reload();
+    } catch (e) {
+      notifyCrmError(e as SbErr, { entity: "unidade do negócio", action: "atualizar" });
     } finally {
       setBusy(false);
     }
@@ -196,6 +216,8 @@ export default function DealDetailSheet({ deal, units, stages, onClose, onReload
       setNewContent("");
       setNewType("nota");
       await reload();
+    } catch (e) {
+      notifyCrmError(e as SbErr, { entity: "atividade", action: "criar" });
     } finally {
       setBusy(false);
     }
@@ -236,9 +258,7 @@ export default function DealDetailSheet({ deal, units, stages, onClose, onReload
       setPending(null);
       await reload();
     } catch (e) {
-      toast.error("Não foi possível atualizar a etapa.", {
-        description: e instanceof Error ? e.message : undefined,
-      });
+      notifyCrmError(e as SbErr, { entity: "negócio", action: "mover" });
     } finally {
       setBusy(false);
     }

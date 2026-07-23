@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { notifyCrmError, type SbErr } from "@/lib/crmErrors";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -108,9 +109,7 @@ export default function PipelineView({
       setPending(null);
       await onReload();
     } catch (e) {
-      toast.error("Não foi possível atualizar a etapa.", {
-        description: e instanceof Error ? e.message : undefined,
-      });
+      notifyCrmError(e as SbErr, { entity: "negócio", action: "mover" });
     } finally {
       setSaving(false);
     }
