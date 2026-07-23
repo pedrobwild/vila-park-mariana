@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Map, { Marker, Popup, NavigationControl } from "react-map-gl/maplibre";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { Trees, Train, GraduationCap, ShoppingBag, UtensilsCrossed, Building2 } from "lucide-react";
@@ -27,14 +27,17 @@ export default function SaoPauloMap() {
   const [active, setActive] = useState<Poi | null>(null);
   const [showVilaPark, setShowVilaPark] = useState(false);
   const { style: mapStyle, onError: onMapError } = useBasemapStyle();
+  const mapRef = useRef<any>(null);
 
   return (
     <div className="h-full w-full rounded-xl overflow-hidden">
       <Map
+        ref={mapRef}
         initialViewState={{ longitude: VILA_PARK_COORDS.lng, latitude: VILA_PARK_COORDS.lat, zoom: 15 }}
         style={{ width: "100%", height: "100%" }}
         mapStyle={mapStyle}
         onError={onMapError}
+        onLoad={(event) => event.target.resize()}
       >
         <NavigationControl position="top-right" showCompass={false} />
 

@@ -145,26 +145,23 @@ function MapContent() {
       </div>
 
       <div
-        className="relative w-full rounded-[10px] border border-border/70 overflow-hidden card-elevated bg-muted"
-        style={{ height: 460 }}
+        className="relative w-full h-[460px] md:h-[540px] rounded-[10px] border border-border/70 overflow-hidden card-elevated bg-muted"
       >
-        <div className="md:hidden absolute inset-0" style={{ height: "100%" }} />
-        <div className="hidden md:block absolute inset-0" style={{ height: 540 }} />
-        <div className="relative w-full h-[460px] md:h-[540px]">
-          <ReactMap
-            ref={mapRef}
-            initialViewState={{ longitude: VILA_PARK_COORDS.lng, latitude: VILA_PARK_COORDS.lat, zoom: 14.6 }}
-            style={{ width: "100%", height: "100%" }}
-            mapStyle={mapStyle}
-            minZoom={12}
-            maxZoom={18}
-            scrollZoom={scrollUnlocked}
-            onClick={() => {
-              if (!scrollUnlocked) setScrollUnlocked(true);
-            }}
-            onError={onMapError}
-            cooperativeGestures={typeof window !== "undefined" && window.matchMedia?.("(pointer: coarse)").matches}
-          >
+        <ReactMap
+          ref={mapRef}
+          initialViewState={{ longitude: VILA_PARK_COORDS.lng, latitude: VILA_PARK_COORDS.lat, zoom: 14.6 }}
+          style={{ width: "100%", height: "100%" }}
+          mapStyle={mapStyle}
+          minZoom={12}
+          maxZoom={18}
+          scrollZoom={scrollUnlocked}
+          onLoad={(event) => event.target.resize()}
+          onClick={() => {
+            if (!scrollUnlocked) setScrollUnlocked(true);
+          }}
+          onError={onMapError}
+          cooperativeGestures={typeof window !== "undefined" && window.matchMedia?.("pointer: coarse").matches}
+        >
             <NavigationControl position="top-right" showCompass={false} />
 
             {/* Anéis de caminhada — halo + linha principal para contraste garantido
@@ -294,8 +291,7 @@ function MapContent() {
                 </div>
               </Popup>
             )}
-          </ReactMap>
-        </div>
+        </ReactMap>
       </div>
 
       <p className="text-xs text-muted-foreground/80 leading-relaxed max-w-3xl">
