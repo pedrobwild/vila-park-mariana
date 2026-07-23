@@ -145,6 +145,10 @@ export default function NewDealDialog({
       toast.error("Selecione uma pessoa.");
       return;
     }
+    if (selectedCount === 0) {
+      toast.error("Selecione pelo menos uma unidade de interesse para criar o negócio.");
+      return;
+    }
     setSaving(true);
     try {
       const { data: firstStage, error: stageErr } = await supabase
@@ -411,7 +415,7 @@ export default function NewDealDialog({
           >
             Cancelar
           </Button>
-          <Button onClick={submit} disabled={saving || !personId}>
+          <Button onClick={submit} disabled={saving || !personId || selectedCount === 0}>
             {saving ? "Criando…" : "Criar negócio"}
           </Button>
         </DialogFooter>
