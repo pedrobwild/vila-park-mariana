@@ -127,7 +127,7 @@ export default function Admin() {
           <div className="md:hidden">
             <Tabs value={active} onValueChange={(v) => setActive(v as SectionKey)}>
               <TabsList>
-                {SECTIONS.map((s) => (
+                {SECTIONS.filter((s) => !s.href).map((s) => (
                   <TabsTrigger key={s.key} value={s.key}>
                     {s.label}
                   </TabsTrigger>
@@ -135,6 +135,13 @@ export default function Admin() {
               </TabsList>
               <TabsContent value="units" />
             </Tabs>
+            <div className="mt-3">
+              <Link to="/admin/extrato">
+                <Button variant="outline" size="sm" className="h-9">
+                  <FileText className="h-3.5 w-3.5 mr-2" /> Extrato do cliente
+                </Button>
+              </Link>
+            </div>
           </div>
 
           <header>
