@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
   SelectContent,
@@ -35,7 +36,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Check, ChevronsUpDown, AlertCircle } from "lucide-react";
+import { Check, ChevronsUpDown, AlertCircle, Users, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatBRL, STATUS_LABEL } from "@/lib/units";
 import type { Unit } from "@/lib/units";
@@ -46,6 +47,7 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   people: CrmPerson[];
+  peopleLoading?: boolean;
   units: Unit[];
   deals: DealFull[];
   presetPersonId?: string | null;
