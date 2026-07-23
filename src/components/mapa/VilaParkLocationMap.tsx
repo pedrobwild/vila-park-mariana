@@ -83,7 +83,7 @@ function MapContent() {
   const [showBuilding, setShowBuilding] = useState(false);
   const [filters, setFilters] = useState<PoiCategory[]>([...CATEGORY_ORDER]);
   const [scrollUnlocked, setScrollUnlocked] = useState(false);
-  const { style: mapStyle, onError: onMapError } = useBasemapStyle();
+  const { style: mapStyle, onError: onMapError } = useBasemapStyle("VilaParkLocationMap");
   const mapRef = useRef<any>(null);
   const contrast = useBasemapContrast(mapRef, mapStyle);
 
