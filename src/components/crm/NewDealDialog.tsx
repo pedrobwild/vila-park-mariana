@@ -213,78 +213,110 @@ export default function NewDealDialog({
           {/* Person picker */}
           <div className="space-y-1.5">
             <Label>Pessoa *</Label>
-            <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={pickerOpen}
-                  className="w-full justify-between font-normal"
-                  disabled={!!presetPersonId}
-                >
-                  {person ? (
-                    <span className="truncate">
-                      {person.full_name}
-                      {person.email && (
-                        <span className="text-muted-foreground"> · {person.email}</span>
+            {peopleLoading ? (
+              <div className="space-y-2">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-3 w-1/2" />
+              </div>
+            ) : people.length === 0 ? (
+              <div className="rounded-lg border border-dashed border-border/60 bg-muted/30 p-4 text-center space-y-2">
+                <Users className="mx-auto h-6 w-6 text-muted-foreground/70" />
+                <div className="space-y-0.5">
+                  <p className="text-sm font-medium">Nenhuma pessoa cadastrada</p>
+                  <p className="text-xs text-muted-foreground">
+                    Cadastre uma pessoa antes de criar o primeiro negócio.
+                  </p>
+                </div>
+                {onCreatePerson && !presetPersonId && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      onOpenChange(false);
+                      onCreatePerson();
+                    }}
+                  >
+                    Cadastrar pessoa
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <>
+                <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={pickerOpen}
+                      className="w-full justify-between font-normal"
+                      disabled={!!presetPersonId}
+                    >
+                      {person ? (
+                        <span className="truncate">
+                          {person.full_name}
+                          {person.email && (
+                            <span className="text-muted-foreground"> · {person.email}</span>
+                          )}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">Selecione uma pessoa…</span>
                       )}
-                    </span>
-                  ) : (
-                    <span className="text-muted-foreground">Selecione uma pessoa…</span>
-                  )}
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                className="p-0 w-[--radix-popover-trigger-width] max-h-[320px]"
-                align="start"
-              >
-                <Command>
-                  <CommandInput placeholder="Buscar por nome ou e-mail…" />
-                  <CommandList>
-                    <CommandEmpty>Nenhuma pessoa encontrada.</CommandEmpty>
-                    <CommandGroup>
-                      {people.map((p) => (
-                        <CommandItem
-                          key={p.id}
-                          value={`${p.full_name} ${p.email ?? ""}`}
-                          onSelect={() => {
-                            setPersonId(p.id);
-                            setPickerOpen(false);
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              personId === p.id ? "opacity-100" : "opacity-0",
-                            )}
-                          />
-                          <div className="flex flex-col min-w-0">
-                            <span className="truncate">{p.full_name}</span>
-                            {p.email && (
-                              <span className="text-[11px] text-muted-foreground truncate">
-                                {p.email}
-                              </span>
-                            )}
-                          </div>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-            {onCreatePerson && !presetPersonId && (
-              <button
-                type="button"
-                onClick={() => {
-                  onOpenChange(false);
-                  onCreatePerson();
-                }}
-                className="text-[11px] text-muted-foreground hover:text-foreground underline underline-offset-2"
-              >
-                cadastrar pessoa nova
-              </button>
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="p-0 w-[--radix-popover-trigger-width] max-h-[320px]"
+                    align="start"
+                  >
+                    <Command>
+                      <CommandInput placeholder="Buscar por nome ou e-mail…" />
+                      <CommandList>
+                        <CommandEmpty>Nenhuma pessoa encontrada.</CommandEmpty>
+                        <CommandGroup>
+                          {people.map((p) => (
+                            <CommandItem
+                              key={p.id}
+                              value={`${p.full_name} ${p.email ?? ""}`}
+                              onSelect={() => {
+                                setPersonId(p.id);
+                                setPickerOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  personId === p.id ? "opacity-100" : "opacity-0",
+                                )}
+                              />
+                              <div className="flex flex-col min-w-0">
+                                <span className="truncate">{p.full_name}</span>
+                                {p.email && (
+                                  <span className="text-[11px] text-muted-foreground truncate">
+                                    {p.email}
+                                  </span>
+                                )}
+                              </div>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                {onCreatePerson && !presetPersonId && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onOpenChange(false);
+                      onCreatePerson();
+                    }}
+                    className="text-[11px] text-muted-foreground hover:text-foreground underline underline-offset-2"
+                  >
+                    cadastrar pessoa nova
+                  </button>
+                )}
+              </>
             )}
           </div>
 
