@@ -11,7 +11,7 @@
  */
 import { useEffect, useState } from "react";
 import { MAP_STYLE_FALLBACK, MAP_STYLE_PRIMARY } from "@/lib/basemap";
-import { clearBasemapLog, getBasemapLog, subscribeBasemapLog, type BasemapLogEntry } from "@/lib/basemapLog";
+import { BASEMAP_SESSION_ID, clearBasemapLog, getBasemapLog, subscribeBasemapLog, type BasemapLogEntry } from "@/lib/basemapLog";
 
 const STORAGE_KEY = "basemap:debug";
 
