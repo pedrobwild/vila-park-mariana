@@ -59,6 +59,7 @@ export default function NewDealDialog({
   open,
   onOpenChange,
   people,
+  peopleLoading,
   units,
   deals,
   presetPersonId,
