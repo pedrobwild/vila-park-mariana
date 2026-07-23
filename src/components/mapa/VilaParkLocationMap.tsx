@@ -54,6 +54,45 @@ function distanceMeters(d: string): number {
 
 const NEARBY_LIMIT_M = 1200;
 
+// Envelope padrão dos eventos de analytics deste componente.
+// Mantido enxuto para agregações no relatório: sempre `location` + `component`.
+const ANALYTICS_BASE = {
+  location: "home:comparativo",
+  component: "VilaParkLocationMap",
+} as const;
+
+// Identificador estável do POI, derivado do nome (sem acentos, kebab-case).
+// Ex.: "Parque da Aclimação" -> "parque-da-aclimacao".
+function poiId(name: string): string {
+  return name
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+// Payload consistente para qualquer evento que se refere a um POI.
+function poiEventPayload(poi: Poi) {
+  return {
+    poi_id: poiId(poi.name),
+    poi_name: poi.name,
+    category: poi.category,
+    distance_label: poi.distance,
+    distance_m: distanceMeters(poi.distance),
+  };
+}
+
+// Payload consistente para eventos de filtro.
+function filterEventPayload(filters: PoiCategory[]) {
+  const sorted = [...filters].sort();
+  return {
+    filters: sorted,
+    filters_count: sorted.length,
+    filters_key: sorted.join(","),
+  };
+}
+
 function prefersReducedMotion(): boolean {
   if (typeof window === "undefined") return false;
   return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
@@ -256,12 +295,9 @@ function MapContent() {
     setActive(poi);
     setShowBuilding(false);
     trackGlobal("map_poi_select", {
-      location: "home:comparativo",
-      component: "VilaParkLocationMap",
-      poi_name: poi.name,
-      poi_category: poi.category,
-      poi_distance: poi.distance,
-      distance_m: distanceMeters(poi.distance),
+      ...ANALYTICS_BASE,
+      ...poiEventPayload(poi),
+      ...filterEventPayload(filters),
       source: opts?.source ?? "list",
     });
     const map = mapRef.current?.getMap?.();
@@ -275,18 +311,17 @@ function MapContent() {
       const el = itemRefs.current.get(poi.name);
       el?.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "nearest", inline: "center" });
     }
-  }, []);
+  }, [filters]);
 
   const toggle = (c: PoiCategory) =>
     setFilters((prev) => {
-      const next = prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c];
+      const wasActive = prev.includes(c);
+      const next = wasActive ? prev.filter((x) => x !== c) : [...prev, c];
       trackGlobal("map_filter_toggle", {
-        location: "home:comparativo",
-        component: "VilaParkLocationMap",
+        ...ANALYTICS_BASE,
         category: c,
-        action: prev.includes(c) ? "off" : "on",
-        active_filters: next,
-        active_count: next.length,
+        filter_action: wasActive ? "off" : "on",
+        ...filterEventPayload(next),
       });
       return next;
     });
@@ -309,8 +344,8 @@ function MapContent() {
           onClick={() => {
             setFilters([...CATEGORY_ORDER]);
             trackGlobal("map_filter_reset", {
-              location: "home:comparativo",
-              component: "VilaParkLocationMap",
+              ...ANALYTICS_BASE,
+              ...filterEventPayload(CATEGORY_ORDER),
             });
           }}
           aria-pressed={allActive}
@@ -618,9 +653,9 @@ function MapContent() {
               setShowFullRadius((v) => {
                 const next = !v;
                 trackGlobal("map_bounds_toggle", {
-                  location: "home:comparativo",
-                  component: "VilaParkLocationMap",
+                  ...ANALYTICS_BASE,
                   mode: next ? "full_radius" : "nearby",
+                  ...filterEventPayload(filters),
                 });
                 return next;
               })
