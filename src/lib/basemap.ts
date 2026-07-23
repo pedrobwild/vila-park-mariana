@@ -6,6 +6,7 @@
  */
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { installBasemapCspReporter, logBasemap } from "./basemapLog";
 
 export const MAPTILER_KEY = "r3SdCfKzNXmowFUKYBgz";
 export const MAP_STYLE_PRIMARY = `https://api.maptiler.com/maps/streets/style.json?key=${MAPTILER_KEY}`;
@@ -25,6 +26,8 @@ async function probeStyle(): Promise<string> {
   if (inflight) return inflight;
 
   inflight = (async () => {
+    const startedAt = performance.now?.() ?? Date.now();
+    logBasemap({ event: "style_probe_start", style: MAP_STYLE_PRIMARY });
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 3500);
@@ -35,16 +38,25 @@ async function probeStyle(): Promise<string> {
       });
       clearTimeout(timeout);
       if (!res.ok) throw new Error(`status ${res.status}`);
-      // valida JSON minimamente
       const json = await res.json();
       if (!json || typeof json !== "object" || !("sources" in json)) {
         throw new Error("invalid style json");
       }
       cachedStyle = MAP_STYLE_PRIMARY;
+      logBasemap({
+        event: "style_probe_ok",
+        style: MAP_STYLE_PRIMARY,
+        detail: { durationMs: Math.round((performance.now?.() ?? Date.now()) - startedAt) },
+      });
     } catch (err) {
-      if (typeof console !== "undefined") {
-        console.warn("[basemap] MapTiler Streets Light indisponível, usando MapTiler Dataviz Light.", err);
-      }
+      logBasemap({
+        event: "style_probe_fail",
+        style: MAP_STYLE_PRIMARY,
+        detail: {
+          error: err,
+          durationMs: Math.round((performance.now?.() ?? Date.now()) - startedAt),
+        },
+      });
       cachedStyle = MAP_STYLE_FALLBACK;
     }
     return cachedStyle!;
@@ -81,12 +93,14 @@ function isStyleLoadError(err: unknown): boolean {
   );
 }
 
-function switchToFallback(reason: string) {
+function switchToFallback(reason: string, err?: unknown) {
   if (cachedStyle === MAP_STYLE_FALLBACK) return false;
   cachedStyle = MAP_STYLE_FALLBACK;
-  if (typeof console !== "undefined") {
-    console.warn(`[basemap] ${reason} — alternando para basemap de fallback.`);
-  }
+  logBasemap({
+    event: "fallback_switch",
+    style: MAP_STYLE_FALLBACK,
+    detail: { reason, from: MAP_STYLE_PRIMARY, error: err },
+  });
   if (!fallbackNotified) {
     fallbackNotified = true;
     try {
@@ -101,11 +115,12 @@ function switchToFallback(reason: string) {
   return true;
 }
 
-export function useBasemapStyle(): { style: string; status: Status; onError: (err?: unknown) => void } {
+export function useBasemapStyle(component?: string): { style: string; status: Status; onError: (err?: unknown) => void } {
   const [style, setStyle] = useState<string>(cachedStyle ?? MAP_STYLE_PRIMARY);
   const [status, setStatus] = useState<Status>(cachedStyle ? (cachedStyle === MAP_STYLE_PRIMARY ? "primary" : "fallback") : "checking");
 
   useEffect(() => {
+    installBasemapCspReporter();
     let alive = true;
     probeStyle().then((s) => {
       if (!alive) return;
@@ -119,8 +134,12 @@ export function useBasemapStyle(): { style: string; status: Status; onError: (er
   }, []);
 
   const onError = (err?: unknown) => {
-    if (!isStyleLoadError(err)) return; // ignora erros de tile individuais
-    if (switchToFallback("Erro ao carregar style.json do basemap primário")) {
+    if (!isStyleLoadError(err)) {
+      logBasemap({ event: "tile_error", component, style, detail: { error: err } });
+      return;
+    }
+    logBasemap({ event: "style_load_error", component, style, detail: { error: err } });
+    if (switchToFallback("Erro ao carregar style.json do basemap primário", err)) {
       setStyle(MAP_STYLE_FALLBACK);
       setStatus("fallback");
     }

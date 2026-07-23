@@ -17,6 +17,7 @@ import {
 } from "@/components/mapa/SaoPauloMap";
 import NeighborhoodComparison from "@/components/mapa/NeighborhoodComparison";
 import { useBasemapStyle } from "@/lib/basemap";
+import { logBasemap } from "@/lib/basemapLog";
 
 const CATEGORY_ORDER: PoiCategory[] = ["leisure", "mobility", "education", "services", "gastronomy"];
 
@@ -25,7 +26,7 @@ export default function MapaBairrosEmbed() {
   const [activePoi, setActivePoi] = useState<VilaParkPoi | null>(null);
   const [showEmpreendimento, setShowEmpreendimento] = useState(false);
   const [showNearby, setShowNearby] = useState(false);
-  const { style: mapStyle, onError: onMapError } = useBasemapStyle();
+  const { style: mapStyle, onError: onMapError } = useBasemapStyle("MapaBairrosEmbed");
   const mapRef = useRef<any>(null);
 
   const toggleCategory = (cat: PoiCategory) => {
@@ -83,7 +84,10 @@ export default function MapaBairrosEmbed() {
           minZoom={12}
           maxZoom={18}
           onError={onMapError}
-          onLoad={(event) => event.target.resize()}
+          onLoad={(event) => {
+            event.target.resize();
+            logBasemap({ event: "map_load", component: "MapaBairrosEmbed", style: mapStyle });
+          }}
         >
           <NavigationControl position="top-right" showCompass={false} />
 

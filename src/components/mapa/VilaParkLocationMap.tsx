@@ -18,6 +18,7 @@ import {
   type PoiCategory,
 } from "@/data/surroundings";
 import { useBasemapStyle, useBasemapContrast } from "@/lib/basemap";
+import { logBasemap } from "@/lib/basemapLog";
 
 const ICON: Record<PoiCategory, typeof Train> = {
   mobility: Train,
@@ -83,7 +84,7 @@ function MapContent() {
   const [showBuilding, setShowBuilding] = useState(false);
   const [filters, setFilters] = useState<PoiCategory[]>([...CATEGORY_ORDER]);
   const [scrollUnlocked, setScrollUnlocked] = useState(false);
-  const { style: mapStyle, onError: onMapError } = useBasemapStyle();
+  const { style: mapStyle, onError: onMapError } = useBasemapStyle("VilaParkLocationMap");
   const mapRef = useRef<any>(null);
   const contrast = useBasemapContrast(mapRef, mapStyle);
 
@@ -155,7 +156,13 @@ function MapContent() {
           minZoom={12}
           maxZoom={18}
           scrollZoom={scrollUnlocked}
-          onLoad={(event) => event.target.resize()}
+          onLoad={(event) => {
+            event.target.resize();
+            logBasemap({ event: "map_load", component: "VilaParkLocationMap", style: mapStyle });
+            event.target.once?.("idle", () =>
+              logBasemap({ event: "map_idle_first", component: "VilaParkLocationMap", style: mapStyle }),
+            );
+          }}
           onClick={() => {
             if (!scrollUnlocked) setScrollUnlocked(true);
           }}
