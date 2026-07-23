@@ -164,6 +164,39 @@ export default function BasemapDiagnosticsOverlay() {
                       {formatDetail(e.detail)}
                     </pre>
                   )}
+                  {e.snapshots && e.snapshots.length > 0 && (
+                    <div className="mt-1 space-y-1">
+                      {e.snapshots.map((s, si) => (
+                        <div key={si} className="rounded border border-slate-800 bg-slate-950/60 p-1.5">
+                          <div className="text-[10px] text-slate-400">
+                            <span className="text-slate-200">{s.component}</span>
+                            <span className="text-slate-500"> · z{s.camera.zoom} · {s.size.width}×{s.size.height}</span>
+                            <span className="text-slate-500"> · style:{s.ready.styleLoaded ? "✓" : "✗"} tiles:{s.ready.sourcesLoaded ? "✓" : "✗"}</span>
+                          </div>
+                          {s.image ? (
+                            <a
+                              href={s.image}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="mt-1 block"
+                              title="Open full-size snapshot"
+                            >
+                              <img
+                                src={s.image}
+                                alt={`${s.component} snapshot at ${e.ts}`}
+                                className="w-full h-auto rounded border border-slate-800"
+                                loading="lazy"
+                              />
+                            </a>
+                          ) : (
+                            <div className="mt-1 text-[10px] text-amber-300">
+                              snapshot unavailable{s.imageError ? ` — ${s.imageError}` : ""}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </li>
               ))
             )}

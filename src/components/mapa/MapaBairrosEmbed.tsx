@@ -17,7 +17,7 @@ import {
 } from "@/components/mapa/SaoPauloMap";
 import NeighborhoodComparison from "@/components/mapa/NeighborhoodComparison";
 import { useBasemapStyle } from "@/lib/basemap";
-import { logBasemap } from "@/lib/basemapLog";
+import { logBasemap, registerBasemapMap, unregisterBasemapMap } from "@/lib/basemapLog";
 
 const CATEGORY_ORDER: PoiCategory[] = ["leisure", "mobility", "education", "services", "gastronomy"];
 
@@ -83,11 +83,16 @@ export default function MapaBairrosEmbed() {
           mapStyle={mapStyle}
           minZoom={12}
           maxZoom={18}
+          // Preserve WebGL buffer for post-hoc canvas snapshot on
+          // fallback_switch / csp_violation. Not in react-map-gl's typed props.
+          {...({ preserveDrawingBuffer: true } as any)}
           onError={onMapError}
           onLoad={(event) => {
             event.target.resize();
+            registerBasemapMap("MapaBairrosEmbed", event.target as any, mapStyle);
             logBasemap({ event: "map_load", component: "MapaBairrosEmbed", style: mapStyle });
           }}
+          onRemove={() => unregisterBasemapMap("MapaBairrosEmbed")}
         >
           <NavigationControl position="top-right" showCompass={false} />
 

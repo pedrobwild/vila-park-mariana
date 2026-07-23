@@ -18,7 +18,7 @@ import {
   type PoiCategory,
 } from "@/data/surroundings";
 import { useBasemapStyle, useBasemapContrast } from "@/lib/basemap";
-import { logBasemap } from "@/lib/basemapLog";
+import { logBasemap, registerBasemapMap, unregisterBasemapMap } from "@/lib/basemapLog";
 
 const ICON: Record<PoiCategory, typeof Train> = {
   mobility: Train,
@@ -156,13 +156,18 @@ function MapContent() {
           minZoom={12}
           maxZoom={18}
           scrollZoom={scrollUnlocked}
+          // Preserve WebGL buffer for post-hoc canvas snapshot on
+          // fallback_switch / csp_violation. Not in react-map-gl's typed props.
+          {...({ preserveDrawingBuffer: true } as any)}
           onLoad={(event) => {
             event.target.resize();
+            registerBasemapMap("VilaParkLocationMap", event.target as any, mapStyle);
             logBasemap({ event: "map_load", component: "VilaParkLocationMap", style: mapStyle });
             event.target.once?.("idle", () =>
               logBasemap({ event: "map_idle_first", component: "VilaParkLocationMap", style: mapStyle }),
             );
           }}
+          onRemove={() => unregisterBasemapMap("VilaParkLocationMap")}
           onClick={() => {
             if (!scrollUnlocked) setScrollUnlocked(true);
           }}

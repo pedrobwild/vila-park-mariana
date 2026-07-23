@@ -10,7 +10,7 @@ import {
   type PoiCategory,
 } from "@/data/surroundings";
 import { useBasemapStyle } from "@/lib/basemap";
-import { logBasemap } from "@/lib/basemapLog";
+import { logBasemap, registerBasemapMap, unregisterBasemapMap } from "@/lib/basemapLog";
 
 // Re-exports para consumidores legados (não duplicar dados).
 export { VILA_PARK_COORDS, VILA_PARK_ADDRESS, POIS as VILA_PARK_POIS };
@@ -37,11 +37,17 @@ export default function SaoPauloMap() {
         initialViewState={{ longitude: VILA_PARK_COORDS.lng, latitude: VILA_PARK_COORDS.lat, zoom: 15 }}
         style={{ width: "100%", height: "100%" }}
         mapStyle={mapStyle}
+        // Preserve the WebGL drawing buffer so we can grab a screenshot from
+        // the canvas when a fallback_switch / csp_violation event fires.
+        // Not in react-map-gl's typed props but forwarded to MapLibre.
+        {...({ preserveDrawingBuffer: true } as any)}
         onError={onMapError}
         onLoad={(event) => {
           event.target.resize();
+          registerBasemapMap("SaoPauloMap", event.target as any, mapStyle);
           logBasemap({ event: "map_load", component: "SaoPauloMap", style: mapStyle });
         }}
+        onRemove={() => unregisterBasemapMap("SaoPauloMap")}
       >
         <NavigationControl position="top-right" showCompass={false} />
 
