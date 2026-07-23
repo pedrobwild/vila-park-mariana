@@ -18,7 +18,7 @@ import {
   type PoiCategory,
 } from "@/data/surroundings";
 import { useBasemapStyle, useBasemapContrast } from "@/lib/basemap";
-import { logBasemap } from "@/lib/basemapLog";
+import { logBasemap, registerBasemapMap, unregisterBasemapMap } from "@/lib/basemapLog";
 
 const ICON: Record<PoiCategory, typeof Train> = {
   mobility: Train,
