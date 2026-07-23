@@ -85,6 +85,7 @@ function MapContent() {
   const [scrollUnlocked, setScrollUnlocked] = useState(false);
   const { style: mapStyle, onError: onMapError } = useBasemapStyle();
   const mapRef = useRef<any>(null);
+  const contrast = useBasemapContrast(mapRef, mapStyle);
 
   const visible = useMemo(() => POIS.filter((p) => filters.includes(p.category)), [filters]);
 
