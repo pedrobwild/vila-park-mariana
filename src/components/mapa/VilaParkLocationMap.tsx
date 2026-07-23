@@ -34,6 +34,7 @@ import {
 } from "@/data/surroundings";
 import { useBasemapStyle, useBasemapContrast } from "@/lib/basemap";
 import { logBasemap, registerBasemapMap, unregisterBasemapMap } from "@/lib/basemapLog";
+import { trackGlobal } from "@/hooks/useGuideAnalytics";
 
 const ICON: Record<PoiCategory, typeof Train> = {
   mobility: Train,
