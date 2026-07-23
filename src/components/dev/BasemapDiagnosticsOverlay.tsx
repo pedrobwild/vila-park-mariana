@@ -99,6 +99,12 @@ export default function BasemapDiagnosticsOverlay() {
             aria-hidden
           />
           <span className="font-sans text-xs font-semibold uppercase tracking-wide">Basemap · {status}</span>
+          <span
+            className="font-mono text-[10px] text-slate-400 truncate"
+            title={`Session ID (this page load): ${BASEMAP_SESSION_ID}`}
+          >
+            #{BASEMAP_SESSION_ID}
+          </span>
         </div>
         <div className="flex items-center gap-1">
           <button
