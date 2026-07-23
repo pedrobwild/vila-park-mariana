@@ -252,9 +252,18 @@ function MapContent() {
     applyBounds([VILA_PARK_COORDS, ...visible], { padding: 70 });
   }, [filters, allActive, visible, mapReady, applyBounds]);
 
-  const focusPoi = useCallback((poi: Poi, opts?: { scrollList?: boolean }) => {
+  const focusPoi = useCallback((poi: Poi, opts?: { scrollList?: boolean; source?: "list" | "pin" | "carousel" }) => {
     setActive(poi);
     setShowBuilding(false);
+    trackGlobal("map_poi_select", {
+      location: "home:comparativo",
+      component: "VilaParkLocationMap",
+      poi_name: poi.name,
+      poi_category: poi.category,
+      poi_distance: poi.distance,
+      distance_m: distanceMeters(poi.distance),
+      source: opts?.source ?? "list",
+    });
     const map = mapRef.current?.getMap?.();
     if (map) {
       const reduced = prefersReducedMotion();
@@ -269,7 +278,18 @@ function MapContent() {
   }, []);
 
   const toggle = (c: PoiCategory) =>
-    setFilters((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]));
+    setFilters((prev) => {
+      const next = prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c];
+      trackGlobal("map_filter_toggle", {
+        location: "home:comparativo",
+        component: "VilaParkLocationMap",
+        category: c,
+        action: prev.includes(c) ? "off" : "on",
+        active_filters: next,
+        active_count: next.length,
+      });
+      return next;
+    });
 
   const catLabel = (c: PoiCategory) => t(`surroundings.${c}`);
 
