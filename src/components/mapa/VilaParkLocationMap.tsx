@@ -167,25 +167,63 @@ function MapContent() {
           >
             <NavigationControl position="top-right" showCompass={false} />
 
-            {/* Anéis de caminhada */}
+            {/* Anéis de caminhada — halo + linha principal para contraste garantido
+                em qualquer variação do basemap Positron ou fallback. */}
             <Source id="ring-500-src" type="geojson" data={ring500}>
-              <Layer {...RING_500} />
+              <Layer
+                {...RING_500_HALO}
+                paint={{
+                  ...(RING_500_HALO.paint as any),
+                  "line-color": contrast.ringHalo,
+                  "line-opacity": contrast.ringHaloOpacity,
+                }}
+              />
+              <Layer
+                {...RING_500}
+                paint={{
+                  ...(RING_500.paint as any),
+                  "line-color": contrast.ringMain,
+                  "line-opacity": contrast.ringMainOpacity,
+                }}
+              />
             </Source>
             <Source id="ring-1000-src" type="geojson" data={ring1000}>
-              <Layer {...RING_1000} />
+              <Layer
+                {...RING_1000_HALO}
+                paint={{
+                  ...(RING_1000_HALO.paint as any),
+                  "line-color": contrast.ringHalo,
+                  "line-opacity": contrast.ringHaloOpacity,
+                }}
+              />
+              <Layer
+                {...RING_1000}
+                paint={{
+                  ...(RING_1000.paint as any),
+                  "line-color": contrast.ringMain,
+                  "line-opacity": Math.max(0.5, contrast.ringMainOpacity - 0.15),
+                }}
+              />
             </Source>
 
             {/* Rótulos dos anéis (marcadores DOM discretos) */}
             <Marker longitude={VILA_PARK_COORDS.lng} latitude={VILA_PARK_COORDS.lat + 500 / 111320} anchor="bottom">
-              <span className="pointer-events-none select-none text-[10px] uppercase tracking-[0.14em] font-medium text-foreground/60 bg-background/85 px-1.5 py-0.5 rounded">
+              <span
+                className="pointer-events-none select-none text-[10px] uppercase tracking-[0.14em] font-medium px-1.5 py-0.5 rounded"
+                style={{ backgroundColor: contrast.labelBg, color: contrast.labelFg }}
+              >
                 {t("map.radius.500")}
               </span>
             </Marker>
             <Marker longitude={VILA_PARK_COORDS.lng} latitude={VILA_PARK_COORDS.lat + 1000 / 111320} anchor="bottom">
-              <span className="pointer-events-none select-none text-[10px] uppercase tracking-[0.14em] font-medium text-foreground/60 bg-background/85 px-1.5 py-0.5 rounded">
+              <span
+                className="pointer-events-none select-none text-[10px] uppercase tracking-[0.14em] font-medium px-1.5 py-0.5 rounded"
+                style={{ backgroundColor: contrast.labelBg, color: contrast.labelFg }}
+              >
                 {t("map.radius.1000")}
               </span>
             </Marker>
+
 
             {/* Empreendimento */}
             <Marker longitude={VILA_PARK_COORDS.lng} latitude={VILA_PARK_COORDS.lat} anchor="bottom">
