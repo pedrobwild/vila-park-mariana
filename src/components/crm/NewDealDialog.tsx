@@ -351,6 +351,18 @@ export default function NewDealDialog({
           {person && (
             <div className="space-y-1.5">
               <Label>Unidades de interesse</Label>
+              {prefilled.size === 0 && availableUnits.length > 0 && (
+                <div className="rounded-lg border border-dashed border-border/60 bg-muted/30 p-3 flex items-start gap-3">
+                  <Building2 className="h-4 w-4 text-muted-foreground/70 shrink-0 mt-0.5" />
+                  <div className="space-y-0.5">
+                    <p className="text-xs font-medium">Nenhuma unidade de interesse cadastrada</p>
+                    <p className="text-[11px] text-muted-foreground">
+                      Esta pessoa ainda não possui unidades de interesse. Marque abaixo as
+                      unidades que ela deseja acompanhar.
+                    </p>
+                  </div>
+                </div>
+              )}
               <div className="max-h-64 overflow-y-auto rounded border border-border/40 divide-y divide-border/40">
                 {availableUnits.length === 0 && (
                   <p className="p-3 text-xs text-muted-foreground text-center">
