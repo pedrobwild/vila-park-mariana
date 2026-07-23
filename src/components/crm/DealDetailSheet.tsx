@@ -86,13 +86,16 @@ const ACTIVITY_ICONS: Record<CrmActivityType, typeof StickyNote> = {
   mudanca_etapa: GitCommitVertical,
 };
 
-export default function DealDetailSheet({ deal, units, onClose, onReload }: Props) {
+export default function DealDetailSheet({ deal, units, stages, onClose, onReload }: Props) {
   const [activities, setActivities] = useState<CrmActivity[]>([]);
   const [loadingAct, setLoadingAct] = useState(false);
   const [newType, setNewType] = useState<CrmActivityType>("nota");
   const [newContent, setNewContent] = useState("");
   const [addUnitOpen, setAddUnitOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [pending, setPending] = useState<CrmStageRow | null>(null);
+  const [updateUnitStatus, setUpdateUnitStatus] = useState(true);
+  const [lostReason, setLostReason] = useState("");
 
   useEffect(() => {
     if (!deal) return;
