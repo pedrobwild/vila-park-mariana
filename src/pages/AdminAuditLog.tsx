@@ -233,7 +233,7 @@ export default function AdminAuditLog() {
               aria-label="Buscar"
             />
           </div>
-          <Select value={entityFilter} onValueChange={setEntityFilter}>
+          <Select value={entityFilter} onValueChange={(v) => updateParams({ entity: v, page: null })}>
             <SelectTrigger className="w-full md:w-[240px]" aria-label="Filtrar por entidade">
               <SelectValue />
             </SelectTrigger>
