@@ -140,13 +140,15 @@ export default function StageManagerDialog({
     if (a.kind !== "aberto" || b.kind !== "aberto") return;
     setBusy(true);
     try {
-      // temp position to avoid unique-conflict if any
-      await supabase.from("crm_stages").update({ position: -1 }).eq("id", a.id);
-      await supabase.from("crm_stages").update({ position: a.position }).eq("id", b.id);
-      await supabase.from("crm_stages").update({ position: b.position }).eq("id", a.id);
+      const r1 = await supabase.from("crm_stages").update({ position: -1 }).eq("id", a.id);
+      if (r1.error) throw r1.error;
+      const r2 = await supabase.from("crm_stages").update({ position: a.position }).eq("id", b.id);
+      if (r2.error) throw r2.error;
+      const r3 = await supabase.from("crm_stages").update({ position: b.position }).eq("id", a.id);
+      if (r3.error) throw r3.error;
       await onReload();
     } catch (e) {
-      toast.error("Não foi possível reordenar.");
+      notifyStageError(e as SbErr, "reorder");
     } finally {
       setBusy(false);
     }
@@ -189,8 +191,8 @@ export default function StageManagerDialog({
         return n;
       });
       await onReload();
-    } catch {
-      toast.error("Não foi possível renomear.");
+    } catch (e) {
+      notifyStageError(e as SbErr, "update", stage);
     } finally {
       setBusy(false);
     }
@@ -205,8 +207,8 @@ export default function StageManagerDialog({
         .eq("id", stage.id);
       if (error) throw error;
       await onReload();
-    } catch {
-      toast.error("Não foi possível atualizar.");
+    } catch (e) {
+      notifyStageError(e as SbErr, "update", stage);
     } finally {
       setBusy(false);
     }
@@ -228,8 +230,8 @@ export default function StageManagerDialog({
       if (error) throw error;
       setNewLabel("");
       await onReload();
-    } catch {
-      toast.error("Não foi possível criar a etapa.");
+    } catch (e) {
+      notifyStageError(e as SbErr, "insert");
     } finally {
       setBusy(false);
     }
@@ -237,15 +239,27 @@ export default function StageManagerDialog({
 
   const remove = async (stage: CrmStageRow) => {
     const count = dealCountByStage.get(stage.id) ?? 0;
-    if (count > 0) return;
+    if (stage.is_system) {
+      notifyStageError(
+        { message: "Etapas de sistema não podem ser excluídas" },
+        "delete",
+        stage,
+        count,
+      );
+      return;
+    }
+    if (count > 0) {
+      notifyStageError({ code: "23503" }, "delete", stage, count);
+      return;
+    }
     setBusy(true);
     try {
       const { error } = await supabase.from("crm_stages").delete().eq("id", stage.id);
       if (error) throw error;
+      toast.success("Etapa excluída.");
       await onReload();
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Erro";
-      toast.error("Não foi possível excluir.", { description: msg });
+      notifyStageError(e as SbErr, "delete", stage, count);
     } finally {
       setBusy(false);
     }
