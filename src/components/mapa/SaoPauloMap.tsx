@@ -9,7 +9,7 @@ import {
   type Poi,
   type PoiCategory,
 } from "@/data/surroundings";
-import { MAP_STYLE } from "@/lib/basemap";
+import { useBasemapStyle } from "@/lib/basemap";
 
 // Re-exports para consumidores legados (não duplicar dados).
 export { VILA_PARK_COORDS, VILA_PARK_ADDRESS, POIS as VILA_PARK_POIS };
@@ -26,13 +26,15 @@ export const POI_CATEGORY_META: Record<PoiCategory, { label: string; icon: typeo
 export default function SaoPauloMap() {
   const [active, setActive] = useState<Poi | null>(null);
   const [showVilaPark, setShowVilaPark] = useState(false);
+  const { style: mapStyle, onError: onMapError } = useBasemapStyle();
 
   return (
     <div className="h-full w-full rounded-xl overflow-hidden">
       <Map
         initialViewState={{ longitude: VILA_PARK_COORDS.lng, latitude: VILA_PARK_COORDS.lat, zoom: 15 }}
         style={{ width: "100%", height: "100%" }}
-        mapStyle={MAP_STYLE}
+        mapStyle={mapStyle}
+        onError={onMapError}
       >
         <NavigationControl position="top-right" showCompass={false} />
 
