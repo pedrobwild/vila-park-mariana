@@ -67,18 +67,18 @@ export default function PipelineBoard({ deals, loading, onReload, onOpenDeal }: 
     const { deal, to } = pending;
     setSaving(true);
     try {
-      const patch: Record<string, unknown> = { stage: to };
-      if (to === "perdido") {
-        if (!lostReason.trim()) {
-          toast.error("Informe o motivo da perda.");
-          setSaving(false);
-          return;
-        }
-        patch.lost_reason = lostReason.trim();
-      } else {
-        patch.lost_reason = null;
+      if (to === "perdido" && !lostReason.trim()) {
+        toast.error("Informe o motivo da perda.");
+        setSaving(false);
+        return;
       }
-      const { error } = await supabase.from("crm_deals").update(patch).eq("id", deal.id);
+      const { error } = await supabase
+        .from("crm_deals")
+        .update({
+          stage: to,
+          lost_reason: to === "perdido" ? lostReason.trim() : null,
+        })
+        .eq("id", deal.id);
       if (error) throw error;
 
       const pu = primaryUnit(deal);
