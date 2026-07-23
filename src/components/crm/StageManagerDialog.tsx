@@ -162,10 +162,9 @@ export default function StageManagerDialog({
   const remove = async (stage: CrmStageRow) => {
     const count = dealCountByStage.get(stage.id) ?? 0;
     if (stage.is_system) {
-      notifyStageError(
+      notifyStage(
         { message: "Etapas de sistema não podem ser excluídas" },
-        "delete",
-        stage,
+        "excluir",
         count,
       );
       return;
