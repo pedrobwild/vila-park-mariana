@@ -201,6 +201,22 @@ function MapContent() {
   const carouselRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<string, HTMLElement>>(new Map());
 
+  // Deduplicação de eventos de analytics.
+  // Evita ruído quando o usuário reclica no mesmo POI, alterna o mesmo filtro
+  // repetidamente ou quando o mapa reconcilia estado após reidratação.
+  const analyticsDedupRef = useRef<Map<string, number>>(new Map());
+  const emitAnalytics = useCallback(
+    (event: string, payload: Record<string, unknown>, dedupKey: string, windowMs = 1500) => {
+      const now = Date.now();
+      const key = `${event}::${dedupKey}`;
+      const last = analyticsDedupRef.current.get(key) ?? 0;
+      if (now - last < windowMs) return;
+      analyticsDedupRef.current.set(key, now);
+      trackGlobal(event, { ...payload, dedup_key: dedupKey });
+    },
+    [],
+  );
+
   const allActive = filters.length === CATEGORY_ORDER.length;
   const visible = useMemo(() => POIS.filter((p) => filters.includes(p.category)), [filters]);
 
@@ -294,12 +310,17 @@ function MapContent() {
   const focusPoi = useCallback((poi: Poi, opts?: { scrollList?: boolean; source?: "list" | "pin" | "carousel" }) => {
     setActive(poi);
     setShowBuilding(false);
-    trackGlobal("map_poi_select", {
-      ...ANALYTICS_BASE,
-      ...poiEventPayload(poi),
-      ...filterEventPayload(filters),
-      source: opts?.source ?? "list",
-    });
+    const source = opts?.source ?? "list";
+    emitAnalytics(
+      "map_poi_select",
+      {
+        ...ANALYTICS_BASE,
+        ...poiEventPayload(poi),
+        ...filterEventPayload(filters),
+        source,
+      },
+      `poi:${poiId(poi.name)}:${source}`,
+    );
     const map = mapRef.current?.getMap?.();
     if (map) {
       const reduced = prefersReducedMotion();
@@ -311,18 +332,23 @@ function MapContent() {
       const el = itemRefs.current.get(poi.name);
       el?.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "nearest", inline: "center" });
     }
-  }, [filters]);
+  }, [filters, emitAnalytics]);
 
   const toggle = (c: PoiCategory) =>
     setFilters((prev) => {
       const wasActive = prev.includes(c);
       const next = wasActive ? prev.filter((x) => x !== c) : [...prev, c];
-      trackGlobal("map_filter_toggle", {
-        ...ANALYTICS_BASE,
-        category: c,
-        filter_action: wasActive ? "off" : "on",
-        ...filterEventPayload(next),
-      });
+      const action = wasActive ? "off" : "on";
+      emitAnalytics(
+        "map_filter_toggle",
+        {
+          ...ANALYTICS_BASE,
+          category: c,
+          filter_action: action,
+          ...filterEventPayload(next),
+        },
+        `filter:${c}:${action}`,
+      );
       return next;
     });
 
@@ -343,10 +369,11 @@ function MapContent() {
           type="button"
           onClick={() => {
             setFilters([...CATEGORY_ORDER]);
-            trackGlobal("map_filter_reset", {
-              ...ANALYTICS_BASE,
-              ...filterEventPayload(CATEGORY_ORDER),
-            });
+            emitAnalytics(
+              "map_filter_reset",
+              { ...ANALYTICS_BASE, ...filterEventPayload(CATEGORY_ORDER) },
+              "filter:reset",
+            );
           }}
           aria-pressed={allActive}
           className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
@@ -652,11 +679,12 @@ function MapContent() {
             onClick={() =>
               setShowFullRadius((v) => {
                 const next = !v;
-                trackGlobal("map_bounds_toggle", {
-                  ...ANALYTICS_BASE,
-                  mode: next ? "full_radius" : "nearby",
-                  ...filterEventPayload(filters),
-                });
+                const mode = next ? "full_radius" : "nearby";
+                emitAnalytics(
+                  "map_bounds_toggle",
+                  { ...ANALYTICS_BASE, mode, ...filterEventPayload(filters) },
+                  `bounds:${mode}`,
+                );
                 return next;
               })
             }
