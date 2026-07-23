@@ -4,14 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ArrowLeft, LogOut, Building2, Lock, Menu } from "lucide-react";
+import { ArrowLeft, LogOut, Building2, Lock, Menu, FileText } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import UnitsManager from "@/components/admin/UnitsManager";
 
-type SectionKey = "units";
+type SectionKey = "units" | "extrato";
 
-const SECTIONS: Array<{ key: SectionKey; label: string; icon: typeof Building2 }> = [
+const SECTIONS: Array<{ key: SectionKey; label: string; icon: typeof Building2; href?: string }> = [
   { key: "units", label: "Unidades à venda", icon: Building2 },
+  { key: "extrato", label: "Extrato do cliente", icon: FileText, href: "/admin/extrato" },
 ];
 
 const COMING_SOON = ["Leads", "Relatórios", "Configurações"];
@@ -39,18 +40,27 @@ export default function Admin() {
     <nav className="space-y-1 p-3">
       {SECTIONS.map((s) => {
         const isActive = active === s.key;
+        const className = `w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm min-h-[44px] transition-colors ${
+          isActive
+            ? "bg-primary text-primary-foreground font-semibold"
+            : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+        }`;
+        if (s.href) {
+          return (
+            <Link key={s.key} to={s.href} onClick={onNavigate} className={className}>
+              <s.icon className="h-4 w-4 shrink-0" />
+              {s.label}
+            </Link>
+          );
+        }
         return (
           <button
             key={s.key}
             onClick={() => {
-              setActive(s.key);
+              setActive(s.key as "units");
               onNavigate?.();
             }}
-            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm min-h-[44px] transition-colors ${
-              isActive
-                ? "bg-primary text-primary-foreground font-semibold"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-            }`}
+            className={className}
           >
             <s.icon className="h-4 w-4 shrink-0" />
             {s.label}

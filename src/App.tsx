@@ -18,6 +18,7 @@ const CorretorPage = lazy(() => import("./pages/CorretorPage"));
 const Login = lazy(() => import("./pages/Login"));
 const Admin = lazy(() => import("./pages/Admin"));
 const Oportunidades = lazy(() => import("./pages/Oportunidades"));
+const ClientStatement = lazy(() => import("./pages/ClientStatement"));
 import RequireAdmin from "./components/auth/RequireAdmin";
 import BasemapDiagnosticsOverlay from "./components/dev/BasemapDiagnosticsOverlay";
 
@@ -44,6 +45,7 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/oportunidades" element={<Oportunidades />} />
               <Route path="/admin" element={<RequireAdmin><Admin /></RequireAdmin>} />
+              <Route path="/admin/extrato" element={<RequireAdmin><ClientStatement /></RequireAdmin>} />
               <Route path="/comercial" element={<Navigate to="/admin" replace />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
