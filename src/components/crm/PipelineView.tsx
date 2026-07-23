@@ -14,7 +14,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { LayoutGrid, List, Settings2 } from "lucide-react";
+import { LayoutGrid, List, Plus, Settings2 } from "lucide-react";
 import { useRole } from "@/hooks/useIsAdmin";
 import type { CrmStageRow } from "@/lib/crm";
 import type { DealFull } from "./CrmSection";
@@ -29,6 +29,7 @@ interface Props {
   onReload: () => Promise<void>;
   onReloadStages: () => Promise<void>;
   onOpenDeal: (id: string) => void;
+  onNewDeal: () => void;
 }
 
 interface PendingChange {
@@ -46,6 +47,7 @@ export default function PipelineView({
   onReload,
   onReloadStages,
   onOpenDeal,
+  onNewDeal,
 }: Props) {
   const { role } = useRole();
   const [view, setView] = useState<ViewMode>(() => {
@@ -161,16 +163,21 @@ export default function PipelineView({
           </button>
         </div>
 
-        {isAdmin && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-8"
-            onClick={() => setManageOpen(true)}
-          >
-            <Settings2 className="h-3.5 w-3.5 mr-1.5" /> Personalizar etapas
+        <div className="flex items-center gap-2">
+          <Button size="sm" className="h-8" onClick={onNewDeal}>
+            <Plus className="h-3.5 w-3.5 mr-1.5" /> Novo negócio
           </Button>
-        )}
+          {isAdmin && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8"
+              onClick={() => setManageOpen(true)}
+            >
+              <Settings2 className="h-3.5 w-3.5 mr-1.5" /> Personalizar etapas
+            </Button>
+          )}
+        </div>
       </div>
 
       {view === "kanban" ? (
