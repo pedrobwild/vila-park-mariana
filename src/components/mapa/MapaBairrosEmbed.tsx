@@ -26,7 +26,7 @@ export default function MapaBairrosEmbed() {
   const [activePoi, setActivePoi] = useState<VilaParkPoi | null>(null);
   const [showEmpreendimento, setShowEmpreendimento] = useState(false);
   const [showNearby, setShowNearby] = useState(false);
-  const { style: mapStyle, onError: onMapError } = useBasemapStyle();
+  const { style: mapStyle, onError: onMapError } = useBasemapStyle("MapaBairrosEmbed");
   const mapRef = useRef<any>(null);
 
   const toggleCategory = (cat: PoiCategory) => {
