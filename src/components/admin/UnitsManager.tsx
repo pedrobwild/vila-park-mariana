@@ -229,9 +229,11 @@ export default function UnitsManager() {
           </div>
         </TabsContent>
 
-        <TabsContent value="fields" className="mt-4">
-          <CustomFieldsManager fields={fieldDefs} onChanged={load} />
-        </TabsContent>
+        {isBewild && (
+          <TabsContent value="fields" className="mt-4">
+            <CustomFieldsManager fields={fieldDefs} onChanged={load} />
+          </TabsContent>
+        )}
       </Tabs>
 
       <UnitFormDialog
