@@ -171,7 +171,7 @@ function MapContent() {
                 em qualquer variação do basemap Positron ou fallback. */}
             <Source id="ring-500-src" type="geojson" data={ring500}>
               <Layer
-                {...RING_500_HALO}
+                {...(RING_500_HALO as any)}
                 paint={{
                   ...(RING_500_HALO.paint as any),
                   "line-color": contrast.ringHalo,
@@ -179,7 +179,7 @@ function MapContent() {
                 }}
               />
               <Layer
-                {...RING_500}
+                {...(RING_500 as any)}
                 paint={{
                   ...(RING_500.paint as any),
                   "line-color": contrast.ringMain,
@@ -189,7 +189,7 @@ function MapContent() {
             </Source>
             <Source id="ring-1000-src" type="geojson" data={ring1000}>
               <Layer
-                {...RING_1000_HALO}
+                {...(RING_1000_HALO as any)}
                 paint={{
                   ...(RING_1000_HALO.paint as any),
                   "line-color": contrast.ringHalo,
@@ -197,7 +197,7 @@ function MapContent() {
                 }}
               />
               <Layer
-                {...RING_1000}
+                {...(RING_1000 as any)}
                 paint={{
                   ...(RING_1000.paint as any),
                   "line-color": contrast.ringMain,
