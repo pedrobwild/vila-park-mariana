@@ -338,12 +338,17 @@ function MapContent() {
     setFilters((prev) => {
       const wasActive = prev.includes(c);
       const next = wasActive ? prev.filter((x) => x !== c) : [...prev, c];
-      trackGlobal("map_filter_toggle", {
-        ...ANALYTICS_BASE,
-        category: c,
-        filter_action: wasActive ? "off" : "on",
-        ...filterEventPayload(next),
-      });
+      const action = wasActive ? "off" : "on";
+      emitAnalytics(
+        "map_filter_toggle",
+        {
+          ...ANALYTICS_BASE,
+          category: c,
+          filter_action: action,
+          ...filterEventPayload(next),
+        },
+        `filter:${c}:${action}`,
+      );
       return next;
     });
 
