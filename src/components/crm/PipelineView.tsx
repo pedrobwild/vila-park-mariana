@@ -29,6 +29,7 @@ interface Props {
   onReload: () => Promise<void>;
   onReloadStages: () => Promise<void>;
   onOpenDeal: (id: string) => void;
+  onNewDeal: () => void;
 }
 
 interface PendingChange {
