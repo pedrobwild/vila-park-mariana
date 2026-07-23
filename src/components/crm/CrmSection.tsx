@@ -25,6 +25,8 @@ export default function CrmSection() {
   const [newDeal, setNewDeal] = useState<{ open: boolean; personId?: string | null }>({
     open: false,
   });
+  const [openNewPerson, setOpenNewPerson] = useState(false);
+
 
   const loadStages = useCallback(async () => {
     const { data } = await supabase.from("crm_stages").select("*");
@@ -95,8 +97,11 @@ export default function CrmSection() {
               setOpenDealId(id);
             }}
             onNewDealForPerson={(personId) => setNewDeal({ open: true, personId })}
+            autoOpenNew={openNewPerson}
+            onAutoOpenNewHandled={() => setOpenNewPerson(false)}
           />
         </TabsContent>
+
       </Tabs>
 
       <DealDetailSheet
@@ -115,7 +120,13 @@ export default function CrmSection() {
         deals={deals}
         presetPersonId={newDeal.personId ?? null}
         onCreated={handleDealCreated}
+        onCreatePerson={() => {
+          setNewDeal((s) => ({ ...s, open: false }));
+          setTab("pessoas");
+          setOpenNewPerson(true);
+        }}
       />
+
     </div>
   );
 }
