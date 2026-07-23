@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useRole } from "@/hooks/useIsAdmin";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ArrowLeft, LogOut, Building2, Lock, Menu, FileText, Upload, Briefcase } from "lucide-react";
+import { ArrowLeft, LogOut, Building2, Lock, Menu, FileText, Upload, Briefcase, ShieldCheck } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import UnitsManager from "@/components/admin/UnitsManager";
 import bwildLogo from "@/assets/bwild-logo.png";
