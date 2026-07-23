@@ -320,32 +320,78 @@ export default function NewDealDialog({
             )}
           </div>
 
-          {/* Open deals warning */}
-          {person && openDealsCount > 0 && (
-            <div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-xs">
-              <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-              <div className="space-y-1">
-                <p className="text-foreground">
-                  Esta pessoa já tem {openDealsCount} negócio
-                  {openDealsCount > 1 ? "s" : ""} em andamento.
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {personDeals
-                    .filter((d) => d.stage.kind === "aberto")
-                    .map((d) => (
-                      <button
-                        key={d.id}
-                        type="button"
-                        onClick={() => openExistingDeal(d.id)}
-                        className="underline underline-offset-2 hover:text-primary"
-                      >
-                        {d.title}
-                      </button>
-                    ))}
+          {/* Open deals warning (non-blocking) */}
+          {person && openDealsCount > 0 && (() => {
+            const openDeals = personDeals
+              .filter((d) => d.stage.kind === "aberto")
+              .sort(
+                (a, b) =>
+                  new Date(b.stage_changed_at ?? b.created_at).getTime() -
+                  new Date(a.stage_changed_at ?? a.created_at).getTime(),
+              );
+            const relTime = (iso: string) => {
+              const diff = Date.now() - new Date(iso).getTime();
+              const d = Math.floor(diff / 86400000);
+              if (d <= 0) return "hoje";
+              if (d === 1) return "ontem";
+              if (d < 30) return `há ${d} dias`;
+              const m = Math.floor(d / 30);
+              return m === 1 ? "há 1 mês" : `há ${m} meses`;
+            };
+            return (
+              <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 space-y-2">
+                <div className="flex items-start gap-2 text-xs">
+                  <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+                  <p className="text-foreground">
+                    Esta pessoa já tem{" "}
+                    <strong>
+                      {openDealsCount} negócio{openDealsCount > 1 ? "s" : ""}
+                    </strong>{" "}
+                    em andamento. Você pode abrir um existente ou seguir com um novo.
+                  </p>
                 </div>
+                <ul className="space-y-1.5">
+                  {openDeals.map((d) => {
+                    const unitCount = d.deal_units?.length ?? 0;
+                    const primary =
+                      d.deal_units?.find((u) => u.is_primary) ?? d.deal_units?.[0];
+                    const changed = d.stage_changed_at ?? d.created_at;
+                    return (
+                      <li key={d.id}>
+                        <button
+                          type="button"
+                          onClick={() => openExistingDeal(d.id)}
+                          className="w-full text-left rounded-md border border-amber-500/20 bg-background/60 hover:bg-background hover:border-amber-500/40 transition-colors p-2 flex items-center gap-2"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-xs font-medium truncate">
+                                {d.title}
+                              </span>
+                              <Badge variant="outline" className="text-[10px]">
+                                {d.stage.label}
+                              </Badge>
+                            </div>
+                            <p className="text-[11px] text-muted-foreground truncate">
+                              {unitCount > 0
+                                ? `${unitCount} unidade${unitCount > 1 ? "s" : ""}${
+                                    primary?.unit ? ` · ${primary.unit.code}` : ""
+                                  }`
+                                : "sem unidades"}{" "}
+                              · {relTime(changed)}
+                            </p>
+                          </div>
+                          <span className="text-[11px] text-primary shrink-0">
+                            Abrir →
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* Units selector */}
           {person && (
