@@ -17,7 +17,7 @@ import {
   type Poi,
   type PoiCategory,
 } from "@/data/surroundings";
-import { MAP_STYLE } from "@/lib/basemap";
+import { useBasemapStyle } from "@/lib/basemap";
 
 const ICON: Record<PoiCategory, typeof Train> = {
   mobility: Train,
