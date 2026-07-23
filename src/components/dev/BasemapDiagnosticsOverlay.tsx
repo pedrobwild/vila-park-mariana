@@ -11,7 +11,7 @@
  */
 import { useEffect, useState } from "react";
 import { MAP_STYLE_FALLBACK, MAP_STYLE_PRIMARY } from "@/lib/basemap";
-import { clearBasemapLog, getBasemapLog, subscribeBasemapLog, type BasemapLogEntry } from "@/lib/basemapLog";
+import { BASEMAP_SESSION_ID, clearBasemapLog, getBasemapLog, subscribeBasemapLog, type BasemapLogEntry } from "@/lib/basemapLog";
 
 const STORAGE_KEY = "basemap:debug";
 
@@ -99,6 +99,12 @@ export default function BasemapDiagnosticsOverlay() {
             aria-hidden
           />
           <span className="font-sans text-xs font-semibold uppercase tracking-wide">Basemap · {status}</span>
+          <span
+            className="font-mono text-[10px] text-slate-400 truncate"
+            title={`Session ID (this page load): ${BASEMAP_SESSION_ID}`}
+          >
+            #{BASEMAP_SESSION_ID}
+          </span>
         </div>
         <div className="flex items-center gap-1">
           <button
