@@ -637,7 +637,7 @@ function MapContent() {
             <button
               key={poi.name}
               type="button"
-              onClick={() => focusPoi(poi)}
+              onClick={() => focusPoi(poi, { source: "carousel" })}
               aria-pressed={isActive}
               role="listitem"
               className={`snap-start shrink-0 min-w-[190px] max-w-[220px] text-left rounded-[10px] border px-3 py-2.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
