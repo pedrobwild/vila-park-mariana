@@ -245,8 +245,11 @@ export default function PeopleManager({ people, deals, units, onReload, onOpenDe
                               >
                                 <span className="truncate">{d.title}</span>
                                 <span className="flex items-center gap-2 shrink-0">
-                                  <Badge variant="outline" className="text-[10px]">
-                                    {STAGE_LABEL[d.stage]}
+                                  <Badge
+                                    variant="outline"
+                                    className={`text-[10px] ${stageBadgeClass(d.stage.kind)}`}
+                                  >
+                                    {d.stage.label}
                                   </Badge>
                                   <span className="tabular-nums text-muted-foreground">
                                     {formatBRLCompact(Number(d.value_brl || 0))}
