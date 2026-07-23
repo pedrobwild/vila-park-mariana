@@ -100,7 +100,7 @@ export default function UnitsManager() {
       <Tabs defaultValue="units">
         <TabsList>
           <TabsTrigger value="units">Unidades</TabsTrigger>
-          <TabsTrigger value="fields">Campos personalizados</TabsTrigger>
+          {isBewild && <TabsTrigger value="fields">Campos personalizados</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="units" className="space-y-4 mt-4">
