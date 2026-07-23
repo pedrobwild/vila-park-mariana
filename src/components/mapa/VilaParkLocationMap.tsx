@@ -71,6 +71,7 @@ function MapContent() {
   const [showBuilding, setShowBuilding] = useState(false);
   const [filters, setFilters] = useState<PoiCategory[]>([...CATEGORY_ORDER]);
   const [scrollUnlocked, setScrollUnlocked] = useState(false);
+  const { style: mapStyle, onError: onMapError } = useBasemapStyle();
   const mapRef = useRef<any>(null);
 
   const visible = useMemo(() => POIS.filter((p) => filters.includes(p.category)), [filters]);
@@ -141,13 +142,14 @@ function MapContent() {
             ref={mapRef}
             initialViewState={{ longitude: VILA_PARK_COORDS.lng, latitude: VILA_PARK_COORDS.lat, zoom: 14.6 }}
             style={{ width: "100%", height: "100%" }}
-            mapStyle={MAP_STYLE}
+            mapStyle={mapStyle}
             minZoom={12}
             maxZoom={18}
             scrollZoom={scrollUnlocked}
             onClick={() => {
               if (!scrollUnlocked) setScrollUnlocked(true);
             }}
+            onError={onMapError}
             cooperativeGestures={typeof window !== "undefined" && window.matchMedia?.("(pointer: coarse)").matches}
           >
             <NavigationControl position="top-right" showCompass={false} />
