@@ -71,7 +71,7 @@ const emptyForm: FormState = {
   interests: {},
 };
 
-export default function PeopleManager({ people, deals, units, onReload, onOpenDeal }: Props) {
+export default function PeopleManager({ people, deals, units, onReload, onOpenDeal, onNewDealForPerson }: Props) {
   const [q, setQ] = useState("");
   const [openNew, setOpenNew] = useState(false);
   const [form, setForm] = useState<FormState>(emptyForm);
