@@ -27,10 +27,34 @@ export type BasemapEvent =
 
 export interface BasemapLogEntry {
   ts: string;
+  /** Correlation ID — one per page load. Every entry from the same load shares this value. */
+  sessionId: string;
   event: BasemapEvent;
   component?: string;
   style?: string;
   detail?: Record<string, unknown>;
+}
+
+/**
+ * Per-page-load correlation ID. Regenerated on each JS execution (reload,
+ * hard nav) so every style/tile event for one load attempt shares an ID.
+ * Prefer `crypto.randomUUID` when available; fall back to a compact base36 id.
+ */
+function makeSessionId(): string {
+  try {
+    if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+      return crypto.randomUUID().slice(0, 8);
+    }
+  } catch {
+    /* ignore */
+  }
+  return Math.random().toString(36).slice(2, 10);
+}
+
+export const BASEMAP_SESSION_ID = makeSessionId();
+
+export function getBasemapSessionId(): string {
+  return BASEMAP_SESSION_ID;
 }
 
 const LEVEL: Record<BasemapEvent, "info" | "warn" | "error"> = {
