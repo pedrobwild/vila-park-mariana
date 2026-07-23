@@ -97,8 +97,11 @@ export default function CrmSection() {
               setOpenDealId(id);
             }}
             onNewDealForPerson={(personId) => setNewDeal({ open: true, personId })}
+            autoOpenNew={openNewPerson}
+            onAutoOpenNewHandled={() => setOpenNewPerson(false)}
           />
         </TabsContent>
+
       </Tabs>
 
       <DealDetailSheet
