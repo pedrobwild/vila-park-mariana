@@ -17,7 +17,7 @@ import ReservationForm from "@/components/ReservationForm";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
 import { PROPERTY } from "@/data/propertyData";
 import { WHATSAPP_PHONE } from "@/data/surroundings";
-import NeighborhoodSection from "@/components/shared/NeighborhoodSection";
+
 import SiteFooter from "@/components/shared/SiteFooter";
 import { trackGlobal } from "@/hooks/useGuideAnalytics";
 
