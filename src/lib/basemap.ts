@@ -6,6 +6,7 @@
  */
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { installBasemapCspReporter, logBasemap } from "./basemapLog";
 
 export const MAPTILER_KEY = "r3SdCfKzNXmowFUKYBgz";
 export const MAP_STYLE_PRIMARY = `https://api.maptiler.com/maps/streets/style.json?key=${MAPTILER_KEY}`;
