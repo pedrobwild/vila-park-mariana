@@ -332,7 +332,7 @@ function MapContent() {
       const el = itemRefs.current.get(poi.name);
       el?.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "nearest", inline: "center" });
     }
-  }, [filters]);
+  }, [filters, emitAnalytics]);
 
   const toggle = (c: PoiCategory) =>
     setFilters((prev) => {
