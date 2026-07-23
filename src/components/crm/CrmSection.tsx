@@ -116,6 +116,7 @@ export default function CrmSection() {
         open={newDeal.open}
         onOpenChange={(o) => setNewDeal((s) => ({ ...s, open: o }))}
         people={people}
+        peopleLoading={loading}
         units={units}
         deals={deals}
         presetPersonId={newDeal.personId ?? null}
