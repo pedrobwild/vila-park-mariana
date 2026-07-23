@@ -173,7 +173,7 @@ function MapContent() {
               <Layer
                 {...(RING_500_HALO as any)}
                 paint={{
-                  ...(RING_500_HALO.paint as any),
+                  ...((RING_500_HALO as any).paint),
                   "line-color": contrast.ringHalo,
                   "line-opacity": contrast.ringHaloOpacity,
                 }}
@@ -181,7 +181,7 @@ function MapContent() {
               <Layer
                 {...(RING_500 as any)}
                 paint={{
-                  ...(RING_500.paint as any),
+                  ...((RING_500 as any).paint),
                   "line-color": contrast.ringMain,
                   "line-opacity": contrast.ringMainOpacity,
                 }}
@@ -191,7 +191,7 @@ function MapContent() {
               <Layer
                 {...(RING_1000_HALO as any)}
                 paint={{
-                  ...(RING_1000_HALO.paint as any),
+                  ...((RING_1000_HALO as any).paint),
                   "line-color": contrast.ringHalo,
                   "line-opacity": contrast.ringHaloOpacity,
                 }}
@@ -199,7 +199,7 @@ function MapContent() {
               <Layer
                 {...(RING_1000 as any)}
                 paint={{
-                  ...(RING_1000.paint as any),
+                  ...((RING_1000 as any).paint),
                   "line-color": contrast.ringMain,
                   "line-opacity": Math.max(0.5, contrast.ringMainOpacity - 0.15),
                 }}
