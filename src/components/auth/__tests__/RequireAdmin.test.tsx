@@ -20,12 +20,14 @@ vi.mock("@/integrations/supabase/client", () => ({
 import RequireAdmin from "@/components/auth/RequireAdmin";
 
 function renderAt(path: string, ui: React.ReactNode) {
+  const extra =
+    path !== "/admin" && path !== "/login" ? <Route path={path} element={ui} /> : null;
   return render(
     <MemoryRouter initialEntries={[path]}>
       <Routes>
-        <Route path="/admin" element={<div>admin-home</div>} />
+        <Route path="/admin" element={path === "/admin" ? ui : <div>admin-home</div>} />
         <Route path="/login" element={<div>login-page</div>} />
-        <Route path={path} element={ui} />
+        {extra}
       </Routes>
     </MemoryRouter>,
   );
