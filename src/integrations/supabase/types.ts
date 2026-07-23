@@ -252,8 +252,8 @@ export type Database = {
           lost_reason: string | null
           notes: string | null
           person_id: string
-          stage: Database["public"]["Enums"]["crm_stage"]
           stage_changed_at: string
+          stage_id: string
           title: string
           updated_at: string
           value_brl: number
@@ -264,8 +264,8 @@ export type Database = {
           lost_reason?: string | null
           notes?: string | null
           person_id: string
-          stage?: Database["public"]["Enums"]["crm_stage"]
           stage_changed_at?: string
+          stage_id: string
           title: string
           updated_at?: string
           value_brl?: number
@@ -276,8 +276,8 @@ export type Database = {
           lost_reason?: string | null
           notes?: string | null
           person_id?: string
-          stage?: Database["public"]["Enums"]["crm_stage"]
           stage_changed_at?: string
+          stage_id?: string
           title?: string
           updated_at?: string
           value_brl?: number
@@ -288,6 +288,13 @@ export type Database = {
             columns: ["person_id"]
             isOneToOne: false
             referencedRelation: "crm_people"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_deals_stage_id_fkey"
+            columns: ["stage_id"]
+            isOneToOne: false
+            referencedRelation: "crm_stages"
             referencedColumns: ["id"]
           },
         ]
@@ -327,6 +334,39 @@ export type Database = {
           occupation?: string | null
           phone?: string | null
           source?: Database["public"]["Enums"]["crm_source"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      crm_stages: {
+        Row: {
+          created_at: string
+          id: string
+          is_system: boolean
+          kind: string
+          label: string
+          position: number
+          reserves_unit: boolean
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_system?: boolean
+          kind?: string
+          label: string
+          position: number
+          reserves_unit?: boolean
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_system?: boolean
+          kind?: string
+          label?: string
+          position?: number
+          reserves_unit?: boolean
           updated_at?: string
         }
         Relationships: []
