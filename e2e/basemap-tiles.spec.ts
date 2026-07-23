@@ -1,4 +1,5 @@
-import { test, expect, type Page } from "../playwright-fixture";
+import { test, expect } from "../playwright-fixture";
+import type { Page } from "@playwright/test";
 
 /**
  * Valida que o basemap (OpenFreeMap Positron ou fallback CARTO Positron) realmente
