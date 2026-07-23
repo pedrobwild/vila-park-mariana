@@ -70,7 +70,7 @@ export default function StageManagerDialog({
       if (r3.error) throw r3.error;
       await onReload();
     } catch (e) {
-      notifyStageError(e as SbErr, "reorder");
+      notifyStage(e as SbErr, "reordenar");
     } finally {
       setBusy(false);
     }
@@ -114,7 +114,7 @@ export default function StageManagerDialog({
       });
       await onReload();
     } catch (e) {
-      notifyStageError(e as SbErr, "update", stage);
+      notifyStage(e as SbErr, "atualizar");
     } finally {
       setBusy(false);
     }
@@ -130,7 +130,7 @@ export default function StageManagerDialog({
       if (error) throw error;
       await onReload();
     } catch (e) {
-      notifyStageError(e as SbErr, "update", stage);
+      notifyStage(e as SbErr, "atualizar");
     } finally {
       setBusy(false);
     }
@@ -153,7 +153,7 @@ export default function StageManagerDialog({
       setNewLabel("");
       await onReload();
     } catch (e) {
-      notifyStageError(e as SbErr, "insert");
+      notifyStage(e as SbErr, "criar");
     } finally {
       setBusy(false);
     }
@@ -171,7 +171,7 @@ export default function StageManagerDialog({
       return;
     }
     if (count > 0) {
-      notifyStageError({ code: "23503" }, "delete", stage, count);
+      notifyStage({ code: "23503" }, "excluir", count);
       return;
     }
     setBusy(true);
@@ -181,7 +181,7 @@ export default function StageManagerDialog({
       toast.success("Etapa excluída.");
       await onReload();
     } catch (e) {
-      notifyStageError(e as SbErr, "delete", stage, count);
+      notifyStage(e as SbErr, "excluir", count);
     } finally {
       setBusy(false);
     }
