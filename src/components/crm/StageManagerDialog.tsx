@@ -23,6 +23,93 @@ import {
 import { ArrowDown, ArrowUp, Lock, Plus, Trash2 } from "lucide-react";
 import { sortStages, stageBadgeClass, type CrmStageRow } from "@/lib/crm";
 
+type SbErr = { message?: string; code?: string; details?: string } | null | undefined;
+
+function friendlyStageError(
+  err: SbErr,
+  ctx: "delete" | "update" | "insert" | "reorder",
+  stage?: CrmStageRow,
+  count?: number,
+): { title: string; description: string } {
+  const raw = (err?.message || "").toLowerCase();
+  const code = err?.code || "";
+
+  // Trigger: crm_protect_system_stage
+  if (raw.includes("etapas de sistema") || raw.includes("system")) {
+    return {
+      title: "Etapa protegida",
+      description:
+        "As etapas de sistema (Ganho e Perdido) não podem ser excluídas — elas são exigidas pelo funil.",
+    };
+  }
+
+  // Foreign key violation: deals still reference this stage
+  if (code === "23503" || raw.includes("foreign key") || raw.includes("violates foreign key")) {
+    const n = count ?? 0;
+    return {
+      title: "Etapa em uso",
+      description:
+        n > 0
+          ? `Existem ${n} negócio${n === 1 ? "" : "s"} nesta etapa. Mova-os para outra etapa antes de excluir.`
+          : "Esta etapa ainda está referenciada por negócios. Mova-os para outra etapa antes de excluir.",
+    };
+  }
+
+  // RLS / permission denied
+  if (
+    code === "42501" ||
+    code === "PGRST301" ||
+    raw.includes("row-level security") ||
+    raw.includes("row level security") ||
+    raw.includes("permission denied") ||
+    raw.includes("not authorized")
+  ) {
+    const action =
+      ctx === "delete"
+        ? "excluir"
+        : ctx === "insert"
+        ? "criar"
+        : ctx === "reorder"
+        ? "reordenar"
+        : "editar";
+    return {
+      title: "Sem permissão",
+      description: `Seu perfil não pode ${action} etapas do funil. Apenas administradores Bewild têm essa permissão.`,
+    };
+  }
+
+  // Unique constraint on position
+  if (code === "23505" || raw.includes("duplicate key") || raw.includes("unique")) {
+    return {
+      title: "Conflito de ordem",
+      description: "Duas etapas acabaram com a mesma posição. Recarregue e tente novamente.",
+    };
+  }
+
+  const fallback =
+    ctx === "delete"
+      ? "Não foi possível excluir a etapa."
+      : ctx === "insert"
+      ? "Não foi possível criar a etapa."
+      : ctx === "reorder"
+      ? "Não foi possível reordenar as etapas."
+      : "Não foi possível atualizar a etapa.";
+  return {
+    title: fallback,
+    description: err?.message || "Tente novamente em instantes.",
+  };
+}
+
+function notifyStageError(
+  err: SbErr,
+  ctx: "delete" | "update" | "insert" | "reorder",
+  stage?: CrmStageRow,
+  count?: number,
+) {
+  const { title, description } = friendlyStageError(err, ctx, stage, count);
+  toast.error(title, { description });
+}
+
 interface Props {
   open: boolean;
   onOpenChange: (o: boolean) => void;
