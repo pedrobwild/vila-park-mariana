@@ -51,17 +51,28 @@ import {
   ACTIVITY_LABEL,
   INTEREST_LABEL,
   SOURCE_LABEL,
-  STAGE_LABEL,
   formatBRLCompact,
+  stageBadgeClass,
   type CrmActivity,
   type CrmActivityType,
   type CrmInterest,
+  type CrmStageRow,
 } from "@/lib/crm";
 import type { DealFull } from "./CrmSection";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 interface Props {
   deal: DealFull | null;
   units: Unit[];
+  stages: CrmStageRow[];
   onClose: () => void;
   onReload: () => Promise<void>;
 }
