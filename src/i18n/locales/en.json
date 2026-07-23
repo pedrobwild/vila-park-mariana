@@ -109,6 +109,17 @@
       "500": "5 min walk",
       "1000": "12 min walk"
     },
+    "list": {
+      "aria": "Points of interest nearby",
+      "empty": "No points for this selection. Enable another category."
+    },
+    "bounds": {
+      "full": "See full radius",
+      "back": "Back to neighborhood"
+    },
+    "popup": {
+      "directions": "Get directions ↗"
+    },
     "disclaimer": "Point positions are approximate, for visual reference only. Distances follow the property's official materials."
   },
   "reservation": {
