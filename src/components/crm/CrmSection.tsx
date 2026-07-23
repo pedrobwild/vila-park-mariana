@@ -120,7 +120,13 @@ export default function CrmSection() {
         deals={deals}
         presetPersonId={newDeal.personId ?? null}
         onCreated={handleDealCreated}
+        onCreatePerson={() => {
+          setNewDeal((s) => ({ ...s, open: false }));
+          setTab("pessoas");
+          setOpenNewPerson(true);
+        }}
       />
+
     </div>
   );
 }
