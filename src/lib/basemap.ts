@@ -93,12 +93,14 @@ function isStyleLoadError(err: unknown): boolean {
   );
 }
 
-function switchToFallback(reason: string) {
+function switchToFallback(reason: string, err?: unknown) {
   if (cachedStyle === MAP_STYLE_FALLBACK) return false;
   cachedStyle = MAP_STYLE_FALLBACK;
-  if (typeof console !== "undefined") {
-    console.warn(`[basemap] ${reason} — alternando para basemap de fallback.`);
-  }
+  logBasemap({
+    event: "fallback_switch",
+    style: MAP_STYLE_FALLBACK,
+    detail: { reason, from: MAP_STYLE_PRIMARY, error: err },
+  });
   if (!fallbackNotified) {
     fallbackNotified = true;
     try {
@@ -113,11 +115,12 @@ function switchToFallback(reason: string) {
   return true;
 }
 
-export function useBasemapStyle(): { style: string; status: Status; onError: (err?: unknown) => void } {
+export function useBasemapStyle(component?: string): { style: string; status: Status; onError: (err?: unknown) => void } {
   const [style, setStyle] = useState<string>(cachedStyle ?? MAP_STYLE_PRIMARY);
   const [status, setStatus] = useState<Status>(cachedStyle ? (cachedStyle === MAP_STYLE_PRIMARY ? "primary" : "fallback") : "checking");
 
   useEffect(() => {
+    installBasemapCspReporter();
     let alive = true;
     probeStyle().then((s) => {
       if (!alive) return;
@@ -131,8 +134,12 @@ export function useBasemapStyle(): { style: string; status: Status; onError: (er
   }, []);
 
   const onError = (err?: unknown) => {
-    if (!isStyleLoadError(err)) return; // ignora erros de tile individuais
-    if (switchToFallback("Erro ao carregar style.json do basemap primário")) {
+    if (!isStyleLoadError(err)) {
+      logBasemap({ event: "tile_error", component, style, detail: { error: err } });
+      return;
+    }
+    logBasemap({ event: "style_load_error", component, style, detail: { error: err } });
+    if (switchToFallback("Erro ao carregar style.json do basemap primário", err)) {
       setStyle(MAP_STYLE_FALLBACK);
       setStatus("fallback");
     }
