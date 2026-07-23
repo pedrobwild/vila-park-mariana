@@ -128,9 +128,17 @@ export default function PeopleManager({ people, deals, units, onReload, onOpenDe
           interestIds.length > 0
             ? `${firstName} · ${interestIds.length} unidade${interestIds.length > 1 ? "s" : ""}`
             : `${firstName} · novo lead`;
+        // Fetch first stage (lowest position) to satisfy NOT NULL stage_id.
+        // A DB trigger would also default it, but the client type requires it.
+        const { data: firstStage } = await supabase
+          .from("crm_stages")
+          .select("id")
+          .order("position", { ascending: true })
+          .limit(1)
+          .maybeSingle();
         const { data: deal, error: dealErr } = await supabase
           .from("crm_deals")
-          .insert({ person_id: person.id, title, stage: "lead" })
+          .insert({ person_id: person.id, title, stage_id: firstStage!.id })
           .select("*")
           .single();
         if (dealErr) throw dealErr;
