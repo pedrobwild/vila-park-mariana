@@ -78,8 +78,25 @@ function serializeError(err: unknown): Record<string, unknown> | undefined {
   };
 }
 
+const RING_MAX = 100;
+const ring: BasemapLogEntry[] = [];
+const listeners = new Set<(entries: BasemapLogEntry[]) => void>();
+
+export function getBasemapLog(): BasemapLogEntry[] {
+  return ring.slice();
+}
+
+export function subscribeBasemapLog(fn: (entries: BasemapLogEntry[]) => void): () => void {
+  listeners.add(fn);
+  return () => listeners.delete(fn);
+}
+
+export function clearBasemapLog(): void {
+  ring.length = 0;
+  listeners.forEach((fn) => fn(ring.slice()));
+}
+
 export function logBasemap(entry: Omit<BasemapLogEntry, "ts">): void {
-  if (typeof console === "undefined") return;
   const payload: BasemapLogEntry = {
     ts: new Date().toISOString(),
     ...entry,
@@ -88,6 +105,10 @@ export function logBasemap(entry: Omit<BasemapLogEntry, "ts">): void {
       ? { ...entry.detail, error: serializeError(entry.detail.error) }
       : entry.detail,
   };
+  ring.push(payload);
+  if (ring.length > RING_MAX) ring.splice(0, ring.length - RING_MAX);
+  listeners.forEach((fn) => fn(ring.slice()));
+  if (typeof console === "undefined") return;
   const method =
     LEVEL[entry.event] === "error"
       ? console.error
