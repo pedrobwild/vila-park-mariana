@@ -5,13 +5,14 @@ import PipelineView from "./PipelineView";
 import PeopleManager from "./PeopleManager";
 import DealDetailSheet from "./DealDetailSheet";
 import NewDealDialog from "./NewDealDialog";
-import { sortStages, type CrmDeal, type CrmDealUnit, type CrmPerson, type CrmStageRow } from "@/lib/crm";
+import { sortStages, type CrmDeal, type CrmDealUnit, type CrmPerson, type CrmProposal, type CrmStageRow } from "@/lib/crm";
 import type { Unit } from "@/lib/units";
 
 export type DealFull = CrmDeal & {
   person: CrmPerson;
   stage: CrmStageRow;
   deal_units: (CrmDealUnit & { unit: Unit })[];
+  proposals: CrmProposal[];
 };
 
 export default function CrmSection() {
