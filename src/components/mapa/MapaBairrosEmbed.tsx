@@ -3,7 +3,7 @@
  * Mapa focado no empreendimento Vila Park (R. Baltazar Lisboa, 543 — Vila Mariana)
  * e nos pontos de interesse do quarteirão.
  */
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,8 +16,7 @@ import {
   type VilaParkPoi, type PoiCategory,
 } from "@/components/mapa/SaoPauloMap";
 import NeighborhoodComparison from "@/components/mapa/NeighborhoodComparison";
-
-const MAP_STYLE = "https://api.maptiler.com/maps/019cc06d-fb8e-741d-b158-a17a30e87c08/style.json?key=AI17dHeoeJx6rUC1KlSL";
+import { useBasemapStyle } from "@/lib/basemap";
 
 const CATEGORY_ORDER: PoiCategory[] = ["leisure", "mobility", "education", "services", "gastronomy"];
 
@@ -26,6 +25,8 @@ export default function MapaBairrosEmbed() {
   const [activePoi, setActivePoi] = useState<VilaParkPoi | null>(null);
   const [showEmpreendimento, setShowEmpreendimento] = useState(false);
   const [showNearby, setShowNearby] = useState(false);
+  const { style: mapStyle, onError: onMapError } = useBasemapStyle();
+  const mapRef = useRef<any>(null);
 
   const toggleCategory = (cat: PoiCategory) => {
     setActiveCategories((prev) => (prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]));
@@ -75,11 +76,14 @@ export default function MapaBairrosEmbed() {
         transition={{ duration: 0.6 }}
       >
         <ReactMap
+          ref={mapRef}
           initialViewState={{ longitude: VILA_PARK_COORDS.lng, latitude: VILA_PARK_COORDS.lat, zoom: 15 }}
           style={{ width: "100%", height: "100%" }}
-          mapStyle={MAP_STYLE}
+          mapStyle={mapStyle}
           minZoom={12}
           maxZoom={18}
+          onError={onMapError}
+          onLoad={(event) => event.target.resize()}
         >
           <NavigationControl position="top-right" showCompass={false} />
 

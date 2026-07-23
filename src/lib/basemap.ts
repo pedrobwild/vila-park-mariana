@@ -1,12 +1,14 @@
 /**
  * Basemap único do projeto.
- * Primário: OpenFreeMap Positron (keyless, produção permitida, visual claro/minimal).
- * Fallback: CARTO Positron (também keyless) caso OpenFreeMap indisponível.
+ * Primário: MapTiler Streets Light — chave pública do projeto.
+ * Para trocar por chave própria: crie uma chave gratuita em cloud.maptiler.com
+ * e substitua MAPTILER_KEY abaixo.
  */
 import { useEffect, useState } from "react";
 
-export const MAP_STYLE_PRIMARY = "https://tiles.openfreemap.org/styles/positron";
-export const MAP_STYLE_FALLBACK = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
+export const MAPTILER_KEY = "AI17dHeoeJx6rUC1KlSL";
+export const MAP_STYLE_PRIMARY = `https://api.maptiler.com/maps/streets-v2-light/style.json?key=${MAPTILER_KEY}`;
+export const MAP_STYLE_FALLBACK = `https://api.maptiler.com/maps/dataviz-light/style.json?key=${MAPTILER_KEY}`;
 
 // Compat: manter export legado usado por componentes existentes.
 export const MAP_STYLE = MAP_STYLE_PRIMARY;
@@ -40,7 +42,7 @@ async function probeStyle(): Promise<string> {
       cachedStyle = MAP_STYLE_PRIMARY;
     } catch (err) {
       if (typeof console !== "undefined") {
-        console.warn("[basemap] OpenFreeMap indisponível, usando CARTO Positron.", err);
+        console.warn("[basemap] MapTiler Streets Light indisponível, usando MapTiler Dataviz Light.", err);
       }
       cachedStyle = MAP_STYLE_FALLBACK;
     }
@@ -77,7 +79,7 @@ export function useBasemapStyle(): { style: string; status: Status; onError: () 
     setStyle(MAP_STYLE_FALLBACK);
     setStatus("fallback");
     if (typeof console !== "undefined") {
-      console.warn("[basemap] Erro ao renderizar OpenFreeMap; alternando para CARTO Positron.");
+      console.warn("[basemap] Erro ao renderizar MapTiler Streets Light; alternando para MapTiler Dataviz Light.");
     }
   };
 
@@ -111,7 +113,7 @@ export interface BasemapContrast {
 }
 
 function themeFromStyleUrl(url: string): BasemapTheme {
-  // Ambos os basemaps atuais são "light" (Positron). Deixe explícito para
+  // Ambos os basemaps atuais são "light". Deixe explícito para
   // facilitar troca futura por estilos escuros (dark-matter, streets-dark, etc.).
   const u = url.toLowerCase();
   if (u.includes("dark") || u.includes("matter") || u.includes("night")) return "dark";
