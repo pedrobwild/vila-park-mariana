@@ -9,7 +9,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import UnitsManager from "@/components/admin/UnitsManager";
 import bwildLogo from "@/assets/bwild-logo.png";
 
-type SectionKey = "units" | "extrato" | "upload";
+type SectionKey = "units" | "extrato" | "upload" | "auditoria";
 
 interface SectionDef {
   key: SectionKey;
@@ -23,6 +23,7 @@ const ALL_sections: SectionDef[] = [
   { key: "units", label: "Unidades à venda", icon: Building2 },
   { key: "extrato", label: "Extrato do cliente", icon: FileText, href: "/admin/extrato" },
   { key: "upload", label: "Painel — upload de plantas", icon: Upload, href: "/admin/upload", bewildOnly: true },
+  { key: "auditoria", label: "Log de auditoria", icon: ShieldCheck, href: "/admin/auditoria" },
 ];
 
 const COMING_SOON = ["Leads", "Relatórios", "Configurações"];
