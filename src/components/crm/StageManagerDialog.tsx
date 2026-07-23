@@ -375,9 +375,14 @@ export default function StageManagerDialog({
                   {stage.is_system ? (
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <span className="h-8 w-8 flex items-center justify-center text-muted-foreground">
+                        <button
+                          type="button"
+                          onClick={() => remove(stage)}
+                          className="h-8 w-8 flex items-center justify-center rounded text-muted-foreground hover:bg-muted"
+                          aria-label="Etapa de sistema (não pode ser excluída)"
+                        >
                           <Lock className="h-3.5 w-3.5" />
-                        </span>
+                        </button>
                       </TooltipTrigger>
                       <TooltipContent>
                         Etapa de sistema — pode renomear, não excluir
@@ -386,12 +391,17 @@ export default function StageManagerDialog({
                   ) : count > 0 ? (
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <span className="h-8 w-8 flex items-center justify-center text-muted-foreground/40">
+                        <button
+                          type="button"
+                          onClick={() => remove(stage)}
+                          className="h-8 w-8 flex items-center justify-center rounded text-muted-foreground/60 hover:bg-muted hover:text-destructive"
+                          aria-label={`Excluir etapa (bloqueado: ${count} negócios)`}
+                        >
                           <Trash2 className="h-3.5 w-3.5" />
-                        </span>
+                        </button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        Mova os {count} negócios desta etapa antes de excluir
+                        Mova os {count} negócio{count === 1 ? "" : "s"} desta etapa antes de excluir
                       </TooltipContent>
                     </Tooltip>
                   ) : (
