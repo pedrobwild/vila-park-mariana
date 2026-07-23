@@ -5,9 +5,62 @@ export type CrmDeal = Database["public"]["Tables"]["crm_deals"]["Row"];
 export type CrmDealUnit = Database["public"]["Tables"]["crm_deal_units"]["Row"];
 export type CrmActivity = Database["public"]["Tables"]["crm_activities"]["Row"];
 export type CrmStageRow = Database["public"]["Tables"]["crm_stages"]["Row"];
+export type CrmProposal = Database["public"]["Tables"]["crm_proposals"]["Row"];
 export type CrmSource = Database["public"]["Enums"]["crm_source"];
 export type CrmInterest = Database["public"]["Enums"]["crm_interest_level"];
 export type CrmActivityType = Database["public"]["Enums"]["crm_activity_type"];
+
+export type CrmProposalStatus = "rascunho" | "enviada" | "aceita" | "recusada";
+export type CrmPaymentMethod = "financiamento" | "a_vista" | "direto";
+
+export const PROPOSAL_STATUS_LABEL: Record<CrmProposalStatus, string> = {
+  rascunho: "Rascunho",
+  enviada: "Enviada",
+  aceita: "Aceita",
+  recusada: "Recusada",
+};
+
+export const PAYMENT_METHOD_LABEL: Record<CrmPaymentMethod, string> = {
+  financiamento: "Financiamento bancário (repasse)",
+  a_vista: "À vista",
+  direto: "Direto com a incorporadora",
+};
+
+export const PAYMENT_METHOD_SHORT: Record<CrmPaymentMethod, string> = {
+  financiamento: "repasse",
+  a_vista: "à vista",
+  direto: "direto",
+};
+
+export function proposalStatusClass(s: CrmProposalStatus | "expirada"): string {
+  switch (s) {
+    case "enviada":
+      return "border-sky-600/40 text-sky-700 dark:text-sky-400 bg-sky-500/5";
+    case "aceita":
+      return "border-emerald-600/40 text-emerald-700 dark:text-emerald-400 bg-emerald-500/5";
+    case "recusada":
+      return "border-rose-600/40 text-rose-700 dark:text-rose-400 bg-rose-500/5";
+    case "expirada":
+      return "border-amber-600/40 text-amber-700 dark:text-amber-400 bg-amber-500/5";
+    default:
+      return "border-border/60 text-muted-foreground bg-muted/20";
+  }
+}
+
+export function isProposalExpired(p: Pick<CrmProposal, "valid_until" | "status">): boolean {
+  if (!p.valid_until) return false;
+  if (p.status !== "rascunho" && p.status !== "enviada") return false;
+  return new Date(p.valid_until + "T23:59:59").getTime() < Date.now();
+}
+
+export function formatBRL2(n: number): string {
+  return (Number.isFinite(n) ? n : 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
 
 export type CrmStageKind = "aberto" | "ganho" | "perdido";
 

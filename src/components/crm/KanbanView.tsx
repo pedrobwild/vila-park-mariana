@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreVertical } from "lucide-react";
+import { MoreVertical, FileText } from "lucide-react";
 import { formatBRLCompact, daysSince, type CrmStageRow } from "@/lib/crm";
 import type { DealFull } from "./CrmSection";
 
@@ -125,12 +125,29 @@ export default function KanbanView({ deals, stages, onOpenDeal, onRequestStageCh
                       </div>
                     )}
 
-                    <div className="mt-2.5 flex items-center justify-between text-[11px] text-muted-foreground">
+                    <div className="mt-2.5 flex items-center justify-between text-[11px] text-muted-foreground gap-2">
                       <span className="tabular-nums font-medium text-foreground">
                         {formatBRLCompact(Number(deal.value_brl || 0))}
                       </span>
-                      <span className="tabular-nums">{daysSince(deal.stage_changed_at)}d</span>
+                      <div className="flex items-center gap-1.5">
+                        {(deal.proposals?.length ?? 0) > 0 && (
+                          <span
+                            className="inline-flex items-center gap-1 tabular-nums"
+                            title={`${deal.proposals.length} proposta(s)`}
+                          >
+                            <FileText className="h-3 w-3" />
+                            {deal.proposals.length}
+                          </span>
+                        )}
+                        {deal.proposals?.some((p) => p.status === "aceita") && (
+                          <span className="text-[9px] px-1 py-0.5 rounded border border-emerald-600/40 text-emerald-700 dark:text-emerald-400 bg-emerald-500/5 uppercase tracking-wide">
+                            negociado
+                          </span>
+                        )}
+                        <span className="tabular-nums">{daysSince(deal.stage_changed_at)}d</span>
+                      </div>
                     </div>
+
 
                     {stage.kind === "perdido" && deal.lost_reason && (
                       <p className="mt-2 text-[10px] text-muted-foreground/80 line-clamp-2">

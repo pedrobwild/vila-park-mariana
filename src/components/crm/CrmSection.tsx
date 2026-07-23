@@ -5,13 +5,14 @@ import PipelineView from "./PipelineView";
 import PeopleManager from "./PeopleManager";
 import DealDetailSheet from "./DealDetailSheet";
 import NewDealDialog from "./NewDealDialog";
-import { sortStages, type CrmDeal, type CrmDealUnit, type CrmPerson, type CrmStageRow } from "@/lib/crm";
+import { sortStages, type CrmDeal, type CrmDealUnit, type CrmPerson, type CrmProposal, type CrmStageRow } from "@/lib/crm";
 import type { Unit } from "@/lib/units";
 
 export type DealFull = CrmDeal & {
   person: CrmPerson;
   stage: CrmStageRow;
   deal_units: (CrmDealUnit & { unit: Unit })[];
+  proposals: CrmProposal[];
 };
 
 export default function CrmSection() {
@@ -38,7 +39,7 @@ export default function CrmSection() {
     const [d, p, u, s] = await Promise.all([
       supabase
         .from("crm_deals")
-        .select("*, person:crm_people(*), stage:crm_stages(*), deal_units:crm_deal_units(*, unit:units(*))")
+        .select("*, person:crm_people(*), stage:crm_stages(*), deal_units:crm_deal_units(*, unit:units(*)), proposals:crm_proposals(*)")
         .order("stage_changed_at", { ascending: false }),
       supabase.from("crm_people").select("*").order("created_at", { ascending: false }),
       supabase.from("units").select("*").order("code"),

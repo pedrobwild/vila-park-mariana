@@ -1,6 +1,12 @@
 import { toast } from "sonner";
 
-export type CrmEntity = "etapa" | "negócio" | "pessoa" | "unidade do negócio" | "atividade";
+export type CrmEntity =
+  | "etapa"
+  | "negócio"
+  | "pessoa"
+  | "unidade do negócio"
+  | "atividade"
+  | "proposta";
 export type CrmAction = "criar" | "renomear" | "reordenar" | "excluir" | "atualizar" | "mover";
 
 export type SbErr =
@@ -14,6 +20,7 @@ const ARTICLE: Record<CrmEntity, string> = {
   "pessoa": "a pessoa",
   "unidade do negócio": "a unidade do negócio",
   "atividade": "a atividade",
+  "proposta": "a proposta",
 };
 
 const ARTICLE_ARE: Record<CrmEntity, string> = {
@@ -22,6 +29,7 @@ const ARTICLE_ARE: Record<CrmEntity, string> = {
   "pessoa": "esta pessoa",
   "unidade do negócio": "esta unidade do negócio",
   "atividade": "esta atividade",
+  "proposta": "esta proposta",
 };
 
 export interface CrmErrorContext {

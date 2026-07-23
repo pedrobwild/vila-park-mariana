@@ -338,6 +338,87 @@ export type Database = {
         }
         Relationships: []
       }
+      crm_proposals: {
+        Row: {
+          balloon_brl: number
+          balloon_count: number
+          created_at: string
+          deal_id: string
+          discount_brl: number
+          discount_pct: number
+          down_payment_brl: number
+          final_price_brl: number
+          id: string
+          keys_brl: number
+          list_price_brl: number
+          monthly_brl: number
+          monthly_count: number
+          notes: string | null
+          payment_method: string
+          status: string
+          unit_id: string
+          updated_at: string
+          valid_until: string | null
+        }
+        Insert: {
+          balloon_brl?: number
+          balloon_count?: number
+          created_at?: string
+          deal_id: string
+          discount_brl?: number
+          discount_pct?: number
+          down_payment_brl?: number
+          final_price_brl: number
+          id?: string
+          keys_brl?: number
+          list_price_brl: number
+          monthly_brl?: number
+          monthly_count?: number
+          notes?: string | null
+          payment_method?: string
+          status?: string
+          unit_id: string
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Update: {
+          balloon_brl?: number
+          balloon_count?: number
+          created_at?: string
+          deal_id?: string
+          discount_brl?: number
+          discount_pct?: number
+          down_payment_brl?: number
+          final_price_brl?: number
+          id?: string
+          keys_brl?: number
+          list_price_brl?: number
+          monthly_brl?: number
+          monthly_count?: number
+          notes?: string | null
+          payment_method?: string
+          status?: string
+          unit_id?: string
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_proposals_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "crm_deals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_proposals_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       crm_stages: {
         Row: {
           created_at: string
@@ -553,6 +634,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      crm_apply_deal_value: { Args: { d: string }; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

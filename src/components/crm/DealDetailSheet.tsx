@@ -69,6 +69,7 @@ import {
   type CrmStageRow,
 } from "@/lib/crm";
 import type { DealFull } from "./CrmSection";
+import ProposalsSection from "./ProposalsSection";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -293,6 +294,11 @@ export default function DealDetailSheet({ deal, units, stages, onClose, onReload
             <span className="text-xs text-muted-foreground tabular-nums">
               {formatBRLCompact(Number(deal.value_brl || 0))}
             </span>
+            {(deal.proposals ?? []).some((p) => p.status === "aceita") && (
+              <span className="text-[10px] text-muted-foreground italic">
+                considera proposta aceita
+              </span>
+            )}
           </div>
           <SheetTitle className="font-display">{deal.person.full_name}</SheetTitle>
           <SheetDescription>{deal.title}</SheetDescription>
@@ -420,6 +426,12 @@ export default function DealDetailSheet({ deal, units, stages, onClose, onReload
           </section>
 
           <Separator />
+
+          <ProposalsSection deal={deal} onReload={reload} />
+
+          <Separator />
+
+
 
           {/* Activity form */}
           <section className="space-y-2">
