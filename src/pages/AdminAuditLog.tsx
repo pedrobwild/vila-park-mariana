@@ -257,7 +257,7 @@ export default function AdminAuditLog() {
               ))}
             </SelectContent>
           </Select>
-          <Select value={String(pageSize)} onValueChange={(v) => setPageSize(Number(v))}>
+          <Select value={String(pageSize)} onValueChange={(v) => updateParams({ size: Number(v) === 25 ? null : Number(v), page: null })}>
             <SelectTrigger className="w-full md:w-[120px]" aria-label="Registros por página">
               <SelectValue />
             </SelectTrigger>
