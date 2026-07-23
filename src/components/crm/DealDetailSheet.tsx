@@ -460,6 +460,59 @@ export default function DealDetailSheet({ deal, units, stages, onClose, onReload
           </section>
         </div>
       </SheetContent>
+
+      <Dialog open={!!pending} onOpenChange={(o) => !o && setPending(null)}>
+        <DialogContent>
+          {pending && deal && (
+            <>
+              <DialogHeader>
+                <DialogTitle>Mover para {pending.label}</DialogTitle>
+                <DialogDescription>
+                  {deal.person.full_name} — {deal.title}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-3 py-2">
+                {(pending.reserves_unit || pending.kind === "ganho") && (
+                  <div className="flex items-start gap-2 rounded-lg border border-border/60 p-3">
+                    <Checkbox
+                      id="dds-upd-unit"
+                      checked={updateUnitStatus}
+                      onCheckedChange={(c) => setUpdateUnitStatus(!!c)}
+                    />
+                    <div className="space-y-0.5">
+                      <Label htmlFor="dds-upd-unit" className="text-sm cursor-pointer">
+                        Marcar unidade primária como{" "}
+                        {pending.kind === "ganho" ? "vendida" : "reservada"}
+                      </Label>
+                    </div>
+                  </div>
+                )}
+                {pending.kind === "perdido" && (
+                  <div className="space-y-1.5">
+                    <Label htmlFor="dds-lost">Motivo da perda *</Label>
+                    <Textarea
+                      id="dds-lost"
+                      value={lostReason}
+                      onChange={(e) => setLostReason(e.target.value)}
+                      rows={3}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setPending(null)} disabled={busy}>
+                  Cancelar
+                </Button>
+                <Button onClick={confirmStageChange} disabled={busy}>
+                  {busy ? "Salvando…" : "Confirmar"}
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </Sheet>
   );
 }
