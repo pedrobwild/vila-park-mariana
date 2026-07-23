@@ -1,0 +1,63 @@
+name: e2e analytics (VilaParkLocationMap)
+
+# Executa a suíte E2E de contrato de analytics do mapa em toda PR que toque
+# no componente, nos payloads/dedup, ou no próprio spec/config de CI.
+# Falha o pipeline se qualquer payload divergir do esperado.
+
+on:
+  pull_request:
+    paths:
+      - "src/components/mapa/VilaParkLocationMap.tsx"
+      - "src/hooks/useGuideAnalytics.ts"
+      - "src/data/surroundings.ts"
+      - "e2e/vilapark-map-analytics.spec.ts"
+      - "playwright.ci.config.ts"
+      - "playwright-fixture.ts"
+      - ".github/workflows/e2e-analytics.yml"
+      - "package.json"
+      - "package-lock.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analytics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run analytics E2E (strict payload contract)
+        run: npm run e2e:analytics
+        env:
+          CI: "true"
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-analytics
+          path: playwright-report
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces-analytics
+          path: test-results
+          if-no-files-found: ignore
+          retention-days: 14
