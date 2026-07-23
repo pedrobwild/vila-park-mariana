@@ -84,7 +84,10 @@ export default function MapaBairrosEmbed() {
           minZoom={12}
           maxZoom={18}
           onError={onMapError}
-          onLoad={(event) => event.target.resize()}
+          onLoad={(event) => {
+            event.target.resize();
+            logBasemap({ event: "map_load", component: "MapaBairrosEmbed", style: mapStyle });
+          }}
         >
           <NavigationControl position="top-right" showCompass={false} />
 
