@@ -442,7 +442,7 @@ export default function Index() {
             </Suspense>
           </div>
         </div>
-        <NeighborhoodSection variant="compact" headerless />
+        <div className="pb-12 md:pb-20" />
       </div>
 
       {/* ETAPAS — Como funciona a reserva */}
