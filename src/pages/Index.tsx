@@ -22,6 +22,7 @@ import SiteFooter from "@/components/shared/SiteFooter";
 import { trackGlobal } from "@/hooks/useGuideAnalytics";
 
 const PlantasSection = lazy(() => import("@/components/PlantasSection"));
+const VilaParkLocationMap = lazy(() => import("@/components/mapa/VilaParkLocationMap"));
 
 const HERO_IMG = "https://vilaparkmariana.com.br/wp-content/uploads/2023/03/frente-fachada-noite-vila-park-mariana.jpg";
 
@@ -429,7 +430,19 @@ export default function Index() {
 
       {/* ENTORNO — shared component */}
       <div id="comparativo" className="border-b border-border/40 bg-background">
-        <NeighborhoodSection variant="compact" />
+        <div className="max-w-7xl mx-auto px-5 md:px-6 pt-12 md:pt-20">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent mb-3">{t("surroundings.eyebrow")}</p>
+          <h2 className="font-display text-3xl md:text-4xl font-medium text-foreground max-w-2xl tracking-tight">
+            {t("surroundings.title")}
+          </h2>
+          <p className="mt-3 text-muted-foreground max-w-2xl">{t("surroundings.subtitle")}</p>
+          <div className="mt-8">
+            <Suspense fallback={<div className="w-full h-[460px] md:h-[540px] rounded-[10px] bg-muted" />}>
+              <VilaParkLocationMap />
+            </Suspense>
+          </div>
+        </div>
+        <NeighborhoodSection variant="compact" headerless />
       </div>
 
       {/* ETAPAS — Como funciona a reserva */}
