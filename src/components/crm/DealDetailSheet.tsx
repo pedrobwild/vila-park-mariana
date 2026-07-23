@@ -69,6 +69,7 @@ import {
   type CrmStageRow,
 } from "@/lib/crm";
 import type { DealFull } from "./CrmSection";
+import ProposalsSection from "./ProposalsSection";
 import {
   DropdownMenu,
   DropdownMenuContent,
