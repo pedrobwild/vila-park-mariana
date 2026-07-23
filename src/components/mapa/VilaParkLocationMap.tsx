@@ -50,7 +50,7 @@ const RING_500: LayerProps = {
   paint: {
     "line-color": "hsl(215, 30%, 15%)",
     "line-width": 1,
-    "line-opacity": 0.55,
+    "line-opacity": 0.6,
     "line-dasharray": [2, 3],
   },
 };
@@ -60,7 +60,7 @@ const RING_1000: LayerProps = {
   paint: {
     "line-color": "hsl(215, 30%, 15%)",
     "line-width": 1,
-    "line-opacity": 0.4,
+    "line-opacity": 0.45,
     "line-dasharray": [2, 3],
   },
 };
