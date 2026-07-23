@@ -117,6 +117,16 @@ export default function BasemapDiagnosticsOverlay() {
           </button>
           <button
             type="button"
+            onClick={() => downloadBasemapLog()}
+            className="rounded px-2 py-0.5 text-slate-300 hover:bg-slate-800"
+            aria-label="Export log as JSON"
+            title="Download log as JSON for bug reports"
+            disabled={entries.length === 0}
+          >
+            export
+          </button>
+          <button
+            type="button"
             onClick={clearBasemapLog}
             className="rounded px-2 py-0.5 text-slate-300 hover:bg-slate-800"
             aria-label="Clear log"
