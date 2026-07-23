@@ -123,7 +123,32 @@ export default function AdminUpload() {
         )
       );
       toast.success(`Enviado: ${sanitizedName}`);
+      // Audit log
+      try {
+        const { data: userData } = await supabase.auth.getUser();
+        const user = userData.user;
+        if (user) {
+          await supabase.from("audit_logs").insert({
+            actor_id: user.id,
+            actor_email: user.email ?? null,
+            action: "upload",
+            entity: `storage:${BUCKET}`,
+            entity_id: path,
+            metadata: {
+              path,
+              bucket: BUCKET,
+              target: selectedTarget,
+              filename: sanitizedName,
+              size: item.file.size,
+              url: data.publicUrl,
+            },
+          });
+        }
+      } catch (e) {
+        console.warn("audit log failed", e);
+      }
     }
+
   };
 
   const uploadAll = async () => {
