@@ -26,6 +26,8 @@ async function probeStyle(): Promise<string> {
   if (inflight) return inflight;
 
   inflight = (async () => {
+    const startedAt = performance.now?.() ?? Date.now();
+    logBasemap({ event: "style_probe_start", style: MAP_STYLE_PRIMARY });
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 3500);
@@ -36,16 +38,25 @@ async function probeStyle(): Promise<string> {
       });
       clearTimeout(timeout);
       if (!res.ok) throw new Error(`status ${res.status}`);
-      // valida JSON minimamente
       const json = await res.json();
       if (!json || typeof json !== "object" || !("sources" in json)) {
         throw new Error("invalid style json");
       }
       cachedStyle = MAP_STYLE_PRIMARY;
+      logBasemap({
+        event: "style_probe_ok",
+        style: MAP_STYLE_PRIMARY,
+        detail: { durationMs: Math.round((performance.now?.() ?? Date.now()) - startedAt) },
+      });
     } catch (err) {
-      if (typeof console !== "undefined") {
-        console.warn("[basemap] MapTiler Streets Light indisponível, usando MapTiler Dataviz Light.", err);
-      }
+      logBasemap({
+        event: "style_probe_fail",
+        style: MAP_STYLE_PRIMARY,
+        detail: {
+          error: err,
+          durationMs: Math.round((performance.now?.() ?? Date.now()) - startedAt),
+        },
+      });
       cachedStyle = MAP_STYLE_FALLBACK;
     }
     return cachedStyle!;
