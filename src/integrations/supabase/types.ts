@@ -171,6 +171,166 @@ export type Database = {
           },
         ]
       }
+      crm_activities: {
+        Row: {
+          content: string
+          created_at: string
+          deal_id: string
+          id: string
+          type: Database["public"]["Enums"]["crm_activity_type"]
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          deal_id: string
+          id?: string
+          type?: Database["public"]["Enums"]["crm_activity_type"]
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          deal_id?: string
+          id?: string
+          type?: Database["public"]["Enums"]["crm_activity_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_activities_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "crm_deals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_deal_units: {
+        Row: {
+          created_at: string
+          deal_id: string
+          id: string
+          interest_level: Database["public"]["Enums"]["crm_interest_level"]
+          is_primary: boolean
+          unit_id: string
+        }
+        Insert: {
+          created_at?: string
+          deal_id: string
+          id?: string
+          interest_level?: Database["public"]["Enums"]["crm_interest_level"]
+          is_primary?: boolean
+          unit_id: string
+        }
+        Update: {
+          created_at?: string
+          deal_id?: string
+          id?: string
+          interest_level?: Database["public"]["Enums"]["crm_interest_level"]
+          is_primary?: boolean
+          unit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_deal_units_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "crm_deals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_deal_units_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_deals: {
+        Row: {
+          created_at: string
+          id: string
+          lost_reason: string | null
+          notes: string | null
+          person_id: string
+          stage: Database["public"]["Enums"]["crm_stage"]
+          stage_changed_at: string
+          title: string
+          updated_at: string
+          value_brl: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lost_reason?: string | null
+          notes?: string | null
+          person_id: string
+          stage?: Database["public"]["Enums"]["crm_stage"]
+          stage_changed_at?: string
+          title: string
+          updated_at?: string
+          value_brl?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lost_reason?: string | null
+          notes?: string | null
+          person_id?: string
+          stage?: Database["public"]["Enums"]["crm_stage"]
+          stage_changed_at?: string
+          title?: string
+          updated_at?: string
+          value_brl?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_deals_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "crm_people"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_people: {
+        Row: {
+          city: string | null
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          notes: string | null
+          occupation: string | null
+          phone: string | null
+          source: Database["public"]["Enums"]["crm_source"]
+          updated_at: string
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          notes?: string | null
+          occupation?: string | null
+          phone?: string | null
+          source?: Database["public"]["Enums"]["crm_source"]
+          updated_at?: string
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          notes?: string | null
+          occupation?: string | null
+          phone?: string | null
+          source?: Database["public"]["Enums"]["crm_source"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       custom_field_definitions: {
         Row: {
           created_at: string
@@ -364,6 +524,29 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "incorporadora"
+      crm_activity_type:
+        | "nota"
+        | "ligacao"
+        | "email"
+        | "whatsapp"
+        | "visita"
+        | "mudanca_etapa"
+      crm_interest_level: "alta" | "media" | "baixa"
+      crm_source:
+        | "indicacao"
+        | "portal"
+        | "plantao"
+        | "instagram"
+        | "site"
+        | "outro"
+      crm_stage:
+        | "lead"
+        | "qualificado"
+        | "visita"
+        | "proposta"
+        | "reserva"
+        | "fechado"
+        | "perdido"
       custom_field_type:
         | "text"
         | "currency"
@@ -500,6 +683,32 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "incorporadora"],
+      crm_activity_type: [
+        "nota",
+        "ligacao",
+        "email",
+        "whatsapp",
+        "visita",
+        "mudanca_etapa",
+      ],
+      crm_interest_level: ["alta", "media", "baixa"],
+      crm_source: [
+        "indicacao",
+        "portal",
+        "plantao",
+        "instagram",
+        "site",
+        "outro",
+      ],
+      crm_stage: [
+        "lead",
+        "qualificado",
+        "visita",
+        "proposta",
+        "reserva",
+        "fechado",
+        "perdido",
+      ],
       custom_field_type: [
         "text",
         "currency",
