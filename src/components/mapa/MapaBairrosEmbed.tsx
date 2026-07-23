@@ -17,6 +17,7 @@ import {
 } from "@/components/mapa/SaoPauloMap";
 import NeighborhoodComparison from "@/components/mapa/NeighborhoodComparison";
 import { useBasemapStyle } from "@/lib/basemap";
+import { logBasemap } from "@/lib/basemapLog";
 
 const CATEGORY_ORDER: PoiCategory[] = ["leisure", "mobility", "education", "services", "gastronomy"];
 
