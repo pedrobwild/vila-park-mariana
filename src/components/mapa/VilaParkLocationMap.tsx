@@ -306,7 +306,13 @@ function MapContent() {
       <div className="flex flex-wrap gap-2" role="group" aria-label={t("map.filters.aria")}>
         <button
           type="button"
-          onClick={() => setFilters([...CATEGORY_ORDER])}
+          onClick={() => {
+            setFilters([...CATEGORY_ORDER]);
+            trackGlobal("map_filter_reset", {
+              location: "home:comparativo",
+              component: "VilaParkLocationMap",
+            });
+          }}
           aria-pressed={allActive}
           className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
             allActive
