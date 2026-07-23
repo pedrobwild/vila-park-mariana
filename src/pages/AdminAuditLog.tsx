@@ -245,7 +245,7 @@ export default function AdminAuditLog() {
               ))}
             </SelectContent>
           </Select>
-          <Select value={actionFilter} onValueChange={setActionFilter}>
+          <Select value={actionFilter} onValueChange={(v) => updateParams({ action: v, page: null })}>
             <SelectTrigger className="w-full md:w-[170px]" aria-label="Filtrar por ação">
               <SelectValue />
             </SelectTrigger>
