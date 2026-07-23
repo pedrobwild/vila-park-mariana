@@ -427,6 +427,12 @@ export default function DealDetailSheet({ deal, units, stages, onClose, onReload
 
           <Separator />
 
+          <ProposalsSection deal={deal} onReload={reload} />
+
+          <Separator />
+
+
+
           {/* Activity form */}
           <section className="space-y-2">
             <h3 className="font-medium text-sm">Registrar atividade</h3>
