@@ -9,8 +9,7 @@ import {
   type Poi,
   type PoiCategory,
 } from "@/data/surroundings";
-
-const MAP_STYLE = "https://api.maptiler.com/maps/019cc06d-fb8e-741d-b158-a17a30e87c08/style.json?key=AI17dHeoeJx6rUC1KlSL";
+import { MAP_STYLE } from "@/lib/basemap";
 
 // Re-exports para consumidores legados (não duplicar dados).
 export { VILA_PARK_COORDS, VILA_PARK_ADDRESS, POIS as VILA_PARK_POIS };

@@ -17,9 +17,7 @@ import {
   type Poi,
   type PoiCategory,
 } from "@/data/surroundings";
-
-const MAP_STYLE =
-  "https://api.maptiler.com/maps/019cc06d-fb8e-741d-b158-a17a30e87c08/style.json?key=AI17dHeoeJx6rUC1KlSL";
+import { MAP_STYLE } from "@/lib/basemap";
 
 const ICON: Record<PoiCategory, typeof Train> = {
   mobility: Train,
@@ -52,7 +50,7 @@ const RING_500: LayerProps = {
   paint: {
     "line-color": "hsl(215, 30%, 15%)",
     "line-width": 1,
-    "line-opacity": 0.55,
+    "line-opacity": 0.6,
     "line-dasharray": [2, 3],
   },
 };
@@ -62,7 +60,7 @@ const RING_1000: LayerProps = {
   paint: {
     "line-color": "hsl(215, 30%, 15%)",
     "line-width": 1,
-    "line-opacity": 0.4,
+    "line-opacity": 0.45,
     "line-dasharray": [2, 3],
   },
 };
