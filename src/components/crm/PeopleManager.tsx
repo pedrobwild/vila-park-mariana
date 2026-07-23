@@ -45,7 +45,10 @@ interface Props {
   onReload: () => Promise<void>;
   onOpenDeal: (id: string) => void;
   onNewDealForPerson: (personId: string) => void;
+  autoOpenNew?: boolean;
+  onAutoOpenNewHandled?: () => void;
 }
+
 
 interface FormState {
   full_name: string;
