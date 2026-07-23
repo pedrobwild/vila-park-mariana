@@ -201,6 +201,22 @@ function MapContent() {
   const carouselRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<string, HTMLElement>>(new Map());
 
+  // Deduplicação de eventos de analytics.
+  // Evita ruído quando o usuário reclica no mesmo POI, alterna o mesmo filtro
+  // repetidamente ou quando o mapa reconcilia estado após reidratação.
+  const analyticsDedupRef = useRef<Map<string, number>>(new Map());
+  const emitAnalytics = useCallback(
+    (event: string, payload: Record<string, unknown>, dedupKey: string, windowMs = 1500) => {
+      const now = Date.now();
+      const key = `${event}::${dedupKey}`;
+      const last = analyticsDedupRef.current.get(key) ?? 0;
+      if (now - last < windowMs) return;
+      analyticsDedupRef.current.set(key, now);
+      trackGlobal(event, { ...payload, dedup_key: dedupKey });
+    },
+    [],
+  );
+
   const allActive = filters.length === CATEGORY_ORDER.length;
   const visible = useMemo(() => POIS.filter((p) => filters.includes(p.category)), [filters]);
 
