@@ -60,13 +60,19 @@ function RoleBadge({ role }: { role: "admin" | "incorporadora" | null }) {
 
 
 export default function Admin() {
-  const { session } = useIsAdmin();
+  const { session, role } = useRole();
   const [active, setActive] = useState<SectionKey>("units");
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const sections = useMemo(
+    () => ALL_SECTIONS.filter((s) => !s.bewildOnly || role === "admin"),
+    [role],
+  );
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
   };
+
 
   const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => (
     <nav className="space-y-1 p-3">
