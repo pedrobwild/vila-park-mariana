@@ -11,7 +11,7 @@
  */
 import { useEffect, useState } from "react";
 import { MAP_STYLE_FALLBACK, MAP_STYLE_PRIMARY } from "@/lib/basemap";
-import { BASEMAP_SESSION_ID, clearBasemapLog, getBasemapLog, subscribeBasemapLog, type BasemapLogEntry } from "@/lib/basemapLog";
+import { BASEMAP_SESSION_ID, clearBasemapLog, downloadBasemapLog, getBasemapLog, subscribeBasemapLog, type BasemapLogEntry } from "@/lib/basemapLog";
 
 const STORAGE_KEY = "basemap:debug";
 
@@ -114,6 +114,16 @@ export default function BasemapDiagnosticsOverlay() {
             aria-label={collapsed ? "Expand diagnostics" : "Collapse diagnostics"}
           >
             {collapsed ? "▸" : "▾"}
+          </button>
+          <button
+            type="button"
+            onClick={() => downloadBasemapLog()}
+            className="rounded px-2 py-0.5 text-slate-300 hover:bg-slate-800"
+            aria-label="Export log as JSON"
+            title="Download log as JSON for bug reports"
+            disabled={entries.length === 0}
+          >
+            export
           </button>
           <button
             type="button"

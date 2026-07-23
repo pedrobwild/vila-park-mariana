@@ -239,6 +239,57 @@ export function clearBasemapLog(): void {
   listeners.forEach((fn) => fn(ring.slice()));
 }
 
+/**
+ * Build a self-contained JSON bug-report payload with all buffered events plus
+ * environment metadata useful for triage (UA, viewport, URL, session ID).
+ * Pure — safe to call in tests or on the server (guards `window`/`navigator`).
+ */
+export function buildBasemapLogReport(): {
+  schema: string;
+  generatedAt: string;
+  sessionId: string;
+  env: Record<string, unknown>;
+  entries: BasemapLogEntry[];
+} {
+  const hasWindow = typeof window !== "undefined";
+  const hasNav = typeof navigator !== "undefined";
+  return {
+    schema: "basemap-log/v1",
+    generatedAt: new Date().toISOString(),
+    sessionId: BASEMAP_SESSION_ID,
+    env: {
+      userAgent: hasNav ? navigator.userAgent : undefined,
+      language: hasNav ? navigator.language : undefined,
+      url: hasWindow ? window.location.href : undefined,
+      viewport: hasWindow
+        ? { width: window.innerWidth, height: window.innerHeight, dpr: window.devicePixelRatio }
+        : undefined,
+    },
+    entries: ring.slice(),
+  };
+}
+
+/**
+ * Trigger a browser download of the current log as a JSON file.
+ * No-op outside the browser. Returns the filename used.
+ */
+export function downloadBasemapLog(): string | null {
+  if (typeof window === "undefined" || typeof document === "undefined") return null;
+  const report = buildBasemapLogReport();
+  const stamp = report.generatedAt.replace(/[:.]/g, "-");
+  const filename = `basemap-log_${BASEMAP_SESSION_ID}_${stamp}.json`;
+  const blob = new Blob([JSON.stringify(report, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  return filename;
+}
+
 export function logBasemap(entry: Omit<BasemapLogEntry, "ts" | "sessionId"> & { sessionId?: string }): void {
   const payload: BasemapLogEntry = {
     ...entry,
