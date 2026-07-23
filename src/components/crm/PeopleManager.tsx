@@ -74,12 +74,29 @@ const emptyForm: FormState = {
   interests: {},
 };
 
-export default function PeopleManager({ people, deals, units, onReload, onOpenDeal, onNewDealForPerson }: Props) {
+export default function PeopleManager({
+  people,
+  deals,
+  units,
+  onReload,
+  onOpenDeal,
+  onNewDealForPerson,
+  autoOpenNew,
+  onAutoOpenNewHandled,
+}: Props) {
   const [q, setQ] = useState("");
   const [openNew, setOpenNew] = useState(false);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [expandedPerson, setExpandedPerson] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (autoOpenNew) {
+      setOpenNew(true);
+      onAutoOpenNewHandled?.();
+    }
+  }, [autoOpenNew, onAutoOpenNewHandled]);
+
 
   const dealsByPerson = useMemo(() => {
     const map = new Map<string, DealFull[]>();
