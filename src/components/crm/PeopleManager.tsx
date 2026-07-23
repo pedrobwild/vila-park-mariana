@@ -160,9 +160,7 @@ export default function PeopleManager({ people, deals, units, onReload, onOpenDe
       setForm(emptyForm);
       await onReload();
     } catch (e) {
-      toast.error("Não foi possível cadastrar.", {
-        description: e instanceof Error ? e.message : undefined,
-      });
+      notifyCrmError(e as SbErr, { entity: "pessoa", action: "criar" });
     } finally {
       setSaving(false);
     }
