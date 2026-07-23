@@ -653,9 +653,9 @@ function MapContent() {
               setShowFullRadius((v) => {
                 const next = !v;
                 trackGlobal("map_bounds_toggle", {
-                  location: "home:comparativo",
-                  component: "VilaParkLocationMap",
+                  ...ANALYTICS_BASE,
                   mode: next ? "full_radius" : "nearby",
+                  ...filterEventPayload(filters),
                 });
                 return next;
               })
