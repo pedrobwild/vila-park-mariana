@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -84,31 +84,58 @@ function formatDate(iso: string) {
 }
 
 export default function AdminAuditLog() {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const paramSortField = ((): SortField => {
+    const v = searchParams.get("sort");
+    return v === "action" || v === "entity" || v === "actor_email" || v === "created_at"
+      ? v
+      : "created_at";
+  })();
+  const paramSortDir: SortDir = searchParams.get("dir") === "asc" ? "asc" : "desc";
+  const paramPage = Math.max(0, Number(searchParams.get("page") ?? "1") - 1) || 0;
+  const paramPageSize = PAGE_SIZES.includes(Number(searchParams.get("size")))
+    ? Number(searchParams.get("size"))
+    : 25;
+  const paramEntity = searchParams.get("entity") ?? "all";
+  const paramAction = searchParams.get("action") ?? "all";
+  const paramQ = searchParams.get("q") ?? "";
+
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [entityFilter, setEntityFilter] = useState<string>("all");
-  const [actionFilter, setActionFilter] = useState<string>("all");
-  const [searchInput, setSearchInput] = useState("");
-  const [search, setSearch] = useState("");
-  const [sortField, setSortField] = useState<SortField>("created_at");
-  const [sortDir, setSortDir] = useState<SortDir>("desc");
-  const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(25);
+  const [searchInput, setSearchInput] = useState(paramQ);
   const [selected, setSelected] = useState<AuditLog | null>(null);
 
-  // Debounce search input
+  const entityFilter = paramEntity;
+  const actionFilter = paramAction;
+  const search = paramQ;
+  const sortField = paramSortField;
+  const sortDir = paramSortDir;
+  const page = paramPage;
+  const pageSize = paramPageSize;
+
+  const updateParams = (
+    patch: Record<string, string | number | null | undefined>,
+    opts: { replace?: boolean } = {}
+  ) => {
+    const next = new URLSearchParams(searchParams);
+    for (const [k, v] of Object.entries(patch)) {
+      if (v === null || v === undefined || v === "" || v === "all") next.delete(k);
+      else next.set(k, String(v));
+    }
+    setSearchParams(next, { replace: opts.replace });
+  };
+
+  // Debounce search input -> URL
   useEffect(() => {
     const t = setTimeout(() => {
-      setSearch(searchInput.trim());
-      setPage(0);
+      const trimmed = searchInput.trim();
+      if (trimmed !== search) updateParams({ q: trimmed || null, page: null });
     }, 300);
     return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchInput]);
-
-  useEffect(() => {
-    setPage(0);
-  }, [entityFilter, actionFilter, pageSize]);
 
   const load = async () => {
     setLoading(true);
@@ -148,13 +175,12 @@ export default function AdminAuditLog() {
 
   const toggleSort = (field: SortField) => {
     if (sortField === field) {
-      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+      updateParams({ dir: sortDir === "asc" ? "desc" : "asc", page: null });
     } else {
-      setSortField(field);
-      setSortDir("desc");
+      updateParams({ sort: field, dir: "desc", page: null });
     }
-    setPage(0);
   };
+
 
   const SortHeader = ({ field, children, className }: { field: SortField; children: React.ReactNode; className?: string }) => (
     <TableHead className={className}>
@@ -207,7 +233,7 @@ export default function AdminAuditLog() {
               aria-label="Buscar"
             />
           </div>
-          <Select value={entityFilter} onValueChange={setEntityFilter}>
+          <Select value={entityFilter} onValueChange={(v) => updateParams({ entity: v, page: null })}>
             <SelectTrigger className="w-full md:w-[240px]" aria-label="Filtrar por entidade">
               <SelectValue />
             </SelectTrigger>
@@ -219,7 +245,7 @@ export default function AdminAuditLog() {
               ))}
             </SelectContent>
           </Select>
-          <Select value={actionFilter} onValueChange={setActionFilter}>
+          <Select value={actionFilter} onValueChange={(v) => updateParams({ action: v, page: null })}>
             <SelectTrigger className="w-full md:w-[170px]" aria-label="Filtrar por ação">
               <SelectValue />
             </SelectTrigger>
@@ -231,7 +257,7 @@ export default function AdminAuditLog() {
               ))}
             </SelectContent>
           </Select>
-          <Select value={String(pageSize)} onValueChange={(v) => setPageSize(Number(v))}>
+          <Select value={String(pageSize)} onValueChange={(v) => updateParams({ size: Number(v) === 25 ? null : Number(v), page: null })}>
             <SelectTrigger className="w-full md:w-[120px]" aria-label="Registros por página">
               <SelectValue />
             </SelectTrigger>
@@ -315,7 +341,7 @@ export default function AdminAuditLog() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              onClick={() => updateParams({ page: Math.max(1, page) === 1 ? null : page })}
               disabled={loading || page === 0}
             >
               <ChevronLeft className="mr-1 h-4 w-4" /> Anterior
@@ -326,7 +352,7 @@ export default function AdminAuditLog() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+              onClick={() => updateParams({ page: Math.min(totalPages, page + 2) })}
               disabled={loading || page >= totalPages - 1}
             >
               Próxima <ChevronRight className="ml-1 h-4 w-4" />
