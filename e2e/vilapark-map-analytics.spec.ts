@@ -3,11 +3,22 @@ import type { Page } from "@playwright/test";
 
 /**
  * Analytics do VilaParkLocationMap (home #comparativo).
- * Garante que window.dataLayer recebe eventos com payload consistente
- * (poi_id, poi_name, category, distance_label, distance_m, source, filters...).
+ * Valida contrato estrito do payload em window.dataLayer para cada evento:
+ *  - map_poi_select: poi_id, poi_name, category, distance_label, distance_m,
+ *    source, filters, filters_count, filters_key, dedup_key
+ *  - map_filter_toggle: category, filter_action, filters, filters_count,
+ *    filters_key, dedup_key
+ *  - map_filter_reset:  filters, filters_count, filters_key, dedup_key
+ *  - map_bounds_toggle: mode, filters, filters_count, filters_key, dedup_key
+ *
+ * Todos os eventos devem carregar envelope { location, component, event }.
  */
 
-type DL = Array<Record<string, unknown>>;
+type EventPayload = Record<string, unknown>;
+type DL = Array<EventPayload>;
+
+const ALL_CATEGORIES_SORTED = ["education", "gastronomy", "leisure", "mobility", "services"] as const;
+const ALL_FILTERS_KEY = ALL_CATEGORIES_SORTED.join(",");
 
 test.setTimeout(90_000);
 test.describe.configure({ retries: 1 });
@@ -18,11 +29,17 @@ async function primeDataLayer(page: Page) {
   });
 }
 
-async function readEvents(page: Page, event: string) {
+async function readEvents(page: Page, event: string): Promise<EventPayload[]> {
   return await page.evaluate((ev) => {
     const dl = (window as unknown as { dataLayer?: DL }).dataLayer ?? [];
     return dl.filter((e) => e.event === ev);
   }, event);
+}
+
+async function waitForEvent(page: Page, event: string, min = 1) {
+  await expect
+    .poll(async () => (await readEvents(page, event)).length, { timeout: 3_000 })
+    .toBeGreaterThanOrEqual(min);
 }
 
 async function waitMapReady(page: Page) {
@@ -41,8 +58,27 @@ async function waitMapReady(page: Page) {
   await page.waitForTimeout(300);
 }
 
+/**
+ * Verifica que o payload contém EXATAMENTE o conjunto de chaves esperado
+ * (nem mais, nem menos), além de validar os tipos primitivos.
+ */
+function assertKeys(payload: EventPayload, expected: readonly string[]) {
+  const actual = Object.keys(payload).sort();
+  const sortedExpected = [...expected].sort();
+  expect(actual, `chaves inesperadas: ${actual.filter((k) => !sortedExpected.includes(k)).join(",")} | faltando: ${sortedExpected.filter((k) => !actual.includes(k)).join(",")}`).toEqual(sortedExpected);
+}
+
+function assertFiltersConsistency(payload: EventPayload) {
+  const filters = payload.filters as string[];
+  expect(Array.isArray(filters)).toBe(true);
+  // sempre ordenado alfabeticamente
+  expect(filters).toEqual([...filters].sort());
+  expect(payload.filters_count).toBe(filters.length);
+  expect(payload.filters_key).toBe(filters.join(","));
+}
+
 test.describe("Analytics: VilaParkLocationMap (window.dataLayer)", () => {
-  test("map_poi_select carrega poi_id/name/category/distance/source ao clicar na lista", async ({ page }) => {
+  test("map_poi_select tem payload completo e consistente ao clicar na lista", async ({ page }) => {
     await primeDataLayer(page);
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto("/");
@@ -52,11 +88,25 @@ test.describe("Analytics: VilaParkLocationMap (window.dataLayer)", () => {
     await item.scrollIntoViewIfNeeded();
     await item.click();
 
-    await expect
-      .poll(async () => (await readEvents(page, "map_poi_select")).length, { timeout: 3_000 })
-      .toBeGreaterThan(0);
+    await waitForEvent(page, "map_poi_select");
+    const evt = (await readEvents(page, "map_poi_select"))[0]!;
 
-    const evt = (await readEvents(page, "map_poi_select"))[0] as Record<string, unknown>;
+    assertKeys(evt, [
+      "event",
+      "location",
+      "component",
+      "poi_id",
+      "poi_name",
+      "category",
+      "distance_label",
+      "distance_m",
+      "source",
+      "filters",
+      "filters_count",
+      "filters_key",
+      "dedup_key",
+    ]);
+
     expect(evt).toMatchObject({
       event: "map_poi_select",
       location: "home:comparativo",
@@ -67,12 +117,15 @@ test.describe("Analytics: VilaParkLocationMap (window.dataLayer)", () => {
       distance_label: "950 m",
       distance_m: 950,
       source: "list",
+      filters_key: ALL_FILTERS_KEY,
+      filters_count: 5,
+      dedup_key: "poi:parque-da-aclimacao:list",
     });
-    expect(Array.isArray(evt.filters)).toBe(true);
-    expect(typeof evt.dedup_key).toBe("string");
+    assertFiltersConsistency(evt);
+    expect(evt.filters).toEqual([...ALL_CATEGORIES_SORTED]);
   });
 
-  test("map_poi_select repetido no mesmo POI é deduplicado dentro da janela", async ({ page }) => {
+  test("map_poi_select repetido no mesmo POI/source é deduplicado dentro da janela", async ({ page }) => {
     await primeDataLayer(page);
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto("/");
@@ -87,44 +140,54 @@ test.describe("Analytics: VilaParkLocationMap (window.dataLayer)", () => {
     const events = await readEvents(page, "map_poi_select");
     const forThisPoi = events.filter((e) => e.poi_id === "parque-da-aclimacao" && e.source === "list");
     expect(forThisPoi.length).toBe(1);
+    expect(forThisPoi[0]!.dedup_key).toBe("poi:parque-da-aclimacao:list");
   });
 
-  test("map_filter_toggle envia category, filter_action e filters", async ({ page }) => {
+  test("map_filter_toggle tem payload completo (category, filter_action, filters*)", async ({ page }) => {
     await primeDataLayer(page);
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto("/");
     await waitMapReady(page);
 
-    // Filtro "Lazer" (leisure). Estado inicial: todos ativos.
     const chip = page.locator("#comparativo button[aria-pressed]", { hasText: /^Lazer$/ }).first();
     await chip.scrollIntoViewIfNeeded();
     await chip.click();
 
-    await expect
-      .poll(async () => (await readEvents(page, "map_filter_toggle")).length, { timeout: 3_000 })
-      .toBeGreaterThan(0);
+    await waitForEvent(page, "map_filter_toggle");
+    const evt = (await readEvents(page, "map_filter_toggle"))[0]!;
 
-    const evt = (await readEvents(page, "map_filter_toggle"))[0] as Record<string, unknown>;
+    assertKeys(evt, [
+      "event",
+      "location",
+      "component",
+      "category",
+      "filter_action",
+      "filters",
+      "filters_count",
+      "filters_key",
+      "dedup_key",
+    ]);
+
     expect(evt).toMatchObject({
       event: "map_filter_toggle",
       location: "home:comparativo",
       component: "VilaParkLocationMap",
       category: "leisure",
       filter_action: "off",
+      dedup_key: "filter:leisure:off",
+      filters_count: 4,
     });
-    expect(Array.isArray(evt.filters)).toBe(true);
-    expect((evt.filters as string[])).not.toContain("leisure");
-    expect(typeof evt.filters_count).toBe("number");
-    expect(typeof evt.filters_key).toBe("string");
+    assertFiltersConsistency(evt);
+    expect(evt.filters as string[]).not.toContain("leisure");
+    expect(evt.filters).toEqual(ALL_CATEGORIES_SORTED.filter((c) => c !== "leisure"));
   });
 
-  test("map_filter_reset dispara ao clicar em 'Todos' com filtros completos", async ({ page }) => {
+  test("map_filter_reset tem payload completo com todas as categorias", async ({ page }) => {
     await primeDataLayer(page);
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto("/");
     await waitMapReady(page);
 
-    // Primeiro remove uma categoria para diferenciar o estado.
     const leisureChip = page.locator("#comparativo button[aria-pressed]", { hasText: /^Lazer$/ }).first();
     await leisureChip.scrollIntoViewIfNeeded();
     await leisureChip.click();
@@ -132,23 +195,32 @@ test.describe("Analytics: VilaParkLocationMap (window.dataLayer)", () => {
     const allChip = page.locator("#comparativo button[aria-pressed]", { hasText: /^Todos$/ }).first();
     await allChip.click();
 
-    await expect
-      .poll(async () => (await readEvents(page, "map_filter_reset")).length, { timeout: 3_000 })
-      .toBeGreaterThan(0);
+    await waitForEvent(page, "map_filter_reset");
+    const evt = (await readEvents(page, "map_filter_reset"))[0]!;
 
-    const evt = (await readEvents(page, "map_filter_reset"))[0] as Record<string, unknown>;
+    assertKeys(evt, [
+      "event",
+      "location",
+      "component",
+      "filters",
+      "filters_count",
+      "filters_key",
+      "dedup_key",
+    ]);
+
     expect(evt).toMatchObject({
       event: "map_filter_reset",
       location: "home:comparativo",
       component: "VilaParkLocationMap",
       dedup_key: "filter:reset",
+      filters_count: 5,
+      filters_key: ALL_FILTERS_KEY,
     });
-    const filters = evt.filters as string[];
-    expect(filters).toEqual(expect.arrayContaining(["mobility", "leisure", "education", "services", "gastronomy"]));
-    expect(evt.filters_count).toBe(5);
+    assertFiltersConsistency(evt);
+    expect(evt.filters).toEqual([...ALL_CATEGORIES_SORTED]);
   });
 
-  test("map_bounds_toggle envia mode full_radius / nearby", async ({ page }) => {
+  test("map_bounds_toggle tem payload completo em full_radius e nearby", async ({ page }) => {
     await primeDataLayer(page);
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto("/");
@@ -158,31 +230,55 @@ test.describe("Analytics: VilaParkLocationMap (window.dataLayer)", () => {
     await btn.scrollIntoViewIfNeeded();
     await btn.click();
 
-    await expect
-      .poll(async () => (await readEvents(page, "map_bounds_toggle")).length, { timeout: 3_000 })
-      .toBeGreaterThan(0);
+    await waitForEvent(page, "map_bounds_toggle");
+    const first = (await readEvents(page, "map_bounds_toggle"))[0]!;
 
-    const first = (await readEvents(page, "map_bounds_toggle"))[0] as Record<string, unknown>;
+    assertKeys(first, [
+      "event",
+      "location",
+      "component",
+      "mode",
+      "filters",
+      "filters_count",
+      "filters_key",
+      "dedup_key",
+    ]);
+
     expect(first).toMatchObject({
       event: "map_bounds_toggle",
       location: "home:comparativo",
       component: "VilaParkLocationMap",
       mode: "full_radius",
       dedup_key: "bounds:full_radius",
+      filters_key: ALL_FILTERS_KEY,
+      filters_count: 5,
     });
-    expect(Array.isArray(first.filters)).toBe(true);
+    assertFiltersConsistency(first);
 
-    // Volta ao entorno.
     const back = page.locator("#comparativo button", { hasText: /Voltar ao entorno/i }).first();
     await back.click();
 
-    await expect
-      .poll(async () => (await readEvents(page, "map_bounds_toggle")).length, { timeout: 3_000 })
-      .toBeGreaterThan(1);
-
+    await waitForEvent(page, "map_bounds_toggle", 2);
     const events = await readEvents(page, "map_bounds_toggle");
-    const nearby = events.find((e) => e.mode === "nearby");
+    const nearby = events.find((e) => e.mode === "nearby")!;
     expect(nearby).toBeTruthy();
-    expect(nearby).toMatchObject({ dedup_key: "bounds:nearby" });
+
+    assertKeys(nearby, [
+      "event",
+      "location",
+      "component",
+      "mode",
+      "filters",
+      "filters_count",
+      "filters_key",
+      "dedup_key",
+    ]);
+    expect(nearby).toMatchObject({
+      mode: "nearby",
+      dedup_key: "bounds:nearby",
+      filters_count: 5,
+      filters_key: ALL_FILTERS_KEY,
+    });
+    assertFiltersConsistency(nearby);
   });
 });
