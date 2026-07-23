@@ -141,7 +141,8 @@ export default function Admin() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="hidden sm:inline text-xs text-muted-foreground truncate max-w-[180px]">
+            <RoleBadge role={role} />
+            <span className="hidden lg:inline text-xs text-muted-foreground truncate max-w-[180px]">
               {session?.user.email}
             </span>
             <Link to="/">
