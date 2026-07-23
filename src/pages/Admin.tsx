@@ -1,18 +1,29 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useRole } from "@/hooks/useIsAdmin";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ArrowLeft, LogOut, Building2, Lock, Menu, FileText } from "lucide-react";
+import { ArrowLeft, LogOut, Building2, Lock, Menu, FileText, Upload, ShieldCheck, Briefcase } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import UnitsManager from "@/components/admin/UnitsManager";
+import bwildLogo from "@/assets/bwild-logo.png";
 
-type SectionKey = "units" | "extrato";
+type SectionKey = "units" | "extrato" | "upload";
 
-const SECTIONS: Array<{ key: SectionKey; label: string; icon: typeof Building2; href?: string }> = [
+interface SectionDef {
+  key: SectionKey;
+  label: string;
+  icon: typeof Building2;
+  href?: string;
+  bewildOnly?: boolean;
+}
+
+const ALL_SECTIONS: SectionDef[] = [
   { key: "units", label: "Unidades à venda", icon: Building2 },
   { key: "extrato", label: "Extrato do cliente", icon: FileText, href: "/admin/extrato" },
+  { key: "upload", label: "Painel — upload de plantas", icon: Upload, href: "/admin/upload", bewildOnly: true },
 ];
 
 const COMING_SOON = ["Leads", "Relatórios", "Configurações"];
@@ -26,6 +37,27 @@ function Logo() {
     </span>
   );
 }
+
+function RoleBadge({ role }: { role: "admin" | "incorporadora" | null }) {
+  if (role === "admin") {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-foreground text-background px-2.5 py-1 text-[11px] font-medium">
+        <img src={bwildLogo} alt="" className="h-3 w-auto opacity-90" />
+        Bewild · administração geral
+      </span>
+    );
+  }
+  if (role === "incorporadora") {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/60 text-accent bg-accent/5 px-2.5 py-1 text-[11px] font-medium">
+        <Briefcase className="h-3 w-3" />
+        Incorporadora · acesso do cliente (demo)
+      </span>
+    );
+  }
+  return null;
+}
+
 
 export default function Admin() {
   const { session } = useIsAdmin();
