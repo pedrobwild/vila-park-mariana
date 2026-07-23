@@ -14,6 +14,130 @@ export type Database = {
   }
   public: {
     Tables: {
+      contract_installments: {
+        Row: {
+          admin_fee: number
+          contract_id: string
+          contractual_value: number
+          corrected_value: number | null
+          created_at: string
+          discount_value: number
+          due_date: string
+          fine_value: number
+          id: string
+          insurance_fee: number
+          interest_value: number
+          kind: string
+          paid_date: string | null
+          paid_value: number
+          seq_label: string
+          updated_at: string
+        }
+        Insert: {
+          admin_fee?: number
+          contract_id: string
+          contractual_value: number
+          corrected_value?: number | null
+          created_at?: string
+          discount_value?: number
+          due_date: string
+          fine_value?: number
+          id?: string
+          insurance_fee?: number
+          interest_value?: number
+          kind: string
+          paid_date?: string | null
+          paid_value?: number
+          seq_label: string
+          updated_at?: string
+        }
+        Update: {
+          admin_fee?: number
+          contract_id?: string
+          contractual_value?: number
+          corrected_value?: number | null
+          created_at?: string
+          discount_value?: number
+          due_date?: string
+          fine_value?: number
+          id?: string
+          insurance_fee?: number
+          interest_value?: number
+          kind?: string
+          paid_date?: string | null
+          paid_value?: number
+          seq_label?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contract_installments_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contracts: {
+        Row: {
+          client_name: string
+          contract_date: string
+          contract_number: string
+          contract_value: number
+          created_at: string
+          id: string
+          index_label: string
+          late_fine_rate: number
+          late_interest_monthly: number
+          monthly_index_rate: number
+          original_value: number
+          status: string
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          client_name: string
+          contract_date: string
+          contract_number: string
+          contract_value: number
+          created_at?: string
+          id?: string
+          index_label?: string
+          late_fine_rate?: number
+          late_interest_monthly?: number
+          monthly_index_rate?: number
+          original_value: number
+          status?: string
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          client_name?: string
+          contract_date?: string
+          contract_number?: string
+          contract_value?: number
+          created_at?: string
+          id?: string
+          index_label?: string
+          late_fine_rate?: number
+          late_interest_monthly?: number
+          monthly_index_rate?: number
+          original_value?: number
+          status?: string
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contracts_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       custom_field_definitions: {
         Row: {
           created_at: string
