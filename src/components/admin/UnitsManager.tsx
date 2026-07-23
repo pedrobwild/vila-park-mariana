@@ -32,6 +32,8 @@ import CustomFieldsManager from "@/components/comercial/CustomFieldsManager";
 type SortKey = "code" | "block" | "area_m2" | "price_brl" | "status";
 
 export default function UnitsManager() {
+  const { role } = useRole();
+  const isBewild = role === "admin";
   const [units, setUnits] = useState<Unit[]>([]);
   const [fieldDefs, setFieldDefs] = useState<CustomFieldDef[]>([]);
   const [values, setValues] = useState<Record<string, Record<string, unknown>>>({});
