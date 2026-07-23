@@ -34,6 +34,7 @@ import {
 } from "@/data/surroundings";
 import { useBasemapStyle, useBasemapContrast } from "@/lib/basemap";
 import { logBasemap, registerBasemapMap, unregisterBasemapMap } from "@/lib/basemapLog";
+import { trackGlobal } from "@/hooks/useGuideAnalytics";
 
 const ICON: Record<PoiCategory, typeof Train> = {
   mobility: Train,
@@ -251,9 +252,18 @@ function MapContent() {
     applyBounds([VILA_PARK_COORDS, ...visible], { padding: 70 });
   }, [filters, allActive, visible, mapReady, applyBounds]);
 
-  const focusPoi = useCallback((poi: Poi, opts?: { scrollList?: boolean }) => {
+  const focusPoi = useCallback((poi: Poi, opts?: { scrollList?: boolean; source?: "list" | "pin" | "carousel" }) => {
     setActive(poi);
     setShowBuilding(false);
+    trackGlobal("map_poi_select", {
+      location: "home:comparativo",
+      component: "VilaParkLocationMap",
+      poi_name: poi.name,
+      poi_category: poi.category,
+      poi_distance: poi.distance,
+      distance_m: distanceMeters(poi.distance),
+      source: opts?.source ?? "list",
+    });
     const map = mapRef.current?.getMap?.();
     if (map) {
       const reduced = prefersReducedMotion();
@@ -268,7 +278,18 @@ function MapContent() {
   }, []);
 
   const toggle = (c: PoiCategory) =>
-    setFilters((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]));
+    setFilters((prev) => {
+      const next = prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c];
+      trackGlobal("map_filter_toggle", {
+        location: "home:comparativo",
+        component: "VilaParkLocationMap",
+        category: c,
+        action: prev.includes(c) ? "off" : "on",
+        active_filters: next,
+        active_count: next.length,
+      });
+      return next;
+    });
 
   const catLabel = (c: PoiCategory) => t(`surroundings.${c}`);
 
@@ -285,7 +306,13 @@ function MapContent() {
       <div className="flex flex-wrap gap-2" role="group" aria-label={t("map.filters.aria")}>
         <button
           type="button"
-          onClick={() => setFilters([...CATEGORY_ORDER])}
+          onClick={() => {
+            setFilters([...CATEGORY_ORDER]);
+            trackGlobal("map_filter_reset", {
+              location: "home:comparativo",
+              component: "VilaParkLocationMap",
+            });
+          }}
           aria-pressed={allActive}
           className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
             allActive
@@ -347,7 +374,7 @@ function MapContent() {
                               else itemRefs.current.delete(poi.name);
                             }}
                             type="button"
-                            onClick={() => focusPoi(poi)}
+                            onClick={() => focusPoi(poi, { source: "list" })}
                             onMouseEnter={() => setActive(poi)}
                             onFocus={() => setActive(poi)}
                             aria-pressed={isActive}
@@ -531,7 +558,7 @@ function MapContent() {
                   <Marker longitude={poi.lng} latitude={poi.lat} anchor="bottom">
                     <button
                       type="button"
-                      onClick={() => focusPoi(poi, { scrollList: true })}
+                      onClick={() => focusPoi(poi, { scrollList: true, source: "pin" })}
                       aria-label={`${poi.name} — ${catLabel(poi.category)}, ${poi.distance}`}
                       className={`rounded-full flex items-center justify-center border border-white shadow transition-transform ${
                         isActive
@@ -587,7 +614,17 @@ function MapContent() {
           {/* Botão "Ver raio completo / Voltar ao entorno" */}
           <button
             type="button"
-            onClick={() => setShowFullRadius((v) => !v)}
+            onClick={() =>
+              setShowFullRadius((v) => {
+                const next = !v;
+                trackGlobal("map_bounds_toggle", {
+                  location: "home:comparativo",
+                  component: "VilaParkLocationMap",
+                  mode: next ? "full_radius" : "nearby",
+                });
+                return next;
+              })
+            }
             className="absolute bottom-3 left-3 z-[2] inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1.5 rounded-full border border-border/70 bg-background/95 backdrop-blur shadow-sm text-foreground hover:border-foreground/40 transition-colors"
           >
             {showFullRadius ? <Minimize2 size={12} strokeWidth={2} /> : <Maximize2 size={12} strokeWidth={2} />}
@@ -610,7 +647,7 @@ function MapContent() {
             <button
               key={poi.name}
               type="button"
-              onClick={() => focusPoi(poi)}
+              onClick={() => focusPoi(poi, { source: "carousel" })}
               aria-pressed={isActive}
               role="listitem"
               className={`snap-start shrink-0 min-w-[190px] max-w-[220px] text-left rounded-[10px] border px-3 py-2.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
