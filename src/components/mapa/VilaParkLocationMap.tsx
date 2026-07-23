@@ -374,7 +374,7 @@ function MapContent() {
                               else itemRefs.current.delete(poi.name);
                             }}
                             type="button"
-                            onClick={() => focusPoi(poi)}
+                            onClick={() => focusPoi(poi, { source: "list" })}
                             onMouseEnter={() => setActive(poi)}
                             onFocus={() => setActive(poi)}
                             aria-pressed={isActive}
