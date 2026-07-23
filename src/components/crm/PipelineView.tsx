@@ -109,9 +109,7 @@ export default function PipelineView({
       setPending(null);
       await onReload();
     } catch (e) {
-      toast.error("Não foi possível atualizar a etapa.", {
-        description: e instanceof Error ? e.message : undefined,
-      });
+      notifyCrmError(e as SbErr, { entity: "negócio", action: "mover" });
     } finally {
       setSaving(false);
     }
