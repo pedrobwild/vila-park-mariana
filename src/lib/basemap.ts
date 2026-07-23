@@ -56,9 +56,52 @@ async function probeStyle(): Promise<string> {
 /**
  * Hook: retorna a URL do basemap com fallback automático.
  * - Começa otimista no primário; se o probe indicar indisponibilidade, troca para o fallback.
- * - Também troca em caso de erro do próprio MapLibre (via `notifyMapStyleError`).
+ * - Também troca em caso de erro do próprio MapLibre (via `onError`), filtrando eventos
+ *   relacionados a carregamento de style.json/sprite/glyphs — que indicam falha do basemap
+ *   inteiro — e ignorando erros de tiles individuais (o MapLibre já retenta).
+ * - Ao alternar para o fallback, emite um toast conciso informando o usuário.
  */
-export function useBasemapStyle(): { style: string; status: Status; onError: () => void } {
+let fallbackNotified = false;
+
+function isStyleLoadError(err: unknown): boolean {
+  if (!err || typeof err !== "object") return true; // sem contexto → tratar como fatal
+  const e = err as { error?: unknown; message?: string; sourceId?: string; tile?: unknown };
+  // Erros de tile trazem `tile` ou `sourceId` de uma source vetorial já ativa.
+  if (e.tile) return false;
+  const inner = (e.error as { message?: string; status?: number } | undefined) ?? {};
+  const msg = (inner.message || e.message || "").toLowerCase();
+  if (!msg) return true;
+  return (
+    msg.includes("style") ||
+    msg.includes("sprite") ||
+    msg.includes("glyph") ||
+    msg.includes("failed to fetch") ||
+    msg.includes("networkerror") ||
+    (typeof inner.status === "number" && inner.status >= 400 && !e.sourceId)
+  );
+}
+
+function switchToFallback(reason: string) {
+  if (cachedStyle === MAP_STYLE_FALLBACK) return false;
+  cachedStyle = MAP_STYLE_FALLBACK;
+  if (typeof console !== "undefined") {
+    console.warn(`[basemap] ${reason} — alternando para basemap de fallback.`);
+  }
+  if (!fallbackNotified) {
+    fallbackNotified = true;
+    try {
+      toast("Mapa em modo alternativo", {
+        description: "O basemap principal falhou; carregamos uma versão alternativa.",
+        duration: 5_000,
+      });
+    } catch {
+      /* toast pode não estar montado em testes; ignorar */
+    }
+  }
+  return true;
+}
+
+export function useBasemapStyle(): { style: string; status: Status; onError: (err?: unknown) => void } {
   const [style, setStyle] = useState<string>(cachedStyle ?? MAP_STYLE_PRIMARY);
   const [status, setStatus] = useState<Status>(cachedStyle ? (cachedStyle === MAP_STYLE_PRIMARY ? "primary" : "fallback") : "checking");
 
@@ -66,6 +109,7 @@ export function useBasemapStyle(): { style: string; status: Status; onError: () 
     let alive = true;
     probeStyle().then((s) => {
       if (!alive) return;
+      if (s === MAP_STYLE_FALLBACK) switchToFallback("Probe do estilo primário falhou");
       setStyle(s);
       setStatus(s === MAP_STYLE_PRIMARY ? "primary" : "fallback");
     });
@@ -74,13 +118,11 @@ export function useBasemapStyle(): { style: string; status: Status; onError: () 
     };
   }, []);
 
-  const onError = () => {
-    if (cachedStyle === MAP_STYLE_FALLBACK) return;
-    cachedStyle = MAP_STYLE_FALLBACK;
-    setStyle(MAP_STYLE_FALLBACK);
-    setStatus("fallback");
-    if (typeof console !== "undefined") {
-      console.warn("[basemap] Erro ao renderizar MapTiler Streets Light; alternando para MapTiler Dataviz Light.");
+  const onError = (err?: unknown) => {
+    if (!isStyleLoadError(err)) return; // ignora erros de tile individuais
+    if (switchToFallback("Erro ao carregar style.json do basemap primário")) {
+      setStyle(MAP_STYLE_FALLBACK);
+      setStatus("fallback");
     }
   };
 
