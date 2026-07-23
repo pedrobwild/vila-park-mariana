@@ -54,6 +54,45 @@ function distanceMeters(d: string): number {
 
 const NEARBY_LIMIT_M = 1200;
 
+// Envelope padrão dos eventos de analytics deste componente.
+// Mantido enxuto para agregações no relatório: sempre `location` + `component`.
+const ANALYTICS_BASE = {
+  location: "home:comparativo",
+  component: "VilaParkLocationMap",
+} as const;
+
+// Identificador estável do POI, derivado do nome (sem acentos, kebab-case).
+// Ex.: "Parque da Aclimação" -> "parque-da-aclimacao".
+function poiId(name: string): string {
+  return name
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+// Payload consistente para qualquer evento que se refere a um POI.
+function poiEventPayload(poi: Poi) {
+  return {
+    poi_id: poiId(poi.name),
+    poi_name: poi.name,
+    category: poi.category,
+    distance_label: poi.distance,
+    distance_m: distanceMeters(poi.distance),
+  };
+}
+
+// Payload consistente para eventos de filtro.
+function filterEventPayload(filters: PoiCategory[]) {
+  const sorted = [...filters].sort();
+  return {
+    filters: sorted,
+    filters_count: sorted.length,
+    filters_key: sorted.join(","),
+  };
+}
+
 function prefersReducedMotion(): boolean {
   if (typeof window === "undefined") return false;
   return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
