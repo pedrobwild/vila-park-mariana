@@ -20,7 +20,7 @@ interface SectionDef {
   bewildOnly?: boolean;
 }
 
-const ALL_SECTIONS: SectionDef[] = [
+const ALL_sections: SectionDef[] = [
   { key: "units", label: "Unidades à venda", icon: Building2 },
   { key: "extrato", label: "Extrato do cliente", icon: FileText, href: "/admin/extrato" },
   { key: "upload", label: "Painel — upload de plantas", icon: Upload, href: "/admin/upload", bewildOnly: true },
@@ -65,7 +65,7 @@ export default function Admin() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const sections = useMemo(
-    () => ALL_SECTIONS.filter((s) => !s.bewildOnly || role === "admin"),
+    () => ALL_sections.filter((s) => !s.bewildOnly || role === "admin"),
     [role],
   );
 
@@ -76,7 +76,7 @@ export default function Admin() {
 
   const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => (
     <nav className="space-y-1 p-3">
-      {SECTIONS.map((s) => {
+      {sections.map((s) => {
         const isActive = active === s.key;
         const className = `w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm min-h-[44px] transition-colors ${
           isActive
@@ -165,7 +165,7 @@ export default function Admin() {
           <div className="md:hidden">
             <Tabs value={active} onValueChange={(v) => setActive(v as SectionKey)}>
               <TabsList>
-                {SECTIONS.filter((s) => !s.href).map((s) => (
+                {sections.filter((s) => !s.href).map((s) => (
                   <TabsTrigger key={s.key} value={s.key}>
                     {s.label}
                   </TabsTrigger>
@@ -184,7 +184,7 @@ export default function Admin() {
 
           <header>
             <h1 className="font-display text-2xl md:text-3xl font-bold">
-              {SECTIONS.find((s) => s.key === active)?.label}
+              {sections.find((s) => s.key === active)?.label}
             </h1>
             <p className="text-sm text-muted-foreground">
               Gestão das unidades à venda do Vila Park Mariana.
