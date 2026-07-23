@@ -49,6 +49,7 @@ const App = () => (
             </Routes>
           </Suspense>
         </BrowserRouter>
+        <BasemapDiagnosticsOverlay />
       </TooltipProvider>
     </QueryClientProvider>
   </ErrorBoundary>
