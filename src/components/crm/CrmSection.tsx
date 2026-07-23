@@ -4,6 +4,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import PipelineView from "./PipelineView";
 import PeopleManager from "./PeopleManager";
 import DealDetailSheet from "./DealDetailSheet";
+import NewDealDialog from "./NewDealDialog";
 import { sortStages, type CrmDeal, type CrmDealUnit, type CrmPerson, type CrmStageRow } from "@/lib/crm";
 import type { Unit } from "@/lib/units";
 
@@ -21,6 +22,9 @@ export default function CrmSection() {
   const [loading, setLoading] = useState(true);
   const [openDealId, setOpenDealId] = useState<string | null>(null);
   const [tab, setTab] = useState<"pipeline" | "pessoas">("pipeline");
+  const [newDeal, setNewDeal] = useState<{ open: boolean; personId?: string | null }>({
+    open: false,
+  });
 
   const loadStages = useCallback(async () => {
     const { data } = await supabase.from("crm_stages").select("*");
@@ -54,6 +58,14 @@ export default function CrmSection() {
     [deals, openDealId],
   );
 
+  const handleDealCreated = useCallback(
+    async (dealId: string) => {
+      await load();
+      setOpenDealId(dealId);
+    },
+    [load],
+  );
+
   return (
     <div className="space-y-4">
       <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
@@ -69,6 +81,7 @@ export default function CrmSection() {
             onReload={load}
             onReloadStages={loadStages}
             onOpenDeal={(id) => setOpenDealId(id)}
+            onNewDeal={() => setNewDeal({ open: true })}
           />
         </TabsContent>
         <TabsContent value="pessoas" className="mt-4">
@@ -81,6 +94,7 @@ export default function CrmSection() {
               setTab("pipeline");
               setOpenDealId(id);
             }}
+            onNewDealForPerson={(personId) => setNewDeal({ open: true, personId })}
           />
         </TabsContent>
       </Tabs>
@@ -91,6 +105,16 @@ export default function CrmSection() {
         stages={stages}
         onClose={() => setOpenDealId(null)}
         onReload={load}
+      />
+
+      <NewDealDialog
+        open={newDeal.open}
+        onOpenChange={(o) => setNewDeal((s) => ({ ...s, open: o }))}
+        people={people}
+        units={units}
+        deals={deals}
+        presetPersonId={newDeal.personId ?? null}
+        onCreated={handleDealCreated}
       />
     </div>
   );
