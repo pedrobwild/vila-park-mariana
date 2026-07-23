@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreVertical } from "lucide-react";
+import { MoreVertical, FileText } from "lucide-react";
 import { formatBRLCompact, daysSince, type CrmStageRow } from "@/lib/crm";
 import type { DealFull } from "./CrmSection";
 
