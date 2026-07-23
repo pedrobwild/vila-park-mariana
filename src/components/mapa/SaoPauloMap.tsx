@@ -39,7 +39,8 @@ export default function SaoPauloMap() {
         mapStyle={mapStyle}
         // Preserve the WebGL drawing buffer so we can grab a screenshot from
         // the canvas when a fallback_switch / csp_violation event fires.
-        preserveDrawingBuffer
+        // Not in react-map-gl's typed props but forwarded to MapLibre.
+        {...({ preserveDrawingBuffer: true } as any)}
         onError={onMapError}
         onLoad={(event) => {
           event.target.resize();
