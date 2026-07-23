@@ -44,6 +44,7 @@ interface Props {
   units: Unit[];
   onReload: () => Promise<void>;
   onOpenDeal: (id: string) => void;
+  onNewDealForPerson: (personId: string) => void;
 }
 
 interface FormState {
