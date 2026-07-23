@@ -100,6 +100,17 @@
     "services": "Services",
     "gastronomy": "Dining"
   },
+  "map": {
+    "filters": {
+      "all": "All",
+      "aria": "Filter points by category"
+    },
+    "radius": {
+      "500": "5 min walk",
+      "1000": "12 min walk"
+    },
+    "disclaimer": "Point positions are approximate, for visual reference only. Distances follow the property's official materials."
+  },
   "reservation": {
     "eyebrow": "Reservation",
     "title": "Reserve your unit.",

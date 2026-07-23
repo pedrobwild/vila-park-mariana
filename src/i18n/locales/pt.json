@@ -100,6 +100,17 @@
     "services": "Serviços",
     "gastronomy": "Gastronomia"
   },
+  "map": {
+    "filters": {
+      "all": "Todos",
+      "aria": "Filtrar pontos por categoria"
+    },
+    "radius": {
+      "500": "5 min a pé",
+      "1000": "12 min a pé"
+    },
+    "disclaimer": "Posições dos pontos são aproximadas, para referência visual. Distâncias conforme material oficial do empreendimento."
+  },
   "reservation": {
     "eyebrow": "Reserva",
     "title": "Reserve sua unidade.",
