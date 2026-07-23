@@ -25,6 +25,23 @@ export type BasemapEvent =
   | "map_idle_first"
   | "csp_violation";
 
+export interface BasemapSnapshot {
+  /** Component name of the map instance sampled. */
+  component: string;
+  /** Truncated style URL currently applied to this map. */
+  style?: string;
+  /** Container size in CSS pixels. */
+  size: { width: number; height: number };
+  /** Camera state at capture time. */
+  camera: { lng: number; lat: number; zoom: number; bearing: number; pitch: number };
+  /** Style / data readiness flags. */
+  ready: { styleLoaded: boolean; loaded: boolean; sourcesLoaded: boolean };
+  /** Downscaled JPEG data URL. Undefined when capture fails (no WebGL buffer, tainted canvas). */
+  image?: string;
+  /** Reason capture was skipped (only present when image is undefined). */
+  imageError?: string;
+}
+
 export interface BasemapLogEntry {
   ts: string;
   /** Correlation ID — one per page load. Every entry from the same load shares this value. */
@@ -33,6 +50,8 @@ export interface BasemapLogEntry {
   component?: string;
   style?: string;
   detail?: Record<string, unknown>;
+  /** Auto-attached snapshots for `fallback_switch` / `csp_violation` events. */
+  snapshots?: BasemapSnapshot[];
 }
 
 /**
