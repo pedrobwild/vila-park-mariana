@@ -315,14 +315,13 @@ function MapContent() {
 
   const toggle = (c: PoiCategory) =>
     setFilters((prev) => {
-      const next = prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c];
+      const wasActive = prev.includes(c);
+      const next = wasActive ? prev.filter((x) => x !== c) : [...prev, c];
       trackGlobal("map_filter_toggle", {
-        location: "home:comparativo",
-        component: "VilaParkLocationMap",
+        ...ANALYTICS_BASE,
         category: c,
-        action: prev.includes(c) ? "off" : "on",
-        active_filters: next,
-        active_count: next.length,
+        filter_action: wasActive ? "off" : "on",
+        ...filterEventPayload(next),
       });
       return next;
     });
