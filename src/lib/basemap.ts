@@ -5,6 +5,7 @@
  * e substitua MAPTILER_KEY abaixo.
  */
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export const MAPTILER_KEY = "r3SdCfKzNXmowFUKYBgz";
 export const MAP_STYLE_PRIMARY = `https://api.maptiler.com/maps/streets/style.json?key=${MAPTILER_KEY}`;
