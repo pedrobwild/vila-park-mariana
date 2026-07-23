@@ -1,26 +1,19 @@
 // Re-export the Playwright test/expect API.
 //
-// No sandbox do Lovable, o pacote `lovable-agent-playwright-config/fixture`
-// injeta configurações específicas do editor. Em CI (GitHub Actions) esse
-// pacote não está disponível, então caímos para o `@playwright/test` base.
-//
-// Os specs deste projeto usam apenas a API pública (test/expect), então o
-// fallback é transparente.
-import type { test as BaseTest, expect as BaseExpect } from "@playwright/test";
+// No sandbox do Lovable, `lovable-agent-playwright-config/fixture` injeta
+// configuração específica do editor. Em CI (GitHub Actions) esse pacote não
+// existe, então caímos para o `@playwright/test` base. Os specs usam apenas
+// a API pública (test/expect), então o fallback é transparente.
+import { createRequire } from "node:module";
 
-let test: typeof BaseTest;
-let expect: typeof BaseExpect;
+const req = createRequire(import.meta.url);
 
+let mod: { test: unknown; expect: unknown };
 try {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const mod = require("lovable-agent-playwright-config/fixture");
-  test = mod.test;
-  expect = mod.expect;
+  mod = req("lovable-agent-playwright-config/fixture");
 } catch {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const mod = require("@playwright/test");
-  test = mod.test;
-  expect = mod.expect;
+  mod = req("@playwright/test");
 }
 
-export { test, expect };
+export const test = mod.test as typeof import("@playwright/test").test;
+export const expect = mod.expect as typeof import("@playwright/test").expect;
