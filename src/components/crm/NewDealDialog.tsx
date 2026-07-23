@@ -415,7 +415,7 @@ export default function NewDealDialog({
           >
             Cancelar
           </Button>
-          <Button onClick={submit} disabled={saving || !personId}>
+          <Button onClick={submit} disabled={saving || !personId || selectedCount === 0}>
             {saving ? "Criando…" : "Criar negócio"}
           </Button>
         </DialogFooter>
