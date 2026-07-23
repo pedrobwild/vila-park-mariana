@@ -19,6 +19,7 @@ const Login = lazy(() => import("./pages/Login"));
 const Admin = lazy(() => import("./pages/Admin"));
 const Oportunidades = lazy(() => import("./pages/Oportunidades"));
 import RequireAdmin from "./components/auth/RequireAdmin";
+import BasemapDiagnosticsOverlay from "./components/dev/BasemapDiagnosticsOverlay";
 
 const queryClient = new QueryClient();
 
