@@ -341,7 +341,7 @@ export default function AdminAuditLog() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              onClick={() => updateParams({ page: Math.max(1, page) === 1 ? null : page })}
               disabled={loading || page === 0}
             >
               <ChevronLeft className="mr-1 h-4 w-4" /> Anterior
