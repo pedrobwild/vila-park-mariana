@@ -10,7 +10,7 @@ import {
   type PoiCategory,
 } from "@/data/surroundings";
 import { useBasemapStyle } from "@/lib/basemap";
-import { logBasemap } from "@/lib/basemapLog";
+import { logBasemap, registerBasemapMap, unregisterBasemapMap } from "@/lib/basemapLog";
 
 // Re-exports para consumidores legados (não duplicar dados).
 export { VILA_PARK_COORDS, VILA_PARK_ADDRESS, POIS as VILA_PARK_POIS };
