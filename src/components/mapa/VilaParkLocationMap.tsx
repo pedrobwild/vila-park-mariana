@@ -295,12 +295,9 @@ function MapContent() {
     setActive(poi);
     setShowBuilding(false);
     trackGlobal("map_poi_select", {
-      location: "home:comparativo",
-      component: "VilaParkLocationMap",
-      poi_name: poi.name,
-      poi_category: poi.category,
-      poi_distance: poi.distance,
-      distance_m: distanceMeters(poi.distance),
+      ...ANALYTICS_BASE,
+      ...poiEventPayload(poi),
+      ...filterEventPayload(filters),
       source: opts?.source ?? "list",
     });
     const map = mapRef.current?.getMap?.();
