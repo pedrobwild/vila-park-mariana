@@ -109,6 +109,17 @@
       "500": "5 min a pé",
       "1000": "12 min a pé"
     },
+    "list": {
+      "aria": "Pontos de interesse no entorno",
+      "empty": "Nenhum ponto para esta seleção. Ative outra categoria."
+    },
+    "bounds": {
+      "full": "Ver raio completo",
+      "back": "Voltar ao entorno"
+    },
+    "popup": {
+      "directions": "Como chegar ↗"
+    },
     "disclaimer": "Posições dos pontos são aproximadas, para referência visual. Distâncias conforme material oficial do empreendimento."
   },
   "reservation": {
