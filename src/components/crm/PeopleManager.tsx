@@ -230,35 +230,54 @@ export default function PeopleManager({ people, deals, units, onReload, onOpenDe
                       {new Date(p.created_at).toLocaleDateString("pt-BR")}
                     </td>
                   </tr>
-                  {isOpen && list.length > 0 && (
+                  {isOpen && (
                     <tr key={`${p.id}-deals`} className="bg-muted/20">
                       <td colSpan={6} className="px-3 py-2">
-                        <ul className="space-y-1">
-                          {list.map((d) => (
-                            <li key={d.id}>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onOpenDeal(d.id);
-                                }}
-                                className="w-full flex items-center justify-between gap-3 rounded px-2 py-1.5 text-xs hover:bg-background transition"
-                              >
-                                <span className="truncate">{d.title}</span>
-                                <span className="flex items-center gap-2 shrink-0">
-                                  <Badge
-                                    variant="outline"
-                                    className={`text-[10px] ${stageBadgeClass(d.stage.kind)}`}
-                                  >
-                                    {d.stage.label}
-                                  </Badge>
-                                  <span className="tabular-nums text-muted-foreground">
-                                    {formatBRLCompact(Number(d.value_brl || 0))}
+                        {list.length > 0 ? (
+                          <ul className="space-y-1">
+                            {list.map((d) => (
+                              <li key={d.id}>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onOpenDeal(d.id);
+                                  }}
+                                  className="w-full flex items-center justify-between gap-3 rounded px-2 py-1.5 text-xs hover:bg-background transition"
+                                >
+                                  <span className="truncate">{d.title}</span>
+                                  <span className="flex items-center gap-2 shrink-0">
+                                    <Badge
+                                      variant="outline"
+                                      className={`text-[10px] ${stageBadgeClass(d.stage.kind)}`}
+                                    >
+                                      {d.stage.label}
+                                    </Badge>
+                                    <span className="tabular-nums text-muted-foreground">
+                                      {formatBRLCompact(Number(d.value_brl || 0))}
+                                    </span>
                                   </span>
-                                </span>
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="px-2 py-1.5 text-[11px] text-muted-foreground">
+                            Nenhum negócio cadastrado para esta pessoa.
+                          </p>
+                        )}
+                        <div className="mt-2 flex justify-end">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 text-xs"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onNewDealForPerson(p.id);
+                            }}
+                          >
+                            <Plus className="h-3 w-3 mr-1" /> Novo negócio
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   )}
