@@ -6,9 +6,9 @@
  */
 import { useEffect, useState } from "react";
 
-export const MAPTILER_KEY = "AI17dHeoeJx6rUC1KlSL";
-export const MAP_STYLE_PRIMARY = `https://api.maptiler.com/maps/streets-v2-light/style.json?key=${MAPTILER_KEY}`;
-export const MAP_STYLE_FALLBACK = `https://api.maptiler.com/maps/dataviz-light/style.json?key=${MAPTILER_KEY}`;
+export const MAPTILER_KEY = "r3SdCfKzNXmowFUKYBgz";
+export const MAP_STYLE_PRIMARY = `https://api.maptiler.com/maps/streets/style.json?key=${MAPTILER_KEY}`;
+export const MAP_STYLE_FALLBACK = `https://api.maptiler.com/maps/streets-v2-light/style.json?key=${MAPTILER_KEY}`;
 
 // Compat: manter export legado usado por componentes existentes.
 export const MAP_STYLE = MAP_STYLE_PRIMARY;
