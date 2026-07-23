@@ -44,23 +44,35 @@ function circleFeature(center: { lat: number; lng: number }, radiusMeters: numbe
   };
 }
 
+// As cores/opacidades reais são aplicadas em runtime a partir de useBasemapContrast,
+// garantindo legibilidade tanto em basemaps claros (Positron) quanto escuros.
+const RING_500_HALO: LayerProps = {
+  id: "ring-500-halo",
+  type: "line",
+  paint: { "line-color": "#fff", "line-width": 3.5, "line-opacity": 0.85, "line-blur": 0.5 },
+};
 const RING_500: LayerProps = {
   id: "ring-500",
   type: "line",
   paint: {
     "line-color": "hsl(215, 30%, 15%)",
-    "line-width": 1,
-    "line-opacity": 0.6,
+    "line-width": 1.25,
+    "line-opacity": 0.75,
     "line-dasharray": [2, 3],
   },
+};
+const RING_1000_HALO: LayerProps = {
+  id: "ring-1000-halo",
+  type: "line",
+  paint: { "line-color": "#fff", "line-width": 3.5, "line-opacity": 0.85, "line-blur": 0.5 },
 };
 const RING_1000: LayerProps = {
   id: "ring-1000",
   type: "line",
   paint: {
     "line-color": "hsl(215, 30%, 15%)",
-    "line-width": 1,
-    "line-opacity": 0.45,
+    "line-width": 1.25,
+    "line-opacity": 0.6,
     "line-dasharray": [2, 3],
   },
 };
