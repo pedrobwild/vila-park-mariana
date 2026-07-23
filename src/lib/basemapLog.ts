@@ -122,9 +122,9 @@ export function clearBasemapLog(): void {
 
 export function logBasemap(entry: Omit<BasemapLogEntry, "ts" | "sessionId"> & { sessionId?: string }): void {
   const payload: BasemapLogEntry = {
+    ...entry,
     ts: new Date().toISOString(),
     sessionId: entry.sessionId ?? BASEMAP_SESSION_ID,
-    ...entry,
     style: shortStyle(entry.style),
     detail: entry.detail?.error
       ? { ...entry.detail, error: serializeError(entry.detail.error) }
