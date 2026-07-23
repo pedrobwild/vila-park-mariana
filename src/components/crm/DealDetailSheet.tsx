@@ -21,6 +21,15 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Popover,
   PopoverContent,
@@ -51,17 +60,28 @@ import {
   ACTIVITY_LABEL,
   INTEREST_LABEL,
   SOURCE_LABEL,
-  STAGE_LABEL,
   formatBRLCompact,
+  stageBadgeClass,
   type CrmActivity,
   type CrmActivityType,
   type CrmInterest,
+  type CrmStageRow,
 } from "@/lib/crm";
 import type { DealFull } from "./CrmSection";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 interface Props {
   deal: DealFull | null;
   units: Unit[];
+  stages: CrmStageRow[];
   onClose: () => void;
   onReload: () => Promise<void>;
 }
@@ -75,13 +95,16 @@ const ACTIVITY_ICONS: Record<CrmActivityType, typeof StickyNote> = {
   mudanca_etapa: GitCommitVertical,
 };
 
-export default function DealDetailSheet({ deal, units, onClose, onReload }: Props) {
+export default function DealDetailSheet({ deal, units, stages, onClose, onReload }: Props) {
   const [activities, setActivities] = useState<CrmActivity[]>([]);
   const [loadingAct, setLoadingAct] = useState(false);
   const [newType, setNewType] = useState<CrmActivityType>("nota");
   const [newContent, setNewContent] = useState("");
   const [addUnitOpen, setAddUnitOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [pending, setPending] = useState<CrmStageRow | null>(null);
+  const [updateUnitStatus, setUpdateUnitStatus] = useState(true);
+  const [lostReason, setLostReason] = useState("");
 
   useEffect(() => {
     if (!deal) return;
@@ -178,12 +201,75 @@ export default function DealDetailSheet({ deal, units, onClose, onReload }: Prop
     }
   };
 
+  const requestStageChange = (to: CrmStageRow) => {
+    if (!deal || to.id === deal.stage_id) return;
+    setLostReason("");
+    setUpdateUnitStatus(to.reserves_unit || to.kind === "ganho");
+    setPending(to);
+  };
+
+  const confirmStageChange = async () => {
+    if (!deal || !pending) return;
+    if (pending.kind === "perdido" && !lostReason.trim()) {
+      toast.error("Informe o motivo da perda.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const { error } = await supabase
+        .from("crm_deals")
+        .update({
+          stage_id: pending.id,
+          lost_reason: pending.kind === "perdido" ? lostReason.trim() : null,
+        })
+        .eq("id", deal.id);
+      if (error) throw error;
+      const pu = deal.deal_units.find((du) => du.is_primary) ?? deal.deal_units[0];
+      if (updateUnitStatus && pu?.unit) {
+        if (pending.reserves_unit && pu.unit.status === "disponivel") {
+          await supabase.from("units").update({ status: "reservado" }).eq("id", pu.unit.id);
+        } else if (pending.kind === "ganho" && pu.unit.status !== "vendido") {
+          await supabase.from("units").update({ status: "vendido" }).eq("id", pu.unit.id);
+        }
+      }
+      toast.success(`Etapa atualizada: ${pending.label}`);
+      setPending(null);
+      await reload();
+    } catch (e) {
+      toast.error("Não foi possível atualizar a etapa.", {
+        description: e instanceof Error ? e.message : undefined,
+      });
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <Sheet open={!!deal} onOpenChange={(o) => !o && onClose()}>
       <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto">
         <SheetHeader>
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="text-[10px]">{STAGE_LABEL[deal.stage]}</Badge>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className={`inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[10px] hover:bg-muted/40 transition ${stageBadgeClass(deal.stage.kind)}`}
+                >
+                  {deal.stage.label}
+                  <ChevronDown className="h-3 w-3" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuLabel className="text-xs">Mover para</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {stages
+                  .filter((s) => s.id !== deal.stage_id)
+                  .map((s) => (
+                    <DropdownMenuItem key={s.id} onClick={() => requestStageChange(s)}>
+                      {s.label}
+                    </DropdownMenuItem>
+                  ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
             <span className="text-xs text-muted-foreground tabular-nums">
               {formatBRLCompact(Number(deal.value_brl || 0))}
             </span>
@@ -191,6 +277,7 @@ export default function DealDetailSheet({ deal, units, onClose, onReload }: Prop
           <SheetTitle className="font-display">{deal.person.full_name}</SheetTitle>
           <SheetDescription>{deal.title}</SheetDescription>
         </SheetHeader>
+
 
         <div className="mt-5 space-y-6">
           {/* Person */}
@@ -382,6 +469,59 @@ export default function DealDetailSheet({ deal, units, onClose, onReload }: Prop
           </section>
         </div>
       </SheetContent>
+
+      <Dialog open={!!pending} onOpenChange={(o) => !o && setPending(null)}>
+        <DialogContent>
+          {pending && deal && (
+            <>
+              <DialogHeader>
+                <DialogTitle>Mover para {pending.label}</DialogTitle>
+                <DialogDescription>
+                  {deal.person.full_name} — {deal.title}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-3 py-2">
+                {(pending.reserves_unit || pending.kind === "ganho") && (
+                  <div className="flex items-start gap-2 rounded-lg border border-border/60 p-3">
+                    <Checkbox
+                      id="dds-upd-unit"
+                      checked={updateUnitStatus}
+                      onCheckedChange={(c) => setUpdateUnitStatus(!!c)}
+                    />
+                    <div className="space-y-0.5">
+                      <Label htmlFor="dds-upd-unit" className="text-sm cursor-pointer">
+                        Marcar unidade primária como{" "}
+                        {pending.kind === "ganho" ? "vendida" : "reservada"}
+                      </Label>
+                    </div>
+                  </div>
+                )}
+                {pending.kind === "perdido" && (
+                  <div className="space-y-1.5">
+                    <Label htmlFor="dds-lost">Motivo da perda *</Label>
+                    <Textarea
+                      id="dds-lost"
+                      value={lostReason}
+                      onChange={(e) => setLostReason(e.target.value)}
+                      rows={3}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setPending(null)} disabled={busy}>
+                  Cancelar
+                </Button>
+                <Button onClick={confirmStageChange} disabled={busy}>
+                  {busy ? "Salvando…" : "Confirmar"}
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </Sheet>
   );
 }
