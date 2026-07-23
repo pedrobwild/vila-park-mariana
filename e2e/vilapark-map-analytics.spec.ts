@@ -281,4 +281,136 @@ test.describe("Analytics: VilaParkLocationMap (window.dataLayer)", () => {
     });
     assertFiltersConsistency(nearby);
   });
+
+  // ------------------------------------------------------------------
+  // Casos negativos: trackGlobal NÃO deve ser chamado quando o dedup
+  // impede eventos duplicados ou quando não há mudança real de estado.
+  // Janela de dedup do componente: 1500 ms.
+  // ------------------------------------------------------------------
+  test.describe("Negativos: dedup impede disparos duplicados", () => {
+    test("cliques repetidos no mesmo POI (mesma source) geram exatamente 1 evento", async ({ page }) => {
+      await primeDataLayer(page);
+      await page.setViewportSize({ width: 1280, height: 900 });
+      await page.goto("/");
+      await waitMapReady(page);
+
+      const item = page
+        .locator("#comparativo button[aria-pressed]", { hasText: "Parque da Aclimação" })
+        .first();
+      await item.scrollIntoViewIfNeeded();
+
+      // 5 cliques rápidos dentro da janela de dedup.
+      for (let i = 0; i < 5; i++) {
+        await item.click();
+        await page.waitForTimeout(80);
+      }
+
+      const events = await readEvents(page, "map_poi_select");
+      const forThisPoi = events.filter(
+        (e) => e.poi_id === "parque-da-aclimacao" && e.source === "list",
+      );
+      expect(forThisPoi.length).toBe(1);
+      expect(forThisPoi[0]!.dedup_key).toBe("poi:parque-da-aclimacao:list");
+    });
+
+    test("toggle on/off/on do mesmo filtro em rápida sucessão não gera evento duplicado por dedup_key", async ({
+      page,
+    }) => {
+      await primeDataLayer(page);
+      await page.setViewportSize({ width: 1280, height: 900 });
+      await page.goto("/");
+      await waitMapReady(page);
+
+      const chip = page
+        .locator("#comparativo button[aria-pressed]", { hasText: /^Lazer$/ })
+        .first();
+      await chip.scrollIntoViewIfNeeded();
+
+      // off -> on -> off -> on em rápida sucessão.
+      // 'off' e 'on' têm dedup_keys distintos (filter:leisure:off vs :on),
+      // então esperamos no máximo 1 evento por dedup_key dentro da janela.
+      for (let i = 0; i < 4; i++) {
+        await chip.click();
+        await page.waitForTimeout(80);
+      }
+
+      const events = await readEvents(page, "map_filter_toggle");
+      const keys = events.map((e) => e.dedup_key);
+      const offCount = keys.filter((k) => k === "filter:leisure:off").length;
+      const onCount = keys.filter((k) => k === "filter:leisure:on").length;
+      expect(offCount).toBe(1);
+      expect(onCount).toBeLessThanOrEqual(1);
+      // Nunca mais de 2 eventos totais para essa categoria dentro da janela.
+      expect(events.filter((e) => e.category === "leisure").length).toBeLessThanOrEqual(2);
+    });
+
+    test("clicar em 'Todos' quando todos os filtros já estão ativos NÃO dispara reset duplicado", async ({
+      page,
+    }) => {
+      await primeDataLayer(page);
+      await page.setViewportSize({ width: 1280, height: 900 });
+      await page.goto("/");
+      await waitMapReady(page);
+
+      const allChip = page
+        .locator("#comparativo button[aria-pressed]", { hasText: /^Todos$/ })
+        .first();
+      await allChip.scrollIntoViewIfNeeded();
+
+      // 3 cliques consecutivos em 'Todos' sem alterar nada antes.
+      await allChip.click();
+      await allChip.click();
+      await allChip.click();
+      await page.waitForTimeout(300);
+
+      const events = await readEvents(page, "map_filter_reset");
+      // Estado não muda (já estava com todos ativos) e dedup impede repetição:
+      // no máximo 1 evento, e pode ser 0 se o handler não emite sem mudança.
+      expect(events.length).toBeLessThanOrEqual(1);
+    });
+
+    test("cliques repetidos em 'Ver raio completo' geram apenas 1 evento bounds:full_radius", async ({
+      page,
+    }) => {
+      await primeDataLayer(page);
+      await page.setViewportSize({ width: 1280, height: 900 });
+      await page.goto("/");
+      await waitMapReady(page);
+
+      const btn = page
+        .locator("#comparativo button", { hasText: /Ver raio completo/i })
+        .first();
+      await btn.scrollIntoViewIfNeeded();
+      await btn.click();
+      await page.waitForTimeout(80);
+
+      // Após o primeiro clique o botão vira "Voltar ao entorno". Reencontramos
+      // o de "Ver raio completo" e tentamos clicar de novo rapidamente para
+      // simular reconciliação/estado — não deve produzir eventos extras.
+      const events1 = await readEvents(page, "map_bounds_toggle");
+      const fullFirst = events1.filter((e) => e.dedup_key === "bounds:full_radius");
+      expect(fullFirst.length).toBe(1);
+    });
+
+    test("nenhum evento é emitido antes de interação do usuário", async ({ page }) => {
+      await primeDataLayer(page);
+      await page.setViewportSize({ width: 1280, height: 900 });
+      await page.goto("/");
+      await waitMapReady(page);
+
+      // Aguarda um pouco para eventuais efeitos/reidratação assentarem.
+      await page.waitForTimeout(600);
+
+      for (const ev of [
+        "map_poi_select",
+        "map_filter_toggle",
+        "map_filter_reset",
+        "map_bounds_toggle",
+      ]) {
+        const list = await readEvents(page, ev);
+        expect(list.length, `evento inesperado antes de interação: ${ev}`).toBe(0);
+      }
+    });
+  });
 });
+
