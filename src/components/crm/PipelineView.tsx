@@ -47,6 +47,7 @@ export default function PipelineView({
   onReload,
   onReloadStages,
   onOpenDeal,
+  onNewDeal,
 }: Props) {
   const { role } = useRole();
   const [view, setView] = useState<ViewMode>(() => {
