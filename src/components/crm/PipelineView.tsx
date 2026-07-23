@@ -14,7 +14,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { LayoutGrid, List, Settings2 } from "lucide-react";
+import { LayoutGrid, List, Plus, Settings2 } from "lucide-react";
 import { useRole } from "@/hooks/useIsAdmin";
 import type { CrmStageRow } from "@/lib/crm";
 import type { DealFull } from "./CrmSection";
