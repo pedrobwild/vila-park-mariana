@@ -182,7 +182,23 @@ export default function ListView({ deals, stages, onOpenDeal }: Props) {
                   </div>
                 </td>
                 <td className="px-3 py-2.5 text-right tabular-nums">
-                  {BRL(Number(d.value_brl || 0))}
+                  <div className="flex items-center justify-end gap-2">
+                    {(d.proposals?.length ?? 0) > 0 && (
+                      <span
+                        className="inline-flex items-center gap-1 text-[10px] text-muted-foreground"
+                        title={`${d.proposals.length} proposta(s)`}
+                      >
+                        <FileText className="h-3 w-3" />
+                        {d.proposals.length}
+                      </span>
+                    )}
+                    {d.proposals?.some((p) => p.status === "aceita") && (
+                      <span className="text-[9px] px-1 py-0.5 rounded border border-emerald-600/40 text-emerald-700 dark:text-emerald-400 bg-emerald-500/5 uppercase tracking-wide">
+                        negociado
+                      </span>
+                    )}
+                    <span>{BRL(Number(d.value_brl || 0))}</span>
+                  </div>
                 </td>
                 <td className="px-3 py-2.5 text-right tabular-nums text-muted-foreground">
                   {daysSince(d.stage_changed_at)}d
