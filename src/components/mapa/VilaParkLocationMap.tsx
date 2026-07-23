@@ -160,7 +160,7 @@ function MapContent() {
             if (!scrollUnlocked) setScrollUnlocked(true);
           }}
           onError={onMapError}
-          cooperativeGestures={typeof window !== "undefined" && window.matchMedia?.("pointer: coarse").matches}
+          cooperativeGestures={typeof window !== "undefined" && window.matchMedia?.("(pointer: coarse)").matches}
         >
             <NavigationControl position="top-right" showCompass={false} />
 
