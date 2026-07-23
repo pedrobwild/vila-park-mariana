@@ -369,10 +369,11 @@ function MapContent() {
           type="button"
           onClick={() => {
             setFilters([...CATEGORY_ORDER]);
-            trackGlobal("map_filter_reset", {
-              ...ANALYTICS_BASE,
-              ...filterEventPayload(CATEGORY_ORDER),
-            });
+            emitAnalytics(
+              "map_filter_reset",
+              { ...ANALYTICS_BASE, ...filterEventPayload(CATEGORY_ORDER) },
+              "filter:reset",
+            );
           }}
           aria-pressed={allActive}
           className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
