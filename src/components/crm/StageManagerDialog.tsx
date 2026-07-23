@@ -23,6 +23,93 @@ import {
 import { ArrowDown, ArrowUp, Lock, Plus, Trash2 } from "lucide-react";
 import { sortStages, stageBadgeClass, type CrmStageRow } from "@/lib/crm";
 
+type SbErr = { message?: string; code?: string; details?: string } | null | undefined;
+
+function friendlyStageError(
+  err: SbErr,
+  ctx: "delete" | "update" | "insert" | "reorder",
+  stage?: CrmStageRow,
+  count?: number,
+): { title: string; description: string } {
+  const raw = (err?.message || "").toLowerCase();
+  const code = err?.code || "";
+
+  // Trigger: crm_protect_system_stage
+  if (raw.includes("etapas de sistema") || raw.includes("system")) {
+    return {
+      title: "Etapa protegida",
+      description:
+        "As etapas de sistema (Ganho e Perdido) não podem ser excluídas — elas são exigidas pelo funil.",
+    };
+  }
+
+  // Foreign key violation: deals still reference this stage
+  if (code === "23503" || raw.includes("foreign key") || raw.includes("violates foreign key")) {
+    const n = count ?? 0;
+    return {
+      title: "Etapa em uso",
+      description:
+        n > 0
+          ? `Existem ${n} negócio${n === 1 ? "" : "s"} nesta etapa. Mova-os para outra etapa antes de excluir.`
+          : "Esta etapa ainda está referenciada por negócios. Mova-os para outra etapa antes de excluir.",
+    };
+  }
+
+  // RLS / permission denied
+  if (
+    code === "42501" ||
+    code === "PGRST301" ||
+    raw.includes("row-level security") ||
+    raw.includes("row level security") ||
+    raw.includes("permission denied") ||
+    raw.includes("not authorized")
+  ) {
+    const action =
+      ctx === "delete"
+        ? "excluir"
+        : ctx === "insert"
+        ? "criar"
+        : ctx === "reorder"
+        ? "reordenar"
+        : "editar";
+    return {
+      title: "Sem permissão",
+      description: `Seu perfil não pode ${action} etapas do funil. Apenas administradores Bewild têm essa permissão.`,
+    };
+  }
+
+  // Unique constraint on position
+  if (code === "23505" || raw.includes("duplicate key") || raw.includes("unique")) {
+    return {
+      title: "Conflito de ordem",
+      description: "Duas etapas acabaram com a mesma posição. Recarregue e tente novamente.",
+    };
+  }
+
+  const fallback =
+    ctx === "delete"
+      ? "Não foi possível excluir a etapa."
+      : ctx === "insert"
+      ? "Não foi possível criar a etapa."
+      : ctx === "reorder"
+      ? "Não foi possível reordenar as etapas."
+      : "Não foi possível atualizar a etapa.";
+  return {
+    title: fallback,
+    description: err?.message || "Tente novamente em instantes.",
+  };
+}
+
+function notifyStageError(
+  err: SbErr,
+  ctx: "delete" | "update" | "insert" | "reorder",
+  stage?: CrmStageRow,
+  count?: number,
+) {
+  const { title, description } = friendlyStageError(err, ctx, stage, count);
+  toast.error(title, { description });
+}
+
 interface Props {
   open: boolean;
   onOpenChange: (o: boolean) => void;
@@ -53,13 +140,15 @@ export default function StageManagerDialog({
     if (a.kind !== "aberto" || b.kind !== "aberto") return;
     setBusy(true);
     try {
-      // temp position to avoid unique-conflict if any
-      await supabase.from("crm_stages").update({ position: -1 }).eq("id", a.id);
-      await supabase.from("crm_stages").update({ position: a.position }).eq("id", b.id);
-      await supabase.from("crm_stages").update({ position: b.position }).eq("id", a.id);
+      const r1 = await supabase.from("crm_stages").update({ position: -1 }).eq("id", a.id);
+      if (r1.error) throw r1.error;
+      const r2 = await supabase.from("crm_stages").update({ position: a.position }).eq("id", b.id);
+      if (r2.error) throw r2.error;
+      const r3 = await supabase.from("crm_stages").update({ position: b.position }).eq("id", a.id);
+      if (r3.error) throw r3.error;
       await onReload();
     } catch (e) {
-      toast.error("Não foi possível reordenar.");
+      notifyStageError(e as SbErr, "reorder");
     } finally {
       setBusy(false);
     }
@@ -102,8 +191,8 @@ export default function StageManagerDialog({
         return n;
       });
       await onReload();
-    } catch {
-      toast.error("Não foi possível renomear.");
+    } catch (e) {
+      notifyStageError(e as SbErr, "update", stage);
     } finally {
       setBusy(false);
     }
@@ -118,8 +207,8 @@ export default function StageManagerDialog({
         .eq("id", stage.id);
       if (error) throw error;
       await onReload();
-    } catch {
-      toast.error("Não foi possível atualizar.");
+    } catch (e) {
+      notifyStageError(e as SbErr, "update", stage);
     } finally {
       setBusy(false);
     }
@@ -141,8 +230,8 @@ export default function StageManagerDialog({
       if (error) throw error;
       setNewLabel("");
       await onReload();
-    } catch {
-      toast.error("Não foi possível criar a etapa.");
+    } catch (e) {
+      notifyStageError(e as SbErr, "insert");
     } finally {
       setBusy(false);
     }
@@ -150,15 +239,27 @@ export default function StageManagerDialog({
 
   const remove = async (stage: CrmStageRow) => {
     const count = dealCountByStage.get(stage.id) ?? 0;
-    if (count > 0) return;
+    if (stage.is_system) {
+      notifyStageError(
+        { message: "Etapas de sistema não podem ser excluídas" },
+        "delete",
+        stage,
+        count,
+      );
+      return;
+    }
+    if (count > 0) {
+      notifyStageError({ code: "23503" }, "delete", stage, count);
+      return;
+    }
     setBusy(true);
     try {
       const { error } = await supabase.from("crm_stages").delete().eq("id", stage.id);
       if (error) throw error;
+      toast.success("Etapa excluída.");
       await onReload();
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Erro";
-      toast.error("Não foi possível excluir.", { description: msg });
+      notifyStageError(e as SbErr, "delete", stage, count);
     } finally {
       setBusy(false);
     }
@@ -274,9 +375,14 @@ export default function StageManagerDialog({
                   {stage.is_system ? (
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <span className="h-8 w-8 flex items-center justify-center text-muted-foreground">
+                        <button
+                          type="button"
+                          onClick={() => remove(stage)}
+                          className="h-8 w-8 flex items-center justify-center rounded text-muted-foreground hover:bg-muted"
+                          aria-label="Etapa de sistema (não pode ser excluída)"
+                        >
                           <Lock className="h-3.5 w-3.5" />
-                        </span>
+                        </button>
                       </TooltipTrigger>
                       <TooltipContent>
                         Etapa de sistema — pode renomear, não excluir
@@ -285,12 +391,17 @@ export default function StageManagerDialog({
                   ) : count > 0 ? (
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <span className="h-8 w-8 flex items-center justify-center text-muted-foreground/40">
+                        <button
+                          type="button"
+                          onClick={() => remove(stage)}
+                          className="h-8 w-8 flex items-center justify-center rounded text-muted-foreground/60 hover:bg-muted hover:text-destructive"
+                          aria-label={`Excluir etapa (bloqueado: ${count} negócios)`}
+                        >
                           <Trash2 className="h-3.5 w-3.5" />
-                        </span>
+                        </button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        Mova os {count} negócios desta etapa antes de excluir
+                        Mova os {count} negócio{count === 1 ? "" : "s"} desta etapa antes de excluir
                       </TooltipContent>
                     </Tooltip>
                   ) : (
