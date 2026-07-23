@@ -310,12 +310,17 @@ function MapContent() {
   const focusPoi = useCallback((poi: Poi, opts?: { scrollList?: boolean; source?: "list" | "pin" | "carousel" }) => {
     setActive(poi);
     setShowBuilding(false);
-    trackGlobal("map_poi_select", {
-      ...ANALYTICS_BASE,
-      ...poiEventPayload(poi),
-      ...filterEventPayload(filters),
-      source: opts?.source ?? "list",
-    });
+    const source = opts?.source ?? "list";
+    emitAnalytics(
+      "map_poi_select",
+      {
+        ...ANALYTICS_BASE,
+        ...poiEventPayload(poi),
+        ...filterEventPayload(filters),
+        source,
+      },
+      `poi:${poiId(poi.name)}:${source}`,
+    );
     const map = mapRef.current?.getMap?.();
     if (map) {
       const reduced = prefersReducedMotion();
