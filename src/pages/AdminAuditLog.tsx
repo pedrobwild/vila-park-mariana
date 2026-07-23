@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, RefreshCw, ShieldCheck } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ArrowLeft, RefreshCw, ShieldCheck, Search, ArrowUp, ArrowDown, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -44,6 +45,14 @@ const ENTITIES = [
   { value: "storage:plantas", label: "Upload de plantas" },
 ];
 
+const ACTIONS = [
+  { value: "all", label: "Todas as ações" },
+  { value: "insert", label: "Criação" },
+  { value: "update", label: "Alteração" },
+  { value: "delete", label: "Exclusão" },
+  { value: "upload", label: "Upload" },
+];
+
 const ACTION_LABEL: Record<string, string> = {
   insert: "Criação",
   update: "Alteração",
@@ -58,6 +67,11 @@ const ACTION_COLOR: Record<string, string> = {
   upload: "bg-sky-100 text-sky-800 border-sky-200",
 };
 
+const PAGE_SIZES = [25, 50, 100];
+
+type SortField = "created_at" | "action" | "entity" | "actor_email";
+type SortDir = "asc" | "desc";
+
 function formatDate(iso: string) {
   return new Date(iso).toLocaleString("pt-BR", {
     day: "2-digit",
@@ -71,23 +85,54 @@ function formatDate(iso: string) {
 
 export default function AdminAuditLog() {
   const [logs, setLogs] = useState<AuditLog[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [entityFilter, setEntityFilter] = useState<string>("all");
+  const [actionFilter, setActionFilter] = useState<string>("all");
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
+  const [sortField, setSortField] = useState<SortField>("created_at");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(25);
   const [selected, setSelected] = useState<AuditLog | null>(null);
+
+  // Debounce search input
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setSearch(searchInput.trim());
+      setPage(0);
+    }, 300);
+    return () => clearTimeout(t);
+  }, [searchInput]);
+
+  useEffect(() => {
+    setPage(0);
+  }, [entityFilter, actionFilter, pageSize]);
 
   const load = async () => {
     setLoading(true);
+    const from = page * pageSize;
+    const to = from + pageSize - 1;
     let q = supabase
       .from("audit_logs")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(200);
+      .select("*", { count: "exact" })
+      .order(sortField, { ascending: sortDir === "asc" })
+      .range(from, to);
     if (entityFilter !== "all") q = q.eq("entity", entityFilter);
-    const { data, error } = await q;
+    if (actionFilter !== "all") q = q.eq("action", actionFilter);
+    if (search) {
+      const esc = search.replace(/[%,]/g, " ");
+      q = q.or(
+        `actor_email.ilike.%${esc}%,entity.ilike.%${esc}%,entity_id.ilike.%${esc}%,action.ilike.%${esc}%`
+      );
+    }
+    const { data, error, count } = await q;
     if (error) {
       console.error(error);
     } else {
       setLogs((data ?? []) as AuditLog[]);
+      setTotal(count ?? 0);
     }
     setLoading(false);
   };
@@ -95,7 +140,38 @@ export default function AdminAuditLog() {
   useEffect(() => {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entityFilter]);
+  }, [entityFilter, actionFilter, search, sortField, sortDir, page, pageSize]);
+
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const rangeStart = total === 0 ? 0 : page * pageSize + 1;
+  const rangeEnd = Math.min(total, (page + 1) * pageSize);
+
+  const toggleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortField(field);
+      setSortDir("desc");
+    }
+    setPage(0);
+  };
+
+  const SortHeader = ({ field, children, className }: { field: SortField; children: React.ReactNode; className?: string }) => (
+    <TableHead className={className}>
+      <button
+        type="button"
+        onClick={() => toggleSort(field)}
+        className="inline-flex items-center gap-1 font-medium hover:text-foreground text-left"
+      >
+        {children}
+        {sortField === field ? (
+          sortDir === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+        ) : (
+          <span className="h-3 w-3 opacity-0" />
+        )}
+      </button>
+    </TableHead>
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -120,10 +196,19 @@ export default function AdminAuditLog() {
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-6">
-        <div className="mb-4 flex flex-wrap items-center gap-3">
-          <span className="text-sm text-muted-foreground">Filtrar por entidade:</span>
+        <div className="mb-4 grid gap-3 md:grid-cols-[1fr_auto_auto_auto] md:items-center">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="Buscar por usuário, entidade, ID ou ação…"
+              className="pl-9"
+              aria-label="Buscar"
+            />
+          </div>
           <Select value={entityFilter} onValueChange={setEntityFilter}>
-            <SelectTrigger className="w-[280px]">
+            <SelectTrigger className="w-full md:w-[240px]" aria-label="Filtrar por entidade">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -134,19 +219,40 @@ export default function AdminAuditLog() {
               ))}
             </SelectContent>
           </Select>
-          <span className="ml-auto text-xs text-muted-foreground">
-            {logs.length} {logs.length === 1 ? "registro" : "registros"} (últimos 200)
-          </span>
+          <Select value={actionFilter} onValueChange={setActionFilter}>
+            <SelectTrigger className="w-full md:w-[170px]" aria-label="Filtrar por ação">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {ACTIONS.map((a) => (
+                <SelectItem key={a.value} value={a.value}>
+                  {a.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={String(pageSize)} onValueChange={(v) => setPageSize(Number(v))}>
+            <SelectTrigger className="w-full md:w-[120px]" aria-label="Registros por página">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {PAGE_SIZES.map((s) => (
+                <SelectItem key={s} value={String(s)}>
+                  {s} / página
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="rounded-lg border border-border bg-card overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[170px]">Data/hora</TableHead>
-                <TableHead className="w-[110px]">Ação</TableHead>
-                <TableHead>Entidade</TableHead>
-                <TableHead>Usuário</TableHead>
+                <SortHeader field="created_at" className="w-[170px]">Data/hora</SortHeader>
+                <SortHeader field="action" className="w-[110px]">Ação</SortHeader>
+                <SortHeader field="entity">Entidade</SortHeader>
+                <SortHeader field="actor_email">Usuário</SortHeader>
                 <TableHead className="w-[100px] text-right">Detalhes</TableHead>
               </TableRow>
             </TableHeader>
@@ -165,7 +271,7 @@ export default function AdminAuditLog() {
                   </TableCell>
                 </TableRow>
               )}
-              {logs.map((log) => (
+              {!loading && logs.map((log) => (
                 <TableRow key={log.id}>
                   <TableCell className="font-mono text-xs tabular-nums">
                     {formatDate(log.created_at)}
@@ -197,6 +303,35 @@ export default function AdminAuditLog() {
               ))}
             </TableBody>
           </Table>
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <span className="text-xs text-muted-foreground">
+            {total === 0
+              ? "Nenhum registro"
+              : `Mostrando ${rangeStart}–${rangeEnd} de ${total}`}
+          </span>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              disabled={loading || page === 0}
+            >
+              <ChevronLeft className="mr-1 h-4 w-4" /> Anterior
+            </Button>
+            <span className="text-xs tabular-nums text-muted-foreground">
+              Página {page + 1} de {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+              disabled={loading || page >= totalPages - 1}
+            >
+              Próxima <ChevronRight className="ml-1 h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </main>
 
