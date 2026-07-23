@@ -558,7 +558,7 @@ function MapContent() {
                   <Marker longitude={poi.lng} latitude={poi.lat} anchor="bottom">
                     <button
                       type="button"
-                      onClick={() => focusPoi(poi, { scrollList: true })}
+                      onClick={() => focusPoi(poi, { scrollList: true, source: "pin" })}
                       aria-label={`${poi.name} — ${catLabel(poi.category)}, ${poi.distance}`}
                       className={`rounded-full flex items-center justify-center border border-white shadow transition-transform ${
                         isActive
