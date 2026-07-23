@@ -25,6 +25,8 @@ export default function CrmSection() {
   const [newDeal, setNewDeal] = useState<{ open: boolean; personId?: string | null }>({
     open: false,
   });
+  const [openNewPerson, setOpenNewPerson] = useState(false);
+
 
   const loadStages = useCallback(async () => {
     const { data } = await supabase.from("crm_stages").select("*");
