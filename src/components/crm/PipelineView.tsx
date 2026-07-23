@@ -163,16 +163,21 @@ export default function PipelineView({
           </button>
         </div>
 
-        {isAdmin && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-8"
-            onClick={() => setManageOpen(true)}
-          >
-            <Settings2 className="h-3.5 w-3.5 mr-1.5" /> Personalizar etapas
+        <div className="flex items-center gap-2">
+          <Button size="sm" className="h-8" onClick={onNewDeal}>
+            <Plus className="h-3.5 w-3.5 mr-1.5" /> Novo negócio
           </Button>
-        )}
+          {isAdmin && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8"
+              onClick={() => setManageOpen(true)}
+            >
+              <Settings2 className="h-3.5 w-3.5 mr-1.5" /> Personalizar etapas
+            </Button>
+          )}
+        </div>
       </div>
 
       {view === "kanban" ? (
