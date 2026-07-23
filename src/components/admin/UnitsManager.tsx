@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useRole } from "@/hooks/useIsAdmin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -31,6 +32,8 @@ import CustomFieldsManager from "@/components/comercial/CustomFieldsManager";
 type SortKey = "code" | "block" | "area_m2" | "price_brl" | "status";
 
 export default function UnitsManager() {
+  const { role } = useRole();
+  const isBewild = role === "admin";
   const [units, setUnits] = useState<Unit[]>([]);
   const [fieldDefs, setFieldDefs] = useState<CustomFieldDef[]>([]);
   const [values, setValues] = useState<Record<string, Record<string, unknown>>>({});
@@ -99,7 +102,7 @@ export default function UnitsManager() {
       <Tabs defaultValue="units">
         <TabsList>
           <TabsTrigger value="units">Unidades</TabsTrigger>
-          <TabsTrigger value="fields">Campos personalizados</TabsTrigger>
+          {isBewild && <TabsTrigger value="fields">Campos personalizados</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="units" className="space-y-4 mt-4">
@@ -226,9 +229,11 @@ export default function UnitsManager() {
           </div>
         </TabsContent>
 
-        <TabsContent value="fields" className="mt-4">
-          <CustomFieldsManager fields={fieldDefs} onChanged={load} />
-        </TabsContent>
+        {isBewild && (
+          <TabsContent value="fields" className="mt-4">
+            <CustomFieldsManager fields={fieldDefs} onChanged={load} />
+          </TabsContent>
+        )}
       </Tabs>
 
       <UnitFormDialog

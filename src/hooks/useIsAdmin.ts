@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Session } from "@supabase/supabase-js";
 
-export function useIsAdmin() {
+export type AppRole = "admin" | "incorporadora";
+
+export function useRole() {
   const [session, setSession] = useState<Session | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [role, setRole] = useState<AppRole | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -13,7 +15,7 @@ export function useIsAdmin() {
     const check = async (s: Session | null) => {
       if (!s) {
         if (mounted) {
-          setIsAdmin(false);
+          setRole(null);
           setLoading(false);
         }
         return;
@@ -22,10 +24,10 @@ export function useIsAdmin() {
         .from("user_roles")
         .select("role")
         .eq("user_id", s.user.id)
-        .eq("role", "admin")
+        .in("role", ["admin", "incorporadora"])
         .maybeSingle();
       if (mounted) {
-        setIsAdmin(!!data);
+        setRole((data?.role as AppRole | undefined) ?? null);
         setLoading(false);
       }
     };
@@ -45,5 +47,15 @@ export function useIsAdmin() {
     };
   }, []);
 
-  return { session, isAdmin, loading };
+  return { session, role, loading };
+}
+
+/**
+ * Back-compat: `isAdmin` here means "any staff role" (admin OR incorporadora),
+ * used by route guards that gate the entire admin area. For Bewild-only access,
+ * check `role === 'admin'` explicitly.
+ */
+export function useIsAdmin() {
+  const { session, role, loading } = useRole();
+  return { session, role, isAdmin: role === "admin" || role === "incorporadora", loading };
 }

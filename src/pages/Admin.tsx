@@ -1,18 +1,28 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useRole } from "@/hooks/useIsAdmin";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ArrowLeft, LogOut, Building2, Lock, Menu, FileText } from "lucide-react";
+import { ArrowLeft, LogOut, Building2, Lock, Menu, FileText, Upload, Briefcase } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import UnitsManager from "@/components/admin/UnitsManager";
+import bwildLogo from "@/assets/bwild-logo.png";
 
-type SectionKey = "units" | "extrato";
+type SectionKey = "units" | "extrato" | "upload";
 
-const SECTIONS: Array<{ key: SectionKey; label: string; icon: typeof Building2; href?: string }> = [
+interface SectionDef {
+  key: SectionKey;
+  label: string;
+  icon: typeof Building2;
+  href?: string;
+  bewildOnly?: boolean;
+}
+
+const ALL_sections: SectionDef[] = [
   { key: "units", label: "Unidades à venda", icon: Building2 },
   { key: "extrato", label: "Extrato do cliente", icon: FileText, href: "/admin/extrato" },
+  { key: "upload", label: "Painel — upload de plantas", icon: Upload, href: "/admin/upload", bewildOnly: true },
 ];
 
 const COMING_SOON = ["Leads", "Relatórios", "Configurações"];
@@ -27,18 +37,45 @@ function Logo() {
   );
 }
 
+function RoleBadge({ role }: { role: "admin" | "incorporadora" | null }) {
+  if (role === "admin") {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-foreground text-background px-2.5 py-1 text-[11px] font-medium">
+        <img src={bwildLogo} alt="" className="h-3 w-auto opacity-90" />
+        Bewild · administração geral
+      </span>
+    );
+  }
+  if (role === "incorporadora") {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/60 text-accent bg-accent/5 px-2.5 py-1 text-[11px] font-medium">
+        <Briefcase className="h-3 w-3" />
+        Incorporadora · acesso do cliente (demo)
+      </span>
+    );
+  }
+  return null;
+}
+
+
 export default function Admin() {
-  const { session } = useIsAdmin();
+  const { session, role } = useRole();
   const [active, setActive] = useState<SectionKey>("units");
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const sections = useMemo(
+    () => ALL_sections.filter((s) => !s.bewildOnly || role === "admin"),
+    [role],
+  );
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
   };
 
+
   const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => (
     <nav className="space-y-1 p-3">
-      {SECTIONS.map((s) => {
+      {sections.map((s) => {
         const isActive = active === s.key;
         const className = `w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm min-h-[44px] transition-colors ${
           isActive
@@ -103,7 +140,8 @@ export default function Admin() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="hidden sm:inline text-xs text-muted-foreground truncate max-w-[180px]">
+            <RoleBadge role={role} />
+            <span className="hidden lg:inline text-xs text-muted-foreground truncate max-w-[180px]">
               {session?.user.email}
             </span>
             <Link to="/">
@@ -127,7 +165,7 @@ export default function Admin() {
           <div className="md:hidden">
             <Tabs value={active} onValueChange={(v) => setActive(v as SectionKey)}>
               <TabsList>
-                {SECTIONS.filter((s) => !s.href).map((s) => (
+                {sections.filter((s) => !s.href).map((s) => (
                   <TabsTrigger key={s.key} value={s.key}>
                     {s.label}
                   </TabsTrigger>
@@ -146,7 +184,7 @@ export default function Admin() {
 
           <header>
             <h1 className="font-display text-2xl md:text-3xl font-bold">
-              {SECTIONS.find((s) => s.key === active)?.label}
+              {sections.find((s) => s.key === active)?.label}
             </h1>
             <p className="text-sm text-muted-foreground">
               Gestão das unidades à venda do Vila Park Mariana.

@@ -39,7 +39,7 @@ const App = () => (
               {/* Legacy path — redirect to home */}
               <Route path="/urban-flex-bela-cintra" element={<Navigate to="/" replace />} />
               <Route path="/ferramentas" element={<Ferramentas />} />
-              <Route path="/admin/upload" element={<RequireAuth><AdminUpload /></RequireAuth>} />
+              <Route path="/admin/upload" element={<RequireAdmin bewildOnly><AdminUpload /></RequireAdmin>} />
               <Route path="/insights" element={<Insights />} />
               <Route path="/corretor" element={<CorretorPage />} />
               <Route path="/login" element={<Login />} />
