@@ -34,7 +34,7 @@ type Attempt = { attempt: number; reason: string; details?: unknown };
 
 async function tryLoadBasemap(page: Page): Promise<{ ok: true } | { ok: false; reason: string; details?: unknown }> {
   const tileResponses: { url: string; status: number }[] = [];
-  const onResponse = (res: import("../playwright-fixture").Response | any) => {
+  const onResponse = (res: any) => {
     const url = res.url();
     if (TILE_HOST_PATTERNS.some((rx) => rx.test(url))) {
       tileResponses.push({ url, status: res.status() });
