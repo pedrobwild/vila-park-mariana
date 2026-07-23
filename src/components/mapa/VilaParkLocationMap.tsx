@@ -679,11 +679,12 @@ function MapContent() {
             onClick={() =>
               setShowFullRadius((v) => {
                 const next = !v;
-                trackGlobal("map_bounds_toggle", {
-                  ...ANALYTICS_BASE,
-                  mode: next ? "full_radius" : "nearby",
-                  ...filterEventPayload(filters),
-                });
+                const mode = next ? "full_radius" : "nearby";
+                emitAnalytics(
+                  "map_bounds_toggle",
+                  { ...ANALYTICS_BASE, mode, ...filterEventPayload(filters) },
+                  `bounds:${mode}`,
+                );
                 return next;
               })
             }
