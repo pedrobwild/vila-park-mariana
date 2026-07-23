@@ -156,7 +156,13 @@ function MapContent() {
           minZoom={12}
           maxZoom={18}
           scrollZoom={scrollUnlocked}
-          onLoad={(event) => event.target.resize()}
+          onLoad={(event) => {
+            event.target.resize();
+            logBasemap({ event: "map_load", component: "VilaParkLocationMap", style: mapStyle });
+            event.target.once?.("idle", () =>
+              logBasemap({ event: "map_idle_first", component: "VilaParkLocationMap", style: mapStyle }),
+            );
+          }}
           onClick={() => {
             if (!scrollUnlocked) setScrollUnlocked(true);
           }}
