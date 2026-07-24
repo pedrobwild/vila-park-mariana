@@ -53,6 +53,8 @@ import {
   parseBRLInput,
   formatBRLValue,
   isValidCPF,
+  normalizeCPF,
+
   ageFromISO,
   formatDateBR,
   evaluateCompleteness,
@@ -238,8 +240,9 @@ export default function PeopleManager({
       )
         return true;
       if (termDigits.length >= 3 && p.cpf) {
-        return p.cpf.replace(/\D/g, "").includes(termDigits);
+        return normalizeCPF(p.cpf).includes(termDigits);
       }
+
       return false;
     });
   }, [people, q]);
@@ -289,9 +292,10 @@ export default function PeopleManager({
       toast.error("CPF inválido.");
       return;
     }
-    const cpfDigits = form.cpf.trim() ? form.cpf.replace(/\D/g, "") : null;
+    const cpfDigits = form.cpf.trim() ? normalizeCPF(form.cpf) : null;
     if (cpfDigits) {
       let q = supabase.from("crm_people").select("id, full_name").eq("cpf", cpfDigits).limit(1);
+
       if (editingId) q = q.neq("id", editingId);
       const { data: dup, error: dupErr } = await q.maybeSingle();
       if (dupErr) {
@@ -315,7 +319,7 @@ export default function PeopleManager({
         source: form.source,
         occupation: form.occupation.trim() || null,
         notes: form.notes.trim() || null,
-        cpf: form.cpf.trim() ? form.cpf.replace(/\D/g, "") : null,
+        cpf: cpfDigits,
         rg: form.rg.trim() || null,
         birth_date: form.birth_date || null,
         marital_status: form.marital_status || null,
