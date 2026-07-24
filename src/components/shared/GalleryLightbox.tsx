@@ -155,6 +155,8 @@ export default function GalleryLightbox({ images, initialIndex, open, onOpenChan
                     key={current.url}
                     src={current.url}
                     alt={current.alt}
+                    decoding="async"
+                    fetchPriority="high"
                     initial={{ opacity: 0, scale: 0.98 }}
                     animate={{
                       opacity: 1,
@@ -172,6 +174,14 @@ export default function GalleryLightbox({ images, initialIndex, open, onOpenChan
                   />
                 </AnimatePresence>
               </div>
+
+              {/* Preload neighbors for snappy navigation */}
+              {total > 1 && (
+                <div aria-hidden="true" className="hidden">
+                  <img src={images[(index + 1) % total].url} alt="" decoding="async" loading="eager" />
+                  <img src={images[(index - 1 + total) % total].url} alt="" decoding="async" loading="eager" />
+                </div>
+              )}
 
               {/* Caption */}
               <div className="absolute bottom-0 left-0 right-0 z-10 px-4 py-3 md:px-6 md:py-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
