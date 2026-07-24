@@ -141,7 +141,7 @@ export default function GalleryLightbox({ images, initialIndex, open, onOpenChan
 
               {/* Main stage */}
               <div
-                className="flex-1 flex items-center justify-center overflow-hidden cursor-zoom-in"
+                className="flex-1 flex items-center justify-center overflow-hidden"
                 onWheel={handleWheel}
                 onDoubleClick={toggleZoom}
                 onPointerDown={onPointerDown}
