@@ -776,7 +776,7 @@ function PaymentFlowSection({ units, clientName }: { units: SharedUnit[]; client
 
         <div className="mt-8 space-y-5">
           {blocks.map(({ u, p }) => (
-            <PaymentFlowBlock key={`${u.code}-${p.updated_at}`} u={u} p={p} />
+            <PaymentFlowBlock key={`${u.code}-${p.updated_at}`} u={u} p={p} clientName={clientName} />
           ))}
         </div>
 
