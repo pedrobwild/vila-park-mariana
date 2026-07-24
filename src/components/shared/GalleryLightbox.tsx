@@ -238,7 +238,10 @@ export default function GalleryLightbox({ images, initialIndex, open, onOpenChan
 
               {/* Caption */}
               <div className="absolute bottom-0 left-0 right-0 z-10 px-4 py-3 md:px-6 md:py-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
-                <p className="text-white/90 text-sm md:text-base max-w-3xl mx-auto text-center leading-relaxed">
+                <p
+                  id="lightbox-caption"
+                  className="text-white/90 text-sm md:text-base max-w-3xl mx-auto text-center leading-relaxed"
+                >
                   {current.alt}
                 </p>
               </div>
@@ -249,18 +252,20 @@ export default function GalleryLightbox({ images, initialIndex, open, onOpenChan
                   <button
                     type="button"
                     onClick={prev}
-                    className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 h-11 w-11 md:h-12 md:w-12 rounded-full bg-black/40 hover:bg-black/60 text-white/90 hover:text-white backdrop-blur-sm flex items-center justify-center transition-colors"
-                    aria-label="Imagem anterior"
+                    className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 h-11 w-11 md:h-12 md:w-12 rounded-full bg-black/40 hover:bg-black/60 text-white/90 hover:text-white backdrop-blur-sm flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 transition-colors"
+                    aria-label="Imagem anterior (seta esquerda)"
+                    aria-controls="lightbox-caption"
                   >
-                    <ChevronLeft size={24} />
+                    <ChevronLeft size={24} aria-hidden="true" />
                   </button>
                   <button
                     type="button"
                     onClick={next}
-                    className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 h-11 w-11 md:h-12 md:w-12 rounded-full bg-black/40 hover:bg-black/60 text-white/90 hover:text-white backdrop-blur-sm flex items-center justify-center transition-colors"
-                    aria-label="Próxima imagem"
+                    className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 h-11 w-11 md:h-12 md:w-12 rounded-full bg-black/40 hover:bg-black/60 text-white/90 hover:text-white backdrop-blur-sm flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 transition-colors"
+                    aria-label="Próxima imagem (seta direita)"
+                    aria-controls="lightbox-caption"
                   >
-                    <ChevronRight size={24} />
+                    <ChevronRight size={24} aria-hidden="true" />
                   </button>
                 </>
               )}
