@@ -409,7 +409,7 @@ export default function Index() {
                   }}
                 >
                   <div className={`w-full ${i === 0 ? "aspect-[21/9]" : "aspect-[16/10]"}`}>
-                    <img
+                    <BlurImage
                       src={img.url}
                       alt={img.alt}
                       loading="lazy"
