@@ -101,7 +101,7 @@ export default function ShareProposalButton({ deal, canShare, onReload }: Props)
       setOpen(false);
       await onReload();
     } catch (e) {
-      notifyCrmError(e as SbErr, { entity: "link da proposta", action: "atualizar" });
+      notifyCrmError(e as SbErr, { entity: "proposta", action: "atualizar" });
     } finally {
       setBusy(false);
     }
