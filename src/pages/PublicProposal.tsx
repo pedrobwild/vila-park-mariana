@@ -10,6 +10,12 @@ import {
 } from "@/components/ui/collapsible";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { MessageCircle, Printer, AlertTriangle, ChevronDown, ImageOff, FileText } from "lucide-react";
 import { formatBRL2, PAYMENT_METHOD_LABEL, type CrmPaymentMethod } from "@/lib/crm";
 import { tipologias } from "@/data/tipologias";
@@ -88,6 +94,7 @@ type SharedPayload = {
   shared_at: string;
   units: SharedUnit[];
   contracts?: SharedContract[] | null;
+  interested_count?: number | null;
 };
 
 const n = (v: unknown) => (typeof v === "number" ? v : Number(v ?? 0)) || 0;
@@ -259,6 +266,34 @@ function PaymentTable({ p, unitCode }: { p: SharedProposal; unitCode: string }) 
         </p>
       )}
     </div>
+  );
+}
+
+function SocialProofChip({ count }: { count?: number | null }) {
+  const value = count ?? 0;
+  if (value <= 0) return null;
+  const label =
+    value === 1 ? "1 pessoa interessada neste imóvel" : `${value} pessoas interessadas neste imóvel`;
+  return (
+    <TooltipProvider delayDuration={100}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-accent/[0.06] px-3 py-1.5 print:hidden">
+            <span className="relative flex h-2 w-2">
+              <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
+            </span>
+            <span className="text-xs text-muted-foreground">
+              <span className="font-medium text-foreground tabular-nums">{value}</span>{" "}
+              {value === 1 ? "pessoa interessada neste imóvel" : "pessoas interessadas neste imóvel"}
+            </span>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" className="max-w-xs text-center">
+          <p>Contatos com negócios em andamento para unidades do Vila Park</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
 
@@ -652,9 +687,12 @@ function ProposalPage({ data }: { data: SharedPayload }) {
       <header className="border-b border-border/40 bg-background">
         <div className="max-w-6xl mx-auto px-5 md:px-8 py-8 md:py-12">
           <p className="eyebrow mb-3">VILA PARK · VILA MARIANA</p>
-          <h1 className="font-display text-3xl md:text-5xl font-medium text-foreground tracking-tight">
-            Proposta preparada para {data.client_name}
-          </h1>
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+            <h1 className="font-display text-3xl md:text-5xl font-medium text-foreground tracking-tight">
+              Proposta preparada para {data.client_name}
+            </h1>
+            <SocialProofChip count={data.interested_count} />
+          </div>
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
             <span className="tabular-nums">
               Emitida em{" "}
