@@ -1,0 +1,652 @@
+import { useEffect, useMemo, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
+import { MessageCircle, Printer, AlertTriangle, ChevronDown, ImageOff } from "lucide-react";
+import { formatBRL2, PAYMENT_METHOD_LABEL, type CrmPaymentMethod } from "@/lib/crm";
+import { tipologias } from "@/data/tipologias";
+import { WHATSAPP_PHONE } from "@/data/surroundings";
+
+type SharedProposal = {
+  status: "enviada" | "aceita";
+  list_price_brl: number | string;
+  discount_pct: number | string;
+  discount_brl: number | string;
+  final_price_brl: number | string;
+  payment_method: CrmPaymentMethod;
+  down_payment_brl: number | string;
+  monthly_count: number;
+  monthly_brl: number | string;
+  balloon_count: number;
+  balloon_brl: number | string;
+  keys_brl: number | string;
+  valid_until: string | null;
+  notes: string | null;
+  updated_at: string;
+};
+
+type SharedUnit = {
+  code: string;
+  block: string | null;
+  area_m2: number | string | null;
+  price_brl: number | string;
+  status: string;
+  planta_url: string | null;
+  is_primary: boolean;
+  custom_fields: Record<string, string | number | null> | null;
+  proposals: SharedProposal[];
+};
+
+type SharedPayload = {
+  client_name: string;
+  shared_at: string;
+  units: SharedUnit[];
+};
+
+const n = (v: unknown) => (typeof v === "number" ? v : Number(v ?? 0)) || 0;
+
+const fmtDateBR = (iso: string | null) => {
+  if (!iso) return null;
+  const d = new Date(iso.length === 10 ? iso + "T00:00:00" : iso);
+  return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
+};
+
+const firstName = (full: string) => (full || "").trim().split(/\s+/)[0] || "";
+
+function guessPlantaFallback(cf: Record<string, string | number | null> | null): string | null {
+  if (!cf) return null;
+  const pav = String(cf["Pavimento"] ?? "").trim();
+  if (!pav) return null;
+  const num = parseInt(pav, 10);
+  if (Number.isNaN(num)) return null;
+  const t =
+    tipologias.find((t) => {
+      const m = t.name.match(/(\d+)(?:º|\s*ao\s*(\d+)º)?/);
+      if (!m) return false;
+      const start = parseInt(m[1], 10);
+      const end = m[2] ? parseInt(m[2], 10) : start;
+      return num >= start && num <= end;
+    }) ?? null;
+  return t?.plantaFile ?? null;
+}
+
+function tipoHighlights(cf: Record<string, string | number | null> | null): string[] {
+  if (!cf) return [];
+  const label = String(cf["Tipologia"] ?? "").toLowerCase();
+  if (!label) return [];
+  const t = tipologias.find((t) => label.includes(t.name.toLowerCase().split(" ")[0]));
+  return t?.highlights ?? [];
+}
+
+function bestProposal(u: SharedUnit): SharedProposal | null {
+  if (!u.proposals?.length) return null;
+  const accepted = u.proposals.find((p) => p.status === "aceita");
+  if (accepted) return accepted;
+  return [...u.proposals].sort(
+    (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
+  )[0];
+}
+
+function unitFinal(u: SharedUnit): number {
+  const p = bestProposal(u);
+  return p ? n(p.final_price_brl) : n(u.price_brl);
+}
+
+function unitSavings(u: SharedUnit): number {
+  const p = bestProposal(u);
+  if (!p) return 0;
+  return Math.max(0, n(u.price_brl) - n(p.final_price_brl));
+}
+
+function PlantaThumb({ url, alt }: { url: string | null; alt: string }) {
+  const [open, setOpen] = useState(false);
+  if (!url) {
+    return (
+      <div className="aspect-[4/3] w-full rounded-md border border-border/60 bg-muted/30 flex flex-col items-center justify-center text-muted-foreground gap-1.5">
+        <ImageOff className="h-6 w-6" />
+        <span className="text-xs">Planta indisponível</span>
+      </div>
+    );
+  }
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="group block aspect-[4/3] w-full overflow-hidden rounded-md border border-border/60 bg-muted/30"
+        aria-label="Abrir planta em tela cheia"
+      >
+        <img
+          src={url}
+          alt={alt}
+          loading="lazy"
+          className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-[1.02]"
+        />
+      </button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-6xl p-2 bg-background">
+          <img src={url} alt={alt} className="max-h-[85vh] w-full object-contain" />
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
+function PaymentTable({ p, unitCode }: { p: SharedProposal; unitCode: string }) {
+  const isAVista = p.payment_method === "a_vista";
+  const keysLabel =
+    p.payment_method === "financiamento"
+      ? "Saldo nas chaves — via financiamento bancário (repasse)"
+      : p.payment_method === "a_vista"
+        ? "Pagamento único na assinatura"
+        : "Saldo nas chaves — direto com a incorporadora";
+
+  const rows: Array<{ label: string; qty?: string; unit?: string; total: number }> = [];
+  if (isAVista) {
+    rows.push({ label: keysLabel, total: n(p.final_price_brl) });
+  } else {
+    if (n(p.down_payment_brl) > 0)
+      rows.push({ label: "Ato / sinal — na assinatura", total: n(p.down_payment_brl) });
+    if (p.monthly_count > 0)
+      rows.push({
+        label: "Mensais pré-chaves",
+        qty: `${p.monthly_count}×`,
+        unit: formatBRL2(n(p.monthly_brl)),
+        total: p.monthly_count * n(p.monthly_brl),
+      });
+    if (p.balloon_count > 0)
+      rows.push({
+        label: "Intermediárias (balões)",
+        qty: `${p.balloon_count}×`,
+        unit: formatBRL2(n(p.balloon_brl)),
+        total: p.balloon_count * n(p.balloon_brl),
+      });
+    if (n(p.keys_brl) > 0) rows.push({ label: keysLabel, total: n(p.keys_brl) });
+  }
+
+  return (
+    <div className="rounded-md border border-border/60 overflow-hidden">
+      <div className="px-3 py-2 bg-muted/40 border-b border-border/60 flex items-center justify-between">
+        <span className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+          Plano de pagamento · unidade {unitCode}
+        </span>
+        <span className="text-[11px] text-muted-foreground">
+          {PAYMENT_METHOD_LABEL[p.payment_method]}
+        </span>
+      </div>
+      <table className="w-full text-sm">
+        <thead className="text-[11px] uppercase tracking-wider text-muted-foreground">
+          <tr className="border-b border-border/50">
+            <th className="text-left font-medium px-3 py-2">Descrição</th>
+            <th className="text-right font-medium px-3 py-2 w-16">Qtd</th>
+            <th className="text-right font-medium px-3 py-2 w-32">Valor unit.</th>
+            <th className="text-right font-medium px-3 py-2 w-40">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r, i) => (
+            <tr key={i} className="border-b border-border/40 last:border-0">
+              <td className="px-3 py-2 text-foreground">{r.label}</td>
+              <td className="px-3 py-2 text-right tabular-nums text-muted-foreground">
+                {r.qty ?? "—"}
+              </td>
+              <td className="px-3 py-2 text-right tabular-nums text-muted-foreground">
+                {r.unit ?? "—"}
+              </td>
+              <td className="px-3 py-2 text-right tabular-nums">{formatBRL2(r.total)}</td>
+            </tr>
+          ))}
+          <tr className="bg-muted/30 font-semibold">
+            <td className="px-3 py-2.5" colSpan={3}>
+              Total da proposta
+            </td>
+            <td className="px-3 py-2.5 text-right tabular-nums text-accent">
+              {formatBRL2(n(p.final_price_brl))}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      {p.notes && (
+        <p className="px-3 py-2 text-[11px] italic text-muted-foreground border-t border-border/40">
+          {p.notes}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function UnitCard({ u }: { u: SharedUnit }) {
+  const primary = bestProposal(u);
+  const others = primary ? u.proposals.filter((p) => p !== primary) : [];
+  const cf = u.custom_fields ?? {};
+  const plantaSrc = u.planta_url ?? guessPlantaFallback(cf);
+  const highlights = tipoHighlights(cf);
+
+  const listPrice = n(u.price_brl);
+  const finalPrice = primary ? n(primary.final_price_brl) : listPrice;
+  const hasDiscount = primary && listPrice > finalPrice;
+  const discountBadge = primary
+    ? n(primary.discount_pct) > 0
+      ? `−${n(primary.discount_pct).toLocaleString("pt-BR", { maximumFractionDigits: 2 })}%`
+      : n(primary.discount_brl) > 0
+        ? `−${formatBRL2(n(primary.discount_brl))}`
+        : null
+    : null;
+
+  const chip = (label: string, value: string | number | null | undefined) =>
+    value === null || value === undefined || value === "" ? null : (
+      <span
+        key={label}
+        className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-background px-2.5 py-1 text-[11px] text-foreground"
+      >
+        <span className="text-muted-foreground">{label}</span>
+        <span className="tabular-nums">{value}</span>
+      </span>
+    );
+
+  return (
+    <article className="rounded-lg border border-border/60 bg-background overflow-hidden print:break-inside-avoid">
+      <div className="grid md:grid-cols-2 gap-0 md:gap-6 p-4 md:p-6">
+        <div>
+          <PlantaThumb url={plantaSrc} alt={`Planta unidade ${u.code}`} />
+        </div>
+        <div className="mt-5 md:mt-0 space-y-4">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="eyebrow text-[10px] mb-1">
+                {u.is_primary ? "Unidade principal" : "Unidade adicional"}
+              </p>
+              <h3 className="font-display text-2xl md:text-3xl font-medium text-foreground tracking-tight">
+                Apartamento {u.code}
+              </h3>
+              {u.block && (
+                <p className="text-sm text-muted-foreground mt-0.5">Bloco {u.block}</p>
+              )}
+            </div>
+            {primary?.status === "aceita" && (
+              <Badge className="bg-emerald-600/15 text-emerald-700 dark:text-emerald-400 border border-emerald-600/30 hover:bg-emerald-600/15">
+                Condição aceita
+              </Badge>
+            )}
+          </div>
+
+          <div className="flex flex-wrap gap-1.5">
+            {chip("Tipologia", cf["Tipologia"] as string)}
+            {chip("Pavimento", cf["Pavimento"] as string | number)}
+            {u.area_m2 != null && chip("Privativa (m²)", `${n(u.area_m2)}`)}
+            {chip("Área externa (m²)", cf["Área externa (m²)"] as string | number)}
+            {chip("Orientação solar", cf["Orientação solar"] as string)}
+          </div>
+
+          {highlights.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {highlights.map((h) => (
+                <span
+                  key={h}
+                  className="text-[10px] uppercase tracking-wider text-muted-foreground border border-dashed border-border/60 rounded-full px-2 py-0.5"
+                >
+                  {h}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div className="pt-2 border-t border-border/50">
+            <p className="eyebrow text-[10px] mb-1">Condição comercial</p>
+            <div className="flex items-baseline flex-wrap gap-x-3 gap-y-1">
+              {hasDiscount && (
+                <span className="text-sm text-muted-foreground line-through tabular-nums">
+                  {formatBRL2(listPrice)}
+                </span>
+              )}
+              {discountBadge && (
+                <Badge className="bg-accent/15 text-accent border border-accent/30 hover:bg-accent/15">
+                  {discountBadge}
+                </Badge>
+              )}
+            </div>
+            <p className="font-display text-3xl md:text-4xl font-medium text-accent tabular-nums leading-tight mt-1">
+              {formatBRL2(finalPrice)}
+            </p>
+            {!primary && (
+              <p className="text-[11px] text-muted-foreground italic mt-1">
+                Valor de tabela — sem proposta ativa.
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {primary && (
+        <div className="px-4 md:px-6 pb-4 md:pb-6 space-y-3">
+          <PaymentTable p={primary} unitCode={u.code} />
+          {others.length > 0 && (
+            <Collapsible>
+              <CollapsibleTrigger className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition">
+                <ChevronDown className="h-3.5 w-3.5" />
+                Outras condições apresentadas ({others.length})
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-3 space-y-3">
+                {others.map((op, i) => (
+                  <PaymentTable key={i} p={op} unitCode={u.code} />
+                ))}
+              </CollapsibleContent>
+            </Collapsible>
+          )}
+        </div>
+      )}
+    </article>
+  );
+}
+
+function ProposalPage({ data }: { data: SharedPayload }) {
+  const units = useMemo(
+    () => [...data.units].sort((a, b) => (a.is_primary === b.is_primary ? 0 : a.is_primary ? -1 : 1)),
+    [data.units],
+  );
+
+  const total = units.reduce((s, u) => s + unitFinal(u), 0);
+  const listTotal = units.reduce((s, u) => s + n(u.price_brl), 0);
+  const savings = units.reduce((s, u) => s + unitSavings(u), 0);
+
+  const validities = units
+    .flatMap((u) => u.proposals.map((p) => p.valid_until))
+    .filter((v): v is string => !!v)
+    .sort();
+  const nearestValidity = validities[0] ?? null;
+  const allExpired =
+    validities.length > 0 &&
+    validities.every((v) => new Date(v + "T23:59:59").getTime() < Date.now());
+
+  const codes = units.map((u) => u.code).join(", ");
+  const waText = encodeURIComponent(
+    `Olá! Sou ${firstName(data.client_name)} e recebi a proposta Vila Park para as unidades ${codes}. Podemos conversar?`,
+  );
+  const waHref = `https://api.whatsapp.com/send?phone=${WHATSAPP_PHONE}&text=${waText}`;
+
+  const steps = [
+    {
+      title: "Solicite pelo formulário ou WhatsApp",
+      desc: "Envie seus dados e a tipologia de interesse — sem compromisso.",
+    },
+    {
+      title: "O time Vila Park entra em contato",
+      desc: "Apresentamos condições atualizadas, disponibilidade e materiais completos.",
+    },
+    {
+      title: "Comercialização conforme o Registro de Incorporação",
+      desc: "A venda só ocorre após o registro cartorial da incorporação imobiliária.",
+    },
+    {
+      title: "Formalização do contrato",
+      desc: "Assinatura, pagamento da entrada e cronograma financeiro definido.",
+    },
+  ];
+
+  return (
+    <div className="min-h-screen bg-muted/25">
+      <header className="border-b border-border/40 bg-background">
+        <div className="max-w-6xl mx-auto px-5 md:px-8 py-8 md:py-12">
+          <p className="eyebrow mb-3">VILA PARK · VILA MARIANA</p>
+          <h1 className="font-display text-3xl md:text-5xl font-medium text-foreground tracking-tight">
+            Proposta preparada para {data.client_name}
+          </h1>
+          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
+            <span className="tabular-nums">
+              Emitida em{" "}
+              {new Date(data.shared_at).toLocaleDateString("pt-BR", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })}
+            </span>
+            {nearestValidity && (
+              <Badge
+                variant="outline"
+                className="border-border/60 text-[11px] tabular-nums"
+              >
+                Válida até {fmtDateBR(nearestValidity)}
+              </Badge>
+            )}
+          </div>
+          {allExpired && (
+            <div className="mt-5 flex items-start gap-2.5 rounded-md border border-amber-500/40 bg-amber-500/10 p-3.5 text-sm text-amber-900 dark:text-amber-200">
+              <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
+              <p>
+                Proposta expirada — fale com o time Vila Park para condições atualizadas.
+              </p>
+            </div>
+          )}
+        </div>
+      </header>
+
+      <div className="max-w-6xl mx-auto px-5 md:px-8 py-10 md:py-14 grid lg:grid-cols-[minmax(0,1fr)_320px] gap-8 lg:gap-10">
+        <div className="space-y-6">
+          {units.map((u) => (
+            <UnitCard key={u.code} u={u} />
+          ))}
+        </div>
+
+        <aside className="lg:sticky lg:top-8 lg:self-start space-y-4 print:hidden">
+          <div className="rounded-lg border border-border/60 bg-background p-5 space-y-3">
+            <p className="eyebrow text-[10px]">Resumo da proposta</p>
+            <ul className="text-sm divide-y divide-border/50">
+              {units.map((u) => {
+                const p = bestProposal(u);
+                return (
+                  <li key={u.code} className="flex items-baseline justify-between gap-3 py-2">
+                    <span>
+                      <span className="font-mono text-xs mr-1.5">{u.code}</span>
+                      {!p && (
+                        <span className="text-[10px] text-muted-foreground italic">
+                          tabela
+                        </span>
+                      )}
+                    </span>
+                    <span className="tabular-nums text-foreground">
+                      {formatBRL2(unitFinal(u))}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+            <div className="pt-3 border-t border-border/50">
+              {savings > 0 && (
+                <div className="flex items-baseline justify-between text-xs text-muted-foreground mb-1">
+                  <span>Tabela</span>
+                  <span className="line-through tabular-nums">{formatBRL2(listTotal)}</span>
+                </div>
+              )}
+              <div className="flex items-baseline justify-between">
+                <span className="text-sm font-medium">Total</span>
+                <span className="font-display text-2xl text-accent tabular-nums">
+                  {formatBRL2(total)}
+                </span>
+              </div>
+              {savings > 0 && (
+                <p className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-1 tabular-nums">
+                  Economia de {formatBRL2(savings)} vs tabela
+                </p>
+              )}
+            </div>
+            <div className="pt-2 space-y-2">
+              <a href={waHref} target="_blank" rel="noopener noreferrer" className="block">
+                <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
+                  <MessageCircle className="mr-2 h-4 w-4" />
+                  Falar com o time Vila Park
+                </Button>
+              </a>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => window.print()}
+              >
+                <Printer className="mr-2 h-4 w-4" />
+                Imprimir / salvar PDF
+              </Button>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      {/* Mobile bottom bar */}
+      <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-background/95 backdrop-blur-md border-t border-border/60 p-3 print:hidden">
+        <div className="max-w-6xl mx-auto flex items-center gap-2">
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Total</p>
+            <p className="font-display text-lg text-accent tabular-nums leading-tight">
+              {formatBRL2(total)}
+            </p>
+          </div>
+          <a href={waHref} target="_blank" rel="noopener noreferrer">
+            <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
+              <MessageCircle className="mr-2 h-4 w-4" />
+              Falar com o time
+            </Button>
+          </a>
+        </div>
+      </div>
+
+      <section className="border-t border-border/40 bg-background print:break-before-page">
+        <div className="max-w-6xl mx-auto px-5 md:px-8 py-12 md:py-16">
+          <p className="eyebrow mb-3">Próximos passos</p>
+          <h2 className="font-display text-2xl md:text-3xl font-medium text-foreground tracking-tight max-w-2xl">
+            Como funciona a reserva
+          </h2>
+          <div className="mt-8 grid gap-0 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-border/60">
+            {steps.map((s, i) => (
+              <div key={s.title} className="p-5 md:px-6 first:pl-0 last:pr-0">
+                <p className="font-display text-3xl md:text-4xl font-medium text-accent leading-none">
+                  {String(i + 1).padStart(2, "0")}
+                </p>
+                <h3 className="mt-3 text-sm font-semibold text-foreground">{s.title}</h3>
+                <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <footer className="border-t border-border/40 bg-muted/40">
+        <div className="max-w-6xl mx-auto px-5 md:px-8 py-8 md:py-10 space-y-3 pb-24 lg:pb-10">
+          <p className="text-[11px] text-muted-foreground leading-relaxed max-w-3xl">
+            Esta proposta comercial não constitui contrato nem reserva de unidade. Valores e
+            disponibilidade sujeitos a confirmação e aprovação. O parcelamento pré-chaves é feito
+            diretamente com a incorporadora; o saldo nas chaves via financiamento bancário está
+            sujeito a análise e aprovação de crédito na época do repasse. Documento de demonstração —
+            dados fictícios.
+          </p>
+          <p className="font-display text-sm text-foreground">Vila Park · Vila Mariana</p>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+function LoadingState() {
+  return (
+    <div className="min-h-screen bg-muted/25">
+      <div className="max-w-6xl mx-auto px-5 md:px-8 py-10 md:py-16 space-y-6">
+        <Skeleton className="h-6 w-40" />
+        <Skeleton className="h-10 w-2/3" />
+        <Skeleton className="h-4 w-56" />
+        <div className="grid lg:grid-cols-[1fr_320px] gap-8 mt-10">
+          <div className="space-y-6">
+            <Skeleton className="h-[420px] w-full" />
+            <Skeleton className="h-[420px] w-full" />
+          </div>
+          <Skeleton className="h-64 w-full" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function NotFoundState() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-muted/25 px-5">
+      <div className="max-w-md text-center space-y-4">
+        <p className="eyebrow">Proposta Vila Park</p>
+        <h1 className="font-display text-3xl font-medium text-foreground tracking-tight">
+          Proposta não encontrada
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          Este link pode ter expirado ou sido desativado pelo time comercial. Fale conosco para
+          receber uma nova proposta.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-2 justify-center pt-2">
+          <Link to="/">
+            <Button variant="outline">Ir para o site Vila Park</Button>
+          </Link>
+          <a
+            href={`https://api.whatsapp.com/send?phone=${WHATSAPP_PHONE}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
+              <MessageCircle className="mr-2 h-4 w-4" />
+              Falar no WhatsApp
+            </Button>
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function PublicProposal() {
+  const { token } = useParams<{ token: string }>();
+  const [state, setState] = useState<
+    { kind: "loading" } | { kind: "ok"; data: SharedPayload } | { kind: "notfound" }
+  >({ kind: "loading" });
+
+  useEffect(() => {
+    // noindex for this public route
+    const prev = document.querySelector('meta[name="robots"]');
+    const meta = document.createElement("meta");
+    meta.name = "robots";
+    meta.content = "noindex, nofollow";
+    document.head.appendChild(meta);
+    const prevTitle = document.title;
+    document.title = "Proposta Vila Park";
+    return () => {
+      document.head.removeChild(meta);
+      if (prev) document.head.appendChild(prev);
+      document.title = prevTitle;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!token) {
+      setState({ kind: "notfound" });
+      return;
+    }
+    setState({ kind: "loading" });
+    supabase
+      .rpc("get_shared_proposal", { _token: token })
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (error || !data) {
+          setState({ kind: "notfound" });
+          return;
+        }
+        setState({ kind: "ok", data: data as unknown as SharedPayload });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
+
+  if (state.kind === "loading") return <LoadingState />;
+  if (state.kind === "notfound") return <NotFoundState />;
+  return <ProposalPage data={state.data} />;
+}
