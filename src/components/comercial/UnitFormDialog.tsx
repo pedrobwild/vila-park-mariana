@@ -226,14 +226,15 @@ export default function UnitFormDialog({ open, onOpenChange, unit, fieldDefs, on
       return;
     }
     setSaving(true);
+    const primary = plantas[0];
     const payload = {
       code: parsed.data.code,
       block: parsed.data.block,
       area_m2: parsed.data.area_m2,
       price_brl: parsed.data.price_brl,
       status: parsed.data.status,
-      planta_url: plantaUrl,
-      planta_mime: plantaMime,
+      planta_url: primary?.url ?? null,
+      planta_mime: primary?.mime ?? null,
     };
 
     let unitId = unit?.id;
@@ -252,7 +253,22 @@ export default function UnitFormDialog({ open, onOpenChange, unit, fieldDefs, on
         return;
       }
       unitId = data.id;
+      // Persist any plantas uploaded before the unit existed
+      const pending = plantas.filter((p) => !p.id);
+      if (pending.length > 0) {
+        const { error: plErr } = await supabase.from("unit_plantas").insert(
+          pending.map((p) => ({
+            unit_id: unitId!,
+            url: p.url,
+            mime: p.mime,
+            filename: p.filename,
+            storage_path: p.storage_path,
+          })),
+        );
+        if (plErr) toast.error("Anexos: " + plErr.message);
+      }
     }
+
 
     // Save custom values (upsert)
     if (unitId && fieldDefs.length > 0) {
