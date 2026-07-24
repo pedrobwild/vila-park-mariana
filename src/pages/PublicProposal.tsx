@@ -269,6 +269,34 @@ function PaymentTable({ p, unitCode }: { p: SharedProposal; unitCode: string }) 
   );
 }
 
+function SocialProofChip({ count }: { count?: number | null }) {
+  const value = count ?? 0;
+  if (value <= 0) return null;
+  const label =
+    value === 1 ? "1 pessoa interessada neste imóvel" : `${value} pessoas interessadas neste imóvel`;
+  return (
+    <TooltipProvider delayDuration={100}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-accent/[0.06] px-3 py-1.5 print:hidden">
+            <span className="relative flex h-2 w-2">
+              <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
+            </span>
+            <span className="text-xs text-muted-foreground">
+              <span className="font-medium text-foreground tabular-nums">{value}</span>{" "}
+              {value === 1 ? "pessoa interessada neste imóvel" : "pessoas interessadas neste imóvel"}
+            </span>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" className="max-w-xs text-center">
+          <p>Contatos com negócios em andamento para unidades do Vila Park</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
 function UnitCard({ u }: { u: SharedUnit }) {
   const primary = bestProposal(u);
   const others = primary ? u.proposals.filter((p) => p !== primary) : [];
