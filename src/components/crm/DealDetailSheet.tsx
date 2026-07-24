@@ -597,3 +597,39 @@ export default function DealDetailSheet({ deal, units, stages, onClose, onReload
     </Sheet>
   );
 }
+
+function PersonCompletenessBadge({ person }: { person: DealFull["person"] }) {
+  const { complete, missing } = evaluateCompleteness(person);
+  if (complete) {
+    return (
+      <Badge
+        variant="outline"
+        className="text-[10px] gap-1 border-emerald-600/40 text-emerald-700 dark:text-emerald-400 bg-emerald-500/5"
+      >
+        <CheckCircle2 className="h-3 w-3" /> Cadastro completo
+      </Badge>
+    );
+  }
+  return (
+    <TooltipProvider delayDuration={200}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Badge
+            variant="outline"
+            className="text-[10px] gap-1 border-amber-600/40 text-amber-700 dark:text-amber-400 bg-amber-500/5 cursor-help"
+          >
+            <AlertCircle className="h-3 w-3" /> Cadastro incompleto · faltam {missing.length}
+          </Badge>
+        </TooltipTrigger>
+        <TooltipContent className="max-w-xs">
+          <p className="text-xs font-medium mb-1">Campos faltantes:</p>
+          <ul className="text-[11px] space-y-0.5">
+            {missing.map((m) => (
+              <li key={m}>• {m}</li>
+            ))}
+          </ul>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
