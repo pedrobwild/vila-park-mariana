@@ -569,6 +569,47 @@ export type Database = {
         }
         Relationships: []
       }
+      unit_plantas: {
+        Row: {
+          created_at: string
+          filename: string | null
+          id: string
+          mime: string | null
+          size: number | null
+          storage_path: string | null
+          unit_id: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          filename?: string | null
+          id?: string
+          mime?: string | null
+          size?: number | null
+          storage_path?: string | null
+          unit_id: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          filename?: string | null
+          id?: string
+          mime?: string | null
+          size?: number | null
+          storage_path?: string | null
+          unit_id?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "unit_plantas_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       units: {
         Row: {
           area_m2: number
