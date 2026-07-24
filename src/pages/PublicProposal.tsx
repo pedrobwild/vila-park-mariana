@@ -760,6 +760,8 @@ function ProposalPage({ data }: { data: SharedPayload }) {
         </aside>
       </div>
 
+      {contracts.length > 0 && <StatementSection contracts={contracts} today={today} />}
+
       {/* Mobile bottom bar */}
       <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-background/95 backdrop-blur-md border-t border-border/60 p-3 print:hidden">
         <div className="max-w-6xl mx-auto flex items-center gap-2">
