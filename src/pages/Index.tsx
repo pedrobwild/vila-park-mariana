@@ -108,6 +108,8 @@ export default function Index() {
   const { t, i18n } = useTranslation();
   const isMobile = useIsMobile();
   const [showStickyCta, setShowStickyCta] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
   const heroRef = useRef<HTMLElement>(null);
 
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
