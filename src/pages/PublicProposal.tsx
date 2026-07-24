@@ -687,9 +687,12 @@ function ProposalPage({ data }: { data: SharedPayload }) {
       <header className="border-b border-border/40 bg-background">
         <div className="max-w-6xl mx-auto px-5 md:px-8 py-8 md:py-12">
           <p className="eyebrow mb-3">VILA PARK · VILA MARIANA</p>
-          <h1 className="font-display text-3xl md:text-5xl font-medium text-foreground tracking-tight">
-            Proposta preparada para {data.client_name}
-          </h1>
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+            <h1 className="font-display text-3xl md:text-5xl font-medium text-foreground tracking-tight">
+              Proposta preparada para {data.client_name}
+            </h1>
+            <SocialProofChip count={data.interested_count} />
+          </div>
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
             <span className="tabular-nums">
               Emitida em{" "}
