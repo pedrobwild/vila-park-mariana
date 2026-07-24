@@ -766,30 +766,60 @@ function ProposalPage({ data }: { data: SharedPayload }) {
     },
   ];
 
-  // --- Simulação de financiamento ---
+  // --- Simulação de financiamento (reutiliza engine/UI de /ferramentas) ---
   const financeableOptions = useMemo(() => financeableOptionsFrom(units), [units]);
   const hasFinanceable = financeableOptions.length > 0;
   const [simOpen, setSimOpen] = useState(false);
-  const [simResult, setSimResult] = useState<SimResultState | null>(null);
+  const [simUnitId, setSimUnitId] = useState<string>(
+    financeableOptions[0]?.id ?? "",
+  );
+  const [committedUnitCode, setCommittedUnitCode] = useState<string | null>(null);
   const simSectionRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    if (simResult && simSectionRef.current) {
-      const el = simSectionRef.current;
-      requestAnimationFrame(() => {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    }
-  }, [simResult]);
+  const initialFormFor = (opt?: FinanceableOption): SimulatorInitialForm =>
+    opt
+      ? {
+          propertyValue: opt.finalPrice,
+          downOverride: opt.paidUntilKeys,
+        }
+      : {};
 
-  const currentSimOption = simResult
-    ? financeableOptions.find((o) => o.unitCode === simResult.unitCode)
-    : undefined;
+  const currentOption = useMemo(
+    () =>
+      financeableOptions.find((o) => o.id === simUnitId) ??
+      financeableOptions[0],
+    [financeableOptions, simUnitId],
+  );
+
+  const simCtl = useFinancingSimulatorController({
+    persist: false,
+    initialForm: initialFormFor(financeableOptions[0]),
+    onGenerated: () => {
+      const opt = financeableOptions.find((o) => o.id === simUnitId) ?? financeableOptions[0];
+      setCommittedUnitCode(opt?.unitCode ?? null);
+      setSimOpen(false);
+      requestAnimationFrame(() => {
+        simSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    },
+    onReset: () => setCommittedUnitCode(null),
+  });
+
+  const handleSelectSimUnit = (id: string) => {
+    setSimUnitId(id);
+    const opt = financeableOptions.find((o) => o.id === id);
+    simCtl.applyForm(initialFormFor(opt));
+  };
 
   const openSimDialog = () => {
     if (!hasFinanceable) return;
+    if (!simUnitId && financeableOptions[0]) {
+      setSimUnitId(financeableOptions[0].id);
+      simCtl.applyForm(initialFormFor(financeableOptions[0]));
+    }
     setSimOpen(true);
   };
+
 
 
   return (
