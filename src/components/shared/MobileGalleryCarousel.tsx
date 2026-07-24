@@ -78,7 +78,12 @@ export default function MobileGalleryCarousel({
               <img
                 src={img.url}
                 alt={img.alt}
-                loading="lazy"
+                loading={i === 0 ? "eager" : "lazy"}
+                decoding="async"
+                fetchPriority={i === 0 ? "high" : "low"}
+                width={680}
+                height={i === 0 ? 425 : 510}
+                sizes="(max-width: 768px) 82vw, 340px"
                 className="h-full w-full object-cover transition-transform duration-700 group-active:scale-[1.02]"
               />
             </div>

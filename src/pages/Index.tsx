@@ -413,6 +413,11 @@ export default function Index() {
                       src={img.url}
                       alt={img.alt}
                       loading="lazy"
+                      decoding="async"
+                      fetchPriority={i < 2 ? "high" : "low"}
+                      width={i === 0 ? 1600 : 800}
+                      height={i === 0 ? 686 : 500}
+                      sizes={i === 0 ? "(min-width: 768px) 1200px, 100vw" : "(min-width: 768px) 600px, 100vw"}
                       className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                     />
                   </div>
