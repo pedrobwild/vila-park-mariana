@@ -475,6 +475,36 @@ export default function UnitFormDialog({ open, onOpenChange, unit, fieldDefs, on
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      <AlertDialog
+        open={!!confirmDelete}
+        onOpenChange={(o) => !o && !deleting && setConfirmDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir anexo?</AlertDialogTitle>
+            <AlertDialogDescription>
+              O arquivo{confirmDelete?.filename ? ` "${confirmDelete.filename}"` : ""} será
+              removido permanentemente do armazenamento. Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={deleting}
+              onClick={(e) => {
+                e.preventDefault();
+                if (confirmDelete) handleDelete(confirmDelete);
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 }
+
