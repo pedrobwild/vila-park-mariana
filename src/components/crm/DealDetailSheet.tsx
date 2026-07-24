@@ -68,6 +68,20 @@ import {
   type CrmInterest,
   type CrmStageRow,
 } from "@/lib/crm";
+import {
+  MARITAL_STATUS_LABEL,
+  maskCPF,
+  formatBRLValue,
+  evaluateCompleteness,
+  type MaritalStatus,
+} from "@/lib/person";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { CheckCircle2, AlertCircle } from "lucide-react";
 import type { DealFull } from "./CrmSection";
 import ProposalsSection from "./ProposalsSection";
 import {
@@ -307,18 +321,44 @@ export default function DealDetailSheet({ deal, units, stages, onClose, onReload
 
         <div className="mt-5 space-y-6">
           {/* Person */}
-          <section className="rounded-lg border border-border/60 p-3 space-y-1.5 text-sm">
-            <div className="flex items-center justify-between">
+          <section className="rounded-lg border border-border/60 p-3 space-y-2 text-sm">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
               <h3 className="font-medium text-sm">Contato</h3>
-              <Badge variant="outline" className="text-[10px]">
-                {SOURCE_LABEL[deal.person.source]}
-              </Badge>
+              <div className="flex items-center gap-1.5">
+                <PersonCompletenessBadge person={deal.person} />
+                <Badge variant="outline" className="text-[10px]">
+                  {SOURCE_LABEL[deal.person.source]}
+                </Badge>
+              </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground">
               {deal.person.email && <span>✉️ {deal.person.email}</span>}
               {deal.person.phone && <span>📞 {deal.person.phone}</span>}
+              {deal.person.cpf && (
+                <span className="tabular-nums">🆔 {maskCPF(deal.person.cpf)}</span>
+              )}
+              {deal.person.marital_status && (
+                <span>
+                  💍 {MARITAL_STATUS_LABEL[deal.person.marital_status as MaritalStatus]}
+                  {(deal.person.marital_status === "casado" ||
+                    deal.person.marital_status === "uniao_estavel") &&
+                  deal.person.spouse_name
+                    ? ` · ${deal.person.spouse_name}`
+                    : ""}
+                </span>
+              )}
+              {deal.person.monthly_income_brl != null && (
+                <span className="tabular-nums">
+                  💰 R$ {formatBRLValue(Number(deal.person.monthly_income_brl))}/mês
+                </span>
+              )}
               {deal.person.occupation && <span>💼 {deal.person.occupation}</span>}
-              {deal.person.city && <span>📍 {deal.person.city}</span>}
+              {(deal.person.city || deal.person.state) && (
+                <span>
+                  📍 {deal.person.city ?? ""}
+                  {deal.person.state ? `/${deal.person.state}` : ""}
+                </span>
+              )}
             </div>
             {deal.person.notes && (
               <p className="text-xs text-muted-foreground pt-1 border-t border-border/40">
@@ -555,5 +595,41 @@ export default function DealDetailSheet({ deal, units, stages, onClose, onReload
         </DialogContent>
       </Dialog>
     </Sheet>
+  );
+}
+
+function PersonCompletenessBadge({ person }: { person: DealFull["person"] }) {
+  const { complete, missing } = evaluateCompleteness(person);
+  if (complete) {
+    return (
+      <Badge
+        variant="outline"
+        className="text-[10px] gap-1 border-emerald-600/40 text-emerald-700 dark:text-emerald-400 bg-emerald-500/5"
+      >
+        <CheckCircle2 className="h-3 w-3" /> Cadastro completo
+      </Badge>
+    );
+  }
+  return (
+    <TooltipProvider delayDuration={200}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Badge
+            variant="outline"
+            className="text-[10px] gap-1 border-amber-600/40 text-amber-700 dark:text-amber-400 bg-amber-500/5 cursor-help"
+          >
+            <AlertCircle className="h-3 w-3" /> Cadastro incompleto · faltam {missing.length}
+          </Badge>
+        </TooltipTrigger>
+        <TooltipContent className="max-w-xs">
+          <p className="text-xs font-medium mb-1">Campos faltantes:</p>
+          <ul className="text-[11px] space-y-0.5">
+            {missing.map((m) => (
+              <li key={m}>• {m}</li>
+            ))}
+          </ul>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
