@@ -319,7 +319,7 @@ export default function PeopleManager({
         source: form.source,
         occupation: form.occupation.trim() || null,
         notes: form.notes.trim() || null,
-        cpf: form.cpf.trim() ? form.cpf.replace(/\D/g, "") : null,
+        cpf: cpfDigits,
         rg: form.rg.trim() || null,
         birth_date: form.birth_date || null,
         marital_status: form.marital_status || null,
