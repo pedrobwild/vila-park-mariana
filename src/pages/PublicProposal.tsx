@@ -94,6 +94,7 @@ type SharedPayload = {
   shared_at: string;
   units: SharedUnit[];
   contracts?: SharedContract[] | null;
+  interested_count?: number | null;
 };
 
 const n = (v: unknown) => (typeof v === "number" ? v : Number(v ?? 0)) || 0;
