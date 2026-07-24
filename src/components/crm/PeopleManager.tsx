@@ -238,8 +238,9 @@ export default function PeopleManager({
       )
         return true;
       if (termDigits.length >= 3 && p.cpf) {
-        return p.cpf.replace(/\D/g, "").includes(termDigits);
+        return normalizeCPF(p.cpf).includes(termDigits);
       }
+
       return false;
     });
   }, [people, q]);
