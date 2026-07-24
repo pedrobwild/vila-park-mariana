@@ -579,7 +579,15 @@ function proposalDateISO(p: SharedProposal): string {
   return `${y}-${m}-${day}`;
 }
 
-function PaymentFlowBlock({ u, p }: { u: SharedUnit; p: SharedProposal }) {
+function PaymentFlowBlock({
+  u,
+  p,
+  clientName,
+}: {
+  u: SharedUnit;
+  p: SharedProposal;
+  clientName: string;
+}) {
   const propISO = proposalDateISO(p);
   const rows = useMemo(() => buildProposalFlow(p, propISO), [p, propISO]);
   const totalContractual = rows.reduce((s, r) => s + r.contractual, 0);
@@ -599,37 +607,39 @@ function PaymentFlowBlock({ u, p }: { u: SharedUnit; p: SharedProposal }) {
         })}%)`
       : "—";
 
-  const chavesLabel = isAVista
-    ? "—"
-    : keysValue > 0
-      ? formatBRL2(keysValue)
-      : "—";
+  const chavesLabel = isAVista ? "—" : keysValue > 0 ? formatBRL2(keysValue) : "—";
 
   const propDateBR = fmtDate(propISO);
   const validityBR = p.valid_until ? fmtDate(p.valid_until.slice(0, 10)) : null;
+
+  const metaParts: Array<{ label: string; value: string }> = [
+    { label: "Cliente", value: clientName },
+  ];
+  if (u.block) metaParts.push({ label: "Bloco", value: u.block });
+  metaParts.push({ label: "Unidade", value: u.code });
+  metaParts.push({ label: "Proposta", value: propDateBR });
 
   return (
     <article className="rounded-lg border border-border/60 bg-background overflow-hidden print:break-inside-avoid">
       <div className="p-4 md:p-6 border-b border-border/50 grid gap-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
         <div className="min-w-0">
-          <p className="eyebrow text-[10px] mb-1">Proposta comercial</p>
-          <div className="flex flex-wrap gap-x-2 gap-y-1 text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
-            <span>
-              Cliente <span className="text-foreground normal-case tracking-normal">{u.proposals[0] ? "" : ""}</span>
-            </span>
+          <p className="eyebrow text-[10px] mb-2">Proposta comercial</p>
+          <div className="flex flex-wrap gap-x-4 gap-y-1.5">
+            {metaParts.map((m) => (
+              <div key={m.label} className="min-w-0">
+                <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground mr-1.5">
+                  {m.label}
+                </span>
+                <span className="text-sm text-foreground tabular-nums">{m.value}</span>
+              </div>
+            ))}
           </div>
-          <h3 className="mt-1 font-display text-lg md:text-xl font-medium text-foreground tracking-tight">
-            {u.block ? `Bloco ${u.block} · ` : ""}Unidade {u.code}
-          </h3>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Proposta emitida em <span className="text-foreground tabular-nums">{propDateBR}</span>
-            {validityBR && (
-              <>
-                {" · validade "}
-                <span className="text-foreground tabular-nums">{validityBR}</span>
-              </>
-            )}
-          </p>
+          {validityBR && (
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              Validade da proposta:{" "}
+              <span className="text-foreground tabular-nums">{validityBR}</span>
+            </p>
+          )}
         </div>
         <dl className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-3 md:min-w-[520px]">
           <div>
