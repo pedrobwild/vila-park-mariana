@@ -125,6 +125,7 @@ export type Database = {
           late_interest_monthly: number
           monthly_index_rate: number
           original_value: number
+          person_id: string | null
           status: string
           unit_id: string
           updated_at: string
@@ -141,6 +142,7 @@ export type Database = {
           late_interest_monthly?: number
           monthly_index_rate?: number
           original_value: number
+          person_id?: string | null
           status?: string
           unit_id: string
           updated_at?: string
@@ -157,11 +159,19 @@ export type Database = {
           late_interest_monthly?: number
           monthly_index_rate?: number
           original_value?: number
+          person_id?: string | null
           status?: string
           unit_id?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "contracts_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "crm_people"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "contracts_unit_id_fkey"
             columns: ["unit_id"]
