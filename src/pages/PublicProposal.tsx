@@ -973,29 +973,89 @@ function ProposalPage({ data }: { data: SharedPayload }) {
 
       {contracts.length > 0 && <StatementSection contracts={contracts} today={today} />}
 
-      {simResult && (
-        <SimulationSection
-          result={simResult}
-          onEdit={() => setSimOpen(true)}
-          sectionRef={simSectionRef}
-        />
+      {simCtl.snapshot && committedUnitCode && (
+        <section
+          ref={simSectionRef}
+          className="border-t border-border/40 bg-background print:break-before-page"
+        >
+          <div className="max-w-6xl mx-auto px-5 md:px-8 py-12 md:py-16">
+            <div className="flex items-start justify-between gap-3 flex-wrap mb-8">
+              <div>
+                <p className="eyebrow mb-3">
+                  <Calculator className="inline h-3 w-3 mr-1.5 -mt-0.5" />
+                  Simulação de financiamento
+                </p>
+                <h2 className="font-display text-2xl md:text-3xl font-medium text-foreground tracking-tight">
+                  Unidade {committedUnitCode} · financiando{" "}
+                  {formatBRL2(
+                    Math.max(
+                      simCtl.snapshot.propertyValue - simCtl.snapshot.downPayment,
+                      0,
+                    ),
+                  )}{" "}
+                  em {simCtl.snapshot.termMonths} meses
+                </h2>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSimOpen(true)}
+                className="print:hidden"
+              >
+                <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
+                Refazer simulação
+              </Button>
+            </div>
+            <FinancingSimulatorResults
+              ctl={simCtl}
+              showEmpty={false}
+              showCopyLink={false}
+              showResetButton={false}
+            />
+          </div>
+        </section>
       )}
 
       {hasFinanceable && (
-        <FinancingSimDialog
-          open={simOpen}
-          onOpenChange={setSimOpen}
-          options={financeableOptions}
-          initialOptionId={currentSimOption?.id ?? financeableOptions[0]?.id}
-          initialFinanced={simResult?.financedAmount}
-          initialTerm={simResult?.termMonths}
-          initialRate={simResult?.annualRate}
-          onSimulate={(r) => {
-            setSimResult(r);
-            setSimOpen(false);
-          }}
-        />
+        <Dialog open={simOpen} onOpenChange={setSimOpen}>
+          <DialogContent className="max-w-3xl max-h-[92vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="font-display text-2xl">
+                Simular financiamento
+              </DialogTitle>
+              <DialogDescription>
+                Mesma calculadora da aba Ferramentas, pré-preenchida com os valores
+                desta proposta. Ajuste o que precisar e gere a simulação.
+              </DialogDescription>
+            </DialogHeader>
+            {financeableOptions.length > 1 && (
+              <div className="space-y-1.5 mb-2">
+                <Label htmlFor="sim-unit-select" className="text-xs">
+                  Unidade
+                </Label>
+                <Select value={simUnitId} onValueChange={handleSelectSimUnit}>
+                  <SelectTrigger id="sim-unit-select">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {financeableOptions.map((o) => (
+                      <SelectItem key={o.id} value={o.id}>
+                        Unidade {o.unitCode} · {formatBRL2(o.finalPrice)}
+                        {o.isPrimaryUnit ? " · principal" : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-[11px] text-muted-foreground">
+                  Trocar a unidade repreenche o formulário com os valores da proposta.
+                </p>
+              </div>
+            )}
+            <FinancingSimulatorForm ctl={simCtl} />
+          </DialogContent>
+        </Dialog>
       )}
+
 
       {/* Mobile bottom bar */}
       <div
