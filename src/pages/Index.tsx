@@ -19,6 +19,7 @@ import { PROPERTY } from "@/data/propertyData";
 import { WHATSAPP_PHONE } from "@/data/surroundings";
 
 import SiteFooter from "@/components/shared/SiteFooter";
+import GalleryLightbox from "@/components/shared/GalleryLightbox";
 import { trackGlobal } from "@/hooks/useGuideAnalytics";
 
 const PlantasSection = lazy(() => import("@/components/PlantasSection"));
@@ -107,6 +108,8 @@ export default function Index() {
   const { t, i18n } = useTranslation();
   const isMobile = useIsMobile();
   const [showStickyCta, setShowStickyCta] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
   const heroRef = useRef<HTMLElement>(null);
 
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
@@ -383,19 +386,39 @@ export default function Index() {
           <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {DECORADO_GALLERY.map((img, i) => (
               <FadeIn key={img.url} delay={Math.min(i * 0.05, 0.3)} className={i === 0 ? "md:col-span-2" : ""}>
-                <figure className="overflow-hidden rounded-2xl border border-border/60 bg-muted/25">
+                <figure
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Ampliar: ${img.alt}`}
+                  className="group overflow-hidden rounded-2xl border border-border/60 bg-muted/25 cursor-zoom-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  onClick={() => { setLightboxIndex(i); setLightboxOpen(true); }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setLightboxIndex(i);
+                      setLightboxOpen(true);
+                    }
+                  }}
+                >
                   <div className={`w-full ${i === 0 ? "aspect-[21/9]" : "aspect-[16/10]"}`}>
                     <img
                       src={img.url}
                       alt={img.alt}
                       loading="lazy"
-                      className="h-full w-full object-cover transition-transform duration-700 hover:scale-[1.03]"
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                     />
                   </div>
                 </figure>
               </FadeIn>
             ))}
           </div>
+
+          <GalleryLightbox
+            images={DECORADO_GALLERY}
+            initialIndex={lightboxIndex}
+            open={lightboxOpen}
+            onOpenChange={setLightboxOpen}
+          />
         </div>
       </section>
 
