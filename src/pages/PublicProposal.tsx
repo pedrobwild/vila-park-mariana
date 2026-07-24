@@ -802,18 +802,22 @@ function ProposalPage({ data }: { data: SharedPayload }) {
       {contracts.length > 0 && <StatementSection contracts={contracts} today={today} />}
 
       {/* Mobile bottom bar */}
-      <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-background/95 backdrop-blur-md border-t border-border/60 p-3 print:hidden">
-        <div className="max-w-6xl mx-auto flex items-center gap-2">
+      <div
+        className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-background/95 backdrop-blur-md border-t border-border/60 px-3 pt-3 print:hidden"
+        style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 0.75rem)" }}
+      >
+        <div className="max-w-6xl mx-auto flex items-center gap-3">
           <div className="flex-1 min-w-0">
             <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Total</p>
-            <p className="font-display text-lg text-accent tabular-nums leading-tight">
+            <p className="font-display text-lg text-accent tabular-nums leading-tight truncate">
               {formatBRL2(total)}
             </p>
           </div>
-          <a href={waHref} target="_blank" rel="noopener noreferrer">
-            <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
-              <MessageCircle className="mr-2 h-4 w-4" />
-              Falar com o time
+          <a href={waHref} target="_blank" rel="noopener noreferrer" className="shrink-0">
+            <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90 h-10 px-3 sm:px-4">
+              <MessageCircle className="sm:mr-2 h-4 w-4" />
+              <span className="hidden sm:inline">Falar com o time</span>
+              <span className="sr-only sm:hidden">Falar com o time</span>
             </Button>
           </a>
         </div>
