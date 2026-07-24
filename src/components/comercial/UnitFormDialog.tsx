@@ -358,35 +358,72 @@ export default function UnitFormDialog({ open, onOpenChange, unit, fieldDefs, on
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <Label>Planta da unidade</Label>
-            {plantaUrl && (
-              <div className="flex items-center gap-3 rounded-md border border-border p-2">
-                {plantaMime === "application/pdf" ? (
-                  <a
-                    href={plantaUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center gap-2 text-sm text-primary hover:underline"
-                  >
-                    <FileText className="h-4 w-4" /> Ver PDF
-                  </a>
-                ) : (
-                  <img src={plantaUrl} alt="Planta" className="h-16 w-16 object-cover rounded" />
-                )}
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setPlantaUrl(null);
-                    setPlantaMime(null);
-                  }}
-                >
-                  <X className="h-4 w-4 mr-1" /> Remover
-                </Button>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label>Plantas da unidade</Label>
+              <span className="text-xs text-muted-foreground">
+                {plantas.length} {plantas.length === 1 ? "anexo" : "anexos"}
+              </span>
+            </div>
+
+            {loadingPlantas ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground py-2">
+                <Loader2 className="h-4 w-4 animate-spin" /> Carregando anexos…
               </div>
+            ) : plantas.length === 0 ? (
+              <p className="text-xs text-muted-foreground italic">
+                Nenhum anexo enviado ainda.
+              </p>
+            ) : (
+              <ul className="space-y-2">
+                {plantas.map((p, idx) => (
+                  <li
+                    key={p.id ?? `pending-${idx}`}
+                    className="flex items-center gap-3 rounded-md border border-border p-2"
+                  >
+                    {p.mime === "application/pdf" ? (
+                      <div className="h-12 w-12 rounded bg-muted flex items-center justify-center shrink-0">
+                        <FileText className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                    ) : p.mime?.startsWith("image/") ? (
+                      <img
+                        src={p.url}
+                        alt={p.filename ?? "Planta"}
+                        className="h-12 w-12 object-cover rounded shrink-0"
+                      />
+                    ) : (
+                      <div className="h-12 w-12 rounded bg-muted flex items-center justify-center shrink-0">
+                        <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <a
+                        href={p.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-sm font-medium text-primary hover:underline truncate block"
+                      >
+                        {p.filename ?? "Anexo"}
+                      </a>
+                      <span className="text-xs text-muted-foreground">
+                        {idx === 0 ? "Planta principal" : `Anexo ${idx + 1}`}
+                        {p.id ? "" : " · pendente"}
+                      </span>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setConfirmDelete(p)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </li>
+                ))}
+              </ul>
             )}
+
             <label className="flex items-center gap-2 rounded-md border border-dashed border-border p-3 cursor-pointer hover:bg-muted/50 text-sm text-muted-foreground">
               {uploading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -394,12 +431,13 @@ export default function UnitFormDialog({ open, onOpenChange, unit, fieldDefs, on
                 <Upload className="h-4 w-4" />
               )}
               <span>
-                {uploading ? "Enviando…" : "Enviar imagem (JPG/PNG/WebP) ou PDF — até 10 MB"}
+                {uploading ? "Enviando…" : "Adicionar anexo (JPG/PNG/WebP ou PDF — até 10 MB)"}
               </span>
               <input
                 type="file"
                 className="hidden"
                 accept="image/jpeg,image/png,image/webp,application/pdf"
+                disabled={uploading}
                 onChange={(e) => {
                   const f = e.target.files?.[0];
                   if (f) handleUpload(f);
@@ -408,6 +446,7 @@ export default function UnitFormDialog({ open, onOpenChange, unit, fieldDefs, on
               />
             </label>
           </div>
+
 
           {fieldDefs.length > 0 && (
             <div className="space-y-3 pt-2 border-t border-border">
