@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical, Plus, FileText } from "lucide-react";
 import ProposalDialog from "./ProposalDialog";
+import ShareProposalButton from "./ShareProposalButton";
 import {
   PAYMENT_METHOD_SHORT,
   PROPOSAL_STATUS_LABEL,
