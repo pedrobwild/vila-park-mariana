@@ -491,10 +491,10 @@ function ContractStatementCard({ c, today }: { c: SharedContract; today: string 
       </div>
 
       <div className="p-4 md:p-6">
-        <Collapsible>
+        <Collapsible open={tableOpen} onOpenChange={setTableOpen}>
           <CollapsibleTrigger className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition">
-            <ChevronDown className="h-3.5 w-3.5" />
-            Ver todas as {totalInst} parcelas ({openCount} em aberto)
+            <ChevronDown className={`h-3.5 w-3.5 transition-transform ${tableOpen ? "rotate-180" : ""}`} />
+            {tableOpen ? "Ocultar parcelas" : `Ver todas as ${totalInst} parcelas (${openCount} em aberto)`}
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-3 print:!block">
             <div className="overflow-x-auto rounded-md border border-border/60">
