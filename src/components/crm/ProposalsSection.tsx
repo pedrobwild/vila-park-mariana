@@ -291,6 +291,16 @@ export default function ProposalsSection({ deal, onReload }: Props) {
         />
       )}
 
+      {flowFor && (
+        <PaymentFlowDialog
+          open={!!flowFor}
+          onOpenChange={(o) => !o && setFlowFor(null)}
+          proposal={flowFor}
+          unitCode={unitByCode(flowFor.unit_id)}
+          onSaved={onReload}
+        />
+      )}
+
       <AlertDialog open={!!confirmDelete} onOpenChange={(o) => !o && setConfirmDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
