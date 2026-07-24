@@ -66,8 +66,9 @@ export function formatBRLValue(n: number | null | undefined): string {
 
 // ── CPF validation ─────────────────────────────────
 export function isValidCPF(raw: string): boolean {
-  const cpf = raw.replace(/\D/g, "");
+  const cpf = normalizeCPF(raw);
   if (cpf.length !== 11) return false;
+
   if (/^(\d)\1{10}$/.test(cpf)) return false;
   const calc = (base: string, factor: number) => {
     let sum = 0;
