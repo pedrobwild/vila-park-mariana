@@ -1055,14 +1055,6 @@ function ProposalPage({ data }: { data: SharedPayload }) {
                   Economia de {formatBRL2(savings)} vs tabela
                 </p>
               )}
-              {contracts.length > 0 && (
-                <p className="text-[11px] text-muted-foreground mt-2 border-t border-border/40 pt-2">
-                  Cliente da base ·{" "}
-                  {contracts.length === 1
-                    ? `contrato ${contracts[0].contract_number} em andamento`
-                    : `${contracts.length} contratos em andamento`}
-                </p>
-              )}
             </div>
             <div className="pt-2 space-y-2">
               <a href={waHref} target="_blank" rel="noopener noreferrer" className="block">
