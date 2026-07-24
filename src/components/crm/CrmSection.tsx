@@ -39,7 +39,7 @@ export default function CrmSection() {
     const [d, p, u, s] = await Promise.all([
       supabase
         .from("crm_deals")
-        .select("*, person:crm_people(*), stage:crm_stages(*), deal_units:crm_deal_units(*, unit:units(*)), proposals:crm_proposals(*)")
+        .select("*, person:crm_people(*), stage:crm_stages(*), deal_units:crm_deal_units(*, unit:units(*)), proposals:crm_proposals(*, installments:crm_proposal_installments(*))")
         .order("stage_changed_at", { ascending: false }),
       supabase.from("crm_people").select("*").order("created_at", { ascending: false }),
       supabase.from("units").select("*").order("code"),
