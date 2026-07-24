@@ -149,37 +149,44 @@ export default function GalleryLightbox({ images, initialIndex, open, onOpenChan
                 </VisuallyHidden.Root>
               {/* Top bar */}
               <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-3 md:px-6 md:py-4 bg-gradient-to-b from-black/70 to-transparent">
-                <div className="text-white/90 text-sm font-medium tabular">
+                <div
+                  className="text-white/90 text-sm font-medium tabular"
+                  aria-live="polite"
+                  aria-atomic="true"
+                >
+                  <span className="sr-only">Imagem </span>
                   <span className="text-white">{String(index + 1).padStart(2, "0")}</span>
-                  <span className="text-white/50 mx-1.5">/</span>
+                  <span className="text-white/50 mx-1.5" aria-hidden="true">/</span>
+                  <span className="sr-only">de </span>
                   <span className="text-white/70">{String(total).padStart(2, "0")}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <button
                     type="button"
                     onClick={toggleZoom}
-                    className="h-10 w-10 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors"
-                    aria-label={zoom > 1 ? "Reduzir zoom" : "Ampliar imagem"}
+                    className="h-11 w-11 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 transition-colors"
+                    aria-label={zoom > 1 ? "Reduzir zoom (tecla -)" : "Ampliar imagem (tecla +)"}
+                    aria-pressed={zoom > 1}
                   >
-                    {zoom > 1 ? <ZoomOut size={20} /> : <ZoomIn size={20} />}
+                    {zoom > 1 ? <ZoomOut size={20} aria-hidden="true" /> : <ZoomIn size={20} aria-hidden="true" />}
                   </button>
                   {zoom > 1 && (
                     <button
                       type="button"
                       onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }}
-                      className="h-10 w-10 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors"
-                      aria-label="Redefinir zoom"
+                      className="h-11 w-11 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 transition-colors"
+                      aria-label="Redefinir zoom (tecla 0)"
                     >
-                      <RotateCcw size={18} />
+                      <RotateCcw size={18} aria-hidden="true" />
                     </button>
                   )}
                   <DialogPrimitive.Close asChild>
                     <button
                       type="button"
-                      className="ml-1 h-10 w-10 rounded-full flex items-center justify-center text-white/90 hover:text-white hover:bg-white/10 transition-colors"
-                      aria-label="Fechar galeria"
+                      className="ml-1 h-11 w-11 rounded-full flex items-center justify-center text-white/90 hover:text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 transition-colors"
+                      aria-label="Fechar galeria (Esc)"
                     >
-                      <X size={22} />
+                      <X size={22} aria-hidden="true" />
                     </button>
                   </DialogPrimitive.Close>
                 </div>
