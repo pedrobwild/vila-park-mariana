@@ -328,11 +328,45 @@ export default function DealDetailSheet({ deal, units, stages, onClose, onReload
                 {SOURCE_LABEL[deal.person.source]}
               </Badge>
             </div>
+          {/* Person */}
+          <section className="rounded-lg border border-border/60 p-3 space-y-2 text-sm">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <h3 className="font-medium text-sm">Contato</h3>
+              <div className="flex items-center gap-1.5">
+                <PersonCompletenessBadge person={deal.person} />
+                <Badge variant="outline" className="text-[10px]">
+                  {SOURCE_LABEL[deal.person.source]}
+                </Badge>
+              </div>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground">
               {deal.person.email && <span>✉️ {deal.person.email}</span>}
               {deal.person.phone && <span>📞 {deal.person.phone}</span>}
+              {deal.person.cpf && (
+                <span className="tabular-nums">🆔 {maskCPF(deal.person.cpf)}</span>
+              )}
+              {deal.person.marital_status && (
+                <span>
+                  💍 {MARITAL_STATUS_LABEL[deal.person.marital_status as MaritalStatus]}
+                  {(deal.person.marital_status === "casado" ||
+                    deal.person.marital_status === "uniao_estavel") &&
+                  deal.person.spouse_name
+                    ? ` · ${deal.person.spouse_name}`
+                    : ""}
+                </span>
+              )}
+              {deal.person.monthly_income_brl != null && (
+                <span className="tabular-nums">
+                  💰 R$ {formatBRLValue(Number(deal.person.monthly_income_brl))}/mês
+                </span>
+              )}
               {deal.person.occupation && <span>💼 {deal.person.occupation}</span>}
-              {deal.person.city && <span>📍 {deal.person.city}</span>}
+              {(deal.person.city || deal.person.state) && (
+                <span>
+                  📍 {deal.person.city ?? ""}
+                  {deal.person.state ? `/${deal.person.state}` : ""}
+                </span>
+              )}
             </div>
             {deal.person.notes && (
               <p className="text-xs text-muted-foreground pt-1 border-t border-border/40">
