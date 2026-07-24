@@ -302,6 +302,21 @@ function PaymentTable({ p, unitCode }: { p: SharedProposal; unitCode: string }) 
               {formatBRL2(n(p.final_price_brl))}
             </td>
           </tr>
+          {p.payment_method === "financiamento" && n(p.keys_brl) > 0 && (
+            <tr className="bg-accent/[0.07] border-t border-accent/20">
+              <td className="px-3 py-2.5" colSpan={3}>
+                <span className="font-display text-[13px] text-foreground">
+                  Valor a financiar nas chaves
+                </span>
+                <span className="ml-2 text-[11px] text-muted-foreground">
+                  (repasse bancário)
+                </span>
+              </td>
+              <td className="px-3 py-2.5 text-right tabular-nums font-display text-accent">
+                {formatBRL2(n(p.keys_brl))}
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
       {p.notes && (
