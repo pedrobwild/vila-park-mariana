@@ -252,6 +252,8 @@ export type Database = {
           lost_reason: string | null
           notes: string | null
           person_id: string
+          share_token: string | null
+          shared_at: string | null
           stage_changed_at: string
           stage_id: string
           title: string
@@ -264,6 +266,8 @@ export type Database = {
           lost_reason?: string | null
           notes?: string | null
           person_id: string
+          share_token?: string | null
+          shared_at?: string | null
           stage_changed_at?: string
           stage_id: string
           title: string
@@ -276,6 +280,8 @@ export type Database = {
           lost_reason?: string | null
           notes?: string | null
           person_id?: string
+          share_token?: string | null
+          shared_at?: string | null
           stage_changed_at?: string
           stage_id?: string
           title?: string
@@ -676,6 +682,7 @@ export type Database = {
     }
     Functions: {
       crm_apply_deal_value: { Args: { d: string }; Returns: undefined }
+      get_shared_proposal: { Args: { _token: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
