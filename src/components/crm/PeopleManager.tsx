@@ -255,10 +255,18 @@ export default function PeopleManager({
     setOpenDialog(true);
   };
 
-  const openEdit = (p: CrmPerson) => {
+  const [highlightLoaded, setHighlightLoaded] = useState(false);
+
+  const openEdit = (p: CrmPerson, opts?: { highlight?: boolean }) => {
     setEditingId(p.id);
     setForm(personToForm(p));
     setOpenDialog(true);
+    if (opts?.highlight) {
+      setHighlightLoaded(true);
+      window.setTimeout(() => setHighlightLoaded(false), 2800);
+    } else {
+      setHighlightLoaded(false);
+    }
   };
 
   const handleCEPBlur = async () => {
