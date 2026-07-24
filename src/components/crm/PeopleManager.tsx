@@ -304,7 +304,25 @@ export default function PeopleManager({
       }
       if (dup) {
         toast.error("CPF já cadastrado", {
-          description: `Este CPF já pertence a ${dup.full_name}. Edite o cadastro existente em vez de criar um novo.`,
+          description: `Este CPF já pertence a ${dup.full_name}. Abra o cadastro existente em vez de criar um novo.`,
+          duration: 10000,
+          action: {
+            label: "Abrir cadastro",
+            onClick: async () => {
+              const { data: full, error: fetchErr } = await supabase
+                .from("crm_people")
+                .select("*")
+                .eq("id", dup.id)
+                .maybeSingle();
+              if (fetchErr || !full) {
+                toast.error("Não foi possível abrir o cadastro.", {
+                  description: fetchErr?.message,
+                });
+                return;
+              }
+              openEdit(full as CrmPerson);
+            },
+          },
         });
         return;
       }
