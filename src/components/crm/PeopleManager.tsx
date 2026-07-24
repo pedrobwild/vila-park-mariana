@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/select";
 import { Plus, Search, Pencil, CheckCircle2, AlertCircle } from "lucide-react";
 import { formatBRL, STATUS_LABEL } from "@/lib/units";
+import { cn } from "@/lib/utils";
 import type { Unit } from "@/lib/units";
 import {
   SOURCES,
