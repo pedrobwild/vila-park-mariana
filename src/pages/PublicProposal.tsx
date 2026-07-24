@@ -11,13 +11,11 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -27,29 +25,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip as RTooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
 import {
   MessageCircle,
   Printer,
@@ -71,7 +51,12 @@ import {
   type Installment as StmtInstallment,
   type InstallmentKind,
 } from "@/lib/contractStatement";
-import { simulate, BRL, BRL2, PCT, PCT_PT, type FinancingResult } from "@/lib/financing";
+import {
+  useFinancingSimulatorController,
+  FinancingSimulatorForm,
+  FinancingSimulatorResults,
+  type SimulatorInitialForm,
+} from "@/components/ferramentas/FinancingSimulator";
 
 type SharedProposal = {
   status: "enviada" | "aceita";
