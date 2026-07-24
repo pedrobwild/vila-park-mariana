@@ -430,6 +430,7 @@ function toStmtInstallments(c: SharedContract): StmtInstallment[] {
 }
 
 function ContractStatementCard({ c, today }: { c: SharedContract; today: string }) {
+  const [tableOpen, setTableOpen] = useState(true);
   const stmt = useMemo(
     () => buildStatement(toStmtContract(c), toStmtInstallments(c), today),
     [c, today],
