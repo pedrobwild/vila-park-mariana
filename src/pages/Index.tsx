@@ -21,6 +21,7 @@ import { WHATSAPP_PHONE } from "@/data/surroundings";
 import SiteFooter from "@/components/shared/SiteFooter";
 import GalleryLightbox from "@/components/shared/GalleryLightbox";
 import MobileGalleryCarousel from "@/components/shared/MobileGalleryCarousel";
+import BlurImage from "@/components/shared/BlurImage";
 import { trackGlobal } from "@/hooks/useGuideAnalytics";
 
 const PlantasSection = lazy(() => import("@/components/PlantasSection"));
