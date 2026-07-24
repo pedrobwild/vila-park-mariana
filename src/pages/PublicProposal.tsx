@@ -386,11 +386,227 @@ function UnitCard({ u }: { u: SharedUnit }) {
   );
 }
 
+const KIND_LABEL: Record<InstallmentKind, string> = {
+  sinal: "Sinal",
+  mensal: "Mensal",
+  intermediaria: "Intermediária",
+  chaves: "Chaves",
+};
+
+function toStmtContract(c: SharedContract): StmtContract {
+  return {
+    id: c.contract_number,
+    unit_id: c.unit_code,
+    contract_number: c.contract_number,
+    client_name: c.client_name,
+    contract_date: c.contract_date,
+    original_value: n(c.original_value),
+    contract_value: n(c.contract_value),
+    monthly_index_rate: n(c.monthly_index_rate),
+    index_label: c.index_label,
+    late_fine_rate: n(c.late_fine_rate),
+    late_interest_monthly: n(c.late_interest_monthly),
+    status: c.status,
+  };
+}
+
+function toStmtInstallments(c: SharedContract): StmtInstallment[] {
+  return c.installments.map((i, idx) => ({
+    id: `${c.contract_number}-${idx}`,
+    contract_id: c.contract_number,
+    seq_label: i.seq_label,
+    kind: i.kind,
+    due_date: i.due_date,
+    contractual_value: n(i.contractual_value),
+    paid_date: i.paid_date,
+    paid_value: n(i.paid_value),
+    fine_value: n(i.fine_value),
+    interest_value: n(i.interest_value),
+    discount_value: n(i.discount_value),
+    admin_fee: n(i.admin_fee),
+    insurance_fee: n(i.insurance_fee),
+    corrected_value: i.corrected_value == null ? null : n(i.corrected_value),
+  }));
+}
+
+function ContractStatementCard({ c, today }: { c: SharedContract; today: string }) {
+  const stmt = useMemo(
+    () => buildStatement(toStmtContract(c), toStmtInstallments(c), today),
+    [c, today],
+  );
+  const totalInst = stmt.rows.length;
+  const openCount = stmt.rows.filter((r) => !r.paid_date || Number(r.paid_value) === 0).length;
+  const saldoAberto = stmt.summary.valorQuitacao;
+  const ratePct = (n(c.monthly_index_rate) * 100).toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+  const statusLabel = c.status.charAt(0).toUpperCase() + c.status.slice(1);
+  const todayBR = formatDateBR(today);
+
+  const kpi = (label: string, value: string, tone?: "accent" | "emerald" | "muted") => (
+    <div className="rounded-md border border-border/60 bg-background/60 p-3">
+      <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</p>
+      <p
+        className={`mt-1 font-display text-lg md:text-xl tabular-nums ${
+          tone === "accent"
+            ? "text-accent"
+            : tone === "emerald"
+              ? "text-emerald-700 dark:text-emerald-400"
+              : "text-foreground"
+        }`}
+      >
+        {value}
+      </p>
+    </div>
+  );
+
+  return (
+    <article className="rounded-lg border border-border/60 bg-background overflow-hidden print:break-inside-avoid">
+      <div className="p-4 md:p-6 border-b border-border/50">
+        <div className="flex items-start justify-between gap-3 flex-wrap">
+          <div>
+            <p className="eyebrow text-[10px] mb-1">Contrato ativo</p>
+            <h3 className="font-display text-xl md:text-2xl font-medium text-foreground tracking-tight">
+              Contrato {c.contract_number} · Unidade {c.unit_code}
+            </h3>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Assinado em {formatDateBR(c.contract_date)} · Correção: {c.index_label} (demo){" "}
+              {ratePct}% a.m.
+            </p>
+          </div>
+          <Badge variant="outline" className="border-border/60 text-[11px]">
+            {statusLabel}
+          </Badge>
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2.5">
+          {kpi("Valor do contrato", fmtBRL(stmt.summary.contractValue))}
+          {kpi("Total pago", fmtBRL(stmt.summary.totalPago), "emerald")}
+          {kpi("Saldo em aberto", fmtBRL(saldoAberto))}
+          {kpi("Valor de quitação hoje", fmtBRL(saldoAberto), "accent")}
+        </div>
+      </div>
+
+      <div className="p-4 md:p-6">
+        <Collapsible>
+          <CollapsibleTrigger className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition">
+            <ChevronDown className="h-3.5 w-3.5" />
+            Ver todas as {totalInst} parcelas ({openCount} em aberto)
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-3 print:!block">
+            <div className="overflow-x-auto rounded-md border border-border/60">
+              <table className="w-full text-xs tabular-nums">
+                <thead className="text-[10px] uppercase tracking-wider text-muted-foreground bg-muted/40">
+                  <tr>
+                    <th className="text-left font-medium px-2.5 py-2">Parcela</th>
+                    <th className="text-left font-medium px-2.5 py-2">Vencimento</th>
+                    <th className="text-right font-medium px-2.5 py-2">Contratual</th>
+                    <th className="text-left font-medium px-2.5 py-2">Situação</th>
+                    <th className="text-right font-medium px-2.5 py-2">Pago / Corrigido</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stmt.rows.map((r) => {
+                    const paid = !!r.paid_date && Number(r.paid_value) > 0;
+                    const overdue =
+                      !paid &&
+                      new Date(r.due_date + "T23:59:59").getTime() <
+                        new Date(today + "T00:00:00").getTime();
+                    const extras =
+                      Number(r.fine_value || 0) + Number(r.interest_value || 0);
+                    return (
+                      <tr key={r.id} className="border-t border-border/40 align-top">
+                        <td className="px-2.5 py-2">
+                          <div className="text-foreground">{r.seq_label}</div>
+                          <div className="text-[10px] text-muted-foreground">
+                            {KIND_LABEL[r.kind]}
+                          </div>
+                        </td>
+                        <td className="px-2.5 py-2 whitespace-nowrap">
+                          {formatDateBR(r.due_date)}
+                        </td>
+                        <td className="px-2.5 py-2 text-right">
+                          {fmtBRL(Number(r.contractual_value))}
+                        </td>
+                        <td className="px-2.5 py-2 whitespace-nowrap">
+                          {paid ? (
+                            <span className="text-emerald-700 dark:text-emerald-400">
+                              Paga em {formatDateBR(r.paid_date)}
+                            </span>
+                          ) : overdue ? (
+                            <span className="text-amber-700 dark:text-amber-400">
+                              Em atraso
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground">Em aberto</span>
+                          )}
+                          {paid && extras > 0 && (
+                            <div className="text-[10px] text-muted-foreground">
+                              Multa/juros {fmtBRL(extras)}
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-2.5 py-2 text-right">
+                          {paid ? (
+                            <span className="text-emerald-700 dark:text-emerald-400">
+                              {fmtBRL(Number(r.paid_value))}
+                            </span>
+                          ) : (
+                            <span className="text-foreground">
+                              {fmtBRL(r.correctedNow)}
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+
+        <p className="mt-3 text-[11px] italic text-muted-foreground">
+          Valores corrigidos até {todayBR} pela taxa contratual. Extrato demonstrativo — o extrato
+          oficial é emitido pela incorporadora.
+        </p>
+      </div>
+    </article>
+  );
+}
+
+function StatementSection({ contracts, today }: { contracts: SharedContract[]; today: string }) {
+  return (
+    <section className="border-t border-border/40 bg-muted/25 print:break-before-page">
+      <div className="max-w-6xl mx-auto px-5 md:px-8 py-12 md:py-16">
+        <p className="eyebrow mb-3">
+          <FileText className="inline h-3 w-3 mr-1.5 -mt-0.5" />
+          Extrato do cliente
+        </p>
+        <h2 className="font-display text-2xl md:text-3xl font-medium text-foreground tracking-tight max-w-2xl">
+          Situação do{contracts.length > 1 ? "s" : ""} contrato
+          {contracts.length > 1 ? "s" : ""} em andamento com a incorporadora
+        </h2>
+        <div className="mt-8 space-y-5">
+          {contracts.map((c) => (
+            <ContractStatementCard key={c.contract_number} c={c} today={today} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function ProposalPage({ data }: { data: SharedPayload }) {
   const units = useMemo(
     () => [...data.units].sort((a, b) => (a.is_primary === b.is_primary ? 0 : a.is_primary ? -1 : 1)),
     [data.units],
   );
+  const contracts = data.contracts ?? [];
+  const today = new Date().toISOString().slice(0, 10);
+
 
   const total = units.reduce((s, u) => s + unitFinal(u), 0);
   const listTotal = units.reduce((s, u) => s + n(u.price_brl), 0);
