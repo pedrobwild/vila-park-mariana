@@ -317,39 +317,78 @@ export type Database = {
       }
       crm_people: {
         Row: {
+          birth_date: string | null
+          cep: string | null
           city: string | null
+          complement: string | null
+          cpf: string | null
           created_at: string
           email: string | null
           full_name: string
           id: string
+          marital_status: string | null
+          monthly_income_brl: number | null
+          nationality: string | null
+          neighborhood: string | null
           notes: string | null
           occupation: string | null
           phone: string | null
+          rg: string | null
           source: Database["public"]["Enums"]["crm_source"]
+          spouse_name: string | null
+          state: string | null
+          street: string | null
+          street_number: string | null
           updated_at: string
         }
         Insert: {
+          birth_date?: string | null
+          cep?: string | null
           city?: string | null
+          complement?: string | null
+          cpf?: string | null
           created_at?: string
           email?: string | null
           full_name: string
           id?: string
+          marital_status?: string | null
+          monthly_income_brl?: number | null
+          nationality?: string | null
+          neighborhood?: string | null
           notes?: string | null
           occupation?: string | null
           phone?: string | null
+          rg?: string | null
           source?: Database["public"]["Enums"]["crm_source"]
+          spouse_name?: string | null
+          state?: string | null
+          street?: string | null
+          street_number?: string | null
           updated_at?: string
         }
         Update: {
+          birth_date?: string | null
+          cep?: string | null
           city?: string | null
+          complement?: string | null
+          cpf?: string | null
           created_at?: string
           email?: string | null
           full_name?: string
           id?: string
+          marital_status?: string | null
+          monthly_income_brl?: number | null
+          nationality?: string | null
+          neighborhood?: string | null
           notes?: string | null
           occupation?: string | null
           phone?: string | null
+          rg?: string | null
           source?: Database["public"]["Enums"]["crm_source"]
+          spouse_name?: string | null
+          state?: string | null
+          street?: string | null
+          street_number?: string | null
           updated_at?: string
         }
         Relationships: []
