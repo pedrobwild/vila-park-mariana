@@ -25,6 +25,12 @@ export const UF_LIST = [
 export type UF = (typeof UF_LIST)[number];
 
 // ── Masks / formatters ─────────────────────────────
+export function normalizeCPF(v: string | null | undefined): string {
+  const d = (v ?? "").replace(/\D/g, "");
+  if (!d) return "";
+  return d.length >= 11 ? d.slice(-11) : d.padStart(11, "0");
+}
+
 export function maskCPF(v: string): string {
   const d = v.replace(/\D/g, "").slice(0, 11);
   return d
@@ -32,6 +38,7 @@ export function maskCPF(v: string): string {
     .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
     .replace(/\.(\d{3})(\d{1,2})$/, ".$1-$2");
 }
+
 
 export function maskCEP(v: string): string {
   const d = v.replace(/\D/g, "").slice(0, 8);
