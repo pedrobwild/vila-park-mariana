@@ -177,6 +177,10 @@ export default function ProposalsSection({ deal, onReload }: Props) {
             const status = p.status as CrmProposalStatus;
             const badgeKind = expired ? "expirada" : status;
             const badgeLabel = expired ? "Expirada" : PROPOSAL_STATUS_LABEL[status];
+            const hasFlow =
+              Array.isArray((p as CrmProposal & { installments?: unknown[] }).installments) &&
+              ((p as CrmProposal & { installments?: unknown[] }).installments?.length ?? 0) > 0;
+            const canConfigureFlow = p.payment_method !== "a_vista";
             return (
               <li key={p.id} className="p-3 space-y-1.5">
                 <div className="flex items-start justify-between gap-2">
@@ -187,6 +191,14 @@ export default function ProposalsSection({ deal, onReload }: Props) {
                     >
                       {badgeLabel}
                     </span>
+                    {hasFlow && (
+                      <span
+                        className="text-[10px] px-1.5 py-0.5 rounded border border-border/60 text-muted-foreground bg-muted/20 inline-flex items-center gap-1"
+                        title="Fluxo de pagamento configurado"
+                      >
+                        <CalendarClock className="h-3 w-3" /> fluxo
+                      </span>
+                    )}
                     <span className="font-display text-sm tabular-nums text-accent">
                       {formatBRL2(Number(p.final_price_brl))}
                     </span>
