@@ -20,8 +20,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, Plus, FileText } from "lucide-react";
+import { MoreVertical, Plus, FileText, CalendarClock } from "lucide-react";
 import ProposalDialog from "./ProposalDialog";
+import PaymentFlowDialog from "./PaymentFlowDialog";
 import ShareProposalButton from "./ShareProposalButton";
 import {
   PAYMENT_METHOD_SHORT,
