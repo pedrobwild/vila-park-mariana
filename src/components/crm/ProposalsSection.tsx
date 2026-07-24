@@ -145,14 +145,21 @@ export default function ProposalsSection({ deal, onReload }: Props) {
 
   return (
     <section className="space-y-2">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
         <h3 className="font-medium text-sm flex items-center gap-1.5">
           <FileText className="h-3.5 w-3.5 text-muted-foreground" />
           Propostas comerciais
         </h3>
-        <Button variant="outline" size="sm" className="h-8" onClick={openNew} disabled={!canCreate}>
-          <Plus className="h-3.5 w-3.5 mr-1" /> Nova proposta
-        </Button>
+        <div className="flex items-center gap-2">
+          <ShareProposalButton
+            deal={deal}
+            canShare={proposals.some((p) => p.status === "enviada" || p.status === "aceita")}
+            onReload={onReload}
+          />
+          <Button variant="outline" size="sm" className="h-8" onClick={openNew} disabled={!canCreate}>
+            <Plus className="h-3.5 w-3.5 mr-1" /> Nova proposta
+          </Button>
+        </div>
       </div>
 
       {proposals.length === 0 ? (
