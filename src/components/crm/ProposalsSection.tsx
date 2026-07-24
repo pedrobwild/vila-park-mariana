@@ -216,6 +216,17 @@ export default function ProposalsSection({ deal, onReload }: Props) {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={() => openEdit(p)}>Editar</DropdownMenuItem>
+                      <DropdownMenuItem
+                        disabled={!canConfigureFlow}
+                        onClick={() => canConfigureFlow && setFlowFor(p)}
+                        title={
+                          canConfigureFlow
+                            ? undefined
+                            : "Pagamento único — sem parcelamento"
+                        }
+                      >
+                        <CalendarClock className="h-3.5 w-3.5 mr-2" /> Configurar fluxo de pagamento
+                      </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       {status !== "enviada" && status !== "aceita" && (
                         <DropdownMenuItem
