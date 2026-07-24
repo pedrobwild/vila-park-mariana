@@ -39,7 +39,7 @@ export default function MobileGalleryCarousel({
     if (!el) return;
     checkScroll();
     el.addEventListener("scroll", checkScroll, { passive: true });
-    return () => elided();
+    return () => el.removeEventListener("scroll", checkScroll);
   }, []);
 
   const scrollBy = (direction: number) => {
