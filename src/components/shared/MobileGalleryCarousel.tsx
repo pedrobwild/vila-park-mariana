@@ -76,7 +76,7 @@ export default function MobileGalleryCarousel({
             }}
           >
             <div className={`w-full ${i === 0 ? leadAspect : cardAspect}`}>
-              <img
+              <BlurImage
                 src={img.url}
                 alt={img.alt}
                 loading={i === 0 ? "eager" : "lazy"}
