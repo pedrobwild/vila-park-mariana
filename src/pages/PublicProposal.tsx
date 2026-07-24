@@ -11,13 +11,11 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -27,29 +25,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip as RTooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
 import {
   MessageCircle,
   Printer,
@@ -71,7 +51,12 @@ import {
   type Installment as StmtInstallment,
   type InstallmentKind,
 } from "@/lib/contractStatement";
-import { simulate, BRL, BRL2, PCT, PCT_PT, type FinancingResult } from "@/lib/financing";
+import {
+  useFinancingSimulatorController,
+  FinancingSimulatorForm,
+  FinancingSimulatorResults,
+  type SimulatorInitialForm,
+} from "@/components/ferramentas/FinancingSimulator";
 
 type SharedProposal = {
   status: "enviada" | "aceita";
@@ -696,10 +681,6 @@ function StatementSection({ contracts, today }: { contracts: SharedContract[]; t
 
 /* --------------------------- Financing simulator --------------------------- */
 
-// Taxa padrão do simulador de /ferramentas (Caixa SBPE, efetiva a.a.).
-const DEFAULT_ANNUAL_RATE = 11.19;
-const DEFAULT_TERM_MONTHS = 360;
-
 type FinanceableOption = {
   id: string; // unit code + updated_at
   unitCode: string;
@@ -710,14 +691,6 @@ type FinanceableOption = {
   isPrimaryUnit: boolean;
 };
 
-type SimResultState = {
-  unitCode: string;
-  financedAmount: number;
-  termMonths: number;
-  annualRate: number;
-  sac: FinancingResult;
-  price: FinancingResult;
-};
 
 function financeableOptionsFrom(units: SharedUnit[]): FinanceableOption[] {
   const out: FinanceableOption[] = [];
@@ -744,370 +717,6 @@ function financeableOptionsFrom(units: SharedUnit[]): FinanceableOption[] {
     return new Date(b.proposalUpdatedAt).getTime() - new Date(a.proposalUpdatedAt).getTime();
   });
   return out;
-}
-
-function FinancingSimDialog({
-  open,
-  onOpenChange,
-  options,
-  initialOptionId,
-  initialFinanced,
-  initialTerm,
-  initialRate,
-  onSimulate,
-}: {
-  open: boolean;
-  onOpenChange: (v: boolean) => void;
-  options: FinanceableOption[];
-  initialOptionId?: string;
-  initialFinanced?: number;
-  initialTerm?: number;
-  initialRate?: number;
-  onSimulate: (r: SimResultState) => void;
-}) {
-  const defaultId = initialOptionId ?? options[0]?.id ?? "";
-  const [optionId, setOptionId] = useState(defaultId);
-  const current = options.find((o) => o.id === optionId) ?? options[0];
-  const [financed, setFinanced] = useState<number>(initialFinanced ?? current?.keysBrl ?? 0);
-  const [termMonths, setTermMonths] = useState<number>(initialTerm ?? DEFAULT_TERM_MONTHS);
-  const [rateStr, setRateStr] = useState<string>(
-    (initialRate ?? DEFAULT_ANNUAL_RATE).toString().replace(".", ","),
-  );
-
-  // Ao trocar unidade, atualiza o valor a financiar sugerido
-  useEffect(() => {
-    if (!current) return;
-    setFinanced(current.keysBrl);
-  }, [optionId]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Reset quando abre novamente com initial values
-  useEffect(() => {
-    if (open) {
-      setOptionId(initialOptionId ?? options[0]?.id ?? "");
-      if (initialFinanced != null) setFinanced(initialFinanced);
-      if (initialTerm != null) setTermMonths(initialTerm);
-      if (initialRate != null) setRateStr(initialRate.toString().replace(".", ","));
-    }
-  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  if (!current) return null;
-
-  const parsedRate = parseFloat(rateStr.replace(",", ".")) || 0;
-  const canSubmit = financed > 0 && termMonths >= 12 && termMonths <= 420 && parsedRate > 0;
-
-  const submit = () => {
-    if (!canSubmit || !current) return;
-    // Usamos propertyValue = financed e downPayment = 0 para que "valor financiado" = financed.
-    const base = {
-      propertyValue: financed,
-      downPayment: 0,
-      termMonths,
-      annualRate: parsedRate,
-      annualRateType: "efetiva" as const,
-    };
-    const sac = simulate("SAC", base);
-    const price = simulate("PRICE", base);
-    onSimulate({
-      unitCode: current.unitCode,
-      financedAmount: financed,
-      termMonths,
-      annualRate: parsedRate,
-      sac,
-      price,
-    });
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="font-display text-xl">Simular financiamento</DialogTitle>
-          <DialogDescription>
-            Simulação do saldo nas chaves via repasse bancário — SAC e Price, mesma metodologia
-            usada nas ferramentas do site.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="space-y-4 pt-2">
-          {options.length > 1 && (
-            <div className="space-y-1.5">
-              <Label htmlFor="sim-unit" className="text-xs">Unidade</Label>
-              <Select value={optionId} onValueChange={setOptionId}>
-                <SelectTrigger id="sim-unit"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {options.map((o) => (
-                    <SelectItem key={o.id} value={o.id}>
-                      Apto {o.unitCode} · {formatBRL2(o.finalPrice)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">Valor do imóvel</Label>
-              <div className="h-10 flex items-center rounded-md border border-border/60 bg-muted/40 px-3 text-sm tabular-nums text-foreground">
-                {formatBRL2(current.finalPrice)}
-              </div>
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">Pago até as chaves</Label>
-              <div className="h-10 flex items-center rounded-md border border-border/60 bg-muted/40 px-3 text-sm tabular-nums text-foreground">
-                {formatBRL2(current.paidUntilKeys)}
-              </div>
-              <p className="text-[10px] text-muted-foreground italic">
-                direto com a incorporadora (ato + mensais + intermediárias)
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="sim-financed" className="text-xs">
-              Valor a financiar (repasse bancário)
-            </Label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">R$</span>
-              <Input
-                id="sim-financed"
-                inputMode="numeric"
-                className="pl-9 h-10 text-right tabular-nums"
-                value={financed ? financed.toLocaleString("pt-BR") : ""}
-                onChange={(e) => {
-                  const digits = e.target.value.replace(/\D/g, "");
-                  setFinanced(digits ? parseInt(digits, 10) : 0);
-                }}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label htmlFor="sim-term" className="text-xs">Prazo (meses)</Label>
-              <Input
-                id="sim-term"
-                type="number"
-                min={12}
-                max={420}
-                className="h-10 tabular-nums"
-                value={termMonths}
-                onChange={(e) => setTermMonths(Math.max(12, Math.min(420, parseInt(e.target.value || "0", 10) || 0)))}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="sim-rate" className="text-xs">Taxa efetiva (% a.a.)</Label>
-              <Input
-                id="sim-rate"
-                inputMode="decimal"
-                className="h-10 tabular-nums"
-                value={rateStr}
-                onChange={(e) => setRateStr(e.target.value.replace(/[^\d,.]/g, ""))}
-              />
-            </div>
-          </div>
-          <p className="text-[11px] text-muted-foreground">
-            Simulamos SAC e Price lado a lado, como no simulador de /ferramentas.
-          </p>
-        </div>
-        <DialogFooter>
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancelar</Button>
-          <Button
-            className="bg-accent text-accent-foreground hover:bg-accent/90"
-            onClick={submit}
-            disabled={!canSubmit}
-          >
-            <Calculator className="mr-2 h-4 w-4" />
-            Simular
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-function SimulationSection({
-  result,
-  onEdit,
-  sectionRef,
-}: {
-  result: SimResultState;
-  onEdit: () => void;
-  sectionRef: React.RefObject<HTMLElement>;
-}) {
-  const { sac, price, unitCode, financedAmount, termMonths, annualRate } = result;
-  const [tableOpen, setTableOpen] = useState(false);
-
-  const balanceData = useMemo(() => {
-    const step = Math.max(1, Math.floor(sac.schedule.length / 60));
-    return sac.schedule
-      .filter((_, i) => i % step === 0 || i === sac.schedule.length - 1)
-      .map((row) => ({
-        month: row.n,
-        SAC: Math.round(row.balance),
-        Price: Math.round(price.schedule[sac.schedule.indexOf(row)]?.balance ?? 0),
-      }));
-  }, [sac, price]);
-
-  const Kpi = ({ label, value, tone }: { label: string; value: string; tone?: "accent" }) => (
-    <div className="rounded-md border border-border/60 bg-background/60 p-3">
-      <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</p>
-      <p className={`mt-1 font-display text-base md:text-lg tabular-nums ${tone === "accent" ? "text-accent" : "text-foreground"}`}>
-        {value}
-      </p>
-    </div>
-  );
-
-  return (
-    <section ref={sectionRef} className="border-t border-border/40 bg-background print:break-before-page">
-      <div className="max-w-6xl mx-auto px-5 md:px-8 py-12 md:py-16">
-        <div className="flex items-start justify-between gap-3 flex-wrap">
-          <div>
-            <p className="eyebrow mb-3">
-              <Calculator className="inline h-3 w-3 mr-1.5 -mt-0.5" />
-              Simulação de financiamento
-            </p>
-            <h2 className="font-display text-2xl md:text-3xl font-medium text-foreground tracking-tight max-w-2xl">
-              Unidade {unitCode} · financiando {formatBRL2(financedAmount)} em {termMonths} meses
-            </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Taxa demonstrativa {PCT_PT(annualRate)} a.a. (efetiva) · SAC × Price lado a lado.
-            </p>
-          </div>
-          <Button variant="outline" size="sm" onClick={onEdit} className="print:hidden">
-            <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
-            Refazer simulação
-          </Button>
-        </div>
-
-        {/* KPIs SAC × Price */}
-        <div className="mt-8 grid md:grid-cols-2 gap-4">
-          <div className="rounded-lg border border-border/60 bg-muted/20 p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="font-display text-lg text-foreground">SAC</h3>
-              <Badge variant="outline" className="text-[10px] border-border/60">parcelas decrescentes</Badge>
-            </div>
-            <div className="grid grid-cols-2 gap-2.5">
-              {Kpi({ label: "1ª parcela", value: BRL(sac.firstInstallment), tone: "accent" })}
-              {Kpi({ label: "Última parcela", value: BRL(sac.lastInstallment) })}
-              {Kpi({ label: "Total de juros", value: BRL(sac.totalInterest) })}
-              {Kpi({ label: "Total pago", value: BRL(sac.totalPaid) })}
-            </div>
-          </div>
-          <div className="rounded-lg border border-border/60 bg-muted/20 p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="font-display text-lg text-foreground">Price</h3>
-              <Badge variant="outline" className="text-[10px] border-border/60">parcelas fixas</Badge>
-            </div>
-            <div className="grid grid-cols-2 gap-2.5">
-              {Kpi({ label: "1ª parcela", value: BRL(price.firstInstallment), tone: "accent" })}
-              {Kpi({ label: "Última parcela", value: BRL(price.lastInstallment) })}
-              {Kpi({ label: "Total de juros", value: BRL(price.totalInterest) })}
-              {Kpi({ label: "Total pago", value: BRL(price.totalPaid) })}
-            </div>
-          </div>
-        </div>
-
-        {/* Evolução do saldo devedor */}
-        <div className="mt-6 rounded-lg border border-border/60 bg-background p-4 md:p-5">
-          <h3 className="text-sm font-semibold text-foreground mb-3">Evolução do saldo devedor</h3>
-          <ResponsiveContainer width="100%" height={260}>
-            <LineChart data={balanceData}>
-              <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-              <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-              <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${Math.round(v / 1000)}k`} />
-              <RTooltip formatter={(v: number) => BRL(v)} labelFormatter={(l) => `Mês ${l}`} />
-              <Legend wrapperStyle={{ fontSize: 12 }} />
-              <Line type="monotone" dataKey="SAC" stroke="hsl(var(--accent))" strokeWidth={2.5} dot={false} />
-              <Line type="monotone" dataKey="Price" stroke="hsl(var(--muted-foreground))" strokeWidth={2} dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Parcelas (colapsável) */}
-        <div className="mt-6 rounded-lg border border-border/60 bg-background p-4 md:p-5">
-          <Collapsible open={tableOpen} onOpenChange={setTableOpen}>
-            <div className="flex items-center justify-between gap-3 flex-wrap">
-              <h3 className="text-sm font-semibold text-foreground">Cronograma de parcelas (SAC)</h3>
-              <CollapsibleTrigger className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition print:hidden">
-                <ChevronDown className={`h-3.5 w-3.5 transition-transform ${tableOpen ? "rotate-180" : ""}`} />
-                {tableOpen ? "Ocultar" : `Ver primeiras 12 e resumo anual`}
-              </CollapsibleTrigger>
-            </div>
-            <CollapsibleContent className="mt-3 print:!block">
-              <div className="overflow-x-auto rounded-md border border-border/60">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-[10px] uppercase tracking-wider">Mês</TableHead>
-                      <TableHead className="text-right text-[10px] uppercase tracking-wider">Amortização</TableHead>
-                      <TableHead className="text-right text-[10px] uppercase tracking-wider">Juros</TableHead>
-                      <TableHead className="text-right text-[10px] uppercase tracking-wider">Parcela</TableHead>
-                      <TableHead className="text-right text-[10px] uppercase tracking-wider">Saldo</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {sac.schedule.slice(0, 12).map((r) => (
-                      <TableRow key={r.n}>
-                        <TableCell className="tabular-nums">{r.n}</TableCell>
-                        <TableCell className="text-right tabular-nums">{BRL2(r.amortization)}</TableCell>
-                        <TableCell className="text-right tabular-nums">{BRL2(r.interest)}</TableCell>
-                        <TableCell className="text-right tabular-nums font-medium">{BRL2(r.fullPayment)}</TableCell>
-                        <TableCell className="text-right tabular-nums">{BRL2(r.balance)}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-
-              <h4 className="mt-5 mb-2 text-xs uppercase tracking-wider text-muted-foreground">Resumo anual (SAC)</h4>
-              <div className="overflow-x-auto rounded-md border border-border/60">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-[10px] uppercase tracking-wider">Ano</TableHead>
-                      <TableHead className="text-right text-[10px] uppercase tracking-wider">Amortizado</TableHead>
-                      <TableHead className="text-right text-[10px] uppercase tracking-wider">Juros pagos</TableHead>
-                      <TableHead className="text-right text-[10px] uppercase tracking-wider">Saldo fim</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {Array.from({ length: Math.ceil(sac.schedule.length / 12) }).map((_, yi) => {
-                      const rows = sac.schedule.slice(yi * 12, yi * 12 + 12);
-                      if (!rows.length) return null;
-                      const amort = rows.reduce((a, r) => a + r.amortization, 0);
-                      const juros = rows.reduce((a, r) => a + r.interest, 0);
-                      const saldo = rows[rows.length - 1].balance;
-                      return (
-                        <TableRow key={yi}>
-                          <TableCell className="tabular-nums">{yi + 1}</TableCell>
-                          <TableCell className="text-right tabular-nums">{BRL(amort)}</TableCell>
-                          <TableCell className="text-right tabular-nums">{BRL(juros)}</TableCell>
-                          <TableCell className="text-right tabular-nums">{BRL(saldo)}</TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
-        </div>
-
-        {/* Avisos obrigatórios */}
-        <div className="mt-6 rounded-md border border-amber-500/40 bg-amber-500/10 p-4 space-y-1.5 text-[12px] leading-relaxed text-amber-900 dark:text-amber-200">
-          <div className="flex items-start gap-2">
-            <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
-            <div className="space-y-1">
-              <p><strong>Simulação ilustrativa</strong> — não constitui proposta de crédito.</p>
-              <p>Sujeito a análise e aprovação do banco no momento do repasse (nas chaves).</p>
-              <p>Compare o <strong>CET</strong> nas propostas reais dos bancos antes de decidir.</p>
-              <p>Taxa demonstrativa de {PCT_PT(annualRate)} a.a. (efetiva) — as taxas praticadas variam por banco, relacionamento e perfil.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
 }
 
 function ProposalPage({ data }: { data: SharedPayload }) {
@@ -1157,30 +766,60 @@ function ProposalPage({ data }: { data: SharedPayload }) {
     },
   ];
 
-  // --- Simulação de financiamento ---
+  // --- Simulação de financiamento (reutiliza engine/UI de /ferramentas) ---
   const financeableOptions = useMemo(() => financeableOptionsFrom(units), [units]);
   const hasFinanceable = financeableOptions.length > 0;
   const [simOpen, setSimOpen] = useState(false);
-  const [simResult, setSimResult] = useState<SimResultState | null>(null);
+  const [simUnitId, setSimUnitId] = useState<string>(
+    financeableOptions[0]?.id ?? "",
+  );
+  const [committedUnitCode, setCommittedUnitCode] = useState<string | null>(null);
   const simSectionRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    if (simResult && simSectionRef.current) {
-      const el = simSectionRef.current;
-      requestAnimationFrame(() => {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    }
-  }, [simResult]);
+  const initialFormFor = (opt?: FinanceableOption): SimulatorInitialForm =>
+    opt
+      ? {
+          propertyValue: opt.finalPrice,
+          downOverride: opt.paidUntilKeys,
+        }
+      : {};
 
-  const currentSimOption = simResult
-    ? financeableOptions.find((o) => o.unitCode === simResult.unitCode)
-    : undefined;
+  const currentOption = useMemo(
+    () =>
+      financeableOptions.find((o) => o.id === simUnitId) ??
+      financeableOptions[0],
+    [financeableOptions, simUnitId],
+  );
+
+  const simCtl = useFinancingSimulatorController({
+    persist: false,
+    initialForm: initialFormFor(financeableOptions[0]),
+    onGenerated: () => {
+      const opt = financeableOptions.find((o) => o.id === simUnitId) ?? financeableOptions[0];
+      setCommittedUnitCode(opt?.unitCode ?? null);
+      setSimOpen(false);
+      requestAnimationFrame(() => {
+        simSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    },
+    onReset: () => setCommittedUnitCode(null),
+  });
+
+  const handleSelectSimUnit = (id: string) => {
+    setSimUnitId(id);
+    const opt = financeableOptions.find((o) => o.id === id);
+    simCtl.applyForm(initialFormFor(opt));
+  };
 
   const openSimDialog = () => {
     if (!hasFinanceable) return;
+    if (!simUnitId && financeableOptions[0]) {
+      setSimUnitId(financeableOptions[0].id);
+      simCtl.applyForm(initialFormFor(financeableOptions[0]));
+    }
     setSimOpen(true);
   };
+
 
 
   return (
@@ -1334,29 +973,89 @@ function ProposalPage({ data }: { data: SharedPayload }) {
 
       {contracts.length > 0 && <StatementSection contracts={contracts} today={today} />}
 
-      {simResult && (
-        <SimulationSection
-          result={simResult}
-          onEdit={() => setSimOpen(true)}
-          sectionRef={simSectionRef}
-        />
+      {simCtl.snapshot && committedUnitCode && (
+        <section
+          ref={simSectionRef}
+          className="border-t border-border/40 bg-background print:break-before-page"
+        >
+          <div className="max-w-6xl mx-auto px-5 md:px-8 py-12 md:py-16">
+            <div className="flex items-start justify-between gap-3 flex-wrap mb-8">
+              <div>
+                <p className="eyebrow mb-3">
+                  <Calculator className="inline h-3 w-3 mr-1.5 -mt-0.5" />
+                  Simulação de financiamento
+                </p>
+                <h2 className="font-display text-2xl md:text-3xl font-medium text-foreground tracking-tight">
+                  Unidade {committedUnitCode} · financiando{" "}
+                  {formatBRL2(
+                    Math.max(
+                      simCtl.snapshot.propertyValue - simCtl.snapshot.downPayment,
+                      0,
+                    ),
+                  )}{" "}
+                  em {simCtl.snapshot.termMonths} meses
+                </h2>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSimOpen(true)}
+                className="print:hidden"
+              >
+                <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
+                Refazer simulação
+              </Button>
+            </div>
+            <FinancingSimulatorResults
+              ctl={simCtl}
+              showEmpty={false}
+              showCopyLink={false}
+              showResetButton={false}
+            />
+          </div>
+        </section>
       )}
 
       {hasFinanceable && (
-        <FinancingSimDialog
-          open={simOpen}
-          onOpenChange={setSimOpen}
-          options={financeableOptions}
-          initialOptionId={currentSimOption?.id ?? financeableOptions[0]?.id}
-          initialFinanced={simResult?.financedAmount}
-          initialTerm={simResult?.termMonths}
-          initialRate={simResult?.annualRate}
-          onSimulate={(r) => {
-            setSimResult(r);
-            setSimOpen(false);
-          }}
-        />
+        <Dialog open={simOpen} onOpenChange={setSimOpen}>
+          <DialogContent className="max-w-3xl max-h-[92vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="font-display text-2xl">
+                Simular financiamento
+              </DialogTitle>
+              <DialogDescription>
+                Mesma calculadora da aba Ferramentas, pré-preenchida com os valores
+                desta proposta. Ajuste o que precisar e gere a simulação.
+              </DialogDescription>
+            </DialogHeader>
+            {financeableOptions.length > 1 && (
+              <div className="space-y-1.5 mb-2">
+                <Label htmlFor="sim-unit-select" className="text-xs">
+                  Unidade
+                </Label>
+                <Select value={simUnitId} onValueChange={handleSelectSimUnit}>
+                  <SelectTrigger id="sim-unit-select">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {financeableOptions.map((o) => (
+                      <SelectItem key={o.id} value={o.id}>
+                        Unidade {o.unitCode} · {formatBRL2(o.finalPrice)}
+                        {o.isPrimaryUnit ? " · principal" : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-[11px] text-muted-foreground">
+                  Trocar a unidade repreenche o formulário com os valores da proposta.
+                </p>
+              </div>
+            )}
+            <FinancingSimulatorForm ctl={simCtl} />
+          </DialogContent>
+        </Dialog>
       )}
+
 
       {/* Mobile bottom bar */}
       <div

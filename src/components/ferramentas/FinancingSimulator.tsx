@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import {
   AreaChart,
   Area,
@@ -74,14 +74,12 @@ const SLIDER_TOUCH =
   "[&_[role=slider]]:h-5 [&_[role=slider]]:w-5 [&_[role=slider]]:relative [&_[role=slider]]:after:content-[''] [&_[role=slider]]:after:absolute [&_[role=slider]]:after:-inset-3";
 
 const RATES_CONSULT_DATE = "2026-07-19";
+const DEFAULT_STORAGE_KEY = "vp_financing_sim_v1";
 
 /* ---------- helpers ---------- */
 
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
 const num = (s: string) => {
-  // Currency inputs here are whole BRL integers. Strip any non-digit
-  // (thousand separators, R$, spaces) so typing 5+ digits keeps working
-  // even after the field re-formats to "10.000".
   const digits = s.replace(/\D/g, "");
   if (!digits) return 0;
   const n = parseInt(digits, 10);
@@ -214,9 +212,9 @@ function generateSimCode(): string {
   return `VP-${y}${m}${d}-${rand}`;
 }
 
-/* ---------- snapshot type ---------- */
+/* ---------- types ---------- */
 
-interface Snapshot {
+export interface Snapshot {
   propertyValue: number;
   downPayment: number;
   downPaymentOwn: number;
@@ -234,25 +232,72 @@ interface Snapshot {
   extraStrategy: "reduce-term" | "reduce-installment";
 }
 
-/* ---------- main ---------- */
+export interface SimulatorInitialForm {
+  typologyId?: string;
+  propertyValue?: number;
+  downPct?: number;
+  downOverride?: number | null;
+  termMonths?: number;
+  bankId?: string;
+  rateInput?: string;
+  system?: AmortSystem;
+  buyerAge?: number;
+  monthlyIncome?: number;
+  fgts?: number;
+  extraAnnual?: number;
+  extraStrategy?: "reduce-term" | "reduce-installment";
+}
 
-export default function FinancingSimulator() {
-  // ---- Form state (empty by default) ----
-  const [typologyId, setTypologyId] = useState<string>("custom");
-  const [propertyValue, setPropertyValue] = useState<number>(0);
-  const [downPct, setDownPct] = useState<number>(0);
-  const [downOverride, setDownOverride] = useState<number | null>(null);
-  const [termMonths, setTermMonths] = useState<number>(0);
+export interface ControllerOptions {
+  /** Persist form/snapshot to localStorage and support ?sim= shareable link. Default true. */
+  persist?: boolean;
+  storageKey?: string;
+  /** Initial values applied on mount (when nothing is restored from persistence). */
+  initialForm?: SimulatorInitialForm;
+  /** Called after a successful simulate. */
+  onGenerated?: (snapshot: Snapshot) => void;
+  /** Called after reset (form cleared, snapshot cleared). */
+  onReset?: () => void;
+}
+
+const EMPTY_FORM: Required<SimulatorInitialForm> = {
+  typologyId: "custom",
+  propertyValue: 0,
+  downPct: 0,
+  downOverride: null,
+  termMonths: 0,
+  bankId: "",
+  rateInput: "",
+  system: "SAC",
+  buyerAge: 0,
+  monthlyIncome: 0,
+  fgts: 0,
+  extraAnnual: 0,
+  extraStrategy: "reduce-term",
+};
+
+/* ---------- controller hook ---------- */
+
+export function useFinancingSimulatorController(options: ControllerOptions = {}) {
+  const persist = options.persist ?? true;
+  const storageKey = options.storageKey ?? DEFAULT_STORAGE_KEY;
+  const initial = { ...EMPTY_FORM, ...(options.initialForm ?? {}) };
+
+  const [typologyId, setTypologyId] = useState<string>(initial.typologyId);
+  const [propertyValue, setPropertyValue] = useState<number>(initial.propertyValue);
+  const [downPct, setDownPct] = useState<number>(initial.downPct);
+  const [downOverride, setDownOverride] = useState<number | null>(initial.downOverride);
+  const [termMonths, setTermMonths] = useState<number>(initial.termMonths);
   const [financedPulse, setFinancedPulse] = useState(false);
 
-  const [bankId, setBankId] = useState<string>("");
-  const [rateInput, setRateInput] = useState<string>("");
-  const [system, setSystem] = useState<AmortSystem>("SAC");
-  const [buyerAge, setBuyerAge] = useState<number>(0);
-  const [monthlyIncome, setMonthlyIncome] = useState<number>(0);
-  const [fgts, setFgts] = useState<number>(0);
-  const [extraAnnual, setExtraAnnual] = useState<number>(0);
-  const [extraStrategy, setExtraStrategy] = useState<"reduce-term" | "reduce-installment">("reduce-term");
+  const [bankId, setBankId] = useState<string>(initial.bankId);
+  const [rateInput, setRateInput] = useState<string>(initial.rateInput);
+  const [system, setSystem] = useState<AmortSystem>(initial.system);
+  const [buyerAge, setBuyerAge] = useState<number>(initial.buyerAge);
+  const [monthlyIncome, setMonthlyIncome] = useState<number>(initial.monthlyIncome);
+  const [fgts, setFgts] = useState<number>(initial.fgts);
+  const [extraAnnual, setExtraAnnual] = useState<number>(initial.extraAnnual);
+  const [extraStrategy, setExtraStrategy] = useState<"reduce-term" | "reduce-installment">(initial.extraStrategy);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
@@ -265,9 +310,12 @@ export default function FinancingSimulator() {
   const formRef = useRef<HTMLElement>(null);
   const hydratedRef = useRef(false);
 
-  // ---- Restore from localStorage on mount ----
+  // ---- Restore from URL/localStorage on mount (only when persist=true) ----
   useEffect(() => {
-    // 1) Try URL param ?sim=<base64> first (shareable link takes precedence)
+    if (!persist) {
+      hydratedRef.current = true;
+      return;
+    }
     let fromUrl = false;
     try {
       const params = new URLSearchParams(window.location.search);
@@ -294,7 +342,6 @@ export default function FinancingSimulator() {
         }
         if (decoded.snapshot) setSnapshot(decoded.snapshot);
         fromUrl = true;
-        // Clean URL so refresh keeps the state via localStorage but URL stays tidy
         const url = new URL(window.location.href);
         url.searchParams.delete("sim");
         window.history.replaceState({}, "", url.toString());
@@ -304,19 +351,12 @@ export default function FinancingSimulator() {
       toast.error("Não foi possível carregar o link da simulação");
     }
 
-    // 2) Fallback to localStorage
     if (!fromUrl) {
       try {
-        const raw = localStorage.getItem("vp_financing_sim_v1");
+        const raw = localStorage.getItem(storageKey);
         if (raw) {
           const s = JSON.parse(raw) as {
-            form?: Partial<{
-              typologyId: string; propertyValue: number; downPct: number;
-              downOverride: number | null; termMonths: number; bankId: string;
-              rateInput: string; system: AmortSystem; buyerAge: number;
-              monthlyIncome: number; fgts: number; extraAnnual: number;
-              extraStrategy: "reduce-term" | "reduce-installment";
-            }>;
+            form?: Partial<Required<SimulatorInitialForm>>;
             snapshot?: Snapshot | null;
             simCode?: string;
             reportEmittedAt?: string;
@@ -341,17 +381,16 @@ export default function FinancingSimulator() {
           if (s.reportEmittedAt) setReportEmittedAt(new Date(s.reportEmittedAt));
         }
       } catch {
-        /* ignore corrupted state */
+        /* ignore */
       }
     }
     hydratedRef.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const selectedRate: InstitutionRate | undefined = INSTITUTION_RATES.find((r) => r.id === bankId);
   const rateIsManual = !selectedRate || selectedRate.annualRate === null;
 
-  // sync rateInput when selecting a bank with a public rate (skip once after hydration
-  // so the restored manual rate is preserved)
   const skipBankSyncRef = useRef(true);
   useEffect(() => {
     if (skipBankSyncRef.current) {
@@ -368,7 +407,7 @@ export default function FinancingSimulator() {
 
   // ---- Persist to localStorage ----
   useEffect(() => {
-    if (!hydratedRef.current) return;
+    if (!persist || !hydratedRef.current) return;
     try {
       const payload = {
         form: {
@@ -380,11 +419,12 @@ export default function FinancingSimulator() {
         simCode: simCodeRef.current,
         reportEmittedAt: reportEmittedAt.toISOString(),
       };
-      localStorage.setItem("vp_financing_sim_v1", JSON.stringify(payload));
+      localStorage.setItem(storageKey, JSON.stringify(payload));
     } catch {
-      /* quota / private mode — ignore */
+      /* ignore */
     }
   }, [
+    persist, storageKey,
     typologyId, propertyValue, downPct, downOverride, termMonths,
     bankId, rateInput, system, buyerAge, monthlyIncome, fgts,
     extraAnnual, extraStrategy, snapshot, reportEmittedAt,
@@ -409,7 +449,6 @@ export default function FinancingSimulator() {
 
   const mcmvForm = useMemo(() => checkMCMV(propertyValue, monthlyIncome || undefined), [propertyValue, monthlyIncome]);
 
-  /* ---- Build current form as tentative snapshot (for drift detection) ---- */
   const parsedRate = parseFloat(rateInput.replace(",", "."));
   const currentSnap: Snapshot = {
     propertyValue,
@@ -434,7 +473,6 @@ export default function FinancingSimulator() {
     return JSON.stringify(snapshot) !== JSON.stringify(currentSnap);
   }, [snapshot, currentSnap]);
 
-  /* ---- Validation ---- */
   const schema = z.object({
     bankId: z.string().min(1, "Selecione um banco ou linha de financiamento."),
     propertyValue: z.number().min(50_000, "Informe o valor do imóvel (mín. R$ 50.000)."),
@@ -456,8 +494,6 @@ export default function FinancingSimulator() {
 
   const handleGenerate = () => {
     const errs: Record<string, string> = {};
-
-    // Custom cross-field checks first
     if (propertyValue > 0 && financedAmount <= 0) {
       errs.financed = "A entrada não pode ser igual ou maior que o valor do imóvel.";
     }
@@ -484,7 +520,6 @@ export default function FinancingSimulator() {
 
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
-      // focus first error
       const order = ["bankId", "annualRate", "propertyValue", "dp", "financed", "termMonths", "buyerAge", "monthlyIncome", "system"];
       const firstKey = order.find((k) => errs[k]) ?? Object.keys(errs)[0];
       const idMap: Record<string, string> = {
@@ -505,55 +540,52 @@ export default function FinancingSimulator() {
     setErrors({});
     setIsLoading(true);
 
-    // small delay so the UI can render the loading state before the synchronous snapshot update
     setTimeout(() => {
       simCodeRef.current = generateSimCode();
       setReportEmittedAt(new Date());
       setSnapshot(currentSnap);
       setIsLoading(false);
-      // scroll to results (mobile)
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        options.onGenerated?.(currentSnap);
       }, 60);
     }, 80);
   };
 
-  const resetFormToEmpty = () => {
-    setTypologyId("custom");
-    setPropertyValue(0);
-    setDownPct(0);
-    setDownOverride(null);
-    setTermMonths(0);
-    setBankId("");
-    setRateInput("");
-    setSystem("SAC");
-    setBuyerAge(0);
-    setMonthlyIncome(0);
-    setFgts(0);
-    setExtraAnnual(0);
-    setExtraStrategy("reduce-term");
+  const applyForm = (next: SimulatorInitialForm) => {
+    const merged = { ...EMPTY_FORM, ...next };
+    setTypologyId(merged.typologyId);
+    setPropertyValue(merged.propertyValue);
+    setDownPct(merged.downPct);
+    setDownOverride(merged.downOverride);
+    setTermMonths(merged.termMonths);
+    setBankId(merged.bankId);
+    setRateInput(merged.rateInput);
+    setSystem(merged.system);
+    setBuyerAge(merged.buyerAge);
+    setMonthlyIncome(merged.monthlyIncome);
+    setFgts(merged.fgts);
+    setExtraAnnual(merged.extraAnnual);
+    setExtraStrategy(merged.extraStrategy);
   };
 
   const handleReset = () => {
     setShowResetConfirm(false);
-    // Remove persisted state so the form comes back empty on next visit
-    try {
-      localStorage.removeItem("vp_financing_sim_v1");
-    } catch {
-      /* ignore */
-    }
-    // Also clear shareable link from URL so it is not restored on refresh
-    if (window.location.search.includes("sim=")) {
-      const url = new URL(window.location.href);
-      url.searchParams.delete("sim");
-      window.history.replaceState({}, "", url.toString());
+    if (persist) {
+      try { localStorage.removeItem(storageKey); } catch { /* ignore */ }
+      if (window.location.search.includes("sim=")) {
+        const url = new URL(window.location.href);
+        url.searchParams.delete("sim");
+        window.history.replaceState({}, "", url.toString());
+      }
     }
     setSnapshot(null);
     setErrors({});
     simCodeRef.current = generateSimCode();
     setReportEmittedAt(new Date());
-    resetFormToEmpty();
+    applyForm(options.initialForm ?? {});
     formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    options.onReset?.();
   };
 
   const handleStart = () => {
@@ -564,486 +596,511 @@ export default function FinancingSimulator() {
     }, 400);
   };
 
+  const handleCopyLink = () => {
+    try {
+      const payload = {
+        form: {
+          typologyId, propertyValue, downPct, downOverride, termMonths,
+          bankId, rateInput, system, buyerAge, monthlyIncome, fgts,
+          extraAnnual, extraStrategy,
+        },
+        snapshot,
+      };
+      const json = JSON.stringify(payload);
+      const b64 = btoa(unescape(encodeURIComponent(json)))
+        .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+      const url = `${window.location.origin}${window.location.pathname}?sim=${b64}`;
+      navigator.clipboard.writeText(url).then(
+        () => toast.success("Link copiado! Cole no WhatsApp ou onde quiser."),
+        () => toast.error("Não foi possível copiar o link"),
+      );
+    } catch {
+      toast.error("Não foi possível gerar o link");
+    }
+  };
+
+  return {
+    // form state
+    typologyId, setTypologyId,
+    propertyValue, setPropertyValue,
+    downPct, setDownPct,
+    downOverride, setDownOverride,
+    termMonths, setTermMonths,
+    bankId, setBankId,
+    rateInput, setRateInput,
+    system, setSystem,
+    buyerAge, setBuyerAge,
+    monthlyIncome, setMonthlyIncome,
+    fgts, setFgts,
+    extraAnnual, setExtraAnnual,
+    extraStrategy, setExtraStrategy,
+    // derived
+    downPayment, downPaymentOwn, financedAmount, financedAmountInvalid,
+    downPctActual, ltvPctForm, ltvOk, financedPulse, mcmvForm,
+    selectedRate, rateIsManual, currentSnap, stale,
+    // snapshot & UI state
+    snapshot, errors, isLoading,
+    reportOpen, setReportOpen,
+    showResetConfirm, setShowResetConfirm,
+    simCode: simCodeRef.current,
+    reportEmittedAt,
+    // refs
+    formRef, resultsRef,
+    // handlers
+    handleGenerate, handleReset, handleStart, handleCopyLink, applyForm,
+  };
+}
+
+export type FinancingSimulatorController = ReturnType<typeof useFinancingSimulatorController>;
+
+/* ---------- form subcomponent ---------- */
+
+export function FinancingSimulatorForm({ ctl }: { ctl: FinancingSimulatorController }) {
+  const {
+    typologyId, setTypologyId,
+    propertyValue, setPropertyValue,
+    downPct, setDownPct,
+    downOverride, setDownOverride,
+    termMonths, setTermMonths,
+    bankId, setBankId,
+    rateInput, setRateInput,
+    system, setSystem,
+    buyerAge, setBuyerAge,
+    monthlyIncome, setMonthlyIncome,
+    fgts, setFgts,
+    extraAnnual, setExtraAnnual,
+    extraStrategy, setExtraStrategy,
+    downPayment, downPctActual, financedAmount, financedAmountInvalid, financedPulse,
+    ltvPctForm, mcmvForm, selectedRate, rateIsManual, currentSnap,
+    errors, isLoading, snapshot,
+    handleGenerate, handleReset,
+    showResetConfirm, setShowResetConfirm,
+  } = ctl;
+
   return (
-    <section id="simulator-form" ref={formRef} className="scroll-mt-24 py-12 md:py-16">
-      <header className="mb-6">
-        <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2">
-          <Calculator className="h-6 w-6 text-primary" />
-          Simulador de financiamento imobiliário
-        </h2>
-        <p className="text-muted-foreground mt-1 max-w-2xl">
-          Preencha as premissas e clique em <strong>Gerar simulação</strong> para ver KPIs, comparativo entre bancos,
-          gráficos e relatório. Simulação estimativa — a proposta oficial é sempre do banco.
-        </p>
-      </header>
+    <>
+      <Card className="border-border/60">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-primary" />
+            Premissas da simulação
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* ============= IMÓVEL ============= */}
+          <Fieldset title="Imóvel">
+            <div className="space-y-1.5">
+              <Label>Unidade Vila Park</Label>
+              <Select
+                value={typologyId}
+                onValueChange={(v) => {
+                  setTypologyId(v);
+                  const t = TYPOLOGIES.find((x) => x.id === v);
+                  if (t && t.purchasePrice > 0) setPropertyValue(t.purchasePrice);
+                }}
+              >
+                <SelectTrigger id="typology" className="h-11"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="custom">Personalizado</SelectItem>
+                  {TYPOLOGIES.map((t) => (
+                    <SelectItem key={t.id} value={t.id}>{t.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
-        {/* ------- Inputs ------- */}
-        <div className="md:col-span-1 lg:col-span-2 space-y-4 lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:pr-1">
-          <Card className="border-border/60">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-primary" />
-                Premissas da simulação
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* ============= IMÓVEL ============= */}
-              <Fieldset title="Imóvel">
-                <div className="space-y-1.5">
-                  <Label>Unidade Vila Park</Label>
-                  <Select
-                    value={typologyId}
-                    onValueChange={(v) => {
-                      setTypologyId(v);
-                      const t = TYPOLOGIES.find((x) => x.id === v);
-                      if (t && t.purchasePrice > 0) setPropertyValue(t.purchasePrice);
-                    }}
-                  >
-                    <SelectTrigger id="typology" className="h-11"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="custom">Personalizado</SelectItem>
-                      {TYPOLOGIES.map((t) => (
-                        <SelectItem key={t.id} value={t.id}>{t.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="pv">Valor do imóvel</Label>
+                <span className="text-sm font-semibold text-foreground tabular-nums">
+                  {propertyValue > 0 ? BRL(propertyValue) : "—"}
+                </span>
+              </div>
+              <CurrencyInput
+                id="pv"
+                value={propertyValue}
+                onChange={setPropertyValue}
+                invalid={!!errors.propertyValue}
+                aria-describedby={errors.propertyValue ? "pv-error" : undefined}
+              />
+              <Slider
+                value={[propertyValue]}
+                min={200_000}
+                max={3_000_000}
+                step={10_000}
+                onValueChange={(v) => setPropertyValue(v[0])}
+                className={SLIDER_TOUCH}
+                aria-invalid={!!errors.propertyValue || undefined}
+                aria-describedby={errors.propertyValue ? "pv-error" : undefined}
+              />
+              <FieldError id="pv-error" msg={errors.propertyValue} />
+            </div>
+          </Fieldset>
 
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="pv">Valor do imóvel</Label>
-                    <span className="text-sm font-semibold text-foreground tabular-nums">
-                      {propertyValue > 0 ? BRL(propertyValue) : "—"}
-                    </span>
-                  </div>
-                  <CurrencyInput
-                    id="pv"
-                    value={propertyValue}
-                    onChange={setPropertyValue}
-                    invalid={!!errors.propertyValue}
-                    aria-describedby={errors.propertyValue ? "pv-error" : undefined}
-                  />
-                  <Slider
-                    value={[propertyValue]}
-                    min={200_000}
-                    max={3_000_000}
-                    step={10_000}
-                    onValueChange={(v) => setPropertyValue(v[0])}
-                    className={SLIDER_TOUCH}
-                    aria-invalid={!!errors.propertyValue || undefined}
-                    aria-describedby={errors.propertyValue ? "pv-error" : undefined}
-                  />
-                  <FieldError id="pv-error" msg={errors.propertyValue} />
-                </div>
-              </Fieldset>
-
-              {/* ============= ENTRADA E PRAZO ============= */}
-              <Fieldset title="Entrada e prazo">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label className="flex items-center gap-1.5">
-                      Entrada
-                      <InfoHint text="Pelas regras SFH, a entrada mínima é 20% do valor do imóvel (LTV 80%)." label="Entrada" />
-                    </Label>
-                    <span className="text-sm font-semibold text-foreground tabular-nums">
-                      {propertyValue > 0 ? `${BRL(downPayment)} · ${downPctActual.toFixed(0)}%` : "—"}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <CurrencyInput
-                      id="dp"
-                      value={downOverride ?? Math.round((propertyValue * downPct) / 100)}
-                      invalid={!!errors.dp}
-                      aria-describedby={errors.dp ? "dp-error" : undefined}
-                      onChange={(v) => {
-                        const maxDown = Math.max(propertyValue - fgts, 0);
-                        const clamped = clamp(v, 0, maxDown);
-                        setDownOverride(clamped);
-                        setDownPct(clamp((clamped / Math.max(propertyValue, 1)) * 100, 0, 100));
-                      }}
-                    />
-                    <div className="relative">
-                      <Input
-                        id="dp-pct"
-                        inputMode="decimal"
-                        value={downPct.toFixed(0)}
-                        onChange={(e) => {
-                          const p = clamp(parseFloat(e.target.value.replace(",", ".")) || 0, 0, 100);
-                          setDownPct(p);
-                          setDownOverride(null);
-                        }}
-                        className="pr-8 h-11 text-right tabular-nums"
-                        aria-describedby={errors.dp ? "dp-error" : undefined}
-                      />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">%</span>
-                    </div>
-                  </div>
-                  <Slider
-                    value={[downPct]}
-                    min={20}
-                    max={80}
-                    step={1}
-                    onValueChange={(v) => {
-                      setDownPct(v[0]);
+          {/* ============= ENTRADA E PRAZO ============= */}
+          <Fieldset title="Entrada e prazo">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="flex items-center gap-1.5">
+                  Entrada
+                  <InfoHint text="Pelas regras SFH, a entrada mínima é 20% do valor do imóvel (LTV 80%)." label="Entrada" />
+                </Label>
+                <span className="text-sm font-semibold text-foreground tabular-nums">
+                  {propertyValue > 0 ? `${BRL(downPayment)} · ${downPctActual.toFixed(0)}%` : "—"}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <CurrencyInput
+                  id="dp"
+                  value={downOverride ?? Math.round((propertyValue * downPct) / 100)}
+                  invalid={!!errors.dp}
+                  aria-describedby={errors.dp ? "dp-error" : undefined}
+                  onChange={(v) => {
+                    const maxDown = Math.max(propertyValue - fgts, 0);
+                    const clamped = clamp(v, 0, maxDown);
+                    setDownOverride(clamped);
+                    setDownPct(clamp((clamped / Math.max(propertyValue, 1)) * 100, 0, 100));
+                  }}
+                />
+                <div className="relative">
+                  <Input
+                    id="dp-pct"
+                    inputMode="decimal"
+                    value={downPct.toFixed(0)}
+                    onChange={(e) => {
+                      const p = clamp(parseFloat(e.target.value.replace(",", ".")) || 0, 0, 100);
+                      setDownPct(p);
                       setDownOverride(null);
                     }}
-                    className={SLIDER_TOUCH}
-                    aria-invalid={!!errors.dp || undefined}
+                    className="pr-8 h-11 text-right tabular-nums"
                     aria-describedby={errors.dp ? "dp-error" : undefined}
                   />
-                  <div className="flex justify-between text-[11px] text-muted-foreground px-0.5">
-                    <span>20% (mín. SFH)</span>
-                    <span>80%</span>
-                  </div>
-                  <FieldError id="dp-error" msg={errors.dp} />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">%</span>
                 </div>
+              </div>
+              <Slider
+                value={[downPct]}
+                min={20}
+                max={80}
+                step={1}
+                onValueChange={(v) => {
+                  setDownPct(v[0]);
+                  setDownOverride(null);
+                }}
+                className={SLIDER_TOUCH}
+                aria-invalid={!!errors.dp || undefined}
+                aria-describedby={errors.dp ? "dp-error" : undefined}
+              />
+              <div className="flex justify-between text-[11px] text-muted-foreground px-0.5">
+                <span>20% (mín. SFH)</span>
+                <span>80%</span>
+              </div>
+              <FieldError id="dp-error" msg={errors.dp} />
+            </div>
 
-                {/* Financed amount (auto) */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="financed" className="flex items-center gap-1.5">
-                      <RefreshCw className="h-3 w-3 text-primary" aria-hidden="true" />
-                      Valor financiado
-                      <InfoHint text="Valor financiado = valor do imóvel − entrada. O FGTS, quando informado, compõe a entrada e reduz o valor financiado." label="Valor financiado" />
-                    </Label>
-                    <span className="text-xs text-muted-foreground">automático</span>
-                  </div>
-                  <div className="relative">
-                    <span
-                      className={[
-                        "absolute left-3 top-1/2 -translate-y-1/2 text-sm",
-                        financedAmountInvalid ? "text-destructive" : "text-muted-foreground",
-                      ].join(" ")}
-                    >
-                      R$
-                    </span>
-                    <Input
-                      id="financed"
-                      readOnly
-                      aria-readonly="true"
-                      tabIndex={-1}
-                      inputMode="numeric"
-                      value={fmtBRL(financedAmount)}
-                      aria-describedby={errors.financed ? "financed-error" : undefined}
-                      className={[
-                        "pl-9 pr-3 h-11 text-right font-semibold tabular-nums cursor-default transition-colors duration-300",
-                        financedAmountInvalid || errors.financed
-                          ? "border-destructive bg-destructive/10 text-destructive focus-visible:ring-destructive"
-                          : "bg-muted/40",
-                        financedPulse && !financedAmountInvalid ? "border-primary/60 text-primary" : "",
-                      ].join(" ")}
-                    />
-                  </div>
-                  <FieldError id="financed-error" msg={errors.financed} />
-                </div>
+            {/* Financed amount (auto) */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="financed" className="flex items-center gap-1.5">
+                  <RefreshCw className="h-3 w-3 text-primary" aria-hidden="true" />
+                  Valor financiado
+                  <InfoHint text="Valor financiado = valor do imóvel − entrada. O FGTS, quando informado, compõe a entrada e reduz o valor financiado." label="Valor financiado" />
+                </Label>
+                <span className="text-xs text-muted-foreground">automático</span>
+              </div>
+              <div className="relative">
+                <span
+                  className={[
+                    "absolute left-3 top-1/2 -translate-y-1/2 text-sm",
+                    financedAmountInvalid ? "text-destructive" : "text-muted-foreground",
+                  ].join(" ")}
+                >
+                  R$
+                </span>
+                <Input
+                  id="financed"
+                  readOnly
+                  aria-readonly="true"
+                  tabIndex={-1}
+                  inputMode="numeric"
+                  value={fmtBRL(financedAmount)}
+                  aria-describedby={errors.financed ? "financed-error" : undefined}
+                  className={[
+                    "pl-9 pr-3 h-11 text-right font-semibold tabular-nums cursor-default transition-colors duration-300",
+                    financedAmountInvalid || errors.financed
+                      ? "border-destructive bg-destructive/10 text-destructive focus-visible:ring-destructive"
+                      : "bg-muted/40",
+                    financedPulse && !financedAmountInvalid ? "border-primary/60 text-primary" : "",
+                  ].join(" ")}
+                />
+              </div>
+              <FieldError id="financed-error" msg={errors.financed} />
+            </div>
 
-                {/* Term */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="term">Prazo</Label>
-                    <span className="text-sm font-semibold text-foreground tabular-nums">
-                      {currentSnap.termMonths} meses · {(currentSnap.termMonths / 12).toFixed(0)} anos
-                    </span>
-                  </div>
-                  <Slider
-                    id="term"
-                    value={[termMonths]}
-                    min={60}
-                    max={420}
-                    step={12}
-                    onValueChange={(v) => setTermMonths(v[0])}
-                    className={SLIDER_TOUCH}
-                    aria-invalid={!!errors.termMonths || undefined}
-                    aria-describedby={errors.termMonths ? "term-error" : undefined}
-                  />
-                  <div className="flex justify-between text-[11px] text-muted-foreground px-0.5">
-                    <span>5 anos (60 meses)</span>
-                    <span>35 anos (420 meses)</span>
-                  </div>
-                  <FieldError id="term-error" msg={errors.termMonths} />
-                </div>
-              </Fieldset>
+            {/* Term */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="term">Prazo</Label>
+                <span className="text-sm font-semibold text-foreground tabular-nums">
+                  {currentSnap.termMonths} meses · {(currentSnap.termMonths / 12).toFixed(0)} anos
+                </span>
+              </div>
+              <Slider
+                id="term"
+                value={[termMonths]}
+                min={60}
+                max={420}
+                step={12}
+                onValueChange={(v) => setTermMonths(v[0])}
+                className={SLIDER_TOUCH}
+                aria-invalid={!!errors.termMonths || undefined}
+                aria-describedby={errors.termMonths ? "term-error" : undefined}
+              />
+              <div className="flex justify-between text-[11px] text-muted-foreground px-0.5">
+                <span>5 anos (60 meses)</span>
+                <span>35 anos (420 meses)</span>
+              </div>
+              <FieldError id="term-error" msg={errors.termMonths} />
+            </div>
+          </Fieldset>
 
-              {/* ============= CONDIÇÕES ============= */}
-              <Fieldset title="Condições">
-                <div className="space-y-1.5">
-                  <Label htmlFor="bank" className="flex items-center gap-1.5">
-                    Banco / linha
-                    <InfoHint text="Base de instituições consultada em 19/07/2026. Bancos com taxa 'sob consulta' exigem digitar a taxa manualmente." label="Banco" />
-                  </Label>
-                  <Select value={bankId} onValueChange={(v) => setBankId(v)}>
-                    <SelectTrigger id="bank" className="h-11" aria-invalid={!!errors.bankId || undefined} aria-describedby={errors.bankId ? "bank-error" : undefined}>
-                      <SelectValue placeholder="Selecione um banco/linha" />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-80">
-                      {INSTITUTION_RATES.map((r) => (
-                        <SelectItem key={r.id} value={r.id}>
-                          <span className="flex items-center gap-2">
-                            <span className="font-medium">{r.bank}</span>
-                            <span className="text-xs text-muted-foreground">
-                              {r.product} · {r.annualRate !== null ? `${PCT_PT(r.annualRate)} ${MODALITY_LABEL[r.modality]}` : `sob consulta · ${MODALITY_LABEL[r.modality]}`}
-                            </span>
-                          </span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {selectedRate && (
-                    <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                      <Badge variant="outline" className={`text-[10px] ${situationBadgeClass(selectedRate.situation)}`}>
-                        {SITUATION_LABEL[selectedRate.situation]}
-                      </Badge>
-                      <Badge variant="outline" className="text-[10px]">{MODALITY_LABEL[selectedRate.modality]}</Badge>
-                      <span className="text-[10px] text-muted-foreground">
-                        consulta {formatConsultDate(selectedRate.consultedAt)}
+          {/* ============= CONDIÇÕES ============= */}
+          <Fieldset title="Condições">
+            <div className="space-y-1.5">
+              <Label htmlFor="bank" className="flex items-center gap-1.5">
+                Banco / linha
+                <InfoHint text="Base de instituições consultada em 19/07/2026. Bancos com taxa 'sob consulta' exigem digitar a taxa manualmente." label="Banco" />
+              </Label>
+              <Select value={bankId} onValueChange={(v) => setBankId(v)}>
+                <SelectTrigger id="bank" className="h-11" aria-invalid={!!errors.bankId || undefined} aria-describedby={errors.bankId ? "bank-error" : undefined}>
+                  <SelectValue placeholder="Selecione um banco/linha" />
+                </SelectTrigger>
+                <SelectContent className="max-h-80">
+                  {INSTITUTION_RATES.map((r) => (
+                    <SelectItem key={r.id} value={r.id}>
+                      <span className="flex items-center gap-2">
+                        <span className="font-medium">{r.bank}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {r.product} · {r.annualRate !== null ? `${PCT_PT(r.annualRate)} ${MODALITY_LABEL[r.modality]}` : `sob consulta · ${MODALITY_LABEL[r.modality]}`}
+                        </span>
                       </span>
-                    </div>
-                  )}
-                  <FieldError id="bank-error" msg={errors.bankId} />
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {selectedRate && (
+                <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                  <Badge variant="outline" className={`text-[10px] ${situationBadgeClass(selectedRate.situation)}`}>
+                    {SITUATION_LABEL[selectedRate.situation]}
+                  </Badge>
+                  <Badge variant="outline" className="text-[10px]">{MODALITY_LABEL[selectedRate.modality]}</Badge>
+                  <span className="text-[10px] text-muted-foreground">
+                    consulta {formatConsultDate(selectedRate.consultedAt)}
+                  </span>
                 </div>
-
-                <div className="space-y-1.5">
-                  <Label htmlFor="rate" className="flex items-center gap-1.5">
-                    Taxa de juros (a.a.)
-                    <InfoHint text="Juros anuais definidos pela instituição. Para bancos 'sob consulta', digite a taxa proposta pelo gerente." label="Taxa" />
-                  </Label>
-                  <div className="relative">
-                    <Input
-                      id="rate"
-                      inputMode="decimal"
-                      readOnly={!rateIsManual}
-                      aria-readonly={!rateIsManual}
-                      value={rateInput}
-                      onChange={(e) => setRateInput(e.target.value)}
-                      placeholder={rateIsManual ? "0,00" : ""}
-                      aria-invalid={!!errors.annualRate || undefined}
-                      aria-describedby={errors.annualRate ? "rate-error" : undefined}
-                      className={[
-                        "pr-20 h-11 font-semibold tabular-nums text-right",
-                        rateIsManual ? "" : "cursor-default bg-muted/40",
-                        errors.annualRate ? "border-destructive focus-visible:ring-destructive" : "",
-                      ].join(" ")}
-                    />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
-                      a.a. {selectedRate ? `+ ${selectedRate.indexer}` : ""}
-                    </span>
-                  </div>
-                  {!rateIsManual && (
-                    <p className="text-[11px] text-muted-foreground">Taxa fixa da linha selecionada — troque de linha para simular outra.</p>
-                  )}
-                  <FieldError id="rate-error" msg={errors.annualRate} />
-                </div>
-
-                <div className="space-y-2" id="system">
-                  <Label className="flex items-center gap-1.5">
-                    Sistema de amortização
-                    <InfoHint text="SAC: parcelas decrescem, paga menos juros total. Price: parcelas fixas, mais previsível." label="Sistema" />
-                  </Label>
-                  <div
-                    role="tablist"
-                    aria-label="Sistema de amortização"
-                    aria-invalid={!!errors.system || undefined}
-                    aria-describedby={errors.system ? "system-error" : undefined}
-                    className={[
-                      "inline-flex w-full rounded-md border bg-muted/30 p-0.5",
-                      errors.system ? "border-destructive" : "border-border/60",
-                    ].join(" ")}
-                  >
-                    {(["SAC", "PRICE"] as const).map((opt) => {
-                      const selected = system === opt;
-                      const hint = opt === "SAC" ? "Parcelas decrescentes, menos juros" : "Parcelas fixas, mais previsibilidade";
-                      return (
-                        <TooltipProvider key={opt} delayDuration={200}>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <button
-                                type="button"
-                                role="tab"
-                                aria-selected={selected}
-                                onClick={() => setSystem(opt)}
-                                className={[
-                                  "flex-1 h-9 rounded-[5px] text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                                  selected ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
-                                ].join(" ")}
-                              >
-                                {opt === "PRICE" ? "Price" : "SAC"}
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent className="text-xs">{hint}</TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      );
-                    })}
-                  </div>
-                  <FieldError id="system-error" msg={errors.system} />
-                </div>
-
-                {mcmvForm.eligible && (
-                  <div className="rounded-lg border border-primary/40 bg-primary/5 p-3">
-                    <p className="text-sm font-semibold text-primary flex items-center gap-1.5">
-                      <Sparkles className="h-4 w-4" /> Você pode se enquadrar no MCMV Faixa 4
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Imóvel até R$ 600 mil + renda familiar até R$ 13 mil dão acesso a taxas de {PCT_PT(mcmvForm.suggestedRateMin, 1)} a {PCT_PT(mcmvForm.suggestedRateMax, 1)} a.a. (regras 2026).
-                    </p>
-                  </div>
-                )}
-              </Fieldset>
-
-              {/* ============= PERFIL DO COMPRADOR ============= */}
-              <Fieldset title="Perfil do comprador">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="age" className="flex items-center gap-1.5">
-                      Idade
-                      <InfoHint text="Usada para estimar o MIP (seguro por morte/invalidez). Quanto mais jovem, mais barato." label="Idade" />
-                    </Label>
-                    <Input
-                      id="age"
-                      type="number"
-                      min={18}
-                      max={80}
-                      value={buyerAge || ""}
-                      aria-invalid={!!errors.buyerAge || undefined}
-                      aria-describedby={errors.buyerAge ? "age-error" : undefined}
-                      className={["h-11 text-right tabular-nums", errors.buyerAge ? "border-destructive focus-visible:ring-destructive" : ""].join(" ")}
-                      onChange={(e) => {
-                        const raw = e.target.value;
-                        setBuyerAge(raw === "" ? 0 : clamp(parseInt(raw) || 0, 0, 120));
-                      }}
-                    />
-                    <FieldError id="age-error" msg={errors.buyerAge} />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="income" className="flex items-center gap-1.5">
-                      Renda familiar
-                      <InfoHint text="Renda familiar mensal bruta. Comprometimento máx. de 30% da renda com a 1ª parcela." label="Renda" />
-                    </Label>
-                    <CurrencyInput
-                      id="income"
-                      value={monthlyIncome}
-                      onChange={setMonthlyIncome}
-                      placeholder="0"
-                      invalid={!!errors.monthlyIncome}
-                      aria-describedby={errors.monthlyIncome ? "income-error" : undefined}
-                    />
-                    <FieldError id="income-error" msg={errors.monthlyIncome} />
-                  </div>
-                </div>
-              </Fieldset>
-
-              {/* ============= OPCIONAIS ============= */}
-              <Fieldset title="Opcionais">
-                <div className="space-y-1.5">
-                  <Label htmlFor="fgts" className="flex items-center gap-1.5">
-                    FGTS na entrada <span className="text-[10px] uppercase tracking-wide text-muted-foreground">(opcional)</span>
-                    <InfoHint text="Somamos ao valor da entrada. Regras: 3 anos de contribuição e imóvel em SP até R$ 1,5 mi." label="FGTS" />
-                  </Label>
-                  <CurrencyInput
-                    id="fgts"
-                    value={fgts}
-                    onChange={(v) => {
-                      const base = downOverride ?? Math.round((propertyValue * downPct) / 100);
-                      const maxFgts = Math.max(propertyValue - base, 0);
-                      setFgts(clamp(v, 0, maxFgts));
-                    }}
-                  />
-                </div>
-
-                <div className="space-y-2 rounded-lg border border-border/60 p-3">
-                  <Label className="flex items-center gap-1.5">
-                    Aporte extra anual <span className="text-[10px] uppercase tracking-wide text-muted-foreground">(opcional)</span>
-                    <InfoHint text="Aporte extra a cada 12 meses. Escolha se reduz o prazo ou a parcela." label="Amortização extra" />
-                  </Label>
-                  <CurrencyInput id="extra" value={extraAnnual} onChange={setExtraAnnual} />
-                  <Tabs value={extraStrategy} onValueChange={(v) => setExtraStrategy(v as typeof extraStrategy)}>
-                    <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="reduce-term">Reduzir prazo</TabsTrigger>
-                      <TabsTrigger value="reduce-installment">Reduzir parcela</TabsTrigger>
-                    </TabsList>
-                  </Tabs>
-                </div>
-              </Fieldset>
-            </CardContent>
-
-            <div className="border-t border-border/60 px-6 py-3 flex flex-wrap gap-1.5 bg-muted/10">
-              <Chip>Financiado {BRL(financedAmount)}</Chip>
-              <Chip>LTV {ltvPctForm.toFixed(0)}%</Chip>
-              <Chip>{currentSnap.termMonths} meses</Chip>
-              <Chip>{system === "SAC" ? "SAC" : "Price"}</Chip>
-            </div>
-
-            <div className="border-t border-border/60 px-6 py-4">
-              <Button
-                type="button"
-                size="lg"
-                className="w-full h-12 gap-2 text-base"
-                onClick={handleGenerate}
-                disabled={isLoading}
-                aria-busy={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                    Calculando...
-                  </>
-                ) : (
-                  <>
-                    <Play className="h-4 w-4" aria-hidden="true" />
-                    {snapshot ? "Atualizar simulação" : "Gerar simulação"}
-                  </>
-                )}
-              </Button>
-              {Object.keys(errors).length > 0 && (
-                <p className="text-xs text-destructive mt-2 flex items-center gap-1">
-                  <AlertTriangle className="h-3 w-3" /> Corrija os campos destacados para gerar a simulação.
-                </p>
               )}
+              <FieldError id="bank-error" msg={errors.bankId} />
             </div>
-          </Card>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="rate" className="flex items-center gap-1.5">
+                Taxa de juros (a.a.)
+                <InfoHint text="Juros anuais definidos pela instituição. Para bancos 'sob consulta', digite a taxa proposta pelo gerente." label="Taxa" />
+              </Label>
+              <div className="relative">
+                <Input
+                  id="rate"
+                  inputMode="decimal"
+                  readOnly={!rateIsManual}
+                  aria-readonly={!rateIsManual}
+                  value={rateInput}
+                  onChange={(e) => setRateInput(e.target.value)}
+                  placeholder={rateIsManual ? "0,00" : ""}
+                  aria-invalid={!!errors.annualRate || undefined}
+                  aria-describedby={errors.annualRate ? "rate-error" : undefined}
+                  className={[
+                    "pr-20 h-11 font-semibold tabular-nums text-right",
+                    rateIsManual ? "" : "cursor-default bg-muted/40",
+                    errors.annualRate ? "border-destructive focus-visible:ring-destructive" : "",
+                  ].join(" ")}
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                  a.a. {selectedRate ? `+ ${selectedRate.indexer}` : ""}
+                </span>
+              </div>
+              {!rateIsManual && (
+                <p className="text-[11px] text-muted-foreground">Taxa fixa da linha selecionada — troque de linha para simular outra.</p>
+              )}
+              <FieldError id="rate-error" msg={errors.annualRate} />
+            </div>
+
+            <div className="space-y-2" id="system">
+              <Label className="flex items-center gap-1.5">
+                Sistema de amortização
+                <InfoHint text="SAC: parcelas decrescem, paga menos juros total. Price: parcelas fixas, mais previsível." label="Sistema" />
+              </Label>
+              <div
+                role="tablist"
+                aria-label="Sistema de amortização"
+                aria-invalid={!!errors.system || undefined}
+                aria-describedby={errors.system ? "system-error" : undefined}
+                className={[
+                  "inline-flex w-full rounded-md border bg-muted/30 p-0.5",
+                  errors.system ? "border-destructive" : "border-border/60",
+                ].join(" ")}
+              >
+                {(["SAC", "PRICE"] as const).map((opt) => {
+                  const selected = system === opt;
+                  const hint = opt === "SAC" ? "Parcelas decrescentes, menos juros" : "Parcelas fixas, mais previsibilidade";
+                  return (
+                    <TooltipProvider key={opt} delayDuration={200}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            type="button"
+                            role="tab"
+                            aria-selected={selected}
+                            onClick={() => setSystem(opt)}
+                            className={[
+                              "flex-1 h-9 rounded-[5px] text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                              selected ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
+                            ].join(" ")}
+                          >
+                            {opt === "PRICE" ? "Price" : "SAC"}
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="text-xs">{hint}</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  );
+                })}
+              </div>
+              <FieldError id="system-error" msg={errors.system} />
+            </div>
+
+            {mcmvForm.eligible && (
+              <div className="rounded-lg border border-primary/40 bg-primary/5 p-3">
+                <p className="text-sm font-semibold text-primary flex items-center gap-1.5">
+                  <Sparkles className="h-4 w-4" /> Você pode se enquadrar no MCMV Faixa 4
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Imóvel até R$ 600 mil + renda familiar até R$ 13 mil dão acesso a taxas de {PCT_PT(mcmvForm.suggestedRateMin, 1)} a {PCT_PT(mcmvForm.suggestedRateMax, 1)} a.a. (regras 2026).
+                </p>
+              </div>
+            )}
+          </Fieldset>
+
+          {/* ============= PERFIL DO COMPRADOR ============= */}
+          <Fieldset title="Perfil do comprador">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="age" className="flex items-center gap-1.5">
+                  Idade
+                  <InfoHint text="Usada para estimar o MIP (seguro por morte/invalidez). Quanto mais jovem, mais barato." label="Idade" />
+                </Label>
+                <Input
+                  id="age"
+                  type="number"
+                  min={18}
+                  max={80}
+                  value={buyerAge || ""}
+                  aria-invalid={!!errors.buyerAge || undefined}
+                  aria-describedby={errors.buyerAge ? "age-error" : undefined}
+                  className={["h-11 text-right tabular-nums", errors.buyerAge ? "border-destructive focus-visible:ring-destructive" : ""].join(" ")}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    setBuyerAge(raw === "" ? 0 : clamp(parseInt(raw) || 0, 0, 120));
+                  }}
+                />
+                <FieldError id="age-error" msg={errors.buyerAge} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="income" className="flex items-center gap-1.5">
+                  Renda familiar
+                  <InfoHint text="Renda familiar mensal bruta. Comprometimento máx. de 30% da renda com a 1ª parcela." label="Renda" />
+                </Label>
+                <CurrencyInput
+                  id="income"
+                  value={monthlyIncome}
+                  onChange={setMonthlyIncome}
+                  placeholder="0"
+                  invalid={!!errors.monthlyIncome}
+                  aria-describedby={errors.monthlyIncome ? "income-error" : undefined}
+                />
+                <FieldError id="income-error" msg={errors.monthlyIncome} />
+              </div>
+            </div>
+          </Fieldset>
+
+          {/* ============= OPCIONAIS ============= */}
+          <Fieldset title="Opcionais">
+            <div className="space-y-1.5">
+              <Label htmlFor="fgts" className="flex items-center gap-1.5">
+                FGTS na entrada <span className="text-[10px] uppercase tracking-wide text-muted-foreground">(opcional)</span>
+                <InfoHint text="Somamos ao valor da entrada. Regras: 3 anos de contribuição e imóvel em SP até R$ 1,5 mi." label="FGTS" />
+              </Label>
+              <CurrencyInput
+                id="fgts"
+                value={fgts}
+                onChange={(v) => {
+                  const base = downOverride ?? Math.round((propertyValue * downPct) / 100);
+                  const maxFgts = Math.max(propertyValue - base, 0);
+                  setFgts(clamp(v, 0, maxFgts));
+                }}
+              />
+            </div>
+
+            <div className="space-y-2 rounded-lg border border-border/60 p-3">
+              <Label className="flex items-center gap-1.5">
+                Aporte extra anual <span className="text-[10px] uppercase tracking-wide text-muted-foreground">(opcional)</span>
+                <InfoHint text="Aporte extra a cada 12 meses. Escolha se reduz o prazo ou a parcela." label="Amortização extra" />
+              </Label>
+              <CurrencyInput id="extra" value={extraAnnual} onChange={setExtraAnnual} />
+              <Tabs value={extraStrategy} onValueChange={(v) => setExtraStrategy(v as typeof extraStrategy)}>
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="reduce-term">Reduzir prazo</TabsTrigger>
+                  <TabsTrigger value="reduce-installment">Reduzir parcela</TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+          </Fieldset>
+        </CardContent>
+
+        <div className="border-t border-border/60 px-6 py-3 flex flex-wrap gap-1.5 bg-muted/10">
+          <Chip>Financiado {BRL(financedAmount)}</Chip>
+          <Chip>LTV {ltvPctForm.toFixed(0)}%</Chip>
+          <Chip>{currentSnap.termMonths} meses</Chip>
+          <Chip>{system === "SAC" ? "SAC" : "Price"}</Chip>
         </div>
 
-        {/* ------- Results ------- */}
-        <div className="md:col-span-1 lg:col-span-3 space-y-4 min-w-0" ref={resultsRef}>
-          {snapshot ? (
-            <ResultsView
-              snap={snapshot}
-              stale={stale}
-              onRegenerate={handleGenerate}
-              onReset={() => setShowResetConfirm(true)}
-              onCopyLink={() => {
-                try {
-                  const payload = {
-                    form: {
-                      typologyId, propertyValue, downPct, downOverride, termMonths,
-                      bankId, rateInput, system, buyerAge, monthlyIncome, fgts,
-                      extraAnnual, extraStrategy,
-                    },
-                    snapshot,
-                  };
-                  const json = JSON.stringify(payload);
-                  const b64 = btoa(unescape(encodeURIComponent(json)))
-                    .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-                  const url = `${window.location.origin}${window.location.pathname}?sim=${b64}`;
-                  navigator.clipboard.writeText(url).then(
-                    () => toast.success("Link copiado! Cole no WhatsApp ou onde quiser."),
-                    () => toast.error("Não foi possível copiar o link")
-                  );
-                } catch {
-                  toast.error("Não foi possível gerar o link");
-                }
-              }}
-              reportOpen={reportOpen}
-              setReportOpen={setReportOpen}
-              simCode={simCodeRef.current}
-              reportEmittedAt={reportEmittedAt}
-            />
-          ) : (
-            <EmptyResults onStart={handleStart} />
+        <div className="border-t border-border/60 px-6 py-4">
+          <Button
+            type="button"
+            size="lg"
+            className="w-full h-12 gap-2 text-base"
+            onClick={handleGenerate}
+            disabled={isLoading}
+            aria-busy={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                Calculando...
+              </>
+            ) : (
+              <>
+                <Play className="h-4 w-4" aria-hidden="true" />
+                {snapshot ? "Atualizar simulação" : "Gerar simulação"}
+              </>
+            )}
+          </Button>
+          {Object.keys(errors).length > 0 && (
+            <p className="text-xs text-destructive mt-2 flex items-center gap-1">
+              <AlertTriangle className="h-3 w-3" /> Corrija os campos destacados para gerar a simulação.
+            </p>
           )}
         </div>
-      </div>
+      </Card>
 
       {/* Reset confirmation dialog */}
       <Dialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
@@ -1065,6 +1122,72 @@ export default function FinancingSimulator() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </>
+  );
+}
+
+/* ---------- results subcomponent ---------- */
+
+export function FinancingSimulatorResults({
+  ctl,
+  showEmpty = true,
+  showCopyLink = true,
+  showResetButton = true,
+}: {
+  ctl: FinancingSimulatorController;
+  showEmpty?: boolean;
+  showCopyLink?: boolean;
+  showResetButton?: boolean;
+}) {
+  const { snapshot, stale, handleGenerate, setShowResetConfirm, handleCopyLink, reportOpen, setReportOpen, simCode, reportEmittedAt, handleStart } = ctl;
+
+  if (!snapshot) {
+    if (!showEmpty) return null;
+    return <EmptyResults onStart={handleStart} />;
+  }
+  return (
+    <ResultsView
+      snap={snapshot}
+      stale={stale}
+      onRegenerate={handleGenerate}
+      onReset={() => setShowResetConfirm(true)}
+      onCopyLink={handleCopyLink}
+      showCopyLink={showCopyLink}
+      showResetButton={showResetButton}
+      reportOpen={reportOpen}
+      setReportOpen={setReportOpen}
+      simCode={simCode}
+      reportEmittedAt={reportEmittedAt}
+    />
+  );
+}
+
+/* ---------- default composed export (used by /ferramentas) ---------- */
+
+export default function FinancingSimulator() {
+  const ctl = useFinancingSimulatorController();
+  return (
+    <section id="simulator-form" ref={ctl.formRef} className="scroll-mt-24 py-12 md:py-16">
+      <header className="mb-6">
+        <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2">
+          <Calculator className="h-6 w-6 text-primary" />
+          Simulador de financiamento imobiliário
+        </h2>
+        <p className="text-muted-foreground mt-1 max-w-2xl">
+          Preencha as premissas e clique em <strong>Gerar simulação</strong> para ver KPIs, comparativo entre bancos,
+          gráficos e relatório. Simulação estimativa — a proposta oficial é sempre do banco.
+        </p>
+      </header>
+
+      <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
+        <div className="md:col-span-1 lg:col-span-2 space-y-4 lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:pr-1">
+          <FinancingSimulatorForm ctl={ctl} />
+        </div>
+
+        <div className="md:col-span-1 lg:col-span-3 space-y-4 min-w-0" ref={ctl.resultsRef}>
+          <FinancingSimulatorResults ctl={ctl} />
+        </div>
+      </div>
     </section>
   );
 }
@@ -1116,7 +1239,7 @@ function EmptyResults({ onStart }: { onStart: () => void }) {
   );
 }
 
-/* ---------- Results view (uses snapshot only) ---------- */
+/* ---------- Results view ---------- */
 
 interface ResultsProps {
   snap: Snapshot;
@@ -1124,13 +1247,15 @@ interface ResultsProps {
   onRegenerate: () => void;
   onReset: () => void;
   onCopyLink: () => void;
+  showCopyLink: boolean;
+  showResetButton: boolean;
   reportOpen: boolean;
   setReportOpen: (v: boolean) => void;
   simCode: string;
   reportEmittedAt: Date;
 }
 
-function ResultsView({ snap, stale, onRegenerate, onReset, onCopyLink, reportOpen, setReportOpen, simCode, reportEmittedAt }: ResultsProps) {
+function ResultsView({ snap, stale, onRegenerate, onReset, onCopyLink, showCopyLink, showResetButton, reportOpen, setReportOpen, simCode, reportEmittedAt }: ResultsProps) {
   const {
     propertyValue,
     downPayment,
@@ -1262,16 +1387,22 @@ function ResultsView({ snap, stale, onRegenerate, onReset, onCopyLink, reportOpe
         </div>
       )}
 
-      <div className="flex items-center justify-end gap-2">
-        <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={onCopyLink}>
-          <Link2 className="h-3.5 w-3.5" />
-          Copiar link
-        </Button>
-        <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={onReset}>
-          <RotateCcw className="h-3.5 w-3.5" />
-          Refazer
-        </Button>
-      </div>
+      {(showCopyLink || showResetButton) && (
+        <div className="flex items-center justify-end gap-2 print:hidden">
+          {showCopyLink && (
+            <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={onCopyLink}>
+              <Link2 className="h-3.5 w-3.5" />
+              Copiar link
+            </Button>
+          )}
+          {showResetButton && (
+            <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={onReset}>
+              <RotateCcw className="h-3.5 w-3.5" />
+              Refazer
+            </Button>
+          )}
+        </div>
+      )}
 
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -1472,7 +1603,7 @@ function ResultsView({ snap, stale, onRegenerate, onReset, onCopyLink, reportOpe
       <FinancingGuide />
 
       {/* Actions */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col sm:flex-row gap-3 print:hidden">
         <Button size="lg" className="flex-1 min-h-[48px] gap-2" onClick={openReport}>
           <Printer className="h-4 w-4" /> Gerar relatório completo
         </Button>
