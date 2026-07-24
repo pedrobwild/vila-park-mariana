@@ -134,7 +134,7 @@ export default function PaymentFlowDialog({
         .order("seq_no");
       if (!alive) return;
       if (error) {
-        notifyCrmError(error as SbErr, { entity: "fluxo", action: "carregar" });
+        notifyCrmError(error as SbErr, { entity: "proposta", action: "atualizar" });
       }
       if (data && data.length > 0) {
         setDrafts(
@@ -232,7 +232,7 @@ export default function PaymentFlowDialog({
       onOpenChange(false);
       await onSaved();
     } catch (e) {
-      notifyCrmError(e as SbErr, { entity: "fluxo", action: "salvar" });
+      notifyCrmError(e as SbErr, { entity: "proposta", action: "atualizar" });
     } finally {
       setBusy(false);
     }
