@@ -36,21 +36,13 @@ import {
   AlertTriangle,
   ChevronDown,
   ImageOff,
-  FileText,
   Calculator,
   RotateCcw,
+  CalendarClock,
 } from "lucide-react";
 import { formatBRL2, PAYMENT_METHOD_LABEL, type CrmPaymentMethod } from "@/lib/crm";
 import { tipologias } from "@/data/tipologias";
 import { WHATSAPP_PHONE } from "@/data/surroundings";
-import {
-  buildStatement,
-  formatBRL as fmtBRL,
-  formatDateBR,
-  type Contract as StmtContract,
-  type Installment as StmtInstallment,
-  type InstallmentKind,
-} from "@/lib/contractStatement";
 import {
   useFinancingSimulatorController,
   FinancingSimulatorForm,
@@ -88,41 +80,10 @@ type SharedUnit = {
   proposals: SharedProposal[];
 };
 
-type SharedContractInstallment = {
-  seq_label: string;
-  kind: InstallmentKind;
-  due_date: string;
-  contractual_value: number | string;
-  paid_date: string | null;
-  paid_value: number | string | null;
-  fine_value: number | string | null;
-  interest_value: number | string | null;
-  discount_value: number | string | null;
-  admin_fee: number | string | null;
-  insurance_fee: number | string | null;
-  corrected_value: number | string | null;
-};
-
-type SharedContract = {
-  contract_number: string;
-  client_name: string;
-  unit_code: string;
-  contract_date: string;
-  original_value: number | string;
-  contract_value: number | string;
-  monthly_index_rate: number | string;
-  index_label: string;
-  late_fine_rate: number | string;
-  late_interest_monthly: number | string;
-  status: string;
-  installments: SharedContractInstallment[];
-};
-
 type SharedPayload = {
   client_name: string;
   shared_at: string;
   units: SharedUnit[];
-  contracts?: SharedContract[] | null;
   interested_count?: number | null;
 };
 
@@ -465,215 +426,391 @@ function UnitCard({ u }: { u: SharedUnit }) {
   );
 }
 
-const KIND_LABEL: Record<InstallmentKind, string> = {
-  sinal: "Sinal",
+/* ------------------------- Fluxo de pagamento proposto ------------------------- */
+
+// INCC-M demo: 0,45% a.m. — mesma taxa usada nos contratos do sistema (contractStatement).
+// O índice oficial vigente será aplicado no contrato definitivo.
+const INCC_M_DEMO_MONTHLY = 0.0045;
+
+const pad3 = (v: number) => String(v).padStart(3, "0");
+
+function parseISODateLocal(iso: string): Date {
+  const s = iso.length > 10 ? iso.slice(0, 10) : iso;
+  const [y, m, d] = s.split("-").map(Number);
+  return new Date(y, (m ?? 1) - 1, d ?? 1);
+}
+function toISODate(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+function fmtDate(iso: string): string {
+  const [y, m, d] = iso.split("-");
+  return `${d}/${m}/${y}`;
+}
+/** Adiciona meses preservando o dia; se o mês alvo não tiver o dia, usa o último dia do mês. */
+function addMonthsSafe(base: Date, months: number): Date {
+  const targetY = base.getFullYear();
+  const targetIdx = base.getMonth() + months;
+  const y = targetY + Math.floor(targetIdx / 12);
+  const m = ((targetIdx % 12) + 12) % 12;
+  const lastDay = new Date(y, m + 1, 0).getDate();
+  return new Date(y, m, Math.min(base.getDate(), lastDay));
+}
+
+type FlowKind = "sinal" | "mensal" | "intermediaria" | "chaves" | "unico";
+type FlowRow = {
+  parcela: number;
+  seq: string;
+  kind: FlowKind;
+  dueDate: string; // ISO
+  contractual: number;
+  correctedNow: number;
+  monthsFromProposal: number;
+};
+
+function correctedByINCC(contractual: number, months: number): number {
+  if (months <= 0) return contractual;
+  return contractual * Math.pow(1 + INCC_M_DEMO_MONTHLY, months);
+}
+
+function buildProposalFlow(p: SharedProposal, proposalDateISO: string): FlowRow[] {
+  const rows: FlowRow[] = [];
+
+  if (p.payment_method === "a_vista") {
+    const value = n(p.final_price_brl);
+    rows.push({
+      parcela: 1,
+      seq: "001/001-S",
+      kind: "unico",
+      dueDate: proposalDateISO,
+      contractual: value,
+      correctedNow: value,
+      monthsFromProposal: 0,
+    });
+    return rows;
+  }
+
+  const base = parseISODateLocal(proposalDateISO);
+  let parcela = 0;
+
+  if (n(p.down_payment_brl) > 0) {
+    parcela++;
+    const v = n(p.down_payment_brl);
+    rows.push({
+      parcela,
+      seq: "001/001-S",
+      kind: "sinal",
+      dueDate: toISODate(base),
+      contractual: v,
+      correctedNow: v,
+      monthsFromProposal: 0,
+    });
+  }
+
+  const N = Math.max(0, p.monthly_count | 0);
+  const B = Math.max(0, p.balloon_count | 0);
+  let balloonIdx = 0;
+
+  for (let i = 1; i <= N; i++) {
+    parcela++;
+    const due = addMonthsSafe(base, i);
+    const v = n(p.monthly_brl);
+    rows.push({
+      parcela,
+      seq: `${pad3(i)}/${pad3(N)}-M`,
+      kind: "mensal",
+      dueDate: toISODate(due),
+      contractual: v,
+      correctedNow: correctedByINCC(v, i),
+      monthsFromProposal: i,
+    });
+    if (B > 0 && i % 6 === 0 && balloonIdx < B) {
+      balloonIdx++;
+      parcela++;
+      const vb = n(p.balloon_brl);
+      rows.push({
+        parcela,
+        seq: `${pad3(balloonIdx)}/${pad3(B)}-I`,
+        kind: "intermediaria",
+        dueDate: toISODate(due),
+        contractual: vb,
+        correctedNow: correctedByINCC(vb, i),
+        monthsFromProposal: i,
+      });
+    }
+  }
+
+  if (n(p.keys_brl) > 0) {
+    parcela++;
+    const keysM = N + 1;
+    const due = addMonthsSafe(base, keysM);
+    const v = n(p.keys_brl);
+    rows.push({
+      parcela,
+      seq: "001/001-C",
+      kind: "chaves",
+      dueDate: toISODate(due),
+      contractual: v,
+      correctedNow: correctedByINCC(v, keysM),
+      monthsFromProposal: keysM,
+    });
+  }
+
+  return rows;
+}
+
+const FLOW_KIND_LABEL: Record<FlowKind, string> = {
+  sinal: "Ato / sinal",
   mensal: "Mensal",
   intermediaria: "Intermediária",
   chaves: "Chaves",
+  unico: "Pagamento único",
 };
 
-function toStmtContract(c: SharedContract): StmtContract {
-  return {
-    id: c.contract_number,
-    unit_id: c.unit_code,
-    contract_number: c.contract_number,
-    client_name: c.client_name,
-    contract_date: c.contract_date,
-    original_value: n(c.original_value),
-    contract_value: n(c.contract_value),
-    monthly_index_rate: n(c.monthly_index_rate),
-    index_label: c.index_label,
-    late_fine_rate: n(c.late_fine_rate),
-    late_interest_monthly: n(c.late_interest_monthly),
-    status: c.status,
-  };
+function proposalDateISO(p: SharedProposal): string {
+  const s = p.updated_at;
+  const d = new Date(s);
+  if (Number.isNaN(d.getTime())) return s.slice(0, 10);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
 }
 
-function toStmtInstallments(c: SharedContract): StmtInstallment[] {
-  return c.installments.map((i, idx) => ({
-    id: `${c.contract_number}-${idx}`,
-    contract_id: c.contract_number,
-    seq_label: i.seq_label,
-    kind: i.kind,
-    due_date: i.due_date,
-    contractual_value: n(i.contractual_value),
-    paid_date: i.paid_date,
-    paid_value: n(i.paid_value),
-    fine_value: n(i.fine_value),
-    interest_value: n(i.interest_value),
-    discount_value: n(i.discount_value),
-    admin_fee: n(i.admin_fee),
-    insurance_fee: n(i.insurance_fee),
-    corrected_value: i.corrected_value == null ? null : n(i.corrected_value),
-  }));
-}
+function PaymentFlowBlock({
+  u,
+  p,
+  clientName,
+}: {
+  u: SharedUnit;
+  p: SharedProposal;
+  clientName: string;
+}) {
+  const propISO = proposalDateISO(p);
+  const rows = useMemo(() => buildProposalFlow(p, propISO), [p, propISO]);
+  const totalContractual = rows.reduce((s, r) => s + r.contractual, 0);
+  const totalCorrected = rows.reduce((s, r) => s + r.correctedNow, 0);
+  const listPrice = n(u.price_brl);
+  const finalPrice = n(p.final_price_brl);
+  const savings = Math.max(0, listPrice - finalPrice);
+  const discountPct = listPrice > 0 ? (savings / listPrice) * 100 : 0;
+  const isAVista = p.payment_method === "a_vista";
+  const keysValue = n(p.keys_brl);
+  const matches = Math.abs(totalContractual - finalPrice) < 0.05;
 
-function ContractStatementCard({ c, today }: { c: SharedContract; today: string }) {
-  const [tableOpen, setTableOpen] = useState(true);
-  const stmt = useMemo(
-    () => buildStatement(toStmtContract(c), toStmtInstallments(c), today),
-    [c, today],
-  );
-  const totalInst = stmt.rows.length;
-  const openCount = stmt.rows.filter((r) => !r.paid_date || Number(r.paid_value) === 0).length;
-  const saldoAberto = stmt.summary.valorQuitacao;
-  const ratePct = (n(c.monthly_index_rate) * 100).toLocaleString("pt-BR", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+  const discountLabel =
+    savings > 0
+      ? `${formatBRL2(savings)} (${discountPct.toLocaleString("pt-BR", {
+          maximumFractionDigits: 2,
+        })}%)`
+      : "—";
 
-  const statusLabel = c.status.charAt(0).toUpperCase() + c.status.slice(1);
-  const todayBR = formatDateBR(today);
+  const chavesLabel = isAVista ? "—" : keysValue > 0 ? formatBRL2(keysValue) : "—";
 
-  const kpi = (label: string, value: string, tone?: "accent" | "emerald" | "muted") => (
-    <div className="rounded-md border border-border/60 bg-background/60 p-3">
-      <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</p>
-      <p
-        className={`mt-1 font-display text-lg md:text-xl tabular-nums ${
-          tone === "accent"
-            ? "text-accent"
-            : tone === "emerald"
-              ? "text-emerald-700 dark:text-emerald-400"
-              : "text-foreground"
-        }`}
-      >
-        {value}
-      </p>
-    </div>
-  );
+  const propDateBR = fmtDate(propISO);
+  const validityBR = p.valid_until ? fmtDate(p.valid_until.slice(0, 10)) : null;
+
+  const metaParts: Array<{ label: string; value: string }> = [
+    { label: "Cliente", value: clientName },
+  ];
+  if (u.block) metaParts.push({ label: "Bloco", value: u.block });
+  metaParts.push({ label: "Unidade", value: u.code });
+  metaParts.push({ label: "Proposta", value: propDateBR });
 
   return (
     <article className="rounded-lg border border-border/60 bg-background overflow-hidden print:break-inside-avoid">
-      <div className="p-4 md:p-6 border-b border-border/50">
-        <div className="flex items-start justify-between gap-3 flex-wrap">
-          <div>
-            <p className="eyebrow text-[10px] mb-1">Contrato ativo</p>
-            <h3 className="font-display text-xl md:text-2xl font-medium text-foreground tracking-tight">
-              Contrato {c.contract_number} · Unidade {c.unit_code}
-            </h3>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Assinado em {formatDateBR(c.contract_date)} · Correção: {c.index_label} (demo){" "}
-              {ratePct}% a.m.
-            </p>
+      <div className="p-4 md:p-6 border-b border-border/50 grid gap-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
+        <div className="min-w-0">
+          <p className="eyebrow text-[10px] mb-2">Proposta comercial</p>
+          <div className="flex flex-wrap gap-x-4 gap-y-1.5">
+            {metaParts.map((m) => (
+              <div key={m.label} className="min-w-0">
+                <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground mr-1.5">
+                  {m.label}
+                </span>
+                <span className="text-sm text-foreground tabular-nums">{m.value}</span>
+              </div>
+            ))}
           </div>
-          <Badge variant="outline" className="border-border/60 text-[11px]">
-            {statusLabel}
-          </Badge>
+          {validityBR && (
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              Validade da proposta:{" "}
+              <span className="text-foreground tabular-nums">{validityBR}</span>
+            </p>
+          )}
         </div>
-
-        <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2.5">
-          {kpi("Valor do contrato", fmtBRL(stmt.summary.contractValue))}
-          {kpi("Total pago", fmtBRL(stmt.summary.totalPago), "emerald")}
-          {kpi("Saldo em aberto", fmtBRL(saldoAberto))}
-          {kpi("Valor de quitação hoje", fmtBRL(saldoAberto), "accent")}
-        </div>
+        <dl className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-3 md:min-w-[520px]">
+          <div>
+            <dt className="text-[10px] uppercase tracking-wider text-muted-foreground">Valor de tabela</dt>
+            <dd className="mt-0.5 text-sm text-muted-foreground tabular-nums line-through">
+              {formatBRL2(listPrice)}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-[10px] uppercase tracking-wider text-muted-foreground">Desconto</dt>
+            <dd className="mt-0.5 text-sm text-foreground tabular-nums">{discountLabel}</dd>
+          </div>
+          <div>
+            <dt className="text-[10px] uppercase tracking-wider text-muted-foreground">Valor da proposta</dt>
+            <dd className="mt-0.5 font-display text-lg md:text-xl text-accent tabular-nums">
+              {formatBRL2(finalPrice)}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-[10px] uppercase tracking-wider text-muted-foreground">Valor a financiar (chaves)</dt>
+            <dd className="mt-0.5 text-sm text-foreground tabular-nums">{chavesLabel}</dd>
+          </div>
+        </dl>
       </div>
 
       <div className="p-4 md:p-6">
-        <Collapsible open={tableOpen} onOpenChange={setTableOpen}>
-          <CollapsibleTrigger className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition">
-            <ChevronDown className={`h-3.5 w-3.5 transition-transform ${tableOpen ? "rotate-180" : ""}`} />
-            {tableOpen ? "Ocultar parcelas" : `Ver todas as ${totalInst} parcelas (${openCount} em aberto)`}
-          </CollapsibleTrigger>
-          <CollapsibleContent className="mt-3 print:!block">
-            <div className="overflow-x-auto rounded-md border border-border/60">
-              <table className="w-full text-xs tabular-nums">
-                <thead className="text-[10px] uppercase tracking-wider text-muted-foreground bg-muted/40">
-                  <tr>
-                    <th className="text-left font-medium px-2.5 py-2">Parcela</th>
-                    <th className="text-left font-medium px-2.5 py-2">Vencimento</th>
-                    <th className="text-right font-medium px-2.5 py-2">Contratual</th>
-                    <th className="text-left font-medium px-2.5 py-2">Situação</th>
-                    <th className="text-right font-medium px-2.5 py-2">Pago / Corrigido</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stmt.rows.map((r) => {
-                    const paid = !!r.paid_date && Number(r.paid_value) > 0;
-                    const overdue =
-                      !paid &&
-                      new Date(r.due_date + "T23:59:59").getTime() <
-                        new Date(today + "T00:00:00").getTime();
-                    const extras =
-                      Number(r.fine_value || 0) + Number(r.interest_value || 0);
-                    return (
-                      <tr key={r.id} className="border-t border-border/40 align-top">
-                        <td className="px-2.5 py-2">
-                          <div className="text-foreground">{r.seq_label}</div>
-                          <div className="text-[10px] text-muted-foreground">
-                            {KIND_LABEL[r.kind]}
-                          </div>
-                        </td>
-                        <td className="px-2.5 py-2 whitespace-nowrap">
-                          {formatDateBR(r.due_date)}
-                        </td>
-                        <td className="px-2.5 py-2 text-right">
-                          {fmtBRL(Number(r.contractual_value))}
-                        </td>
-                        <td className="px-2.5 py-2 whitespace-nowrap">
-                          {paid ? (
-                            <span className="text-emerald-700 dark:text-emerald-400">
-                              Paga em {formatDateBR(r.paid_date)}
-                            </span>
-                          ) : overdue ? (
-                            <span className="text-amber-700 dark:text-amber-400">
-                              Em atraso
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground">Em aberto</span>
-                          )}
-                          {paid && extras > 0 && (
-                            <div className="text-[10px] text-muted-foreground">
-                              Multa/juros {fmtBRL(extras)}
-                            </div>
-                          )}
-                        </td>
-                        <td className="px-2.5 py-2 text-right">
-                          {paid ? (
-                            <span className="text-emerald-700 dark:text-emerald-400">
-                              {fmtBRL(Number(r.paid_value))}
-                            </span>
-                          ) : (
-                            <span className="text-foreground">
-                              {fmtBRL(r.correctedNow)}
-                            </span>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
+        <div className="overflow-x-auto rounded-md border border-border/60">
+          <table className="w-full text-xs tabular-nums">
+            <thead className="text-[10px] uppercase tracking-wider text-muted-foreground bg-muted/40">
+              <tr>
+                <th className="text-left font-medium px-2.5 py-2 w-16">Parcela</th>
+                <th className="text-left font-medium px-2.5 py-2 w-28">Sequência</th>
+                <th className="text-left font-medium px-2.5 py-2 whitespace-nowrap">Data vencimento</th>
+                <th className="text-right font-medium px-2.5 py-2">Valor contratual</th>
+                <th className="text-right font-medium px-2.5 py-2 whitespace-nowrap">
+                  Valor corrigido (projetado)
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r, idx) => (
+                <tr
+                  key={`${r.seq}-${idx}`}
+                  className={`border-t border-border/40 align-top ${
+                    idx % 2 === 1 ? "bg-muted/20" : ""
+                  }`}
+                >
+                  <td className="px-2.5 py-2 text-muted-foreground">{r.parcela}</td>
+                  <td className="px-2.5 py-2">
+                    <div className="font-mono text-foreground">{r.seq}</div>
+                    <div className="text-[10px] text-muted-foreground">
+                      {FLOW_KIND_LABEL[r.kind]}
+                    </div>
+                  </td>
+                  <td className="px-2.5 py-2 whitespace-nowrap">{fmtDate(r.dueDate)}</td>
+                  <td className="px-2.5 py-2 text-right">{formatBRL2(r.contractual)}</td>
+                  <td className="px-2.5 py-2 text-right text-foreground">
+                    {formatBRL2(r.correctedNow)}
+                  </td>
+                </tr>
+              ))}
+              <tr className="border-t-2 border-border/60 bg-muted/40 font-semibold">
+                <td className="px-2.5 py-2.5" colSpan={3}>
+                  Total
+                </td>
+                <td className="px-2.5 py-2.5 text-right tabular-nums">
+                  {formatBRL2(totalContractual)}
+                </td>
+                <td className="px-2.5 py-2.5 text-right tabular-nums text-accent">
+                  {formatBRL2(totalCorrected)}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-        <p className="mt-3 text-[11px] italic text-muted-foreground">
-          Valores corrigidos até {todayBR} pela taxa contratual. Extrato demonstrativo — o extrato
-          oficial é emitido pela incorporadora.
-        </p>
+        {matches ? (
+          <p className="mt-3 text-[11px] text-emerald-700 dark:text-emerald-400">
+            Total contratual confere com o valor da proposta ✓
+          </p>
+        ) : (
+          <div className="mt-3 flex items-start gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 p-2.5 text-[11px] text-amber-900 dark:text-amber-200">
+            <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+            <span>
+              Divergência entre a soma das parcelas contratuais ({formatBRL2(totalContractual)}) e o
+              valor da proposta ({formatBRL2(finalPrice)}). Confirme com o time comercial.
+            </span>
+          </div>
+        )}
+
+        {p.payment_method === "financiamento" && keysValue > 0 && (
+          <p className="mt-2 text-[11px] text-muted-foreground italic">
+            Chaves — previsão de entrega alinhada ao plano proposto. O saldo nas chaves é liquidado
+            via financiamento bancário (repasse).
+          </p>
+        )}
       </div>
     </article>
   );
 }
 
-function StatementSection({ contracts, today }: { contracts: SharedContract[]; today: string }) {
+function PaymentFlowSection({ units, clientName }: { units: SharedUnit[]; clientName: string }) {
+  const blocks = units
+    .map((u) => ({ u, p: bestProposal(u) }))
+    .filter((x): x is { u: SharedUnit; p: SharedProposal } => !!x.p);
+  if (blocks.length === 0) return null;
+
+  const totalContractual = blocks.reduce(
+    (s, { p }) =>
+      s + buildProposalFlow(p, proposalDateISO(p)).reduce((a, r) => a + r.contractual, 0),
+    0,
+  );
+  const totalCorrected = blocks.reduce(
+    (s, { p }) =>
+      s + buildProposalFlow(p, proposalDateISO(p)).reduce((a, r) => a + r.correctedNow, 0),
+    0,
+  );
+
   return (
     <section className="border-t border-border/40 bg-muted/25 print:break-before-page">
       <div className="max-w-6xl mx-auto px-5 md:px-8 py-12 md:py-16">
         <p className="eyebrow mb-3">
-          <FileText className="inline h-3 w-3 mr-1.5 -mt-0.5" />
-          Extrato do cliente
+          <CalendarClock className="inline h-3 w-3 mr-1.5 -mt-0.5" />
+          Proposta de fluxo de pagamento
         </p>
-        <h2 className="font-display text-2xl md:text-3xl font-medium text-foreground tracking-tight max-w-2xl">
-          Situação do{contracts.length > 1 ? "s" : ""} contrato
-          {contracts.length > 1 ? "s" : ""} em andamento com a incorporadora
+        <h2 className="font-display text-2xl md:text-3xl font-medium text-foreground tracking-tight max-w-3xl">
+          Fluxo de pagamento proposto
         </h2>
+        <p className="mt-2 text-sm text-muted-foreground max-w-3xl">
+          Parcelas futuras projetadas pelo INCC-M (demo) de 0,45% a.m. — o índice oficial vigente
+          será aplicado no contrato.
+        </p>
+        <p className="sr-only">Cliente: {clientName}</p>
+
         <div className="mt-8 space-y-5">
-          {contracts.map((c) => (
-            <ContractStatementCard key={c.contract_number} c={c} today={today} />
+          {blocks.map(({ u, p }) => (
+            <PaymentFlowBlock key={`${u.code}-${p.updated_at}`} u={u} p={p} clientName={clientName} />
           ))}
         </div>
+
+        {blocks.length > 1 && (
+          <div className="mt-5 rounded-md border border-border/60 bg-background overflow-hidden">
+            <table className="w-full text-xs tabular-nums">
+              <tbody>
+                <tr className="bg-muted/40 font-semibold">
+                  <td className="px-3 py-2.5 text-[11px] uppercase tracking-wider">
+                    Total geral · {blocks.length} unidades
+                  </td>
+                  <td className="px-3 py-2.5 text-right">
+                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground mr-2">
+                      Contratual
+                    </span>
+                    {formatBRL2(totalContractual)}
+                  </td>
+                  <td className="px-3 py-2.5 text-right text-accent">
+                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground mr-2">
+                      Corrigido (projetado)
+                    </span>
+                    {formatBRL2(totalCorrected)}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        <p className="mt-4 text-[11px] italic text-muted-foreground max-w-3xl">
+          Projeção ilustrativa: as parcelas futuras estão corrigidas pela projeção do INCC-M (demo)
+          de 0,45% a.m. a partir da data da proposta. O índice oficial, as datas e o cronograma
+          definitivo serão os do contrato. Documento de demonstração — dados fictícios.
+        </p>
       </div>
     </section>
   );
@@ -724,8 +861,8 @@ function ProposalPage({ data }: { data: SharedPayload }) {
     () => [...data.units].sort((a, b) => (a.is_primary === b.is_primary ? 0 : a.is_primary ? -1 : 1)),
     [data.units],
   );
-  const contracts = data.contracts ?? [];
-  const today = new Date().toISOString().slice(0, 10);
+
+
 
 
   const total = units.reduce((s, u) => s + unitFinal(u), 0);
@@ -928,14 +1065,6 @@ function ProposalPage({ data }: { data: SharedPayload }) {
                   Economia de {formatBRL2(savings)} vs tabela
                 </p>
               )}
-              {contracts.length > 0 && (
-                <p className="text-[11px] text-muted-foreground mt-2 border-t border-border/40 pt-2">
-                  Cliente da base ·{" "}
-                  {contracts.length === 1
-                    ? `contrato ${contracts[0].contract_number} em andamento`
-                    : `${contracts.length} contratos em andamento`}
-                </p>
-              )}
             </div>
             <div className="pt-2 space-y-2">
               <a href={waHref} target="_blank" rel="noopener noreferrer" className="block">
@@ -971,7 +1100,7 @@ function ProposalPage({ data }: { data: SharedPayload }) {
         </aside>
       </div>
 
-      {contracts.length > 0 && <StatementSection contracts={contracts} today={today} />}
+      <PaymentFlowSection units={units} clientName={data.client_name} />
 
       {simCtl.snapshot && committedUnitCode && (
         <section
