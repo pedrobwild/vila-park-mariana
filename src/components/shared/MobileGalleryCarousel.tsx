@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import BlurImage from "./BlurImage";
 
 export interface CarouselImage {
   url: string;
