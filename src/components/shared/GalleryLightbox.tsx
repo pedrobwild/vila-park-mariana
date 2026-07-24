@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -53,13 +54,31 @@ export default function GalleryLightbox({ images, initialIndex, open, onOpenChan
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onOpenChange(false);
-      if (e.key === "ArrowRight") next();
-      if (e.key === "ArrowLeft") prev();
+      if (e.key === "ArrowRight") { e.preventDefault(); next(); }
+      else if (e.key === "ArrowLeft") { e.preventDefault(); prev(); }
+      else if (e.key === "Home") { e.preventDefault(); goTo(0); }
+      else if (e.key === "End") { e.preventDefault(); goTo(total - 1); }
+      else if (e.key === "+" || e.key === "=") {
+        e.preventDefault();
+        setZoom((z) => Math.min(z + 0.5, 4));
+      }
+      else if (e.key === "-" || e.key === "_") {
+        e.preventDefault();
+        setZoom((z) => {
+          const n = Math.max(z - 0.5, 1);
+          if (n <= 1) setPan({ x: 0, y: 0 });
+          return n;
+        });
+      }
+      else if (e.key === "0") {
+        e.preventDefault();
+        setZoom(1);
+        setPan({ x: 0, y: 0 });
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, next, prev, onOpenChange]);
+  }, [open, next, prev, goTo, total]);
 
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault();
@@ -93,47 +112,81 @@ export default function GalleryLightbox({ images, initialIndex, open, onOpenChan
       <DialogPrimitive.Portal>
         <AnimatePresence>
           {open && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-50 flex flex-col bg-black/95"
-              ref={containerRef}
+            <DialogPrimitive.Overlay asChild forceMount>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 z-40 bg-black/95"
+              />
+            </DialogPrimitive.Overlay>
+          )}
+        </AnimatePresence>
+        <AnimatePresence>
+          {open && (
+            <DialogPrimitive.Content
+              asChild
+              forceMount
+              aria-label={`Galeria do decorado, imagem ${index + 1} de ${total}`}
+              aria-describedby="lightbox-caption"
+              onOpenAutoFocus={(e) => {
+                e.preventDefault();
+                containerRef.current?.focus();
+              }}
             >
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 z-50 flex flex-col outline-none"
+                ref={containerRef}
+                tabIndex={-1}
+              >
+                <VisuallyHidden.Root>
+                  <DialogPrimitive.Title>Galeria do decorado</DialogPrimitive.Title>
+                </VisuallyHidden.Root>
               {/* Top bar */}
               <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-3 md:px-6 md:py-4 bg-gradient-to-b from-black/70 to-transparent">
-                <div className="text-white/90 text-sm font-medium tabular">
+                <div
+                  className="text-white/90 text-sm font-medium tabular"
+                  aria-live="polite"
+                  aria-atomic="true"
+                >
+                  <span className="sr-only">Imagem </span>
                   <span className="text-white">{String(index + 1).padStart(2, "0")}</span>
-                  <span className="text-white/50 mx-1.5">/</span>
+                  <span className="text-white/50 mx-1.5" aria-hidden="true">/</span>
+                  <span className="sr-only">de </span>
                   <span className="text-white/70">{String(total).padStart(2, "0")}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <button
                     type="button"
                     onClick={toggleZoom}
-                    className="h-10 w-10 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors"
-                    aria-label={zoom > 1 ? "Reduzir zoom" : "Ampliar imagem"}
+                    className="h-11 w-11 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 transition-colors"
+                    aria-label={zoom > 1 ? "Reduzir zoom (tecla -)" : "Ampliar imagem (tecla +)"}
+                    aria-pressed={zoom > 1}
                   >
-                    {zoom > 1 ? <ZoomOut size={20} /> : <ZoomIn size={20} />}
+                    {zoom > 1 ? <ZoomOut size={20} aria-hidden="true" /> : <ZoomIn size={20} aria-hidden="true" />}
                   </button>
                   {zoom > 1 && (
                     <button
                       type="button"
                       onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }}
-                      className="h-10 w-10 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors"
-                      aria-label="Redefinir zoom"
+                      className="h-11 w-11 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 transition-colors"
+                      aria-label="Redefinir zoom (tecla 0)"
                     >
-                      <RotateCcw size={18} />
+                      <RotateCcw size={18} aria-hidden="true" />
                     </button>
                   )}
                   <DialogPrimitive.Close asChild>
                     <button
                       type="button"
-                      className="ml-1 h-10 w-10 rounded-full flex items-center justify-center text-white/90 hover:text-white hover:bg-white/10 transition-colors"
-                      aria-label="Fechar galeria"
+                      className="ml-1 h-11 w-11 rounded-full flex items-center justify-center text-white/90 hover:text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 transition-colors"
+                      aria-label="Fechar galeria (Esc)"
                     >
-                      <X size={22} />
+                      <X size={22} aria-hidden="true" />
                     </button>
                   </DialogPrimitive.Close>
                 </div>
@@ -185,7 +238,10 @@ export default function GalleryLightbox({ images, initialIndex, open, onOpenChan
 
               {/* Caption */}
               <div className="absolute bottom-0 left-0 right-0 z-10 px-4 py-3 md:px-6 md:py-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
-                <p className="text-white/90 text-sm md:text-base max-w-3xl mx-auto text-center leading-relaxed">
+                <p
+                  id="lightbox-caption"
+                  className="text-white/90 text-sm md:text-base max-w-3xl mx-auto text-center leading-relaxed"
+                >
                   {current.alt}
                 </p>
               </div>
@@ -196,22 +252,25 @@ export default function GalleryLightbox({ images, initialIndex, open, onOpenChan
                   <button
                     type="button"
                     onClick={prev}
-                    className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 h-11 w-11 md:h-12 md:w-12 rounded-full bg-black/40 hover:bg-black/60 text-white/90 hover:text-white backdrop-blur-sm flex items-center justify-center transition-colors"
-                    aria-label="Imagem anterior"
+                    className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 h-11 w-11 md:h-12 md:w-12 rounded-full bg-black/40 hover:bg-black/60 text-white/90 hover:text-white backdrop-blur-sm flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 transition-colors"
+                    aria-label="Imagem anterior (seta esquerda)"
+                    aria-controls="lightbox-caption"
                   >
-                    <ChevronLeft size={24} />
+                    <ChevronLeft size={24} aria-hidden="true" />
                   </button>
                   <button
                     type="button"
                     onClick={next}
-                    className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 h-11 w-11 md:h-12 md:w-12 rounded-full bg-black/40 hover:bg-black/60 text-white/90 hover:text-white backdrop-blur-sm flex items-center justify-center transition-colors"
-                    aria-label="Próxima imagem"
+                    className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 h-11 w-11 md:h-12 md:w-12 rounded-full bg-black/40 hover:bg-black/60 text-white/90 hover:text-white backdrop-blur-sm flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 transition-colors"
+                    aria-label="Próxima imagem (seta direita)"
+                    aria-controls="lightbox-caption"
                   >
-                    <ChevronRight size={24} />
+                    <ChevronRight size={24} aria-hidden="true" />
                   </button>
                 </>
               )}
-            </motion.div>
+              </motion.div>
+            </DialogPrimitive.Content>
           )}
         </AnimatePresence>
       </DialogPrimitive.Portal>
