@@ -68,6 +68,20 @@ import {
   type CrmInterest,
   type CrmStageRow,
 } from "@/lib/crm";
+import {
+  MARITAL_STATUS_LABEL,
+  maskCPF,
+  formatBRLValue,
+  evaluateCompleteness,
+  type MaritalStatus,
+} from "@/lib/person";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { CheckCircle2, AlertCircle } from "lucide-react";
 import type { DealFull } from "./CrmSection";
 import ProposalsSection from "./ProposalsSection";
 import {
