@@ -112,14 +112,41 @@ export default function GalleryLightbox({ images, initialIndex, open, onOpenChan
       <DialogPrimitive.Portal>
         <AnimatePresence>
           {open && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-50 flex flex-col bg-black/95"
-              ref={containerRef}
+            <DialogPrimitive.Overlay asChild forceMount>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 z-40 bg-black/95"
+              />
+            </DialogPrimitive.Overlay>
+          )}
+        </AnimatePresence>
+        <AnimatePresence>
+          {open && (
+            <DialogPrimitive.Content
+              asChild
+              forceMount
+              aria-label={`Galeria do decorado, imagem ${index + 1} de ${total}`}
+              aria-describedby="lightbox-caption"
+              onOpenAutoFocus={(e) => {
+                e.preventDefault();
+                containerRef.current?.focus();
+              }}
             >
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 z-50 flex flex-col outline-none"
+                ref={containerRef}
+                tabIndex={-1}
+              >
+                <VisuallyHidden.Root>
+                  <DialogPrimitive.Title>Galeria do decorado</DialogPrimitive.Title>
+                </VisuallyHidden.Root>
               {/* Top bar */}
               <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-3 md:px-6 md:py-4 bg-gradient-to-b from-black/70 to-transparent">
                 <div className="text-white/90 text-sm font-medium tabular">
