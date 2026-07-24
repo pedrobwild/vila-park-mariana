@@ -36,21 +36,13 @@ import {
   AlertTriangle,
   ChevronDown,
   ImageOff,
-  FileText,
   Calculator,
   RotateCcw,
+  CalendarClock,
 } from "lucide-react";
 import { formatBRL2, PAYMENT_METHOD_LABEL, type CrmPaymentMethod } from "@/lib/crm";
 import { tipologias } from "@/data/tipologias";
 import { WHATSAPP_PHONE } from "@/data/surroundings";
-import {
-  buildStatement,
-  formatBRL as fmtBRL,
-  formatDateBR,
-  type Contract as StmtContract,
-  type Installment as StmtInstallment,
-  type InstallmentKind,
-} from "@/lib/contractStatement";
 import {
   useFinancingSimulatorController,
   FinancingSimulatorForm,
