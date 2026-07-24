@@ -155,7 +155,8 @@ export default function ShareProposalButton({ deal, canShare, onReload }: Props)
             </div>
             <p className="text-[10px] text-muted-foreground leading-relaxed">
               Propostas em rascunho ou recusadas não aparecem para o cliente. Notas internas,
-              atividades e motivo de perda ficam ocultos.
+              atividades e motivo de perda ficam ocultos. O cliente vê o fluxo configurado;
+              sem configuração, vale a distribuição automática.
             </p>
             <button
               type="button"
