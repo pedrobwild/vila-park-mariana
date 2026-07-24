@@ -321,14 +321,6 @@ export default function DealDetailSheet({ deal, units, stages, onClose, onReload
 
         <div className="mt-5 space-y-6">
           {/* Person */}
-          <section className="rounded-lg border border-border/60 p-3 space-y-1.5 text-sm">
-            <div className="flex items-center justify-between">
-              <h3 className="font-medium text-sm">Contato</h3>
-              <Badge variant="outline" className="text-[10px]">
-                {SOURCE_LABEL[deal.person.source]}
-              </Badge>
-            </div>
-          {/* Person */}
           <section className="rounded-lg border border-border/60 p-3 space-y-2 text-sm">
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <h3 className="font-medium text-sm">Contato</h3>
