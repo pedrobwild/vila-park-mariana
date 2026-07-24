@@ -748,8 +748,8 @@ function PaymentFlowSection({ units, clientName }: { units: SharedUnit[]; client
   if (blocks.length === 0) return null;
 
   const totalContractual = blocks.reduce(
-    (s, { u, p }) => s + buildProposalFlow(p, proposalDateISO(p)).reduce((a, r) => a + r.contractual, 0) * 0 + // placeholder to satisfy lint on unused u
-      buildProposalFlow(p, proposalDateISO(p)).reduce((a, r) => a + r.contractual, 0),
+    (s, { p }) =>
+      s + buildProposalFlow(p, proposalDateISO(p)).reduce((a, r) => a + r.contractual, 0),
     0,
   );
   const totalCorrected = blocks.reduce(
