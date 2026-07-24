@@ -466,9 +466,8 @@ function PaymentFlowBlock({
   clientName: string;
 }) {
   const propISO = proposalDateISO(p);
-  const rows = useMemo(() => buildProposalFlow(p, propISO), [p, propISO]);
-  const totalContractual = rows.reduce((s, r) => s + r.contractual, 0);
-  const totalCorrected = rows.reduce((s, r) => s + r.correctedNow, 0);
+  const rows = useMemo(() => resolveFlow(p, propISO), [p, propISO]);
+  const { contractual: totalContractual, corrected: totalCorrected } = flowTotals(rows);
   const listPrice = n(u.price_brl);
   const finalPrice = n(p.final_price_brl);
   const savings = Math.max(0, listPrice - finalPrice);
