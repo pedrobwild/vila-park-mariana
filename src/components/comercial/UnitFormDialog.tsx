@@ -59,17 +59,27 @@ interface Props {
   onSaved: () => void;
 }
 
+interface PlantaItem {
+  id: string | null; // null = pending (unit not created yet)
+  url: string;
+  mime: string | null;
+  filename: string | null;
+  storage_path: string | null;
+}
+
 export default function UnitFormDialog({ open, onOpenChange, unit, fieldDefs, onSaved }: Props) {
   const [code, setCode] = useState("");
   const [block, setBlock] = useState("");
   const [area, setArea] = useState("");
   const [price, setPrice] = useState("");
   const [status, setStatus] = useState<UnitStatus>("disponivel");
-  const [plantaUrl, setPlantaUrl] = useState<string | null>(null);
-  const [plantaMime, setPlantaMime] = useState<string | null>(null);
+  const [plantas, setPlantas] = useState<PlantaItem[]>([]);
+  const [loadingPlantas, setLoadingPlantas] = useState(false);
   const [customValues, setCustomValues] = useState<Record<string, unknown>>({});
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState<PlantaItem | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -78,24 +88,44 @@ export default function UnitFormDialog({ open, onOpenChange, unit, fieldDefs, on
     setArea(unit ? String(unit.area_m2) : "");
     setPrice(unit ? formatCurrencyInput(Number(unit.price_brl)) : "");
     setStatus((unit?.status as UnitStatus) ?? "disponivel");
-    setPlantaUrl(unit?.planta_url ?? null);
-    setPlantaMime(unit?.planta_mime ?? null);
+    setPlantas([]);
     setCustomValues({});
+    setConfirmDelete(null);
 
     if (unit) {
-      supabase
-        .from("custom_field_values")
-        .select("field_id, value")
-        .eq("unit_id", unit.id)
-        .then(({ data }) => {
-          const map: Record<string, unknown> = {};
-          (data ?? []).forEach((r) => {
-            map[r.field_id] = r.value;
-          });
-          setCustomValues(map);
+      setLoadingPlantas(true);
+      Promise.all([
+        supabase
+          .from("custom_field_values")
+          .select("field_id, value")
+          .eq("unit_id", unit.id),
+        supabase
+          .from("unit_plantas")
+          .select("id, url, mime, filename, storage_path")
+          .eq("unit_id", unit.id)
+          .order("created_at", { ascending: true }),
+      ]).then(([cv, pl]) => {
+        const map: Record<string, unknown> = {};
+        (cv.data ?? []).forEach((r) => {
+          map[r.field_id] = r.value;
         });
+        setCustomValues(map);
+        setPlantas((pl.data ?? []) as PlantaItem[]);
+        setLoadingPlantas(false);
+      });
     }
   }, [open, unit]);
+
+  const syncUnitPrimaryPlanta = async (unitId: string, list: PlantaItem[]) => {
+    const primary = list[0] ?? null;
+    await supabase
+      .from("units")
+      .update({
+        planta_url: primary?.url ?? null,
+        planta_mime: primary?.mime ?? null,
+      })
+      .eq("id", unitId);
+  };
 
   const handleUpload = async (file: File) => {
     if (!ALLOWED.includes(file.type)) {
@@ -107,7 +137,8 @@ export default function UnitFormDialog({ open, onOpenChange, unit, fieldDefs, on
       return;
     }
     setUploading(true);
-    const path = `${Date.now()}-${file.name.replace(/[^\w.\-]/g, "_")}`;
+    const safeName = file.name.replace(/[^\w.\-]/g, "_");
+    const path = `${Date.now()}-${safeName}`;
     const { error } = await supabase.storage.from("plantas").upload(path, file, {
       contentType: file.type,
       upsert: false,
@@ -118,11 +149,69 @@ export default function UnitFormDialog({ open, onOpenChange, unit, fieldDefs, on
       return;
     }
     const { data } = supabase.storage.from("plantas").getPublicUrl(path);
-    setPlantaUrl(data.publicUrl);
-    setPlantaMime(file.type);
+    const item: PlantaItem = {
+      id: null,
+      url: data.publicUrl,
+      mime: file.type,
+      filename: file.name,
+      storage_path: path,
+    };
+
+    if (unit) {
+      const { data: inserted, error: insErr } = await supabase
+        .from("unit_plantas")
+        .insert({
+          unit_id: unit.id,
+          url: item.url,
+          mime: item.mime,
+          filename: item.filename,
+          storage_path: item.storage_path,
+        })
+        .select("id, url, mime, filename, storage_path")
+        .single();
+      if (insErr) {
+        toast.error("Falha ao registrar anexo: " + insErr.message);
+        await supabase.storage.from("plantas").remove([path]);
+        setUploading(false);
+        return;
+      }
+      const next = [...plantas, inserted as PlantaItem];
+      setPlantas(next);
+      await syncUnitPrimaryPlanta(unit.id, next);
+    } else {
+      setPlantas((prev) => [...prev, item]);
+    }
     setUploading(false);
     toast.success("Planta enviada.");
   };
+
+  const handleDelete = async (item: PlantaItem) => {
+    setDeleting(true);
+    try {
+      if (item.storage_path) {
+        await supabase.storage.from("plantas").remove([item.storage_path]);
+      }
+      if (item.id) {
+        const { error } = await supabase
+          .from("unit_plantas")
+          .delete()
+          .eq("id", item.id);
+        if (error) {
+          toast.error("Falha ao excluir: " + error.message);
+          return;
+        }
+      }
+      const next = plantas.filter((p) => p !== item && (p.id ? p.id !== item.id : true));
+      setPlantas(next);
+      if (unit) await syncUnitPrimaryPlanta(unit.id, next);
+      toast.success("Anexo excluído.");
+      setConfirmDelete(null);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+
 
   const handleSubmit = async () => {
     const parsed = schema.safeParse({
