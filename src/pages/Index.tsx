@@ -40,6 +40,31 @@ const PROGRESS_MAY_2025 = [
 ];
 const PROGRESS_JUL_2026 = "https://vilaparkmariana.com.br/wp-content/uploads/2026/07/fachada_07_07.jpeg";
 
+import decorado4 from "@/assets/decorado/decorado-4.png.asset.json";
+import decorado5 from "@/assets/decorado/decorado-5.png.asset.json";
+import decorado6 from "@/assets/decorado/decorado-6.png.asset.json";
+import decorado7 from "@/assets/decorado/decorado-7.png.asset.json";
+import decorado8 from "@/assets/decorado/decorado-8.png.asset.json";
+import decorado9 from "@/assets/decorado/decorado-9.png.asset.json";
+import decorado10 from "@/assets/decorado/decorado-10.png.asset.json";
+import decorado11 from "@/assets/decorado/decorado-11.png.asset.json";
+import decorado12 from "@/assets/decorado/decorado-12.png.asset.json";
+import decorado13 from "@/assets/decorado/decorado-13.png.asset.json";
+
+const DECORADO_GALLERY: { url: string; alt: string }[] = [
+  { url: decorado5.url, alt: "Vista integrada do studio decorado — sala, quarto e cozinha" },
+  { url: decorado8.url, alt: "Painel de TV em pedra natural com nichos iluminados" },
+  { url: decorado11.url, alt: "Quarto com cabeceira estofada e iluminação indireta" },
+  { url: decorado6.url, alt: "Sala de estar com sofá curvo e adega vertical" },
+  { url: decorado4.url, alt: "Cozinha compacta com marcenaria planejada e eletros premium" },
+  { url: decorado9.url, alt: "Living com painel de TV em pedra e adega decorativa" },
+  { url: decorado13.url, alt: "Suíte com varanda e vista para a cidade" },
+  { url: decorado7.url, alt: "Home office integrado ao quarto com bancada suspensa" },
+  { url: decorado10.url, alt: "Perspectiva da bancada de trabalho e painel de TV" },
+  { url: decorado12.url, alt: "Quarto principal com bancada e nichos laterais" },
+];
+
+
 
 function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
   const ref = useRef(null);
