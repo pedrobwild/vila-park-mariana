@@ -50,19 +50,40 @@ import decorado10 from "@/assets/decorado/decorado-10.png.asset.json";
 import decorado11 from "@/assets/decorado/decorado-11.png.asset.json";
 import decorado12 from "@/assets/decorado/decorado-12.png.asset.json";
 import decorado13 from "@/assets/decorado/decorado-13.png.asset.json";
+import decorado13b from "@/assets/decorado/decorado-13-2.png.asset.json";
+import decorado14 from "@/assets/decorado/decorado-14.png.asset.json";
+import decorado15 from "@/assets/decorado/decorado-15.png.asset.json";
+import decorado16 from "@/assets/decorado/decorado-16.png.asset.json";
+import decorado17 from "@/assets/decorado/decorado-17.png.asset.json";
+import decorado18 from "@/assets/decorado/decorado-18.png.asset.json";
+import decorado19 from "@/assets/decorado/decorado-19.png.asset.json";
+import decorado21 from "@/assets/decorado/decorado-21.png.asset.json";
+import decorado23 from "@/assets/decorado/decorado-23.png.asset.json";
+import decorado26 from "@/assets/decorado/decorado-26.png.asset.json";
 
 const DECORADO_GALLERY: { url: string; alt: string }[] = [
   { url: decorado5.url, alt: "Vista integrada do studio decorado — sala, quarto e cozinha" },
+  { url: decorado16.url, alt: "Perspectiva completa do studio com iluminação cênica e marcenaria integrada" },
   { url: decorado8.url, alt: "Painel de TV em pedra natural com nichos iluminados" },
   { url: decorado11.url, alt: "Quarto com cabeceira estofada e iluminação indireta" },
+  { url: decorado13b.url, alt: "Suíte com ar-condicionado, arandelas escultóricas e varanda com vista" },
   { url: decorado6.url, alt: "Sala de estar com sofá curvo e adega vertical" },
   { url: decorado4.url, alt: "Cozinha compacta com marcenaria planejada e eletros premium" },
+  { url: decorado17.url, alt: "Cozinha em travertino iluminado com geladeira black e forno embutido" },
+  { url: decorado18.url, alt: "Cozinha aberta com estantes iluminadas e acabamento em madeira clara" },
   { url: decorado9.url, alt: "Living com painel de TV em pedra e adega decorativa" },
+  { url: decorado15.url, alt: "Quarto integrado ao living com adega vertical e painel de TV em pedra" },
+  { url: decorado21.url, alt: "Bancada de trabalho integrada ao quarto, com sala de estar ao fundo" },
   { url: decorado13.url, alt: "Suíte com varanda e vista para a cidade" },
   { url: decorado7.url, alt: "Home office integrado ao quarto com bancada suspensa" },
+  { url: decorado14.url, alt: "Quarto com sanca de LED linear e cabideiros de madeira" },
   { url: decorado10.url, alt: "Perspectiva da bancada de trabalho e painel de TV" },
   { url: decorado12.url, alt: "Quarto principal com bancada e nichos laterais" },
+  { url: decorado19.url, alt: "Nicho de cafeteria em marcenaria de madeira clara com iluminação embutida" },
+  { url: decorado23.url, alt: "Banheiro com pastilhas verticais, bancada em travertino e toalheiro térmico" },
+  { url: decorado26.url, alt: "Banheiro com nichos iluminados, espelheira e acabamentos em madeira e travertino" },
 ];
+
 
 
 
