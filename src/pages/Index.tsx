@@ -346,7 +346,40 @@ export default function Index() {
         <PlantasSection />
       </Suspense>
 
+      {/* DECORADO — galeria em imagens grandes */}
+      <section id="decorado" className="border-b border-border/40 bg-background">
+        <div className="max-w-7xl mx-auto px-5 md:px-6 py-14 md:py-24">
+          <FadeIn>
+            <p className="eyebrow mb-3">Decorado</p>
+            <h2 className="font-display text-3xl md:text-4xl font-medium text-foreground max-w-2xl tracking-tight">
+              Um studio pensado para render mais.
+            </h2>
+            <p className="mt-3 text-muted-foreground max-w-2xl">
+              Projeto de interiores com marcenaria planejada, iluminação cênica e materiais nobres — a base visual que sustenta diárias premium e alta ocupação em short stay.
+            </p>
+          </FadeIn>
+
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            {DECORADO_GALLERY.map((img, i) => (
+              <FadeIn key={img.url} delay={Math.min(i * 0.05, 0.3)} className={i === 0 ? "md:col-span-2" : ""}>
+                <figure className="overflow-hidden rounded-2xl border border-border/60 bg-muted/25">
+                  <div className={`w-full ${i === 0 ? "aspect-[21/9]" : "aspect-[16/10]"}`}>
+                    <img
+                      src={img.url}
+                      alt={img.alt}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition-transform duration-700 hover:scale-[1.03]"
+                    />
+                  </div>
+                </figure>
+              </FadeIn>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ANDAMENTO DA OBRA */}
+
       <section id="obra" className="border-b border-border/40 bg-muted/25">
         <div className="max-w-7xl mx-auto px-5 md:px-6 py-12 md:py-24">
           <FadeIn>
