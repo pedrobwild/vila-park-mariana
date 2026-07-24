@@ -387,8 +387,18 @@ export default function Index() {
             {DECORADO_GALLERY.map((img, i) => (
               <FadeIn key={img.url} delay={Math.min(i * 0.05, 0.3)} className={i === 0 ? "md:col-span-2" : ""}>
                 <figure
-                  className="group overflow-hidden rounded-2xl border border-border/60 bg-muted/25 cursor-zoom-in"
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Ampliar: ${img.alt}`}
+                  className="group overflow-hidden rounded-2xl border border-border/60 bg-muted/25 cursor-zoom-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   onClick={() => { setLightboxIndex(i); setLightboxOpen(true); }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setLightboxIndex(i);
+                      setLightboxOpen(true);
+                    }
+                  }}
                 >
                   <div className={`w-full ${i === 0 ? "aspect-[21/9]" : "aspect-[16/10]"}`}>
                     <img
