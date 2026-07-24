@@ -328,7 +328,7 @@ export default function PeopleManager({
                 });
                 return;
               }
-              openEdit(full as CrmPerson);
+              openEdit(full as CrmPerson, { highlight: true });
             },
           },
         });
