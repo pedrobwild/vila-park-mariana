@@ -46,6 +46,7 @@ const fmtDate = (iso: string | null) =>
 export default function ProposalsSection({ deal, onReload }: Props) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<CrmProposal | null>(null);
+  const [flowFor, setFlowFor] = useState<CrmProposal | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<CrmProposal | null>(null);
   const [confirmAccept, setConfirmAccept] = useState<CrmProposal | null>(null);
   const [busy, setBusy] = useState(false);
