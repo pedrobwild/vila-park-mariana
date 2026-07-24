@@ -1005,7 +1005,7 @@ export default function FinancingSimulator() {
         </div>
 
         {/* ------- Results ------- */}
-        <div className="lg:col-span-3 space-y-4" ref={resultsRef}>
+        <div className="md:col-span-1 lg:col-span-3 space-y-4 min-w-0" ref={resultsRef}>
           {snapshot ? (
             <ResultsView
               snap={snapshot}
