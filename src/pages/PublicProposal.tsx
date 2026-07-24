@@ -1231,8 +1231,26 @@ function ProposalPage({ data }: { data: SharedPayload }) {
         </div>
 
         <aside className="lg:sticky lg:top-8 lg:self-start space-y-4 print:hidden">
-          <div className="rounded-lg border border-border/60 bg-background p-5 space-y-3">
-            <p className="eyebrow text-[10px]">Resumo da proposta</p>
+          <div className="rounded-lg border border-border/60 bg-background p-5 space-y-3 relative">
+            <div className="flex items-start justify-between gap-2">
+              <p className="eyebrow text-[10px]">Resumo da proposta</p>
+              <TooltipProvider delayDuration={100}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 -mt-1 -mr-1 text-muted-foreground hover:text-foreground"
+                      onClick={() => window.print()}
+                      aria-label="Imprimir ou salvar em PDF"
+                    >
+                      <Printer className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="left">Imprimir / salvar PDF</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
             <ul className="text-sm divide-y divide-border/50">
               {units.map((u) => {
                 const p = bestProposal(u);
@@ -1287,14 +1305,28 @@ function ProposalPage({ data }: { data: SharedPayload }) {
                   Falar com o time Vila Park
                 </Button>
               </a>
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => window.print()}
-              >
-                <Printer className="mr-2 h-4 w-4" />
-                Imprimir / salvar PDF
-              </Button>
+              <TooltipProvider delayDuration={100}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="block">
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={openSimDialog}
+                        disabled={!hasFinanceable}
+                      >
+                        <Calculator className="mr-2 h-4 w-4" />
+                        Simular financiamento
+                      </Button>
+                    </span>
+                  </TooltipTrigger>
+                  {!hasFinanceable && (
+                    <TooltipContent side="top" className="max-w-xs text-center">
+                      Disponível para propostas com financiamento bancário
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
         </aside>
@@ -1302,18 +1334,69 @@ function ProposalPage({ data }: { data: SharedPayload }) {
 
       {contracts.length > 0 && <StatementSection contracts={contracts} today={today} />}
 
+      {simResult && (
+        <SimulationSection
+          result={simResult}
+          onEdit={() => setSimOpen(true)}
+          sectionRef={simSectionRef}
+        />
+      )}
+
+      {hasFinanceable && (
+        <FinancingSimDialog
+          open={simOpen}
+          onOpenChange={setSimOpen}
+          options={financeableOptions}
+          initialOptionId={currentSimOption?.id ?? financeableOptions[0]?.id}
+          initialFinanced={simResult?.financedAmount}
+          initialTerm={simResult?.termMonths}
+          initialRate={simResult?.annualRate}
+          onSimulate={(r) => {
+            setSimResult(r);
+            setSimOpen(false);
+          }}
+        />
+      )}
+
       {/* Mobile bottom bar */}
       <div
         className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-background/95 backdrop-blur-md border-t border-border/60 px-3 pt-3 print:hidden"
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 0.75rem)" }}
       >
-        <div className="max-w-6xl mx-auto flex items-center gap-3">
+        <div className="max-w-6xl mx-auto flex items-center gap-2">
           <div className="flex-1 min-w-0">
             <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Total</p>
             <p className="font-display text-lg text-accent tabular-nums leading-tight truncate">
               {formatBRL2(total)}
             </p>
           </div>
+          <TooltipProvider delayDuration={100}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-10 w-10 shrink-0 text-muted-foreground"
+                  onClick={() => window.print()}
+                  aria-label="Imprimir ou salvar em PDF"
+                >
+                  <Printer className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">Imprimir / salvar PDF</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <Button
+            variant="outline"
+            size="sm"
+            className="shrink-0 h-10 px-3"
+            onClick={openSimDialog}
+            disabled={!hasFinanceable}
+            aria-label="Simular financiamento"
+          >
+            <Calculator className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Simular</span>
+          </Button>
           <a href={waHref} target="_blank" rel="noopener noreferrer" className="shrink-0">
             <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90 h-10 px-3 sm:px-4">
               <MessageCircle className="sm:mr-2 h-4 w-4" />
@@ -1323,6 +1406,7 @@ function ProposalPage({ data }: { data: SharedPayload }) {
           </a>
         </div>
       </div>
+
 
       <section className="border-t border-border/40 bg-background print:break-before-page">
         <div className="max-w-6xl mx-auto px-5 md:px-8 py-12 md:py-16">
