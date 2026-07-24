@@ -1090,7 +1090,7 @@ function ProposalPage({ data }: { data: SharedPayload }) {
         </aside>
       </div>
 
-      {contracts.length > 0 && <StatementSection contracts={contracts} today={today} />}
+      <PaymentFlowSection units={units} clientName={data.client_name} />
 
       {simCtl.snapshot && committedUnitCode && (
         <section
