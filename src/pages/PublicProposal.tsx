@@ -49,6 +49,15 @@ import {
   FinancingSimulatorResults,
   type SimulatorInitialForm,
 } from "@/components/ferramentas/FinancingSimulator";
+import {
+  buildProposalFlow,
+  flowFromSaved,
+  flowTotals,
+  proposalDateISO as toProposalDateISO,
+  FLOW_KIND_LABEL,
+  type FlowRow,
+  type SavedInstallment,
+} from "@/lib/proposalFlow";
 
 type SharedProposal = {
   status: "enviada" | "aceita";
@@ -66,6 +75,7 @@ type SharedProposal = {
   valid_until: string | null;
   notes: string | null;
   updated_at: string;
+  installments?: SavedInstallment[] | null;
 };
 
 type SharedUnit = {
@@ -428,156 +438,23 @@ function UnitCard({ u }: { u: SharedUnit }) {
 
 /* ------------------------- Fluxo de pagamento proposto ------------------------- */
 
-// INCC-M demo: 0,45% a.m. — mesma taxa usada nos contratos do sistema (contractStatement).
-// O índice oficial vigente será aplicado no contrato definitivo.
-const INCC_M_DEMO_MONTHLY = 0.0045;
-
-const pad3 = (v: number) => String(v).padStart(3, "0");
-
-function parseISODateLocal(iso: string): Date {
-  const s = iso.length > 10 ? iso.slice(0, 10) : iso;
-  const [y, m, d] = s.split("-").map(Number);
-  return new Date(y, (m ?? 1) - 1, d ?? 1);
-}
-function toISODate(d: Date): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
 function fmtDate(iso: string): string {
   const [y, m, d] = iso.split("-");
   return `${d}/${m}/${y}`;
 }
-/** Adiciona meses preservando o dia; se o mês alvo não tiver o dia, usa o último dia do mês. */
-function addMonthsSafe(base: Date, months: number): Date {
-  const targetY = base.getFullYear();
-  const targetIdx = base.getMonth() + months;
-  const y = targetY + Math.floor(targetIdx / 12);
-  const m = ((targetIdx % 12) + 12) % 12;
-  const lastDay = new Date(y, m + 1, 0).getDate();
-  return new Date(y, m, Math.min(base.getDate(), lastDay));
-}
-
-type FlowKind = "sinal" | "mensal" | "intermediaria" | "chaves" | "unico";
-type FlowRow = {
-  parcela: number;
-  seq: string;
-  kind: FlowKind;
-  dueDate: string; // ISO
-  contractual: number;
-  correctedNow: number;
-  monthsFromProposal: number;
-};
-
-function correctedByINCC(contractual: number, months: number): number {
-  if (months <= 0) return contractual;
-  return contractual * Math.pow(1 + INCC_M_DEMO_MONTHLY, months);
-}
-
-function buildProposalFlow(p: SharedProposal, proposalDateISO: string): FlowRow[] {
-  const rows: FlowRow[] = [];
-
-  if (p.payment_method === "a_vista") {
-    const value = n(p.final_price_brl);
-    rows.push({
-      parcela: 1,
-      seq: "001/001-S",
-      kind: "unico",
-      dueDate: proposalDateISO,
-      contractual: value,
-      correctedNow: value,
-      monthsFromProposal: 0,
-    });
-    return rows;
-  }
-
-  const base = parseISODateLocal(proposalDateISO);
-  let parcela = 0;
-
-  if (n(p.down_payment_brl) > 0) {
-    parcela++;
-    const v = n(p.down_payment_brl);
-    rows.push({
-      parcela,
-      seq: "001/001-S",
-      kind: "sinal",
-      dueDate: toISODate(base),
-      contractual: v,
-      correctedNow: v,
-      monthsFromProposal: 0,
-    });
-  }
-
-  const N = Math.max(0, p.monthly_count | 0);
-  const B = Math.max(0, p.balloon_count | 0);
-  let balloonIdx = 0;
-
-  for (let i = 1; i <= N; i++) {
-    parcela++;
-    const due = addMonthsSafe(base, i);
-    const v = n(p.monthly_brl);
-    rows.push({
-      parcela,
-      seq: `${pad3(i)}/${pad3(N)}-M`,
-      kind: "mensal",
-      dueDate: toISODate(due),
-      contractual: v,
-      correctedNow: correctedByINCC(v, i),
-      monthsFromProposal: i,
-    });
-    if (B > 0 && i % 6 === 0 && balloonIdx < B) {
-      balloonIdx++;
-      parcela++;
-      const vb = n(p.balloon_brl);
-      rows.push({
-        parcela,
-        seq: `${pad3(balloonIdx)}/${pad3(B)}-I`,
-        kind: "intermediaria",
-        dueDate: toISODate(due),
-        contractual: vb,
-        correctedNow: correctedByINCC(vb, i),
-        monthsFromProposal: i,
-      });
-    }
-  }
-
-  if (n(p.keys_brl) > 0) {
-    parcela++;
-    const keysM = N + 1;
-    const due = addMonthsSafe(base, keysM);
-    const v = n(p.keys_brl);
-    rows.push({
-      parcela,
-      seq: "001/001-C",
-      kind: "chaves",
-      dueDate: toISODate(due),
-      contractual: v,
-      correctedNow: correctedByINCC(v, keysM),
-      monthsFromProposal: keysM,
-    });
-  }
-
-  return rows;
-}
-
-const FLOW_KIND_LABEL: Record<FlowKind, string> = {
-  sinal: "Ato / sinal",
-  mensal: "Mensal",
-  intermediaria: "Intermediária",
-  chaves: "Chaves",
-  unico: "Pagamento único",
-};
 
 function proposalDateISO(p: SharedProposal): string {
-  const s = p.updated_at;
-  const d = new Date(s);
-  if (Number.isNaN(d.getTime())) return s.slice(0, 10);
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
+  return toProposalDateISO(p.updated_at);
 }
+
+/** Se a proposta veio com parcelas configuradas, usa-as; senão gera a distribuição automática. */
+function resolveFlow(p: SharedProposal, dateISO: string): FlowRow[] {
+  if (p.installments && p.installments.length > 0) {
+    return flowFromSaved(p.installments, dateISO);
+  }
+  return buildProposalFlow(p, dateISO);
+}
+
 
 function PaymentFlowBlock({
   u,
@@ -589,9 +466,8 @@ function PaymentFlowBlock({
   clientName: string;
 }) {
   const propISO = proposalDateISO(p);
-  const rows = useMemo(() => buildProposalFlow(p, propISO), [p, propISO]);
-  const totalContractual = rows.reduce((s, r) => s + r.contractual, 0);
-  const totalCorrected = rows.reduce((s, r) => s + r.correctedNow, 0);
+  const rows = useMemo(() => resolveFlow(p, propISO), [p, propISO]);
+  const { contractual: totalContractual, corrected: totalCorrected } = flowTotals(rows);
   const listPrice = n(u.price_brl);
   const finalPrice = n(p.final_price_brl);
   const savings = Math.max(0, listPrice - finalPrice);
@@ -748,13 +624,11 @@ function PaymentFlowSection({ units, clientName }: { units: SharedUnit[]; client
   if (blocks.length === 0) return null;
 
   const totalContractual = blocks.reduce(
-    (s, { p }) =>
-      s + buildProposalFlow(p, proposalDateISO(p)).reduce((a, r) => a + r.contractual, 0),
+    (s, { p }) => s + flowTotals(resolveFlow(p, proposalDateISO(p))).contractual,
     0,
   );
   const totalCorrected = blocks.reduce(
-    (s, { p }) =>
-      s + buildProposalFlow(p, proposalDateISO(p)).reduce((a, r) => a + r.correctedNow, 0),
+    (s, { p }) => s + flowTotals(resolveFlow(p, proposalDateISO(p))).corrected,
     0,
   );
 

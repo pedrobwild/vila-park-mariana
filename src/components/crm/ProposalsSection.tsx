@@ -20,8 +20,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, Plus, FileText } from "lucide-react";
+import { MoreVertical, Plus, FileText, CalendarClock } from "lucide-react";
 import ProposalDialog from "./ProposalDialog";
+import PaymentFlowDialog from "./PaymentFlowDialog";
 import ShareProposalButton from "./ShareProposalButton";
 import {
   PAYMENT_METHOD_SHORT,
@@ -45,6 +46,7 @@ const fmtDate = (iso: string | null) =>
 export default function ProposalsSection({ deal, onReload }: Props) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<CrmProposal | null>(null);
+  const [flowFor, setFlowFor] = useState<CrmProposal | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<CrmProposal | null>(null);
   const [confirmAccept, setConfirmAccept] = useState<CrmProposal | null>(null);
   const [busy, setBusy] = useState(false);
@@ -175,6 +177,10 @@ export default function ProposalsSection({ deal, onReload }: Props) {
             const status = p.status as CrmProposalStatus;
             const badgeKind = expired ? "expirada" : status;
             const badgeLabel = expired ? "Expirada" : PROPOSAL_STATUS_LABEL[status];
+            const hasFlow =
+              Array.isArray((p as CrmProposal & { installments?: unknown[] }).installments) &&
+              ((p as CrmProposal & { installments?: unknown[] }).installments?.length ?? 0) > 0;
+            const canConfigureFlow = p.payment_method !== "a_vista";
             return (
               <li key={p.id} className="p-3 space-y-1.5">
                 <div className="flex items-start justify-between gap-2">
@@ -185,6 +191,14 @@ export default function ProposalsSection({ deal, onReload }: Props) {
                     >
                       {badgeLabel}
                     </span>
+                    {hasFlow && (
+                      <span
+                        className="text-[10px] px-1.5 py-0.5 rounded border border-border/60 text-muted-foreground bg-muted/20 inline-flex items-center gap-1"
+                        title="Fluxo de pagamento configurado"
+                      >
+                        <CalendarClock className="h-3 w-3" /> fluxo
+                      </span>
+                    )}
                     <span className="font-display text-sm tabular-nums text-accent">
                       {formatBRL2(Number(p.final_price_brl))}
                     </span>
@@ -202,6 +216,17 @@ export default function ProposalsSection({ deal, onReload }: Props) {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={() => openEdit(p)}>Editar</DropdownMenuItem>
+                      <DropdownMenuItem
+                        disabled={!canConfigureFlow}
+                        onClick={() => canConfigureFlow && setFlowFor(p)}
+                        title={
+                          canConfigureFlow
+                            ? undefined
+                            : "Pagamento único — sem parcelamento"
+                        }
+                      >
+                        <CalendarClock className="h-3.5 w-3.5 mr-2" /> Configurar fluxo de pagamento
+                      </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       {status !== "enviada" && status !== "aceita" && (
                         <DropdownMenuItem
@@ -262,6 +287,16 @@ export default function ProposalsSection({ deal, onReload }: Props) {
           onOpenChange={setDialogOpen}
           deal={deal}
           proposal={editing}
+          onSaved={onReload}
+        />
+      )}
+
+      {flowFor && (
+        <PaymentFlowDialog
+          open={!!flowFor}
+          onOpenChange={(o) => !o && setFlowFor(null)}
+          proposal={flowFor}
+          unitCode={unitByCode(flowFor.unit_id)}
           onSaved={onReload}
         />
       )}

@@ -393,6 +393,44 @@ export type Database = {
         }
         Relationships: []
       }
+      crm_proposal_installments: {
+        Row: {
+          amount_brl: number
+          created_at: string
+          due_date: string
+          id: string
+          kind: string
+          proposal_id: string
+          seq_no: number
+        }
+        Insert: {
+          amount_brl: number
+          created_at?: string
+          due_date: string
+          id?: string
+          kind: string
+          proposal_id: string
+          seq_no: number
+        }
+        Update: {
+          amount_brl?: number
+          created_at?: string
+          due_date?: string
+          id?: string
+          kind?: string
+          proposal_id?: string
+          seq_no?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_proposal_installments_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "crm_proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       crm_proposals: {
         Row: {
           balloon_brl: number
