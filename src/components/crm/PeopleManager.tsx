@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/select";
 import { Plus, Search, Pencil, CheckCircle2, AlertCircle } from "lucide-react";
 import { formatBRL, STATUS_LABEL } from "@/lib/units";
+import { cn } from "@/lib/utils";
 import type { Unit } from "@/lib/units";
 import {
   SOURCES,
@@ -255,10 +256,18 @@ export default function PeopleManager({
     setOpenDialog(true);
   };
 
-  const openEdit = (p: CrmPerson) => {
+  const [highlightLoaded, setHighlightLoaded] = useState(false);
+
+  const openEdit = (p: CrmPerson, opts?: { highlight?: boolean }) => {
     setEditingId(p.id);
     setForm(personToForm(p));
     setOpenDialog(true);
+    if (opts?.highlight) {
+      setHighlightLoaded(true);
+      window.setTimeout(() => setHighlightLoaded(false), 2800);
+    } else {
+      setHighlightLoaded(false);
+    }
   };
 
   const handleCEPBlur = async () => {
@@ -320,7 +329,7 @@ export default function PeopleManager({
                 });
                 return;
               }
-              openEdit(full as CrmPerson);
+              openEdit(full as CrmPerson, { highlight: true });
             },
           },
         });
@@ -553,7 +562,19 @@ export default function PeopleManager({
       </div>
 
       <Dialog open={openDialog} onOpenChange={(o) => !o && setOpenDialog(false)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent
+          data-highlight-loaded={highlightLoaded ? "true" : undefined}
+          className={cn(
+            "max-w-2xl max-h-[90vh] overflow-y-auto",
+            // Highlight all filled inputs/textareas/selects when opened via duplicate-CPF flow
+            "[&[data-highlight-loaded=true]_input:not([value=''])]:ring-2",
+            "[&[data-highlight-loaded=true]_input:not([value=''])]:ring-primary/50",
+            "[&[data-highlight-loaded=true]_input:not([value=''])]:ring-offset-1",
+            "[&[data-highlight-loaded=true]_input:not([value=''])]:transition-shadow",
+            "[&[data-highlight-loaded=true]_textarea:not(:empty)]:ring-2",
+            "[&[data-highlight-loaded=true]_textarea:not(:empty)]:ring-primary/50",
+          )}
+        >
           <DialogHeader>
             <DialogTitle className="font-display">
               {editingId ? "Editar pessoa" : "Nova pessoa"}
@@ -565,7 +586,18 @@ export default function PeopleManager({
             </DialogDescription>
           </DialogHeader>
 
+          {highlightLoaded && (
+            <div
+              role="status"
+              className="rounded-md border border-primary/30 bg-primary/5 px-3 py-2 text-xs text-primary"
+            >
+              Cadastro existente carregado em modo edição. Os campos preenchidos estão destacados —
+              revise e salve as alterações.
+            </div>
+          )}
+
           <div className="space-y-6">
+
             {/* ── CONTATO ── */}
             <section className="space-y-3">
               <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
