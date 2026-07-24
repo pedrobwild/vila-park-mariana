@@ -386,19 +386,29 @@ export default function Index() {
           <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {DECORADO_GALLERY.map((img, i) => (
               <FadeIn key={img.url} delay={Math.min(i * 0.05, 0.3)} className={i === 0 ? "md:col-span-2" : ""}>
-                <figure className="overflow-hidden rounded-2xl border border-border/60 bg-muted/25">
+                <figure
+                  className="group overflow-hidden rounded-2xl border border-border/60 bg-muted/25 cursor-zoom-in"
+                  onClick={() => { setLightboxIndex(i); setLightboxOpen(true); }}
+                >
                   <div className={`w-full ${i === 0 ? "aspect-[21/9]" : "aspect-[16/10]"}`}>
                     <img
                       src={img.url}
                       alt={img.alt}
                       loading="lazy"
-                      className="h-full w-full object-cover transition-transform duration-700 hover:scale-[1.03]"
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                     />
                   </div>
                 </figure>
               </FadeIn>
             ))}
           </div>
+
+          <GalleryLightbox
+            images={DECORADO_GALLERY}
+            initialIndex={lightboxIndex}
+            open={lightboxOpen}
+            onOpenChange={setLightboxOpen}
+          />
         </div>
       </section>
 
