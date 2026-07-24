@@ -289,7 +289,24 @@ export default function PeopleManager({
       toast.error("CPF inválido.");
       return;
     }
+    const cpfDigits = form.cpf.trim() ? form.cpf.replace(/\D/g, "") : null;
+    if (cpfDigits) {
+      let q = supabase.from("crm_people").select("id, full_name").eq("cpf", cpfDigits).limit(1);
+      if (editingId) q = q.neq("id", editingId);
+      const { data: dup, error: dupErr } = await q.maybeSingle();
+      if (dupErr) {
+        toast.error("Não foi possível validar o CPF.", { description: dupErr.message });
+        return;
+      }
+      if (dup) {
+        toast.error("CPF já cadastrado", {
+          description: `Este CPF já pertence a ${dup.full_name}. Edite o cadastro existente em vez de criar um novo.`,
+        });
+        return;
+      }
+    }
     setSaving(true);
+
     try {
       const payload = {
         full_name: form.full_name.trim(),
