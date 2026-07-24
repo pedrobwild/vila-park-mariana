@@ -851,8 +851,8 @@ function ProposalPage({ data }: { data: SharedPayload }) {
     () => [...data.units].sort((a, b) => (a.is_primary === b.is_primary ? 0 : a.is_primary ? -1 : 1)),
     [data.units],
   );
-  const contracts = data.contracts ?? [];
-  const today = new Date().toISOString().slice(0, 10);
+
+
 
 
   const total = units.reduce((s, u) => s + unitFinal(u), 0);
