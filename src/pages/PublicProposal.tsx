@@ -80,41 +80,10 @@ type SharedUnit = {
   proposals: SharedProposal[];
 };
 
-type SharedContractInstallment = {
-  seq_label: string;
-  kind: InstallmentKind;
-  due_date: string;
-  contractual_value: number | string;
-  paid_date: string | null;
-  paid_value: number | string | null;
-  fine_value: number | string | null;
-  interest_value: number | string | null;
-  discount_value: number | string | null;
-  admin_fee: number | string | null;
-  insurance_fee: number | string | null;
-  corrected_value: number | string | null;
-};
-
-type SharedContract = {
-  contract_number: string;
-  client_name: string;
-  unit_code: string;
-  contract_date: string;
-  original_value: number | string;
-  contract_value: number | string;
-  monthly_index_rate: number | string;
-  index_label: string;
-  late_fine_rate: number | string;
-  late_interest_monthly: number | string;
-  status: string;
-  installments: SharedContractInstallment[];
-};
-
 type SharedPayload = {
   client_name: string;
   shared_at: string;
   units: SharedUnit[];
-  contracts?: SharedContract[] | null;
   interested_count?: number | null;
 };
 
