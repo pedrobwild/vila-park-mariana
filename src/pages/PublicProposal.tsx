@@ -1157,6 +1157,32 @@ function ProposalPage({ data }: { data: SharedPayload }) {
     },
   ];
 
+  // --- Simulação de financiamento ---
+  const financeableOptions = useMemo(() => financeableOptionsFrom(units), [units]);
+  const hasFinanceable = financeableOptions.length > 0;
+  const [simOpen, setSimOpen] = useState(false);
+  const [simResult, setSimResult] = useState<SimResultState | null>(null);
+  const simSectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (simResult && simSectionRef.current) {
+      const el = simSectionRef.current;
+      requestAnimationFrame(() => {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  }, [simResult]);
+
+  const currentSimOption = simResult
+    ? financeableOptions.find((o) => o.unitCode === simResult.unitCode)
+    : undefined;
+
+  const openSimDialog = () => {
+    if (!hasFinanceable) return;
+    setSimOpen(true);
+  };
+
+
   return (
     <div className="min-h-screen bg-muted/25">
       <header className="border-b border-border/40 bg-background">
