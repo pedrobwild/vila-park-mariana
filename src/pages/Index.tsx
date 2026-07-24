@@ -384,7 +384,14 @@ export default function Index() {
             </p>
           </FadeIn>
 
-          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          {/* Mobile: horizontal carousel */}
+          <MobileGalleryCarousel
+            images={DECORADO_GALLERY}
+            onImageClick={(i) => { setLightboxIndex(i); setLightboxOpen(true); }}
+          />
+
+          {/* Desktop: large grid */}
+          <div className="hidden md:grid mt-10 grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {DECORADO_GALLERY.map((img, i) => (
               <FadeIn key={img.url} delay={Math.min(i * 0.05, 0.3)} className={i === 0 ? "md:col-span-2" : ""}>
                 <figure
