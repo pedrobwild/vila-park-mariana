@@ -53,6 +53,8 @@ import {
   parseBRLInput,
   formatBRLValue,
   isValidCPF,
+  normalizeCPF,
+
   ageFromISO,
   formatDateBR,
   evaluateCompleteness,
