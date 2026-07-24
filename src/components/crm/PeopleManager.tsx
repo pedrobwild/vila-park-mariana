@@ -292,9 +292,10 @@ export default function PeopleManager({
       toast.error("CPF inválido.");
       return;
     }
-    const cpfDigits = form.cpf.trim() ? form.cpf.replace(/\D/g, "") : null;
+    const cpfDigits = form.cpf.trim() ? normalizeCPF(form.cpf) : null;
     if (cpfDigits) {
       let q = supabase.from("crm_people").select("id, full_name").eq("cpf", cpfDigits).limit(1);
+
       if (editingId) q = q.neq("id", editingId);
       const { data: dup, error: dupErr } = await q.maybeSingle();
       if (dupErr) {
