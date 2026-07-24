@@ -75,6 +75,7 @@ type SharedProposal = {
   valid_until: string | null;
   notes: string | null;
   updated_at: string;
+  installments?: SavedInstallment[] | null;
 };
 
 type SharedUnit = {
