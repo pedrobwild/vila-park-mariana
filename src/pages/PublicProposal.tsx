@@ -10,10 +10,18 @@ import {
 } from "@/components/ui/collapsible";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MessageCircle, Printer, AlertTriangle, ChevronDown, ImageOff } from "lucide-react";
+import { MessageCircle, Printer, AlertTriangle, ChevronDown, ImageOff, FileText } from "lucide-react";
 import { formatBRL2, PAYMENT_METHOD_LABEL, type CrmPaymentMethod } from "@/lib/crm";
 import { tipologias } from "@/data/tipologias";
 import { WHATSAPP_PHONE } from "@/data/surroundings";
+import {
+  buildStatement,
+  formatBRL as fmtBRL,
+  formatDateBR,
+  type Contract as StmtContract,
+  type Installment as StmtInstallment,
+  type InstallmentKind,
+} from "@/lib/contractStatement";
 
 type SharedProposal = {
   status: "enviada" | "aceita";
