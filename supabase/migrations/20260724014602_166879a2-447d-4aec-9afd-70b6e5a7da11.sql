@@ -1,0 +1,1 @@
+UPDATE public.contract_installments SET due_date = DATE '2027-09-15' WHERE kind = 'chaves' AND due_date = DATE '2026-12-30';
