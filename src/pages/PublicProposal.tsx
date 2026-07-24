@@ -681,10 +681,6 @@ function StatementSection({ contracts, today }: { contracts: SharedContract[]; t
 
 /* --------------------------- Financing simulator --------------------------- */
 
-// Taxa padrão do simulador de /ferramentas (Caixa SBPE, efetiva a.a.).
-const DEFAULT_ANNUAL_RATE = 11.19;
-const DEFAULT_TERM_MONTHS = 360;
-
 type FinanceableOption = {
   id: string; // unit code + updated_at
   unitCode: string;
@@ -695,14 +691,6 @@ type FinanceableOption = {
   isPrimaryUnit: boolean;
 };
 
-type SimResultState = {
-  unitCode: string;
-  financedAmount: number;
-  termMonths: number;
-  annualRate: number;
-  sac: FinancingResult;
-  price: FinancingResult;
-};
 
 function financeableOptionsFrom(units: SharedUnit[]): FinanceableOption[] {
   const out: FinanceableOption[] = [];
