@@ -257,7 +257,8 @@ export default function GalleryLightbox({ images, initialIndex, open, onOpenChan
                   </button>
                 </>
               )}
-            </motion.div>
+              </motion.div>
+            </DialogPrimitive.Content>
           )}
         </AnimatePresence>
       </DialogPrimitive.Portal>
