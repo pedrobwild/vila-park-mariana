@@ -53,13 +53,31 @@ export default function GalleryLightbox({ images, initialIndex, open, onOpenChan
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onOpenChange(false);
-      if (e.key === "ArrowRight") next();
-      if (e.key === "ArrowLeft") prev();
+      if (e.key === "ArrowRight") { e.preventDefault(); next(); }
+      else if (e.key === "ArrowLeft") { e.preventDefault(); prev(); }
+      else if (e.key === "Home") { e.preventDefault(); goTo(0); }
+      else if (e.key === "End") { e.preventDefault(); goTo(total - 1); }
+      else if (e.key === "+" || e.key === "=") {
+        e.preventDefault();
+        setZoom((z) => Math.min(z + 0.5, 4));
+      }
+      else if (e.key === "-" || e.key === "_") {
+        e.preventDefault();
+        setZoom((z) => {
+          const n = Math.max(z - 0.5, 1);
+          if (n <= 1) setPan({ x: 0, y: 0 });
+          return n;
+        });
+      }
+      else if (e.key === "0") {
+        e.preventDefault();
+        setZoom(1);
+        setPan({ x: 0, y: 0 });
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, next, prev, onOpenChange]);
+  }, [open, next, prev, goTo, total]);
 
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault();
