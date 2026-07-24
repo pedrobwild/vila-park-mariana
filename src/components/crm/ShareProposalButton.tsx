@@ -64,7 +64,7 @@ export default function ShareProposalButton({ deal, canShare, onReload }: Props)
       await onReload();
       return newToken;
     } catch (e) {
-      notifyCrmError(e as SbErr, { entity: "link da proposta", action: "criar" });
+      notifyCrmError(e as SbErr, { entity: "proposta", action: "criar" });
       return null;
     } finally {
       setBusy(false);
