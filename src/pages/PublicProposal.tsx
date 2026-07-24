@@ -49,6 +49,15 @@ import {
   FinancingSimulatorResults,
   type SimulatorInitialForm,
 } from "@/components/ferramentas/FinancingSimulator";
+import {
+  buildProposalFlow,
+  flowFromSaved,
+  flowTotals,
+  proposalDateISO as toProposalDateISO,
+  FLOW_KIND_LABEL,
+  type FlowRow,
+  type SavedInstallment,
+} from "@/lib/proposalFlow";
 
 type SharedProposal = {
   status: "enviada" | "aceita";
