@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import BlurImage from "./BlurImage";
 
 export interface CarouselImage {
   url: string;
@@ -75,7 +76,7 @@ export default function MobileGalleryCarousel({
             }}
           >
             <div className={`w-full ${i === 0 ? leadAspect : cardAspect}`}>
-              <img
+              <BlurImage
                 src={img.url}
                 alt={img.alt}
                 loading={i === 0 ? "eager" : "lazy"}
