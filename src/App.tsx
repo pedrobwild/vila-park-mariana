@@ -24,6 +24,7 @@ const PublicProposal = lazy(() => import("./pages/PublicProposal"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
 import RequireAdmin from "./components/auth/RequireAdmin";
+import SessionWatcher from "./components/auth/SessionWatcher";
 import BasemapDiagnosticsOverlay from "./components/dev/BasemapDiagnosticsOverlay";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <SessionWatcher />
           <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Carregando…</div>}>
             <Routes>
               <Route path="/" element={<Index />} />
