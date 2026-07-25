@@ -21,6 +21,7 @@ const Oportunidades = lazy(() => import("./pages/Oportunidades"));
 const ClientStatement = lazy(() => import("./pages/ClientStatement"));
 const AdminAuditLog = lazy(() => import("./pages/AdminAuditLog"));
 const PublicProposal = lazy(() => import("./pages/PublicProposal"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
 import RequireAdmin from "./components/auth/RequireAdmin";
 import BasemapDiagnosticsOverlay from "./components/dev/BasemapDiagnosticsOverlay";
