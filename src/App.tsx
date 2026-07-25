@@ -47,6 +47,7 @@ const App = () => (
               <Route path="/insights" element={<Insights />} />
               <Route path="/corretor" element={<CorretorPage />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/proposta/:token" element={<PublicProposal />} />
               <Route path="/oportunidades" element={<Oportunidades />} />
               <Route path="/admin" element={<RequireAdmin><Admin /></RequireAdmin>} />
