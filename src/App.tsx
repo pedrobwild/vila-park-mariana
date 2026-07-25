@@ -21,6 +21,7 @@ const Oportunidades = lazy(() => import("./pages/Oportunidades"));
 const ClientStatement = lazy(() => import("./pages/ClientStatement"));
 const AdminAuditLog = lazy(() => import("./pages/AdminAuditLog"));
 const PublicProposal = lazy(() => import("./pages/PublicProposal"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
 import RequireAdmin from "./components/auth/RequireAdmin";
 import BasemapDiagnosticsOverlay from "./components/dev/BasemapDiagnosticsOverlay";
@@ -46,6 +47,7 @@ const App = () => (
               <Route path="/insights" element={<Insights />} />
               <Route path="/corretor" element={<CorretorPage />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/proposta/:token" element={<PublicProposal />} />
               <Route path="/oportunidades" element={<Oportunidades />} />
               <Route path="/admin" element={<RequireAdmin><Admin /></RequireAdmin>} />
