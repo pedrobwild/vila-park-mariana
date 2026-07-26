@@ -45,17 +45,33 @@ export interface GoalsData {
 
 const num = (v: unknown) => (typeof v === "number" ? v : Number(v ?? 0)) || 0;
 
+/** Número opcional: mantém `null` quando o backend não tem valor (meta não cadastrada). */
+const numOrNull = (v: unknown): number | null => {
+  if (v === null || v === undefined || v === "") return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+};
+
+/** Data do mês a partir de `yyyy-MM-dd`; `null` quando o valor é inválido. */
+function mesDate(iso: string): Date | null {
+  const [y, m] = String(iso).split("-").map(Number);
+  if (!Number.isFinite(y) || !Number.isFinite(m) || m < 1 || m > 12) return null;
+  return new Date(y, m - 1, 1);
+}
+
 function mesExtenso(iso: string) {
-  const [y, m] = iso.split("-").map(Number);
-  const d = new Date(y, (m ?? 1) - 1, 1);
+  const d = mesDate(iso);
+  if (!d) return "mês não informado";
   const s = d.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 function mesCurto(iso: string) {
-  const [y, m] = iso.split("-").map(Number);
-  return new Date(y, (m ?? 1) - 1, 1).toLocaleDateString("pt-BR", { month: "short", year: "2-digit" });
+  const d = mesDate(iso);
+  if (!d) return "—";
+  return d.toLocaleDateString("pt-BR", { month: "short", year: "2-digit" });
 }
+
 
 /** Barra de progresso do termômetro de meta — trava em 100% e informa o excedente por texto. */
 function Termometro({
