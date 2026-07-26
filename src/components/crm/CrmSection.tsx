@@ -5,6 +5,8 @@ import PipelineView from "./PipelineView";
 import PeopleManager from "./PeopleManager";
 import DealDetailSheet from "./DealDetailSheet";
 import NewDealDialog from "./NewDealDialog";
+import SalesMirrorView from "./SalesMirrorView";
+import CrmDashboard from "./CrmDashboard";
 import { sortStages, type CrmDeal, type CrmDealUnit, type CrmPerson, type CrmProposal, type CrmStageRow } from "@/lib/crm";
 import type { Unit } from "@/lib/units";
 
@@ -15,18 +17,21 @@ export type DealFull = CrmDeal & {
   proposals: CrmProposal[];
 };
 
-export default function CrmSection() {
+type CrmTab = "pipeline" | "espelho" | "pessoas" | "painel";
+
+export default function CrmSection({ onOpenUnits }: { onOpenUnits?: () => void }) {
   const [deals, setDeals] = useState<DealFull[]>([]);
   const [people, setPeople] = useState<CrmPerson[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
   const [stages, setStages] = useState<CrmStageRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [openDealId, setOpenDealId] = useState<string | null>(null);
-  const [tab, setTab] = useState<"pipeline" | "pessoas">("pipeline");
+  const [tab, setTab] = useState<CrmTab>("pipeline");
   const [newDeal, setNewDeal] = useState<{ open: boolean; personId?: string | null }>({
     open: false,
   });
   const [openNewPerson, setOpenNewPerson] = useState(false);
+
 
 
   const loadStages = useCallback(async () => {
