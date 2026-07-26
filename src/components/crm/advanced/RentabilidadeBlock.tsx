@@ -1,9 +1,11 @@
 import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatBRLCompact } from "@/lib/crm";
 import { computePropostasVpl, formatPct, totalNpv, VERDICT_LABEL, type AdvancedData } from "@/lib/crmAdvanced";
+
 
 interface Props {
   data: AdvancedData["rentabilidade"];
@@ -12,7 +14,9 @@ interface Props {
 const MAX_LINHAS = 25;
 
 export default function RentabilidadeBlock({ data }: Props) {
+  const navigate = useNavigate();
   const rows = useMemo(
+
     () => computePropostasVpl(data.propostas, data.parametros),
     [data.propostas, data.parametros],
   );
@@ -91,7 +95,21 @@ export default function RentabilidadeBlock({ data }: Props) {
                 </TableHeader>
                 <TableBody>
                   {visiveis.map((p) => (
-                    <TableRow key={p.id}>
+                    <TableRow
+                      key={p.id}
+                      className="cursor-pointer"
+                      tabIndex={0}
+                      role="button"
+                      aria-label={`Abrir o negócio da proposta da unidade ${p.unit_code}`}
+                      onClick={() => navigate(`/admin?m=crm&deal=${p.deal_id}`)}
+                      onKeyDown={(ev) => {
+                        if (ev.key === "Enter" || ev.key === " ") {
+                          ev.preventDefault();
+                          navigate(`/admin?m=crm&deal=${p.deal_id}`);
+                        }
+                      }}
+                    >
+
                       <TableCell className="pl-6">
                         <p className="text-sm font-medium">Unidade {p.unit_code}</p>
                         <p className="text-xs text-muted-foreground">

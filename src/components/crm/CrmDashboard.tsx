@@ -41,12 +41,15 @@ import type { DateRange } from "react-day-picker";
 import { formatBRLCompact, formatBRL2 } from "@/lib/crm";
 import { cn } from "@/lib/utils";
 import type { AdvancedData, DrillItem } from "@/lib/crmAdvanced";
+import type { GoalsData } from "@/components/crm/dashboard/MetasBlock";
 import DrillDownSheet from "@/components/crm/advanced/DrillDownSheet";
 
+const MetasBlock = lazy(() => import("@/components/crm/dashboard/MetasBlock"));
 const PrevisaoBlock = lazy(() => import("@/components/crm/advanced/PrevisaoBlock"));
 const AbsorcaoBlock = lazy(() => import("@/components/crm/advanced/AbsorcaoBlock"));
 const RentabilidadeBlock = lazy(() => import("@/components/crm/advanced/RentabilidadeBlock"));
 const ProdutividadeBlock = lazy(() => import("@/components/crm/advanced/ProdutividadeBlock"));
+
 
 
 interface DashboardData {
@@ -171,6 +174,8 @@ export default function CrmDashboard({ onGoToPipeline }: Props) {
   const [stageId, setStageId] = useState("todas");
   const [data, setData] = useState<DashboardData | null>(null);
   const [advanced, setAdvanced] = useState<AdvancedData | null>(null);
+  const [goals, setGoals] = useState<GoalsData | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [brokers, setBrokers] = useState<{ id: string; full_name: string }[]>([]);
   const [stages, setStages] = useState<{ id: string; label: string }[]>([]);
@@ -220,9 +225,17 @@ export default function CrmDashboard({ onGoToPipeline }: Props) {
       _area_m2: area === "todas" ? null : Number(area),
       _stage_id: stageId === "todas" ? null : stageId,
     };
-    const [base, adv] = await Promise.all([
+    // Mês das metas: o mês final do período — ou o mês corrente quando o período termina no futuro.
+    const hoje = new Date();
+    const fim = new Date(`${to}T00:00:00`);
+    fim.setDate(fim.getDate() - 1);
+    const refMes = fim > hoje ? hoje : fim;
+    const goalsMonth = `${refMes.getFullYear()}-${String(refMes.getMonth() + 1).padStart(2, "0")}-01`;
+
+    const [base, adv, gls] = await Promise.all([
       supabase.rpc("crm_dashboard", args),
       supabase.rpc("crm_dashboard_advanced", args),
+      supabase.rpc("crm_goals_report", { _month: goalsMonth }),
     ]);
     if (base.error) {
       toast.error("Não foi possível carregar o painel.");
@@ -236,7 +249,14 @@ export default function CrmDashboard({ onGoToPipeline }: Props) {
     } else {
       setAdvanced(adv.data as unknown as AdvancedData);
     }
+    if (gls.error) {
+      toast.error("Não foi possível carregar as metas do mês.");
+      setGoals(null);
+    } else {
+      setGoals(gls.data as unknown as GoalsData);
+    }
     setLoading(false);
+
   }, [period, custom, brokerId, area, stageId]);
 
   useEffect(() => {
@@ -445,6 +465,14 @@ export default function CrmDashboard({ onGoToPipeline }: Props) {
                   sub={`${data.totais.deals_ganhos} ganhos · ${data.totais.deals_perdidos} perdidos`}
                 />
               </div>
+
+              {goals && (
+                <Suspense fallback={<Skeleton className="h-64 w-full" />}>
+                  <MetasBlock data={goals} />
+                </Suspense>
+              )}
+
+
 
               {/* Linha 2 */}
               <div className="grid gap-4 lg:grid-cols-2">
