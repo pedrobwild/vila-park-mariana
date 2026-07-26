@@ -83,10 +83,21 @@ export function monthsBetweenISO(aISO: string, bISO: string): number {
   return rawMonths + dayAdjust;
 }
 
-export function correctedByINCC(contractual: number, months: number): number {
+export function correctedByINCC(
+  contractual: number,
+  months: number,
+  monthlyRate: number = INCC_M_DEMO_MONTHLY,
+): number {
   if (months <= 0) return contractual;
-  return contractual * Math.pow(1 + INCC_M_DEMO_MONTHLY, months);
+  return contractual * Math.pow(1 + monthlyRate, months);
 }
+
+export type FlowOptions = {
+  /** Índice de correção mensal (decimal). Padrão: INCC-M de demonstração. */
+  inccMonthly?: number;
+  /** Cadência das parcelas intermediárias, em meses. Padrão: 6. */
+  balloonEveryMonths?: number;
+};
 
 /** Normaliza a data de referência da proposta para ISO (yyyy-mm-dd). */
 export function proposalDateISO(input: string): string {
@@ -100,7 +111,13 @@ export function proposalDateISO(input: string): string {
  * Distribuição automática a partir da estrutura da proposta.
  * Determinística: parte da data da proposta e projeta vencimentos futuros.
  */
-export function buildProposalFlow(p: ProposalLike, proposalDate: string): FlowRow[] {
+export function buildProposalFlow(
+  p: ProposalLike,
+  proposalDate: string,
+  opts: FlowOptions = {},
+): FlowRow[] {
+  const incc = opts.inccMonthly ?? INCC_M_DEMO_MONTHLY;
+  const every = Math.max(1, Math.floor(opts.balloonEveryMonths ?? 6));
   const rows: FlowRow[] = [];
 
   if (p.payment_method === "a_vista") {
@@ -148,10 +165,10 @@ export function buildProposalFlow(p: ProposalLike, proposalDate: string): FlowRo
       kind: "mensal",
       dueDate: toISODate(due),
       contractual: v,
-      correctedNow: correctedByINCC(v, i),
+      correctedNow: correctedByINCC(v, i, incc),
       monthsFromProposal: i,
     });
-    if (B > 0 && i % 6 === 0 && balloonIdx < B) {
+    if (B > 0 && i % every === 0 && balloonIdx < B) {
       balloonIdx++;
       parcela++;
       const vb = num(p.balloon_brl);
@@ -161,7 +178,7 @@ export function buildProposalFlow(p: ProposalLike, proposalDate: string): FlowRo
         kind: "intermediaria",
         dueDate: toISODate(due),
         contractual: vb,
-        correctedNow: correctedByINCC(vb, i),
+        correctedNow: correctedByINCC(vb, i, incc),
         monthsFromProposal: i,
       });
     }
@@ -178,7 +195,7 @@ export function buildProposalFlow(p: ProposalLike, proposalDate: string): FlowRo
       kind: "chaves",
       dueDate: toISODate(due),
       contractual: v,
-      correctedNow: correctedByINCC(v, keysM),
+      correctedNow: correctedByINCC(v, keysM, incc),
       monthsFromProposal: keysM,
     });
   }
