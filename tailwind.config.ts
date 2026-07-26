@@ -47,6 +47,7 @@ export default {
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
+        },
         mirror: {
           disponivel: "hsl(var(--mirror-disponivel))",
           negociacao: "hsl(var(--mirror-negociacao))",
@@ -62,7 +63,7 @@ export default {
           "5": "hsl(var(--chart-5))",
           "6": "hsl(var(--chart-6))",
         },
-      },
+
 
         card: {
           DEFAULT: "hsl(var(--card))",
