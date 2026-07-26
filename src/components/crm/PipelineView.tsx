@@ -12,19 +12,21 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { LayoutGrid, List, Plus, Settings2 } from "lucide-react";
 import { useRole } from "@/hooks/useIsAdmin";
-import type { CrmStageRow } from "@/lib/crm";
+import type { CrmBroker, CrmStageRow } from "@/lib/crm";
 import type { DealFull } from "./CrmSection";
 import KanbanView from "./KanbanView";
 import ListView from "./ListView";
 import StageManagerDialog from "./StageManagerDialog";
+import LossReasonDialog from "./LossReasonDialog";
 
 interface Props {
   deals: DealFull[];
   stages: CrmStageRow[];
+  brokers: CrmBroker[];
+  staleDealDays: number;
   loading: boolean;
   onReload: () => Promise<void>;
   onReloadStages: () => Promise<void>;
@@ -43,6 +45,8 @@ const VIEW_KEY = "crm.pipeline.view";
 export default function PipelineView({
   deals,
   stages,
+  brokers,
+  staleDealDays,
   loading,
   onReload,
   onReloadStages,
@@ -57,7 +61,7 @@ export default function PipelineView({
   });
   const [pending, setPending] = useState<PendingChange | null>(null);
   const [updateUnitStatus, setUpdateUnitStatus] = useState(true);
-  const [lostReason, setLostReason] = useState("");
+  const [loss, setLoss] = useState<PendingChange | null>(null);
   const [saving, setSaving] = useState(false);
   const [manageOpen, setManageOpen] = useState(false);
 
@@ -75,7 +79,10 @@ export default function PipelineView({
 
   const requestChange = useCallback((deal: DealFull, to: CrmStageRow) => {
     if (to.id === deal.stage_id) return;
-    setLostReason("");
+    if (to.kind === "perdido") {
+      setLoss({ deal, to });
+      return;
+    }
     setUpdateUnitStatus(to.reserves_unit || to.kind === "ganho");
     setPending({ deal, to });
   }, []);
@@ -85,17 +92,9 @@ export default function PipelineView({
     const { deal, to } = pending;
     setSaving(true);
     try {
-      if (to.kind === "perdido" && !lostReason.trim()) {
-        toast.error("Informe o motivo da perda.");
-        setSaving(false);
-        return;
-      }
       const { error } = await supabase
         .from("crm_deals")
-        .update({
-          stage_id: to.id,
-          lost_reason: to.kind === "perdido" ? lostReason.trim() : null,
-        })
+        .update({ stage_id: to.id })
         .eq("id", deal.id);
       if (error) throw error;
 
@@ -109,6 +108,29 @@ export default function PipelineView({
       }
       toast.success(`Etapa atualizada: ${to.label}`);
       setPending(null);
+      await onReload();
+    } catch (e) {
+      notifyCrmError(e as SbErr, { entity: "negócio", action: "mover" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const confirmLoss = async (reasonId: string, note: string) => {
+    if (!loss) return;
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("crm_deals")
+        .update({
+          stage_id: loss.to.id,
+          loss_reason_id: reasonId,
+          lost_reason: note.trim() || null,
+        })
+        .eq("id", loss.deal.id);
+      if (error) throw error;
+      toast.success("Negócio marcado como perdido.");
+      setLoss(null);
       await onReload();
     } catch (e) {
       notifyCrmError(e as SbErr, { entity: "negócio", action: "mover" });
@@ -184,6 +206,7 @@ export default function PipelineView({
         <KanbanView
           deals={deals}
           stages={stages}
+          staleDays={staleDealDays}
           onOpenDeal={onOpenDeal}
           onRequestStageChange={requestChange}
         />
@@ -191,6 +214,8 @@ export default function PipelineView({
         <ListView
           deals={deals}
           stages={stages}
+          brokers={brokers}
+          staleDays={staleDealDays}
           onOpenDeal={onOpenDeal}
         />
       )}
@@ -229,18 +254,6 @@ export default function PipelineView({
                   </div>
                 )}
 
-                {pending.to.kind === "perdido" && (
-                  <div className="space-y-1.5">
-                    <Label htmlFor="lost-reason">Motivo da perda *</Label>
-                    <Textarea
-                      id="lost-reason"
-                      value={lostReason}
-                      onChange={(e) => setLostReason(e.target.value)}
-                      placeholder="Ex.: cliente optou por outro empreendimento"
-                      rows={3}
-                    />
-                  </div>
-                )}
               </div>
 
               <DialogFooter>
@@ -255,6 +268,15 @@ export default function PipelineView({
           )}
         </DialogContent>
       </Dialog>
+
+      <LossReasonDialog
+        open={!!loss}
+        stageLabel={loss?.to.label ?? ""}
+        dealLabel={loss ? `${loss.deal.person.full_name} — ${loss.deal.title}` : ""}
+        saving={saving}
+        onCancel={() => setLoss(null)}
+        onConfirm={confirmLoss}
+      />
 
       {isAdmin && (
         <StageManagerDialog
