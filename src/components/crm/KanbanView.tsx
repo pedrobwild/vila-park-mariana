@@ -8,8 +8,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreVertical, FileText } from "lucide-react";
-import { formatBRLCompact, daysSince, type CrmStageRow } from "@/lib/crm";
+import { MoreVertical, FileText, AlertTriangle } from "lucide-react";
+import { formatBRLCompact, daysSince, initials, type CrmStageRow } from "@/lib/crm";
 import type { DealFull } from "./CrmSection";
 
 interface Props {
@@ -17,9 +17,16 @@ interface Props {
   stages: CrmStageRow[];
   onOpenDeal: (id: string) => void;
   onRequestStageChange: (deal: DealFull, to: CrmStageRow) => void;
+  staleDays?: number;
 }
 
-export default function KanbanView({ deals, stages, onOpenDeal, onRequestStageChange }: Props) {
+export default function KanbanView({
+  deals,
+  stages,
+  onOpenDeal,
+  onRequestStageChange,
+  staleDays = 7,
+}: Props) {
   const byStage = useMemo(() => {
     const map = new Map<string, DealFull[]>();
     for (const s of stages) map.set(s.id, []);
@@ -62,7 +69,10 @@ export default function KanbanView({ deals, stages, onOpenDeal, onRequestStageCh
                     Sem negócios
                   </p>
                 )}
-                {list.map((deal) => (
+                {list.map((deal) => {
+                  const dias = daysSince(deal.stage_changed_at);
+                  const parado = stage.kind === "aberto" && dias >= staleDays;
+                  return (
                   <article
                     key={deal.id}
                     className="group rounded-lg border border-border/60 bg-background p-3 hover:border-accent/50 hover:shadow-sm transition cursor-pointer"
@@ -144,18 +154,37 @@ export default function KanbanView({ deals, stages, onOpenDeal, onRequestStageCh
                             negociado
                           </span>
                         )}
-                        <span className="tabular-nums">{daysSince(deal.stage_changed_at)}d</span>
+                        <span
+                          className={`tabular-nums ${parado ? "text-amber-700 dark:text-amber-400 font-medium" : ""}`}
+                          title={parado ? `Parado há ${dias} dias nesta etapa` : undefined}
+                        >
+                          {parado && <AlertTriangle className="inline h-3 w-3 mr-0.5 -mt-0.5" />}
+                          {dias}d
+                        </span>
                       </div>
                     </div>
 
 
-                    {stage.kind === "perdido" && deal.lost_reason && (
+                    <div className="mt-2 flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                      <span
+                        className="h-5 w-5 rounded-full bg-muted flex items-center justify-center text-[9px] font-medium"
+                        aria-hidden
+                      >
+                        {initials(deal.broker?.full_name)}
+                      </span>
+                      <span className="truncate">
+                        {deal.broker?.full_name ?? "Sem corretor"}
+                      </span>
+                    </div>
+
+                    {stage.kind === "perdido" && (deal.loss_reason?.label || deal.lost_reason) && (
                       <p className="mt-2 text-[10px] text-muted-foreground/80 line-clamp-2">
-                        {deal.lost_reason}
+                        {deal.loss_reason?.label ?? deal.lost_reason}
                       </p>
                     )}
                   </article>
-                ))}
+                  );
+                })}
               </div>
             </section>
           );
