@@ -865,6 +865,12 @@ export type Database = {
         Row: {
           default_commission_pct: number
           id: boolean
+          proposal_balloon_every_months: number
+          proposal_default_down_pct: number
+          proposal_default_keys_pct: number
+          proposal_default_monthly_count: number
+          proposal_incc_monthly: number
+          proposal_validity_days: number
           roleta_enabled: boolean
           stale_deal_days: number
           task_sla_days: number
@@ -875,6 +881,12 @@ export type Database = {
         Insert: {
           default_commission_pct?: number
           id?: boolean
+          proposal_balloon_every_months?: number
+          proposal_default_down_pct?: number
+          proposal_default_keys_pct?: number
+          proposal_default_monthly_count?: number
+          proposal_incc_monthly?: number
+          proposal_validity_days?: number
           roleta_enabled?: boolean
           stale_deal_days?: number
           task_sla_days?: number
@@ -885,6 +897,12 @@ export type Database = {
         Update: {
           default_commission_pct?: number
           id?: boolean
+          proposal_balloon_every_months?: number
+          proposal_default_down_pct?: number
+          proposal_default_keys_pct?: number
+          proposal_default_monthly_count?: number
+          proposal_incc_monthly?: number
+          proposal_validity_days?: number
           roleta_enabled?: boolean
           stale_deal_days?: number
           task_sla_days?: number
