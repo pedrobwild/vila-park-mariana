@@ -14,7 +14,9 @@ interface Props {
 const MAX_LINHAS = 25;
 
 export default function RentabilidadeBlock({ data }: Props) {
+  const navigate = useNavigate();
   const rows = useMemo(
+
     () => computePropostasVpl(data.propostas, data.parametros),
     [data.propostas, data.parametros],
   );
