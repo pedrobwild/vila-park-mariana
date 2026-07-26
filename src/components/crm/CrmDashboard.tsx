@@ -40,6 +40,8 @@ import { format } from "date-fns";
 import type { DateRange } from "react-day-picker";
 import { formatBRLCompact, formatBRL2 } from "@/lib/crm";
 import { cn } from "@/lib/utils";
+import { goalsMonthFor, periodEndInclusive } from "@/lib/crmGoalsMonth";
+
 import type { AdvancedData, DrillItem } from "@/lib/crmAdvanced";
 import type { GoalsData } from "@/components/crm/dashboard/MetasBlock";
 import DrillDownSheet from "@/components/crm/advanced/DrillDownSheet";
