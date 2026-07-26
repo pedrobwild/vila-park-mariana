@@ -104,6 +104,20 @@
     --sidebar-accent-foreground: 30 15% 95%;
     --sidebar-border: 215 25% 14%;
     --sidebar-ring: 24 58% 52%;
+
+    --mirror-disponivel: 215 12% 60%;
+    --mirror-negociacao: 38 88% 55%;
+    --mirror-proposta: 212 70% 60%;
+    --mirror-reservado: 270 55% 68%;
+    --mirror-vendido: 152 45% 45%;
+
+    --chart-1: 24 58% 55%;
+    --chart-2: 212 70% 60%;
+    --chart-3: 152 45% 48%;
+    --chart-4: 38 88% 55%;
+    --chart-5: 270 55% 68%;
+    --chart-6: 215 12% 60%;
+
   }
 }
 
