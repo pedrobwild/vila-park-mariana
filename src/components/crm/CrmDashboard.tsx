@@ -174,6 +174,8 @@ export default function CrmDashboard({ onGoToPipeline }: Props) {
   const [stageId, setStageId] = useState("todas");
   const [data, setData] = useState<DashboardData | null>(null);
   const [advanced, setAdvanced] = useState<AdvancedData | null>(null);
+  const [goals, setGoals] = useState<GoalsData | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [brokers, setBrokers] = useState<{ id: string; full_name: string }[]>([]);
   const [stages, setStages] = useState<{ id: string; label: string }[]>([]);
