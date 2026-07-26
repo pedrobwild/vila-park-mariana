@@ -995,6 +995,7 @@ export type Database = {
           position: number
           reserves_unit: boolean
           updated_at: string
+          win_probability_pct: number
         }
         Insert: {
           created_at?: string
@@ -1005,6 +1006,7 @@ export type Database = {
           position: number
           reserves_unit?: boolean
           updated_at?: string
+          win_probability_pct?: number
         }
         Update: {
           created_at?: string
@@ -1015,6 +1017,7 @@ export type Database = {
           position?: number
           reserves_unit?: boolean
           updated_at?: string
+          win_probability_pct?: number
         }
         Relationships: []
       }
