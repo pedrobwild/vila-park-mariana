@@ -307,6 +307,35 @@ export default function StageManagerDialog({
                     </div>
                   </div>
 
+                  <div className="flex items-center gap-1.5">
+                    <Label
+                      htmlFor={`prob-${stage.id}`}
+                      className="text-[11px] text-muted-foreground cursor-pointer"
+                    >
+                      Prob. de ganho
+                    </Label>
+                    <Input
+                      id={`prob-${stage.id}`}
+                      type="number"
+                      min={0}
+                      max={100}
+                      inputMode="numeric"
+                      className="h-8 w-[68px] text-right tabular-nums"
+                      disabled={busy || stage.is_system}
+                      value={probEdit[stage.id] ?? String(stage.win_probability_pct)}
+                      onChange={(e) =>
+                        setProbEdit((s) => ({ ...s, [stage.id]: e.target.value }))
+                      }
+                      onBlur={(e) => saveProbability(stage, e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                      }}
+                      aria-label={`Probabilidade de ganho da etapa ${stage.label}, em porcentagem`}
+                    />
+                    <span className="text-[11px] text-muted-foreground">%</span>
+                  </div>
+
+
                   <div className="flex items-center gap-2">
                     <Label
                       htmlFor={`res-${stage.id}`}
