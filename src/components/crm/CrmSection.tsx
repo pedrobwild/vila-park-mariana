@@ -120,6 +120,10 @@ export default function CrmSection({ onOpenUnits }: { onOpenUnits?: () => void }
             onAutoOpenNewHandled={() => setOpenNewPerson(false)}
           />
         </TabsContent>
+        <TabsContent value="painel" className="mt-4">
+          <CrmDashboard onGoToPipeline={() => setTab("pipeline")} />
+        </TabsContent>
+
 
       </Tabs>
 
