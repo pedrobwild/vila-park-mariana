@@ -42,7 +42,9 @@ export default function CrmSection({
   onOpenRelatorios?: () => void;
 }) {
 
+  const [searchParams, setSearchParams] = useSearchParams();
   const [deals, setDeals] = useState<DealFull[]>([]);
+
   const [people, setPeople] = useState<CrmPerson[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
   const [stages, setStages] = useState<CrmStageRow[]>([]);
