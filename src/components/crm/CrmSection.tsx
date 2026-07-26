@@ -30,15 +30,18 @@ export type DealFull = CrmDeal & {
   loss_reason: CrmLossReason | null;
 };
 
-type CrmTab = "pipeline" | "espelho" | "painel";
+type CrmTab = "pipeline" | "espelho";
 
 export default function CrmSection({
   onOpenUnits,
   onOpenLeads,
+  onOpenRelatorios,
 }: {
   onOpenUnits?: () => void;
   onOpenLeads?: (opts?: { novo?: boolean }) => void;
+  onOpenRelatorios?: () => void;
 }) {
+
   const [deals, setDeals] = useState<DealFull[]>([]);
   const [people, setPeople] = useState<CrmPerson[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
