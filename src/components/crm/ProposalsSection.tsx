@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { notifyCrmError, type SbErr } from "@/lib/crmErrors";
@@ -20,7 +20,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, Plus, FileText, CalendarClock } from "lucide-react";
+import { MoreVertical, Plus, FileText, CalendarClock, CheckCircle2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  buildProposalFlow,
+  flowFromSaved,
+  proposalDateISO,
+  type SavedInstallment,
+} from "@/lib/proposalFlow";
+import { analyzeVpl, installmentsFromFlow } from "@/lib/vpl";
 import ProposalDialog from "./ProposalDialog";
 import PaymentFlowDialog from "./PaymentFlowDialog";
 import ShareProposalButton from "./ShareProposalButton";
@@ -50,6 +64,11 @@ export default function ProposalsSection({ deal, onReload }: Props) {
   const [confirmDelete, setConfirmDelete] = useState<CrmProposal | null>(null);
   const [confirmAccept, setConfirmAccept] = useState<CrmProposal | null>(null);
   const [busy, setBusy] = useState(false);
+  const [vplRate, setVplRate] = useState(0.008);
+  const [vplIncc, setVplIncc] = useState(false);
+  const [acceptances, setAcceptances] = useState<
+    Record<string, { signer_name: string; accepted_at: string; doc_hash: string }>
+  >({});
 
   const proposals = useMemo(
     () =>
@@ -58,6 +77,99 @@ export default function ProposalsSection({ deal, onReload }: Props) {
       ),
     [deal.proposals],
   );
+
+  const proposalIds = useMemo(() => proposals.map((p) => p.id).join(","), [proposals]);
+
+  useEffect(() => {
+    let alive = true;
+    supabase
+      .from("crm_settings")
+      .select("vpl_monthly_rate, vpl_correct_by_incc")
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!alive || !data) return;
+        setVplRate(Number(data.vpl_monthly_rate ?? 0.008));
+        setVplIncc(!!data.vpl_correct_by_incc);
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const loadAcceptances = useCallback(async () => {
+    const ids = proposalIds ? proposalIds.split(",") : [];
+    if (ids.length === 0) {
+      setAcceptances({});
+      return;
+    }
+    const { data } = await supabase
+      .from("crm_proposal_acceptances")
+      .select("proposal_id, signer_name, accepted_at, doc_hash")
+      .in("proposal_id", ids)
+      .order("accepted_at", { ascending: false });
+    const map: Record<string, { signer_name: string; accepted_at: string; doc_hash: string }> = {};
+    for (const a of data ?? []) {
+      if (!map[a.proposal_id]) {
+        map[a.proposal_id] = {
+          signer_name: a.signer_name,
+          accepted_at: a.accepted_at,
+          doc_hash: a.doc_hash,
+        };
+      }
+    }
+    setAcceptances(map);
+  }, [proposalIds]);
+
+  useEffect(() => {
+    loadAcceptances();
+  }, [loadAcceptances]);
+
+  const vplByProposal = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const p of proposals) {
+      const saved = (p as CrmProposal & { installments?: SavedInstallment[] }).installments;
+      const date = proposalDateISO(p.created_at);
+      const rows =
+        Array.isArray(saved) && saved.length > 0
+          ? flowFromSaved(saved, date)
+          : buildProposalFlow(
+              {
+                payment_method: p.payment_method,
+                final_price_brl: Number(p.final_price_brl ?? 0),
+                down_payment_brl: Number(p.down_payment_brl ?? 0),
+                monthly_count: Number(p.monthly_count ?? 0),
+                monthly_brl: Number(p.monthly_brl ?? 0),
+                balloon_count: Number(p.balloon_count ?? 0),
+                balloon_brl: Number(p.balloon_brl ?? 0),
+                keys_brl: Number(p.keys_brl ?? 0),
+              },
+              date,
+            );
+      map[p.id] = analyzeVpl(installmentsFromFlow(rows), {
+        listPriceBrl: Number(p.list_price_brl ?? 0),
+        monthlyRate: vplRate,
+        correctByIncc: vplIncc,
+      }).realDiscount;
+    }
+    return map;
+  }, [proposals, vplRate, vplIncc]);
+
+  const bestProposalId = useMemo(() => {
+    if (proposals.length < 2) return null;
+    let best: string | null = null;
+    let min = Infinity;
+    for (const p of proposals) {
+      const v = vplByProposal[p.id];
+      if (Number.isFinite(v) && v < min) {
+        min = v;
+        best = p.id;
+      }
+    }
+    return best;
+  }, [proposals, vplByProposal]);
+
+  const pctBR = (frac: number) =>
+    `${(frac * 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`;
 
   const unitByCode = (unitId: string) =>
     deal.deal_units.find((du) => du.unit_id === unitId)?.unit?.code ?? "—";
@@ -271,6 +383,55 @@ export default function ProposalsSection({ deal, onReload }: Props) {
                   </DropdownMenu>
                 </div>
                 <p className="text-[11px] text-muted-foreground">{conditionsLine(p)}</p>
+                <TooltipProvider delayDuration={200}>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded border border-border/60 text-muted-foreground bg-muted/20 tabular-nums cursor-help">
+                          Desconto de tabela{" "}
+                          {Number(p.discount_pct || 0).toLocaleString("pt-BR", {
+                            maximumFractionDigits: 2,
+                          })}
+                          % · Desconto real (VPL) {pctBR(vplByProposal[p.id] ?? 0)}
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs">
+                        <p className="text-xs">
+                          O desconto real traz cada parcela a valor presente: quanto mais alongado o
+                          fluxo, maior o custo efetivo para a incorporadora.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+
+                    {bestProposalId === p.id && (
+                      <Badge variant="secondary" className="text-[10px]">
+                        Melhor para a incorporadora
+                      </Badge>
+                    )}
+
+                    {acceptances[p.id] && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Badge
+                            variant="outline"
+                            className="text-[10px] gap-1 border-emerald-600/40 text-emerald-700 dark:text-emerald-400 bg-emerald-500/5 cursor-help"
+                          >
+                            <CheckCircle2 className="h-3 w-3" /> Aceita pelo cliente
+                          </Badge>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-xs">
+                            {acceptances[p.id].signer_name} ·{" "}
+                            {new Date(acceptances[p.id].accepted_at).toLocaleString("pt-BR")}
+                          </p>
+                          <p className="text-[11px] text-muted-foreground font-mono">
+                            hash {acceptances[p.id].doc_hash.slice(0, 12)}
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                  </div>
+                </TooltipProvider>
                 <p className="text-[10px] text-muted-foreground tabular-nums">
                   Validade: {fmtDate(p.valid_until)}
                   {p.notes ? ` · ${p.notes}` : ""}
