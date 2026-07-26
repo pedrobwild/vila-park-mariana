@@ -45,7 +45,7 @@ export default function GeralSettings() {
       .limit(1)
       .maybeSingle();
     if (error) {
-      notifyCrmError(error, { entity: "configuração", action: "carregar" });
+      notifyCrmError(error, { entity: "configuração", action: "consultar" });
       setLoading(false);
       return;
     }
@@ -108,7 +108,7 @@ export default function GeralSettings() {
     const { error } = await supabase.from("crm_settings").upsert(payload, { onConflict: "id" });
     setSaving(false);
     if (error) {
-      notifyCrmError(error, { entity: "configuração", action: "salvar" });
+      notifyCrmError(error, { entity: "configuração", action: "atualizar" });
       return;
     }
     toast.success("Configurações salvas.");
