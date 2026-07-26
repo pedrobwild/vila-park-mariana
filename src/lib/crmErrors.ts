@@ -49,6 +49,7 @@ const ARTICLE: Record<CrmEntity, string> = {
   "análise de crédito": "a análise de crédito",
   "comissão": "a comissão",
   "rateio": "o rateio",
+  "meta": "a meta",
   "roleta": "a roleta",
 };
 
@@ -67,6 +68,7 @@ const ARTICLE_ARE: Record<CrmEntity, string> = {
   "análise de crédito": "esta análise de crédito",
   "comissão": "esta comissão",
   "rateio": "este rateio",
+  "meta": "esta meta",
   "roleta": "esta roleta",
 };
 
@@ -190,6 +192,7 @@ function defaultTitle(action: CrmAction, entity: CrmEntity): string {
     reordenar: "reordenar",
     excluir: "excluir",
     atualizar: "atualizar",
+    salvar: "salvar",
     mover: "mover",
     consultar: "consultar",
     distribuir: "distribuir",
