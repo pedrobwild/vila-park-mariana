@@ -95,7 +95,21 @@ export default function RentabilidadeBlock({ data }: Props) {
                 </TableHeader>
                 <TableBody>
                   {visiveis.map((p) => (
-                    <TableRow key={p.id}>
+                    <TableRow
+                      key={p.id}
+                      className="cursor-pointer"
+                      tabIndex={0}
+                      role="button"
+                      aria-label={`Abrir o negócio da proposta da unidade ${p.unit_code}`}
+                      onClick={() => navigate(`/admin?m=crm&deal=${p.deal_id}`)}
+                      onKeyDown={(ev) => {
+                        if (ev.key === "Enter" || ev.key === " ") {
+                          ev.preventDefault();
+                          navigate(`/admin?m=crm&deal=${p.deal_id}`);
+                        }
+                      }}
+                    >
+
                       <TableCell className="pl-6">
                         <p className="text-sm font-medium">Unidade {p.unit_code}</p>
                         <p className="text-xs text-muted-foreground">
