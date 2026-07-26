@@ -1,11 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import PipelineView from "./PipelineView";
 import DealDetailSheet from "./DealDetailSheet";
 import NewDealDialog from "./NewDealDialog";
 import SalesMirrorView from "./SalesMirrorView";
-import CrmDashboard from "./CrmDashboard";
+
 import {
   sortStages,
   type CrmBroker,
