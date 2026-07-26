@@ -95,7 +95,17 @@ export default function CrmSection({ onOpenUnits }: { onOpenUnits?: () => void }
             onNewDeal={() => setNewDeal({ open: true })}
           />
         </TabsContent>
+        <TabsContent value="espelho" className="mt-4">
+          <SalesMirrorView
+            onOpenDeal={(id) => {
+              setTab("pipeline");
+              setOpenDealId(id);
+            }}
+            onOpenUnits={onOpenUnits}
+          />
+        </TabsContent>
         <TabsContent value="pessoas" className="mt-4">
+
           <PeopleManager
             people={people}
             deals={deals}
