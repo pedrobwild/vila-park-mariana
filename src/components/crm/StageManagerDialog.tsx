@@ -51,6 +51,7 @@ export default function StageManagerDialog({
   const [busy, setBusy] = useState(false);
   const [newLabel, setNewLabel] = useState("");
   const [editing, setEditing] = useState<Record<string, string>>({});
+  const [probEdit, setProbEdit] = useState<Record<string, string>>({});
 
   useEffect(() => {
     setLocal(sortStages(stages));
@@ -135,6 +136,34 @@ export default function StageManagerDialog({
       setBusy(false);
     }
   };
+
+  const saveProbability = async (stage: CrmStageRow, raw: string) => {
+    const parsed = Math.round(Number(raw));
+    setProbEdit((s) => {
+      const n = { ...s };
+      delete n[stage.id];
+      return n;
+    });
+    if (!Number.isFinite(parsed) || parsed < 0 || parsed > 100) {
+      toast.error("Informe uma probabilidade entre 0 e 100.");
+      return;
+    }
+    if (parsed === stage.win_probability_pct) return;
+    setBusy(true);
+    try {
+      const { error } = await supabase
+        .from("crm_stages")
+        .update({ win_probability_pct: parsed })
+        .eq("id", stage.id);
+      if (error) throw error;
+      await onReload();
+    } catch (e) {
+      notifyStage(e as SbErr, "atualizar");
+    } finally {
+      setBusy(false);
+    }
+  };
+
 
   const addStage = async () => {
     const label = newLabel.trim();
