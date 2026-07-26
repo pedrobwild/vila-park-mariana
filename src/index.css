@@ -40,6 +40,22 @@
 
     --radius: 0.625rem;
 
+    /* Espelho de vendas — status das unidades */
+    --mirror-disponivel: 215 12% 52%;
+    --mirror-negociacao: 38 92% 42%;
+    --mirror-proposta: 212 72% 45%;
+    --mirror-reservado: 270 48% 52%;
+    --mirror-vendido: 152 52% 26%;
+
+    /* Gráficos (BI) */
+    --chart-1: 24 58% 46%;
+    --chart-2: 212 72% 45%;
+    --chart-3: 152 45% 36%;
+    --chart-4: 38 92% 42%;
+    --chart-5: 270 48% 52%;
+    --chart-6: 215 12% 52%;
+
+
     --sidebar-background: 215 30% 12%;
     --sidebar-foreground: 30 15% 95%;
     --sidebar-primary: 24 58% 46%;
