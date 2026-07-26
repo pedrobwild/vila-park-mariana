@@ -180,15 +180,16 @@ export default function PrevisaoBlock({ data, onDrill }: Props) {
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
             Período anterior de mesma duração, de{" "}
-            <Badge variant="outline" className="text-[10px]">
+            <span className="rounded border border-border px-1.5 py-0.5 text-[10px] font-semibold">
               {cmp.periodo_anterior.de}
-            </Badge>{" "}
+            </span>{" "}
             a{" "}
-            <Badge variant="outline" className="text-[10px]">
+            <span className="rounded border border-border px-1.5 py-0.5 text-[10px] font-semibold">
               {cmp.periodo_anterior.ate}
-            </Badge>
+            </span>
             .
           </p>
+
         </div>
       </CardContent>
     </Card>
