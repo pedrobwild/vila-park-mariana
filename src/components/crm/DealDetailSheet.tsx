@@ -54,6 +54,7 @@ import {
   StickyNote,
   MapPin,
   GitCommitVertical,
+  Shuffle,
 } from "lucide-react";
 import { formatBRL, STATUS_LABEL } from "@/lib/units";
 import type { Unit } from "@/lib/units";
@@ -63,9 +64,12 @@ import {
   SOURCE_LABEL,
   formatBRLCompact,
   stageBadgeClass,
+  initials,
   type CrmActivity,
   type CrmActivityType,
+  type CrmBroker,
   type CrmInterest,
+  type CrmSettings,
   type CrmStageRow,
 } from "@/lib/crm";
 import {
@@ -84,6 +88,10 @@ import {
 import { CheckCircle2, AlertCircle } from "lucide-react";
 import type { DealFull } from "./CrmSection";
 import ProposalsSection from "./ProposalsSection";
+import DealTasksSection from "./DealTasksSection";
+import DealCreditSection from "./DealCreditSection";
+import DealCommissionSection from "./DealCommissionSection";
+import LossReasonDialog from "./LossReasonDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -98,6 +106,8 @@ interface Props {
   deal: DealFull | null;
   units: Unit[];
   stages: CrmStageRow[];
+  brokers: CrmBroker[];
+  settings: CrmSettings | null;
   onClose: () => void;
   onReload: () => Promise<void>;
 }
@@ -111,7 +121,15 @@ const ACTIVITY_ICONS: Record<CrmActivityType, typeof StickyNote> = {
   mudanca_etapa: GitCommitVertical,
 };
 
-export default function DealDetailSheet({ deal, units, stages, onClose, onReload }: Props) {
+export default function DealDetailSheet({
+  deal,
+  units,
+  stages,
+  brokers,
+  settings,
+  onClose,
+  onReload,
+}: Props) {
   const [activities, setActivities] = useState<CrmActivity[]>([]);
   const [loadingAct, setLoadingAct] = useState(false);
   const [newType, setNewType] = useState<CrmActivityType>("nota");
@@ -121,6 +139,7 @@ export default function DealDetailSheet({ deal, units, stages, onClose, onReload
   const [pending, setPending] = useState<CrmStageRow | null>(null);
   const [updateUnitStatus, setUpdateUnitStatus] = useState(true);
   const [lostReason, setLostReason] = useState("");
+  const [lossStage, setLossStage] = useState<CrmStageRow | null>(null);
 
   useEffect(() => {
     if (!deal) return;
@@ -240,6 +259,10 @@ export default function DealDetailSheet({ deal, units, stages, onClose, onReload
 
   const requestStageChange = (to: CrmStageRow) => {
     if (!deal || to.id === deal.stage_id) return;
+    if (to.kind === "perdido") {
+      setLossStage(to);
+      return;
+    }
     setLostReason("");
     setUpdateUnitStatus(to.reserves_unit || to.kind === "ganho");
     setPending(to);
@@ -274,6 +297,62 @@ export default function DealDetailSheet({ deal, units, stages, onClose, onReload
       await reload();
     } catch (e) {
       notifyCrmError(e as SbErr, { entity: "negócio", action: "mover" });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const confirmLoss = async (reasonId: string, note: string) => {
+    if (!deal || !lossStage) return;
+    setBusy(true);
+    try {
+      const { error } = await supabase
+        .from("crm_deals")
+        .update({
+          stage_id: lossStage.id,
+          loss_reason_id: reasonId,
+          lost_reason: note.trim() || null,
+        })
+        .eq("id", deal.id);
+      if (error) throw error;
+      toast.success("Negócio marcado como perdido.");
+      setLossStage(null);
+      await reload();
+    } catch (e) {
+      notifyCrmError(e as SbErr, { entity: "negócio", action: "mover" });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const setBroker = async (brokerId: string | null) => {
+    if (!deal) return;
+    const { error } = await supabase
+      .from("crm_deals")
+      .update({ broker_id: brokerId })
+      .eq("id", deal.id);
+    if (error) {
+      notifyCrmError(error as SbErr, { entity: "negócio", action: "atualizar" });
+      return;
+    }
+    toast.success(brokerId ? "Corretor responsável atualizado." : "Corretor removido.");
+    await reload();
+  };
+
+  const distributeRoleta = async () => {
+    if (!deal) return;
+    setBusy(true);
+    try {
+      const { data, error } = await supabase.rpc("crm_assign_broker", { _deal: deal.id });
+      if (error) throw error;
+      if (!data) {
+        toast.error("Roleta desativada ou sem corretores disponíveis.");
+      } else {
+        toast.success("Negócio distribuído pela roleta.");
+      }
+      await reload();
+    } catch (e) {
+      notifyCrmError(e as SbErr, { entity: "roleta", action: "distribuir" });
     } finally {
       setBusy(false);
     }
@@ -363,6 +442,54 @@ export default function DealDetailSheet({ deal, units, stages, onClose, onReload
             {deal.person.notes && (
               <p className="text-xs text-muted-foreground pt-1 border-t border-border/40">
                 {deal.person.notes}
+              </p>
+            )}
+          </section>
+
+          {/* Broker */}
+          <section className="rounded-lg border border-border/60 p-3 space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="font-medium text-sm">Corretor responsável</h3>
+              {(settings?.roleta_enabled ?? true) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 text-xs"
+                  onClick={distributeRoleta}
+                  disabled={busy}
+                >
+                  <Shuffle className="h-3.5 w-3.5 mr-1" /> Distribuir pela roleta
+                </Button>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="h-8 w-8 shrink-0 rounded-full bg-muted text-[11px] font-medium flex items-center justify-center">
+                {initials(deal.broker?.full_name)}
+              </span>
+              <Select
+                value={deal.broker_id ?? "none"}
+                onValueChange={(v) => setBroker(v === "none" ? null : v)}
+              >
+                <SelectTrigger className="h-9 text-xs flex-1" aria-label="Corretor responsável">
+                  <SelectValue placeholder="Sem corretor" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Sem corretor</SelectItem>
+                  {brokers
+                    .filter((b) => b.is_active || b.id === deal.broker_id)
+                    .map((b) => (
+                      <SelectItem key={b.id} value={b.id}>
+                        {b.full_name}
+                        {b.team ? ` · ${b.team}` : ""}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {deal.stage.kind === "perdido" && (
+              <p className="text-[11px] text-rose-700 dark:text-rose-400">
+                Perda: {deal.loss_reason?.label ?? "motivo não informado"}
+                {deal.lost_reason ? ` — ${deal.lost_reason}` : ""}
               </p>
             )}
           </section>
@@ -468,6 +595,27 @@ export default function DealDetailSheet({ deal, units, stages, onClose, onReload
           <Separator />
 
           <ProposalsSection deal={deal} onReload={reload} />
+
+          <Separator />
+
+          <DealTasksSection
+            deal={deal}
+            brokers={brokers}
+            slaDays={settings?.sla_first_contact_hours ? Math.ceil(settings.sla_first_contact_hours / 24) : 1}
+            onReload={reload}
+          />
+
+          <Separator />
+
+          <DealCreditSection dealId={deal.id} />
+
+          <Separator />
+
+          <DealCommissionSection
+            deal={deal}
+            brokers={brokers}
+            defaultPct={Number(settings?.default_commission_pct ?? 5)}
+          />
 
           <Separator />
 
@@ -594,6 +742,15 @@ export default function DealDetailSheet({ deal, units, stages, onClose, onReload
           )}
         </DialogContent>
       </Dialog>
+
+      <LossReasonDialog
+        open={!!lossStage}
+        stageLabel={lossStage?.label ?? ""}
+        dealLabel={`${deal.person.full_name} — ${deal.title}`}
+        saving={busy}
+        onCancel={() => setLossStage(null)}
+        onConfirm={confirmLoss}
+      />
     </Sheet>
   );
 }
