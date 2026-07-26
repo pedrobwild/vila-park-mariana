@@ -125,15 +125,22 @@ export default function MetasBlock({ data }: Props) {
   const e = data.equipe;
   const semMeta = num(e.vgv_meta) === 0 && num(e.unid_meta) === 0;
 
+  // Meses sem meta cadastrada entram com `null`: a barra "Meta" simplesmente não é
+  // desenhada (em vez de virar uma barra zerada) e o tooltip mostra "—".
   const historico = useMemo(
     () =>
-      (data.historico ?? []).map((h) => ({
-        mes: mesCurto(String(h.mes)),
-        Meta: num(h.vgv_meta),
-        Realizado: num(h.vgv_realizado),
-      })),
+      (data.historico ?? [])
+        .filter((h) => mesDate(String(h?.mes)) !== null)
+        .map((h) => ({
+          mes: mesCurto(String(h.mes)),
+          Meta: numOrNull(h.vgv_meta),
+          Realizado: numOrNull(h.vgv_realizado) ?? 0,
+        })),
     [data.historico],
   );
+
+  const historicoTemMeta = historico.some((h) => h.Meta !== null && h.Meta > 0);
+
 
   const melhorPct = useMemo(() => {
     const pcts = (data.por_corretor ?? []).map((c) => c.vgv_pct).filter((p): p is number => p !== null);
