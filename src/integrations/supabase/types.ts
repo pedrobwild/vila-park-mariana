@@ -995,6 +995,7 @@ export type Database = {
           position: number
           reserves_unit: boolean
           updated_at: string
+          win_probability_pct: number
         }
         Insert: {
           created_at?: string
@@ -1005,6 +1006,7 @@ export type Database = {
           position: number
           reserves_unit?: boolean
           updated_at?: string
+          win_probability_pct?: number
         }
         Update: {
           created_at?: string
@@ -1015,6 +1017,7 @@ export type Database = {
           position?: number
           reserves_unit?: boolean
           updated_at?: string
+          win_probability_pct?: number
         }
         Relationships: []
       }
@@ -1372,7 +1375,26 @@ export type Database = {
       }
       crm_apply_deal_value: { Args: { d: string }; Returns: undefined }
       crm_assign_broker: { Args: { _deal: string }; Returns: string }
-      crm_dashboard: { Args: { _from?: string; _to?: string }; Returns: Json }
+      crm_dashboard: {
+        Args: {
+          _area_m2?: number
+          _broker_id?: string
+          _from?: string
+          _stage_id?: string
+          _to?: string
+        }
+        Returns: Json
+      }
+      crm_dashboard_advanced: {
+        Args: {
+          _area_m2?: number
+          _broker_id?: string
+          _from?: string
+          _stage_id?: string
+          _to?: string
+        }
+        Returns: Json
+      }
       crm_goals_report: { Args: { _month?: string }; Returns: Json }
       crm_next_broker: { Args: never; Returns: string }
       get_shared_proposal: { Args: { _token: string }; Returns: Json }

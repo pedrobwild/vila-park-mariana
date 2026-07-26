@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.crm_dashboard_advanced(date, date, uuid, numeric, uuid) TO service_role;
