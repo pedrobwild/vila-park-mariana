@@ -185,6 +185,8 @@ function defaultTitle(action: CrmAction, entity: CrmEntity): string {
     excluir: "excluir",
     atualizar: "atualizar",
     mover: "mover",
+    consultar: "consultar",
+    distribuir: "distribuir",
   };
   return `Não foi possível ${verb[action]} ${ARTICLE[entity]}.`;
 }

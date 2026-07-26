@@ -92,7 +92,7 @@ export default function BrokersManager() {
     setSettings(next);
     const { error } = await supabase.from("crm_settings").upsert(next, { onConflict: "id" });
     if (error) {
-      notifyCrmError(error as SbErr, { entity: "configurações", action: "atualizar" });
+      notifyCrmError(error as SbErr, { entity: "configuração", action: "atualizar" });
       await load();
       return;
     }
@@ -134,7 +134,8 @@ export default function BrokersManager() {
 
   const toggleField = async (b: CrmBroker, field: "in_rotation" | "is_active", v: boolean) => {
     setBrokers((prev) => prev.map((x) => (x.id === b.id ? { ...x, [field]: v } : x)));
-    const { error } = await supabase.from("crm_brokers").update({ [field]: v }).eq("id", b.id);
+    const patch = field === "in_rotation" ? { in_rotation: v } : { is_active: v };
+    const { error } = await supabase.from("crm_brokers").update(patch).eq("id", b.id);
     if (error) {
       notifyCrmError(error as SbErr, { entity: "corretor", action: "atualizar" });
       await load();
