@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import PeopleManager from "./PeopleManager";
 import { SOURCE_LABEL, type CrmPerson, type CrmSource } from "@/lib/crm";
@@ -7,10 +8,6 @@ import type { Unit } from "@/lib/units";
 import type { DealFull } from "./CrmSection";
 
 interface Props {
-  people: CrmPerson[];
-  deals: DealFull[];
-  units: Unit[];
-  onReload: () => Promise<void>;
   onOpenDeal: (id: string) => void;
   onNewDealForPerson: (personId: string) => void;
   autoOpenNew?: boolean;
@@ -30,7 +27,27 @@ function Kpi({ value, label, hint }: { value: string; label: string; hint?: stri
 }
 
 export default function LeadsSection(props: Props) {
-  const { people, deals } = props;
+  const [people, setPeople] = useState<CrmPerson[]>([]);
+  const [deals, setDeals] = useState<DealFull[]>([]);
+  const [units, setUnits] = useState<Unit[]>([]);
+
+  const load = useCallback(async () => {
+    const [p, d, u] = await Promise.all([
+      supabase.from("crm_people").select("*").order("created_at", { ascending: false }),
+      supabase
+        .from("crm_deals")
+        .select("*, person:crm_people(*), stage:crm_stages(*), deal_units:crm_deal_units(*, unit:units(*))")
+        .order("stage_changed_at", { ascending: false }),
+      supabase.from("units").select("*").order("code"),
+    ]);
+    setPeople((p.data ?? []) as CrmPerson[]);
+    setDeals((d.data ?? []) as unknown as DealFull[]);
+    setUnits((u.data ?? []) as Unit[]);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const stats = useMemo(() => {
     const total = people.length;
@@ -104,7 +121,16 @@ export default function LeadsSection(props: Props) {
         </section>
       )}
 
-      <PeopleManager {...props} />
+      <PeopleManager
+        people={people}
+        deals={deals}
+        units={units}
+        onReload={load}
+        onOpenDeal={props.onOpenDeal}
+        onNewDealForPerson={props.onNewDealForPerson}
+        autoOpenNew={props.autoOpenNew}
+        onAutoOpenNewHandled={props.onAutoOpenNewHandled}
+      />
     </div>
   );
 }
