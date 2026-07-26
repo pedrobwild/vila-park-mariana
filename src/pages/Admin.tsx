@@ -335,6 +335,7 @@ export default function Admin() {
           {active === "crm" && (
             <CrmSection
               onOpenUnits={() => setActive("units")}
+              onOpenRelatorios={() => setActive("relatorios")}
               onOpenLeads={(opts) => {
                 setActive("leads");
                 if (opts?.novo) setLeadsAutoOpenNew(true);
@@ -343,7 +344,13 @@ export default function Admin() {
           )}
           {active === "leads" && (
             <LeadsSection
-              onOpenDeal={() => setActive("crm")}
+              onOpenDeal={(dealId) => {
+                const next = new URLSearchParams(searchParams);
+                next.delete("tab");
+                next.set("m", "crm");
+                next.set("deal", dealId);
+                setSearchParams(next, { replace: true });
+              }}
               onNewDealForPerson={() => setActive("crm")}
               autoOpenNew={leadsAutoOpenNew}
               onAutoOpenNewHandled={() => setLeadsAutoOpenNew(false)}
@@ -355,11 +362,18 @@ export default function Admin() {
               <LossReasonsManager />
             </div>
           )}
-          {(active === "relatorios" || active === "config") && (
+          {active === "relatorios" && (
+            <RelatoriosSection
+              onGoToPipeline={() => setActive("crm")}
+              onGoToLeads={() => setActive("leads")}
+            />
+          )}
+          {active === "config" && (
             <p className="rounded-lg border border-dashed border-border/60 px-4 py-8 text-center text-sm text-muted-foreground">
               Em construção — próxima etapa.
             </p>
           )}
+
         </main>
       </div>
 
