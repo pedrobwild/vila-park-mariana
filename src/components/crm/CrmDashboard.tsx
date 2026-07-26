@@ -764,6 +764,16 @@ export default function CrmDashboard({ onGoToPipeline }: Props) {
         </>
 
       )}
+
+      <DrillDownSheet
+        open={drill.open}
+        onOpenChange={(o) => setDrill((d) => ({ ...d, open: o }))}
+        title={drill.title}
+        description={drill.description}
+        items={drill.items}
+        total={drill.total}
+      />
     </div>
+
   );
 }
