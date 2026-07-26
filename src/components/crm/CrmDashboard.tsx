@@ -446,6 +446,14 @@ export default function CrmDashboard({ onGoToPipeline }: Props) {
                 />
               </div>
 
+              {goals && (
+                <Suspense fallback={<Skeleton className="h-64 w-full" />}>
+                  <MetasBlock data={goals} />
+                </Suspense>
+              )}
+
+
+
               {/* Linha 2 */}
               <div className="grid gap-4 lg:grid-cols-2">
                 <Card className="border-border/60">
