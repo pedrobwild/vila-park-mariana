@@ -119,18 +119,21 @@ export default function MetasSettings() {
     const { vgv, units } = draftValues(d);
     const existing = rows.find((r) => r.broker_id === brokerId);
     if (!existing && vgv === 0 && units === 0) return true;
-    const { error } = await supabase
-      .from("crm_sales_goals")
-      .upsert(
-        { month: mKey, broker_id: brokerId, vgv_target_brl: vgv, units_target: units },
-        { onConflict: brokerId ? "month,broker_id" : "month" },
-      );
+    const { error } = existing
+      ? await supabase
+          .from("crm_sales_goals")
+          .update({ vgv_target_brl: vgv, units_target: units })
+          .eq("id", existing.id)
+      : await supabase
+          .from("crm_sales_goals")
+          .insert({ month: mKey, broker_id: brokerId, vgv_target_brl: vgv, units_target: units });
     if (error) {
       notifyCrmError(error, { entity: "meta", action: "salvar" });
       return false;
     }
     return true;
   };
+
 
   const saveTeam = async () => {
     setSaving(true);
