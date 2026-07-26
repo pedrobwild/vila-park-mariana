@@ -10,6 +10,146 @@ export type CrmSource = Database["public"]["Enums"]["crm_source"];
 export type CrmInterest = Database["public"]["Enums"]["crm_interest_level"];
 export type CrmActivityType = Database["public"]["Enums"]["crm_activity_type"];
 
+export type CrmBroker = Database["public"]["Tables"]["crm_brokers"]["Row"];
+export type CrmSettings = Database["public"]["Tables"]["crm_settings"]["Row"];
+export type CrmLossReason = Database["public"]["Tables"]["crm_loss_reasons"]["Row"];
+export type CrmTask = Database["public"]["Tables"]["crm_tasks"]["Row"];
+export type CrmCreditCheck = Database["public"]["Tables"]["crm_credit_checks"]["Row"];
+export type CrmCommission = Database["public"]["Tables"]["crm_commissions"]["Row"];
+export type CrmCommissionSplit =
+  Database["public"]["Tables"]["crm_commission_splits"]["Row"];
+export type CrmTaskKind = Database["public"]["Enums"]["crm_task_kind"];
+export type CrmCreditStatus = Database["public"]["Enums"]["crm_credit_status"];
+export type CrmCommissionStatus = Database["public"]["Enums"]["crm_commission_status"];
+
+export const TASK_KIND_LABEL: Record<CrmTaskKind, string> = {
+  ligacao: "Ligação",
+  whatsapp: "WhatsApp",
+  email: "E-mail",
+  visita: "Visita",
+  documentacao: "Documentação",
+  follow_up: "Follow-up",
+  outro: "Outro",
+};
+
+export const TASK_KINDS: CrmTaskKind[] = [
+  "ligacao",
+  "whatsapp",
+  "email",
+  "visita",
+  "documentacao",
+  "follow_up",
+  "outro",
+];
+
+export const CREDIT_STATUS_LABEL: Record<CrmCreditStatus, string> = {
+  nao_iniciada: "Não iniciada",
+  em_analise: "Em análise",
+  aprovada: "Aprovada",
+  aprovada_parcial: "Aprovada parcial",
+  reprovada: "Reprovada",
+};
+
+export const CREDIT_STATUSES: CrmCreditStatus[] = [
+  "nao_iniciada",
+  "em_analise",
+  "aprovada",
+  "aprovada_parcial",
+  "reprovada",
+];
+
+export function creditStatusClass(s: CrmCreditStatus): string {
+  switch (s) {
+    case "em_analise":
+    case "aprovada_parcial":
+      return "border-amber-600/40 text-amber-700 dark:text-amber-400 bg-amber-500/5";
+    case "aprovada":
+      return "border-emerald-600/40 text-emerald-700 dark:text-emerald-400 bg-emerald-500/5";
+    case "reprovada":
+      return "border-destructive/40 text-destructive bg-destructive/5";
+    default:
+      return "border-border/60 text-muted-foreground bg-muted/20";
+  }
+}
+
+export const COMMISSION_STATUS_LABEL: Record<CrmCommissionStatus, string> = {
+  prevista: "Prevista",
+  a_pagar: "A pagar",
+  paga: "Paga",
+  cancelada: "Cancelada",
+};
+
+export const COMMISSION_STATUSES: CrmCommissionStatus[] = [
+  "prevista",
+  "a_pagar",
+  "paga",
+  "cancelada",
+];
+
+export function commissionStatusClass(s: CrmCommissionStatus): string {
+  switch (s) {
+    case "a_pagar":
+      return "border-amber-600/40 text-amber-700 dark:text-amber-400 bg-amber-500/5";
+    case "paga":
+      return "border-emerald-600/40 text-emerald-700 dark:text-emerald-400 bg-emerald-500/5";
+    case "cancelada":
+      return "border-border/60 text-muted-foreground bg-muted/20 line-through";
+    default:
+      return "border-border/60 text-muted-foreground bg-muted/20";
+  }
+}
+
+export function initials(name: string | null | undefined): string {
+  if (!name) return "—";
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "—";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+/** Date-only (YYYY-MM-DD) in pt-BR, without timezone drift. */
+export function formatDateBR(d: string | null | undefined): string {
+  if (!d) return "—";
+  const iso = d.length > 10 ? d : `${d}T12:00:00`;
+  const t = new Date(iso);
+  return Number.isNaN(t.getTime()) ? "—" : t.toLocaleDateString("pt-BR");
+}
+
+export function todayISO(): string {
+  const now = new Date();
+  const off = now.getTimezoneOffset() * 60000;
+  return new Date(now.getTime() - off).toISOString().slice(0, 10);
+}
+
+export function addDaysISO(days: number): string {
+  const now = new Date();
+  now.setDate(now.getDate() + days);
+  const off = now.getTimezoneOffset() * 60000;
+  return new Date(now.getTime() - off).toISOString().slice(0, 10);
+}
+
+/** Positive = overdue days; 0 = today; negative = future. */
+export function daysOverdue(due: string | null | undefined): number | null {
+  if (!due) return null;
+  const t = new Date(`${due}T12:00:00`).getTime();
+  if (Number.isNaN(t)) return null;
+  const today = new Date();
+  today.setHours(12, 0, 0, 0);
+  return Math.round((today.getTime() - t) / 86_400_000);
+}
+
+export function relativeDateBR(iso: string | null | undefined): string {
+  if (!iso) return "nunca";
+  const diff = Date.now() - new Date(iso).getTime();
+  const d = Math.floor(diff / 86_400_000);
+  if (d <= 0) return "hoje";
+  if (d === 1) return "ontem";
+  if (d < 30) return `há ${d} dias`;
+  const m = Math.floor(d / 30);
+  return m === 1 ? "há 1 mês" : `há ${m} meses`;
+}
+
+
 export type CrmProposalStatus = "rascunho" | "enviada" | "aceita" | "recusada";
 export type CrmPaymentMethod = "financiamento" | "a_vista" | "direto";
 

@@ -12,7 +12,9 @@ import { ArrowDown, ArrowUp, ArrowUpDown, FileText, Search } from "lucide-react"
 import {
   daysSince,
   formatBRLCompact,
+  initials,
   stageBadgeClass,
+  type CrmBroker,
   type CrmStageRow,
 } from "@/lib/crm";
 import type { DealFull } from "./CrmSection";
@@ -20,6 +22,8 @@ import type { DealFull } from "./CrmSection";
 interface Props {
   deals: DealFull[];
   stages: CrmStageRow[];
+  brokers?: CrmBroker[];
+  staleDays?: number;
   onOpenDeal: (id: string) => void;
 }
 
@@ -29,9 +33,16 @@ type SortDir = "asc" | "desc";
 const BRL = (n: number) =>
   n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
 
-export default function ListView({ deals, stages, onOpenDeal }: Props) {
+export default function ListView({
+  deals,
+  stages,
+  brokers = [],
+  staleDays = 7,
+  onOpenDeal,
+}: Props) {
   const [q, setQ] = useState("");
   const [stageFilter, setStageFilter] = useState<string>("all");
+  const [brokerFilter, setBrokerFilter] = useState<string>("all");
   const [sortKey, setSortKey] = useState<SortKey>("updated");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
@@ -39,6 +50,9 @@ export default function ListView({ deals, stages, onOpenDeal }: Props) {
     const term = q.trim().toLowerCase();
     const list = deals.filter((d) => {
       if (stageFilter !== "all" && d.stage_id !== stageFilter) return false;
+      if (brokerFilter === "none" && d.broker_id) return false;
+      if (brokerFilter !== "all" && brokerFilter !== "none" && d.broker_id !== brokerFilter)
+        return false;
       if (!term) return true;
       return (
         d.title.toLowerCase().includes(term) ||
@@ -55,7 +69,7 @@ export default function ListView({ deals, stages, onOpenDeal }: Props) {
       );
     });
     return list;
-  }, [deals, q, stageFilter, sortKey, sortDir]);
+  }, [deals, q, stageFilter, brokerFilter, sortKey, sortDir]);
 
   const total = filtered.reduce((s, d) => s + Number(d.value_brl || 0), 0);
 
@@ -101,6 +115,20 @@ export default function ListView({ deals, stages, onOpenDeal }: Props) {
             ))}
           </SelectContent>
         </Select>
+        <Select value={brokerFilter} onValueChange={setBrokerFilter}>
+          <SelectTrigger className="h-9 w-full sm:w-[180px]" aria-label="Filtrar por corretor">
+            <SelectValue placeholder="Todos os corretores" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os corretores</SelectItem>
+            <SelectItem value="none">Sem corretor</SelectItem>
+            {brokers.map((b) => (
+              <SelectItem key={b.id} value={b.id}>
+                {b.full_name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="rounded-lg border border-border/60 overflow-hidden">
@@ -109,6 +137,7 @@ export default function ListView({ deals, stages, onOpenDeal }: Props) {
             <tr className="text-left">
               <th className="px-3 py-2 font-medium">Negócio</th>
               <th className="px-3 py-2 font-medium">Etapa</th>
+              <th className="px-3 py-2 font-medium">Corretor</th>
               <th className="px-3 py-2 font-medium">Unidades</th>
               <th className="px-3 py-2 font-medium text-right">
                 <button
@@ -132,7 +161,7 @@ export default function ListView({ deals, stages, onOpenDeal }: Props) {
           <tbody className="divide-y divide-border/50">
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-3 py-10 text-center text-xs text-muted-foreground">
+                <td colSpan={7} className="px-3 py-10 text-center text-xs text-muted-foreground">
                   Nenhum negócio encontrado.
                 </td>
               </tr>
@@ -156,6 +185,16 @@ export default function ListView({ deals, stages, onOpenDeal }: Props) {
                   >
                     {d.stage.label}
                   </Badge>
+                </td>
+                <td className="px-3 py-2.5">
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <span className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-[9px] font-medium">
+                      {initials(d.broker?.full_name)}
+                    </span>
+                    <span className="truncate max-w-[110px]">
+                      {d.broker?.full_name ?? "—"}
+                    </span>
+                  </div>
                 </td>
                 <td className="px-3 py-2.5">
                   <div className="flex flex-wrap gap-1">
@@ -200,7 +239,13 @@ export default function ListView({ deals, stages, onOpenDeal }: Props) {
                     <span>{BRL(Number(d.value_brl || 0))}</span>
                   </div>
                 </td>
-                <td className="px-3 py-2.5 text-right tabular-nums text-muted-foreground">
+                <td
+                  className={`px-3 py-2.5 text-right tabular-nums ${
+                    d.stage.kind === "aberto" && daysSince(d.stage_changed_at) >= staleDays
+                      ? "text-amber-700 dark:text-amber-400 font-medium"
+                      : "text-muted-foreground"
+                  }`}
+                >
                   {daysSince(d.stage_changed_at)}d
                 </td>
                 <td className="px-3 py-2.5 text-xs text-muted-foreground">
@@ -212,7 +257,7 @@ export default function ListView({ deals, stages, onOpenDeal }: Props) {
           {filtered.length > 0 && (
             <tfoot className="bg-muted/30 text-xs text-muted-foreground">
               <tr>
-                <td className="px-3 py-2" colSpan={3}>
+                <td className="px-3 py-2" colSpan={4}>
                   {filtered.length} negócio{filtered.length > 1 ? "s" : ""}
                 </td>
                 <td className="px-3 py-2 text-right tabular-nums font-medium text-foreground">

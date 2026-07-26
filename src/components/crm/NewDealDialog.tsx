@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
@@ -40,6 +41,7 @@ import { Check, ChevronsUpDown, AlertCircle, Users, Building2 } from "lucide-rea
 import { cn } from "@/lib/utils";
 import { formatBRL, STATUS_LABEL } from "@/lib/units";
 import type { Unit } from "@/lib/units";
+import type { CrmBroker } from "@/lib/crm";
 import { INTEREST_LABEL, type CrmInterest, type CrmPerson } from "@/lib/crm";
 import type { DealFull } from "./CrmSection";
 
@@ -50,6 +52,8 @@ interface Props {
   peopleLoading?: boolean;
   units: Unit[];
   deals: DealFull[];
+  brokers?: CrmBroker[];
+  roletaEnabled?: boolean;
   presetPersonId?: string | null;
   onCreated: (dealId: string) => void;
   onCreatePerson?: () => void;
@@ -62,6 +66,8 @@ export default function NewDealDialog({
   peopleLoading,
   units,
   deals,
+  brokers = [],
+  roletaEnabled = true,
   presetPersonId,
   onCreated,
   onCreatePerson,
@@ -73,6 +79,8 @@ export default function NewDealDialog({
   const [title, setTitle] = useState("");
   const [titleTouched, setTitleTouched] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [useRoleta, setUseRoleta] = useState(roletaEnabled);
+  const [brokerId, setBrokerId] = useState("");
 
   // Reset when dialog opens
   useEffect(() => {
@@ -82,7 +90,9 @@ export default function NewDealDialog({
     setPrefilled(new Set());
     setTitle("");
     setTitleTouched(false);
-  }, [open, presetPersonId]);
+    setUseRoleta(roletaEnabled);
+    setBrokerId("");
+  }, [open, presetPersonId, roletaEnabled]);
 
   const person = useMemo(
     () => people.find((p) => p.id === personId) ?? null,
@@ -172,6 +182,7 @@ export default function NewDealDialog({
           person_id: personId,
           title: (effectiveTitle || suggestedTitle).trim(),
           stage_id: firstStage.id,
+          broker_id: useRoleta ? null : brokerId || null,
         })
         .select("*")
         .single();
@@ -187,6 +198,11 @@ export default function NewDealDialog({
         }));
         const { error: duErr } = await supabase.from("crm_deal_units").insert(rows);
         if (duErr) throw duErr;
+      }
+
+      if (deal && useRoleta) {
+        const { data: assigned } = await supabase.rpc("crm_assign_broker", { _deal: deal.id });
+        if (!assigned) toast.warning("Roleta sem corretor disponível — atribua manualmente.");
       }
 
       toast.success("Negócio criado.");
@@ -477,6 +493,46 @@ export default function NewDealDialog({
               <p className="text-[11px] text-muted-foreground">
                 A primeira unidade marcada será definida como principal.
               </p>
+            </div>
+          )}
+
+          {/* Broker */}
+          {person && (
+            <div className="space-y-2 rounded-lg border border-border/60 p-3">
+              <div className="flex items-center justify-between gap-2">
+                <Label htmlFor="deal-roleta" className="text-sm">
+                  Distribuir pela roleta
+                </Label>
+                <Switch
+                  id="deal-roleta"
+                  checked={useRoleta}
+                  onCheckedChange={setUseRoleta}
+                  disabled={!roletaEnabled}
+                />
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                {roletaEnabled
+                  ? "A roleta escolhe o próximo corretor da fila, respeitando peso e último atendimento."
+                  : "Roleta desativada nas configurações — escolha o corretor manualmente."}
+              </p>
+              {!useRoleta && (
+                <Select value={brokerId || "none"} onValueChange={(v) => setBrokerId(v === "none" ? "" : v)}>
+                  <SelectTrigger className="h-9" aria-label="Corretor responsável">
+                    <SelectValue placeholder="Sem corretor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Sem corretor</SelectItem>
+                    {brokers
+                      .filter((b) => b.is_active)
+                      .map((b) => (
+                        <SelectItem key={b.id} value={b.id}>
+                          {b.full_name}
+                          {b.team ? ` · ${b.team}` : ""}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
           )}
 

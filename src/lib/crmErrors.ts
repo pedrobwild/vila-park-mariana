@@ -6,8 +6,24 @@ export type CrmEntity =
   | "pessoa"
   | "unidade do negócio"
   | "atividade"
-  | "proposta";
-export type CrmAction = "criar" | "renomear" | "reordenar" | "excluir" | "atualizar" | "mover";
+  | "proposta"
+  | "corretor"
+  | "configuração"
+  | "motivo de perda"
+  | "tarefa"
+  | "análise de crédito"
+  | "comissão"
+  | "rateio"
+  | "roleta";
+export type CrmAction =
+  | "criar"
+  | "renomear"
+  | "reordenar"
+  | "excluir"
+  | "atualizar"
+  | "mover"
+  | "consultar"
+  | "distribuir";
 
 export type SbErr =
   | { message?: string; code?: string; details?: string; hint?: string }
@@ -21,6 +37,14 @@ const ARTICLE: Record<CrmEntity, string> = {
   "unidade do negócio": "a unidade do negócio",
   "atividade": "a atividade",
   "proposta": "a proposta",
+  "corretor": "o corretor",
+  "configuração": "a configuração",
+  "motivo de perda": "o motivo de perda",
+  "tarefa": "a tarefa",
+  "análise de crédito": "a análise de crédito",
+  "comissão": "a comissão",
+  "rateio": "o rateio",
+  "roleta": "a roleta",
 };
 
 const ARTICLE_ARE: Record<CrmEntity, string> = {
@@ -30,7 +54,16 @@ const ARTICLE_ARE: Record<CrmEntity, string> = {
   "unidade do negócio": "esta unidade do negócio",
   "atividade": "esta atividade",
   "proposta": "esta proposta",
+  "corretor": "este corretor",
+  "configuração": "esta configuração",
+  "motivo de perda": "este motivo de perda",
+  "tarefa": "esta tarefa",
+  "análise de crédito": "esta análise de crédito",
+  "comissão": "esta comissão",
+  "rateio": "este rateio",
+  "roleta": "esta roleta",
 };
+
 
 export interface CrmErrorContext {
   entity: CrmEntity;
@@ -152,6 +185,8 @@ function defaultTitle(action: CrmAction, entity: CrmEntity): string {
     excluir: "excluir",
     atualizar: "atualizar",
     mover: "mover",
+    consultar: "consultar",
+    distribuir: "distribuir",
   };
   return `Não foi possível ${verb[action]} ${ARTICLE[entity]}.`;
 }
