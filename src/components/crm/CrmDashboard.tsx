@@ -748,9 +748,21 @@ export default function CrmDashboard({ onGoToPipeline }: Props) {
                   </CardContent>
                 </Card>
               </div>
+
+              {advanced && (
+                <Suspense fallback={<Skeleton className="h-64 w-full" />}>
+                  <div className="space-y-4">
+                    <PrevisaoBlock data={advanced.previsao} onDrill={openDrill} />
+                    <AbsorcaoBlock data={advanced.absorcao} onDrill={openDrill} />
+                    <RentabilidadeBlock data={advanced.rentabilidade} />
+                    <ProdutividadeBlock data={advanced.produtividade} onDrill={openDrill} />
+                  </div>
+                </Suspense>
+              )}
             </>
           )}
         </>
+
       )}
     </div>
   );
