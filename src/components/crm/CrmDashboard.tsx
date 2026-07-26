@@ -425,18 +425,26 @@ export default function CrmDashboard({ onGoToPipeline }: Props) {
           )}
 
           {isEmpty ? (
-            <Card className="border-border/60">
-              <CardContent className="p-10 text-center">
-                <p className="font-display text-lg font-semibold">Nenhum negócio no período</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Escolha um período maior ou cadastre negócios no pipeline para acompanhar os indicadores aqui.
-                </p>
-                <Button className="mt-4" size="sm" onClick={onGoToPipeline}>
-                  Ir para o pipeline
-                </Button>
-              </CardContent>
-            </Card>
+            <>
+              {goals && (
+                <Suspense fallback={<Skeleton className="h-64 w-full" />}>
+                  <MetasBlock data={goals} />
+                </Suspense>
+              )}
+              <Card className="border-border/60">
+                <CardContent className="p-10 text-center">
+                  <p className="font-display text-lg font-semibold">Nenhum negócio no período</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Escolha um período maior ou cadastre negócios no pipeline para acompanhar os indicadores aqui.
+                  </p>
+                  <Button className="mt-4" size="sm" onClick={onGoToPipeline}>
+                    Ir para o pipeline
+                  </Button>
+                </CardContent>
+              </Card>
+            </>
           ) : (
+
             <>
               {/* Linha 1 — KPIs */}
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
