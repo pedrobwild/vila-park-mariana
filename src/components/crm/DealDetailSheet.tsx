@@ -601,7 +601,7 @@ export default function DealDetailSheet({
           <DealTasksSection
             deal={deal}
             brokers={brokers}
-            slaDays={settings?.sla_first_contact_hours ? Math.ceil(settings.sla_first_contact_hours / 24) : 1}
+            slaDays={settings?.task_sla_days ?? 2}
             onReload={reload}
           />
 
