@@ -77,10 +77,13 @@ export default function CrmSection({ onOpenUnits }: { onOpenUnits?: () => void }
   return (
     <div className="space-y-4">
       <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
-        <TabsList>
+        <TabsList className="flex-wrap">
           <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
+          <TabsTrigger value="espelho">Espelho de vendas</TabsTrigger>
           <TabsTrigger value="pessoas">Pessoas</TabsTrigger>
+          <TabsTrigger value="painel">Painel</TabsTrigger>
         </TabsList>
+
         <TabsContent value="pipeline" className="mt-4">
           <PipelineView
             deals={deals}
