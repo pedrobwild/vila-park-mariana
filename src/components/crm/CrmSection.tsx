@@ -7,7 +7,17 @@ import DealDetailSheet from "./DealDetailSheet";
 import NewDealDialog from "./NewDealDialog";
 import SalesMirrorView from "./SalesMirrorView";
 import CrmDashboard from "./CrmDashboard";
-import { sortStages, type CrmDeal, type CrmDealUnit, type CrmPerson, type CrmProposal, type CrmStageRow } from "@/lib/crm";
+import {
+  sortStages,
+  type CrmBroker,
+  type CrmDeal,
+  type CrmDealUnit,
+  type CrmLossReason,
+  type CrmPerson,
+  type CrmProposal,
+  type CrmSettings,
+  type CrmStageRow,
+} from "@/lib/crm";
 import type { Unit } from "@/lib/units";
 
 export type DealFull = CrmDeal & {
@@ -15,6 +25,8 @@ export type DealFull = CrmDeal & {
   stage: CrmStageRow;
   deal_units: (CrmDealUnit & { unit: Unit })[];
   proposals: CrmProposal[];
+  broker: CrmBroker | null;
+  loss_reason: CrmLossReason | null;
 };
 
 type CrmTab = "pipeline" | "espelho" | "pessoas" | "painel";
@@ -24,6 +36,8 @@ export default function CrmSection({ onOpenUnits }: { onOpenUnits?: () => void }
   const [people, setPeople] = useState<CrmPerson[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
   const [stages, setStages] = useState<CrmStageRow[]>([]);
+  const [brokers, setBrokers] = useState<CrmBroker[]>([]);
+  const [settings, setSettings] = useState<CrmSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [openDealId, setOpenDealId] = useState<string | null>(null);
   const [tab, setTab] = useState<CrmTab>("pipeline");
@@ -41,19 +55,23 @@ export default function CrmSection({ onOpenUnits }: { onOpenUnits?: () => void }
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [d, p, u, s] = await Promise.all([
+    const [d, p, u, s, b, cfg] = await Promise.all([
       supabase
         .from("crm_deals")
-        .select("*, person:crm_people(*), stage:crm_stages(*), deal_units:crm_deal_units(*, unit:units(*)), proposals:crm_proposals(*, installments:crm_proposal_installments(*))")
+        .select("*, person:crm_people(*), stage:crm_stages(*), deal_units:crm_deal_units(*, unit:units(*)), proposals:crm_proposals(*, installments:crm_proposal_installments(*)), broker:crm_brokers(*), loss_reason:crm_loss_reasons(*)")
         .order("stage_changed_at", { ascending: false }),
       supabase.from("crm_people").select("*").order("created_at", { ascending: false }),
       supabase.from("units").select("*").order("code"),
       supabase.from("crm_stages").select("*"),
+      supabase.from("crm_brokers").select("*").order("full_name"),
+      supabase.from("crm_settings").select("*").maybeSingle(),
     ]);
     setDeals((d.data ?? []) as unknown as DealFull[]);
     setPeople((p.data ?? []) as CrmPerson[]);
     setUnits((u.data ?? []) as Unit[]);
     setStages(sortStages((s.data ?? []) as CrmStageRow[]));
+    setBrokers((b.data ?? []) as CrmBroker[]);
+    setSettings((cfg.data ?? null) as CrmSettings | null);
     setLoading(false);
   }, []);
 
@@ -88,6 +106,8 @@ export default function CrmSection({ onOpenUnits }: { onOpenUnits?: () => void }
           <PipelineView
             deals={deals}
             stages={stages}
+            brokers={brokers}
+            staleDealDays={settings?.stale_deal_days ?? 7}
             loading={loading}
             onReload={load}
             onReloadStages={loadStages}
@@ -131,6 +151,8 @@ export default function CrmSection({ onOpenUnits }: { onOpenUnits?: () => void }
         deal={openDeal}
         units={units}
         stages={stages}
+        brokers={brokers}
+        settings={settings}
         onClose={() => setOpenDealId(null)}
         onReload={load}
       />
@@ -142,6 +164,8 @@ export default function CrmSection({ onOpenUnits }: { onOpenUnits?: () => void }
         peopleLoading={loading}
         units={units}
         deals={deals}
+        brokers={brokers}
+        roletaEnabled={settings?.roleta_enabled ?? true}
         presetPersonId={newDeal.personId ?? null}
         onCreated={handleDealCreated}
         onCreatePerson={() => {
