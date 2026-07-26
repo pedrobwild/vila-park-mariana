@@ -1,9 +1,11 @@
 import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatBRLCompact } from "@/lib/crm";
 import { computePropostasVpl, formatPct, totalNpv, VERDICT_LABEL, type AdvancedData } from "@/lib/crmAdvanced";
+
 
 interface Props {
   data: AdvancedData["rentabilidade"];
