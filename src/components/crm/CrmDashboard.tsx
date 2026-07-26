@@ -40,6 +40,8 @@ import { format } from "date-fns";
 import type { DateRange } from "react-day-picker";
 import { formatBRLCompact, formatBRL2 } from "@/lib/crm";
 import { cn } from "@/lib/utils";
+import { goalsMonthFor, periodEndInclusive } from "@/lib/crmGoalsMonth";
+
 import type { AdvancedData, DrillItem } from "@/lib/crmAdvanced";
 import type { GoalsData } from "@/components/crm/dashboard/MetasBlock";
 import DrillDownSheet from "@/components/crm/advanced/DrillDownSheet";
@@ -226,11 +228,10 @@ export default function CrmDashboard({ onGoToPipeline }: Props) {
       _stage_id: stageId === "todas" ? null : stageId,
     };
     // Mês das metas: o mês final do período — ou o mês corrente quando o período termina no futuro.
-    const hoje = new Date();
-    const fim = new Date(`${to}T00:00:00`);
-    fim.setDate(fim.getDate() - 1);
-    const refMes = fim > hoje ? hoje : fim;
-    const goalsMonth = `${refMes.getFullYear()}-${String(refMes.getMonth() + 1).padStart(2, "0")}-01`;
+    const goalsMonth = goalsMonthFor(
+      periodEndInclusive(period === "custom", custom?.from, custom?.to),
+    );
+
 
     const [base, adv, gls] = await Promise.all([
       supabase.rpc("crm_dashboard", args),
