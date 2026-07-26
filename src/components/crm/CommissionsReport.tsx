@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -306,8 +306,8 @@ export default function CommissionsReport({ onGoToPipeline }: Props) {
                     const late =
                       c.status === "a_pagar" && c.due_date && (daysOverdue(c.due_date) ?? 0) > 0;
                     return (
-                      <>
-                        <TableRow key={c.id} className={cn(c.status === "cancelada" && "opacity-60")}>
+                      <Fragment key={c.id}>
+                        <TableRow className={cn(c.status === "cancelada" && "opacity-60")}>
                           <TableCell className="p-0 pl-2">
                             <Button
                               variant="ghost"
@@ -358,7 +358,7 @@ export default function CommissionsReport({ onGoToPipeline }: Props) {
                         </TableRow>
                         {open &&
                           (ss.length === 0 ? (
-                            <TableRow key={`${c.id}-empty`} className="bg-muted/20">
+                            <TableRow className="bg-muted/20">
                               <TableCell />
                               <TableCell colSpan={7} className="text-xs text-muted-foreground">
                                 Sem rateio cadastrado para esta comissão.
@@ -388,7 +388,7 @@ export default function CommissionsReport({ onGoToPipeline }: Props) {
                               </TableRow>
                             ))
                           ))}
-                      </>
+                      </Fragment>
                     );
                   })}
                 </TableBody>
