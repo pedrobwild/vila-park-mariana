@@ -41,12 +41,15 @@ import type { DateRange } from "react-day-picker";
 import { formatBRLCompact, formatBRL2 } from "@/lib/crm";
 import { cn } from "@/lib/utils";
 import type { AdvancedData, DrillItem } from "@/lib/crmAdvanced";
+import type { GoalsData } from "@/components/crm/dashboard/MetasBlock";
 import DrillDownSheet from "@/components/crm/advanced/DrillDownSheet";
 
+const MetasBlock = lazy(() => import("@/components/crm/dashboard/MetasBlock"));
 const PrevisaoBlock = lazy(() => import("@/components/crm/advanced/PrevisaoBlock"));
 const AbsorcaoBlock = lazy(() => import("@/components/crm/advanced/AbsorcaoBlock"));
 const RentabilidadeBlock = lazy(() => import("@/components/crm/advanced/RentabilidadeBlock"));
 const ProdutividadeBlock = lazy(() => import("@/components/crm/advanced/ProdutividadeBlock"));
+
 
 
 interface DashboardData {
