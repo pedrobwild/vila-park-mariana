@@ -47,7 +47,23 @@ export default {
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
+        mirror: {
+          disponivel: "hsl(var(--mirror-disponivel))",
+          negociacao: "hsl(var(--mirror-negociacao))",
+          proposta: "hsl(var(--mirror-proposta))",
+          reservado: "hsl(var(--mirror-reservado))",
+          vendido: "hsl(var(--mirror-vendido))",
         },
+        chart: {
+          "1": "hsl(var(--chart-1))",
+          "2": "hsl(var(--chart-2))",
+          "3": "hsl(var(--chart-3))",
+          "4": "hsl(var(--chart-4))",
+          "5": "hsl(var(--chart-5))",
+          "6": "hsl(var(--chart-6))",
+        },
+      },
+
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
