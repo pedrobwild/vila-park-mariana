@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,6 +40,14 @@ import { format } from "date-fns";
 import type { DateRange } from "react-day-picker";
 import { formatBRLCompact, formatBRL2 } from "@/lib/crm";
 import { cn } from "@/lib/utils";
+import type { AdvancedData, DrillItem } from "@/lib/crmAdvanced";
+import DrillDownSheet from "@/components/crm/advanced/DrillDownSheet";
+
+const PrevisaoBlock = lazy(() => import("@/components/crm/advanced/PrevisaoBlock"));
+const AbsorcaoBlock = lazy(() => import("@/components/crm/advanced/AbsorcaoBlock"));
+const RentabilidadeBlock = lazy(() => import("@/components/crm/advanced/RentabilidadeBlock"));
+const ProdutividadeBlock = lazy(() => import("@/components/crm/advanced/ProdutividadeBlock"));
+
 
 interface DashboardData {
   periodo: { de: string; ate: string };
@@ -153,29 +161,91 @@ interface Props {
   onGoToPipeline: () => void;
 }
 
+type Drill = { open: boolean; title: string; description: string; items: DrillItem[]; total: number };
+
 export default function CrmDashboard({ onGoToPipeline }: Props) {
   const [period, setPeriod] = useState<PeriodKey>("180");
   const [custom, setCustom] = useState<DateRange | undefined>();
+  const [brokerId, setBrokerId] = useState("todos");
+  const [area, setArea] = useState("todas");
+  const [stageId, setStageId] = useState("todas");
   const [data, setData] = useState<DashboardData | null>(null);
+  const [advanced, setAdvanced] = useState<AdvancedData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [brokers, setBrokers] = useState<{ id: string; full_name: string }[]>([]);
+  const [stages, setStages] = useState<{ id: string; label: string }[]>([]);
+  const [areas, setAreas] = useState<number[]>([]);
+  const [drill, setDrill] = useState<Drill>({
+    open: false,
+    title: "",
+    description: "",
+    items: [],
+    total: 0,
+  });
+
+  const openDrill = useCallback(
+    (title: string, description: string, items: DrillItem[], total: number) =>
+      setDrill({ open: true, title, description, items, total }),
+    [],
+  );
+
+  useEffect(() => {
+    let active = true;
+    void (async () => {
+      const [b, s, u] = await Promise.all([
+        supabase.from("crm_brokers").select("id, full_name").eq("is_active", true).order("full_name"),
+        supabase.from("crm_stages").select("id, label").order("position"),
+        supabase.from("units").select("area_m2"),
+      ]);
+      if (!active) return;
+      setBrokers(b.data ?? []);
+      setStages(s.data ?? []);
+      const uniq = Array.from(
+        new Set((u.data ?? []).map((r) => Number(r.area_m2)).filter((n) => Number.isFinite(n))),
+      );
+      setAreas(uniq.sort((x, y) => x - y));
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
     const { from, to } = rangeFor(period, custom);
-    const { data: res, error } = await supabase.rpc("crm_dashboard", { _from: from, _to: to });
-    if (error) {
+    const args = {
+      _from: from,
+      _to: to,
+      _broker_id: brokerId === "todos" ? null : brokerId,
+      _area_m2: area === "todas" ? null : Number(area),
+      _stage_id: stageId === "todas" ? null : stageId,
+    };
+    const [base, adv] = await Promise.all([
+      supabase.rpc("crm_dashboard", args),
+      supabase.rpc("crm_dashboard_advanced", args),
+    ]);
+    if (base.error) {
       toast.error("Não foi possível carregar o painel.");
       setData(null);
     } else {
-      setData(res as unknown as DashboardData);
+      setData(base.data as unknown as DashboardData);
+    }
+    if (adv.error) {
+      toast.error("Não foi possível carregar as análises avançadas.");
+      setAdvanced(null);
+    } else {
+      setAdvanced(adv.data as unknown as AdvancedData);
     }
     setLoading(false);
-  }, [period, custom]);
+  }, [period, custom, brokerId, area, stageId]);
 
   useEffect(() => {
     if (period === "custom" && !custom?.from) return;
-    load();
+    void load();
   }, [load, period, custom]);
+
+  const temFiltro = brokerId !== "todos" || area !== "todas" || stageId !== "todas";
+
 
   const funilAbertos = useMemo(
     () => (data?.funil ?? []).filter((f) => f.kind === "aberto").sort((a, b) => a.position - b.position),
