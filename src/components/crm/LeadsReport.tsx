@@ -141,7 +141,7 @@ export default function LeadsReport({ onGoToLeads }: Props) {
       supabase.from("crm_proposals").select("id, deal_id"),
     ]);
     if (p.error || d.error || pr.error) {
-      notifyCrmError(p.error ?? d.error ?? pr.error, "Não foi possível carregar o relatório de leads.");
+      notifyCrmError(p.error ?? d.error ?? pr.error, { entity: "lead", action: "consultar" });
     }
     setPeople((p.data ?? []) as CrmPerson[]);
     setDeals((d.data ?? []) as unknown as DealLite[]);
