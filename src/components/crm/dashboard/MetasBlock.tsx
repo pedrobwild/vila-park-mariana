@@ -302,6 +302,11 @@ export default function MetasBlock({ data }: Props) {
             <p className="mb-2 text-xs uppercase tracking-wider text-muted-foreground">
               Meta e realizado de VGV nos últimos 6 meses
             </p>
+            {!historicoTemMeta && (
+              <p className="mb-2 text-xs text-muted-foreground">
+                Nenhum mês do período tem meta cadastrada — o gráfico mostra apenas o realizado.
+              </p>
+            )}
             <div className="h-56 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={historico} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
@@ -310,11 +315,16 @@ export default function MetasBlock({ data }: Props) {
                   <YAxis
                     tick={{ fontSize: 11 }}
                     stroke="hsl(var(--muted-foreground))"
-                    tickFormatter={(v: number) => formatBRLCompact(v)}
+                    tickFormatter={(v: number) => (Number.isFinite(v) ? formatBRLCompact(v) : "—")}
                     width={72}
                   />
                   <RTooltip
-                    formatter={(v: number, n) => [formatBRL2(Number(v)), String(n)]}
+                    formatter={(v: number | null, n) => [
+                      v === null || v === undefined || !Number.isFinite(Number(v))
+                        ? "—"
+                        : formatBRL2(Number(v)),
+                      String(n),
+                    ]}
                     contentStyle={{
                       background: "hsl(var(--popover))",
                       border: "1px solid hsl(var(--border))",
@@ -330,6 +340,7 @@ export default function MetasBlock({ data }: Props) {
             </div>
           </div>
         )}
+
       </CardContent>
     </Card>
   );
