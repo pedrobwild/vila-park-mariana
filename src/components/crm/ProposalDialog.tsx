@@ -22,6 +22,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import { buildProposalFlow, proposalDateISO } from "@/lib/proposalFlow";
+import { INCC_M_DEMO_MONTHLY, analyzeVpl, installmentsFromFlow } from "@/lib/vpl";
 import {
   PAYMENT_METHOD_LABEL,
   formatBRL2,
@@ -67,6 +71,8 @@ export default function ProposalDialog({ open, onOpenChange, deal, proposal, onS
   const [validUntil, setValidUntil] = useState<string>(addDaysISO(new Date(), 15));
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
+  const [vplRatePct, setVplRatePct] = useState("0,8");
+  const [correctByIncc, setCorrectByIncc] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -98,6 +104,27 @@ export default function ProposalDialog({ open, onOpenChange, deal, proposal, onS
       setNotes("");
     }
   }, [open, proposal]);
+
+  useEffect(() => {
+    if (!open) return;
+    let alive = true;
+    supabase
+      .from("crm_settings")
+      .select("vpl_monthly_rate, vpl_correct_by_incc")
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!alive || !data) return;
+        setVplRatePct(
+          (Number(data.vpl_monthly_rate ?? 0.008) * 100).toLocaleString("pt-BR", {
+            maximumFractionDigits: 4,
+          }),
+        );
+        setCorrectByIncc(!!data.vpl_correct_by_incc);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [open]);
 
   const onPickUnit = (id: string) => {
     setUnitId(id);
@@ -185,6 +212,45 @@ export default function ProposalDialog({ open, onOpenChange, deal, proposal, onS
   };
 
   const atoPct = finalPrice > 0 ? (ato / finalPrice) * 100 : 0;
+
+  const vpl = useMemo(() => {
+    if (!unitId || listPrice <= 0 || finalPrice <= 0 || negative) return null;
+    const rows = buildProposalFlow(
+      {
+        payment_method: method,
+        final_price_brl: finalPrice,
+        down_payment_brl: ato,
+        monthly_count: mCount,
+        monthly_brl: mBrl,
+        balloon_count: bCount,
+        balloon_brl: bBrl,
+        keys_brl: Math.max(0, keys),
+      },
+      proposalDateISO(new Date().toISOString()),
+    );
+    return analyzeVpl(installmentsFromFlow(rows), {
+      listPriceBrl: listPrice,
+      monthlyRate: toNum(vplRatePct) / 100,
+      correctByIncc,
+    });
+  }, [
+    unitId,
+    listPrice,
+    finalPrice,
+    negative,
+    method,
+    ato,
+    mCount,
+    mBrl,
+    bCount,
+    bBrl,
+    keys,
+    vplRatePct,
+    correctByIncc,
+  ]);
+
+  const pctBR = (frac: number) =>
+    `${(frac * 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -372,6 +438,95 @@ export default function ProposalDialog({ open, onOpenChange, deal, proposal, onS
                   ) : null}
                 </div>
               )}
+
+              <Separator />
+
+              {/* VPL */}
+              <section className="rounded-lg border border-border/60 p-3 space-y-3">
+                <div>
+                  <h4 className="text-sm font-medium">Análise de valor presente (VPL)</h4>
+                  <p className="text-[11px] text-muted-foreground">
+                    O VPL traz cada parcela a valor presente pela taxa de oportunidade. Quanto mais
+                    alongado o pagamento, maior o desconto real embutido.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="pd-vpl-rate">Taxa de desconto (oportunidade) ao mês (%)</Label>
+                    <Input
+                      id="pd-vpl-rate"
+                      inputMode="decimal"
+                      value={vplRatePct}
+                      onChange={(e) => setVplRatePct(e.target.value)}
+                      className="tabular-nums text-right"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between gap-2 rounded-md border border-border/60 px-3 py-2">
+                    <Label htmlFor="pd-vpl-incc" className="text-xs font-normal cursor-pointer">
+                      Corrigir parcelas futuras pelo INCC (
+                      {(INCC_M_DEMO_MONTHLY * 100).toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                      })}
+                      % a.m.)
+                    </Label>
+                    <Switch
+                      id="pd-vpl-incc"
+                      checked={correctByIncc}
+                      onCheckedChange={setCorrectByIncc}
+                    />
+                  </div>
+                </div>
+
+                {vpl ? (
+                  <>
+                    <dl className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      {[
+                        { k: "Preço de tabela", v: formatBRL2(vpl.listPriceBrl) },
+                        { k: "Valor nominal da proposta", v: formatBRL2(vpl.nominalBrl) },
+                        { k: "VPL do fluxo", v: formatBRL2(vpl.npvBrl) },
+                        { k: "Desconto real", v: pctBR(vpl.realDiscount) },
+                      ].map((x) => (
+                        <div
+                          key={x.k}
+                          className="rounded-md border border-border/50 bg-muted/20 p-2"
+                        >
+                          <dt className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                            {x.k}
+                          </dt>
+                          <dd className="text-sm font-medium tabular-nums">{x.v}</dd>
+                        </div>
+                      ))}
+                    </dl>
+
+                    <p className="text-[11px] text-muted-foreground tabular-nums">
+                      Desconto de tabela: {pctBR(vpl.listDiscount)} · Desconto real (VPL):{" "}
+                      {pctBR(vpl.realDiscount)}
+                    </p>
+
+                    <Badge
+                      variant={vpl.verdict === "equilibrado" ? "secondary" : "outline"}
+                      className={
+                        vpl.verdict === "alongado"
+                          ? "border-amber-600/40 text-amber-700 dark:text-amber-400 bg-amber-500/5 text-[11px] whitespace-normal text-left"
+                          : vpl.verdict === "antecipado"
+                            ? "border-emerald-600/40 text-emerald-700 dark:text-emerald-400 bg-emerald-500/5 text-[11px] whitespace-normal text-left"
+                            : "text-[11px] whitespace-normal text-left"
+                      }
+                    >
+                      {vpl.verdict === "alongado"
+                        ? `Fluxo alongado — custa ${pctBR(vpl.realDiscount)} à incorporadora, acima dos ${pctBR(vpl.listDiscount)} de tabela`
+                        : vpl.verdict === "antecipado"
+                          ? "Fluxo antecipado — desconto real menor que o de tabela"
+                          : "Fluxo equilibrado"}
+                    </Badge>
+                  </>
+                ) : (
+                  <p className="text-[11px] text-muted-foreground">
+                    Preencha a estrutura de pagamento para calcular o valor presente.
+                  </p>
+                )}
+              </section>
 
               <Separator />
 
