@@ -256,7 +256,8 @@ export default function MetasBlock({ data }: Props) {
                     </TableRow>
                   ) : (
                     data.por_corretor.map((c) => {
-                      const destaque = melhorPct !== null && c.vgv_pct === melhorPct;
+                      const pct = numOrNull(c.vgv_pct);
+                      const destaque = melhorPct !== null && pct !== null && pct === melhorPct;
                       return (
                         <TableRow key={c.broker_id} className={cn(destaque && "bg-primary/5")}>
                           <TableCell className="pl-6 text-sm font-medium">{c.corretor}</TableCell>
@@ -268,15 +269,17 @@ export default function MetasBlock({ data }: Props) {
                             {formatBRLCompact(num(c.vgv_realizado))}
                           </TableCell>
                           <TableCell>
-                            {c.vgv_pct === null ? (
-                              <span className="text-xs text-muted-foreground">Sem meta cadastrada</span>
+                            {pct === null ? (
+                              <span className="text-xs text-muted-foreground">
+                                <span aria-hidden>— </span>Sem meta cadastrada
+                              </span>
                             ) : (
                               <div className="space-y-1">
-                                <span className="text-sm font-medium tabular-nums">{formatPct(c.vgv_pct)}</span>
+                                <span className="text-sm font-medium tabular-nums">{formatPct(pct)}</span>
                                 <div className="h-2 w-full overflow-hidden rounded-full bg-muted/60">
                                   <div
                                     className="h-2 rounded-full bg-primary"
-                                    style={{ width: `${Math.max(0, Math.min(100, c.vgv_pct))}%` }}
+                                    style={{ width: `${Math.max(0, Math.min(100, pct))}%` }}
                                   />
                                 </div>
                               </div>
@@ -285,6 +288,7 @@ export default function MetasBlock({ data }: Props) {
                           <TableCell className="text-right tabular-nums">
                             {num(c.unid_meta) > 0 ? num(c.unid_meta) : "—"}
                           </TableCell>
+
                           <TableCell className="text-right tabular-nums">{num(c.unid_realizado)}</TableCell>
                           <TableCell className="text-right tabular-nums">{num(c.deals_abertos)}</TableCell>
                           <TableCell className="pr-6 text-right tabular-nums">
