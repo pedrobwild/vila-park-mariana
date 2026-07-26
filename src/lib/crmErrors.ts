@@ -4,6 +4,7 @@ export type CrmEntity =
   | "etapa"
   | "negócio"
   | "pessoa"
+  | "lead"
   | "unidade do negócio"
   | "atividade"
   | "proposta"
@@ -34,6 +35,7 @@ const ARTICLE: Record<CrmEntity, string> = {
   "etapa": "a etapa",
   "negócio": "o negócio",
   "pessoa": "a pessoa",
+  "lead": "o lead",
   "unidade do negócio": "a unidade do negócio",
   "atividade": "a atividade",
   "proposta": "a proposta",
@@ -51,6 +53,7 @@ const ARTICLE_ARE: Record<CrmEntity, string> = {
   "etapa": "esta etapa",
   "negócio": "este negócio",
   "pessoa": "esta pessoa",
+  "lead": "este lead",
   "unidade do negócio": "esta unidade do negócio",
   "atividade": "esta atividade",
   "proposta": "esta proposta",
