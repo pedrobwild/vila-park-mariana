@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
@@ -78,6 +79,8 @@ export default function NewDealDialog({
   const [title, setTitle] = useState("");
   const [titleTouched, setTitleTouched] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [useRoleta, setUseRoleta] = useState(roletaEnabled);
+  const [brokerId, setBrokerId] = useState("");
 
   // Reset when dialog opens
   useEffect(() => {
@@ -87,7 +90,9 @@ export default function NewDealDialog({
     setPrefilled(new Set());
     setTitle("");
     setTitleTouched(false);
-  }, [open, presetPersonId]);
+    setUseRoleta(roletaEnabled);
+    setBrokerId("");
+  }, [open, presetPersonId, roletaEnabled]);
 
   const person = useMemo(
     () => people.find((p) => p.id === personId) ?? null,
