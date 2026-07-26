@@ -1,18 +1,47 @@
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useRole } from "@/hooks/useIsAdmin";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ArrowLeft, LogOut, Building2, Lock, Menu, FileText, Upload, Briefcase, ShieldCheck, Users, UserCog } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  ArrowLeft,
+  LogOut,
+  Building2,
+  Menu,
+  FileText,
+  Upload,
+  Briefcase,
+  ShieldCheck,
+  UserCog,
+  UserPlus,
+  BarChart3,
+  Settings,
+  ChevronDown,
+} from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import UnitsManager from "@/components/admin/UnitsManager";
 import CrmSection from "@/components/crm/CrmSection";
+import LeadsSection from "@/components/crm/LeadsSection";
 import BrokersManager from "@/components/admin/BrokersManager";
 import LossReasonsManager from "@/components/admin/LossReasonsManager";
 import bwildLogo from "@/assets/bwild-logo.png";
 
-type SectionKey = "units" | "crm" | "comercial" | "extrato" | "upload" | "auditoria";
+type SectionKey =
+  | "units"
+  | "crm"
+  | "leads"
+  | "comercial"
+  | "relatorios"
+  | "config"
+  | "extrato"
+  | "upload"
+  | "auditoria";
 
 interface SectionDef {
   key: SectionKey;
@@ -22,16 +51,68 @@ interface SectionDef {
   bewildOnly?: boolean;
 }
 
-const ALL_sections: SectionDef[] = [
-  { key: "units", label: "Unidades à venda", icon: Building2 },
-  { key: "crm", label: "CRM", icon: Users },
-  { key: "comercial", label: "Equipe comercial", icon: UserCog },
-  { key: "extrato", label: "Extrato do cliente", icon: FileText, href: "/admin/extrato" },
-  { key: "upload", label: "Painel — upload de plantas", icon: Upload, href: "/admin/upload", bewildOnly: true },
-  { key: "auditoria", label: "Log de auditoria", icon: ShieldCheck, href: "/admin/auditoria" },
+interface SectionGroup {
+  label: string;
+  collapsible?: boolean;
+  items: SectionDef[];
+}
+
+const GROUPS: SectionGroup[] = [
+  {
+    label: "Comercial",
+    items: [
+      { key: "units", label: "Unidades à venda", icon: Building2 },
+      { key: "crm", label: "CRM", icon: Briefcase },
+      { key: "leads", label: "Leads", icon: UserPlus },
+      { key: "comercial", label: "Equipe comercial", icon: UserCog },
+    ],
+  },
+  {
+    label: "Análise",
+    items: [{ key: "relatorios", label: "Relatórios", icon: BarChart3 }],
+  },
+  {
+    label: "Configurações e ferramentas",
+    collapsible: true,
+    items: [
+      { key: "config", label: "Configurações", icon: Settings },
+      { key: "extrato", label: "Extrato do cliente", icon: FileText, href: "/admin/extrato" },
+      { key: "auditoria", label: "Log de auditoria", icon: ShieldCheck, href: "/admin/auditoria" },
+      {
+        key: "upload",
+        label: "Painel — upload de plantas",
+        icon: Upload,
+        href: "/admin/upload",
+        bewildOnly: true,
+      },
+    ],
+  },
 ];
 
-const COMING_SOON = ["Leads", "Relatórios", "Configurações"];
+const SECTION_KEYS: SectionKey[] = [
+  "units",
+  "crm",
+  "leads",
+  "comercial",
+  "relatorios",
+  "config",
+  "extrato",
+  "upload",
+  "auditoria",
+];
+
+function isSectionKey(v: string | null): v is SectionKey {
+  return !!v && (SECTION_KEYS as string[]).includes(v);
+}
+
+const DESCRIPTIONS: Partial<Record<SectionKey, string>> = {
+  units: "Gestão das unidades à venda do Vila Park Mariana.",
+  crm: "Pipeline de negócios e espelho de vendas.",
+  leads: "Base de leads, qualificação e origem do contato.",
+  comercial: "Corretores, roleta de distribuição e SLA.",
+  relatorios: "Indicadores de funil, base de leads e comissões.",
+  config: "Parâmetros do CRM, etapas do funil e padrões de proposta.",
+};
 
 function Logo() {
   return (
@@ -63,66 +144,119 @@ function RoleBadge({ role }: { role: "admin" | "incorporadora" | null }) {
   return null;
 }
 
+const GROUP_LABEL_CLASS =
+  "px-3 pt-4 pb-1 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-muted-foreground/70";
 
 export default function Admin() {
   const { session, role } = useRole();
-  const [active, setActive] = useState<SectionKey>("units");
+  const [searchParams, setSearchParams] = useSearchParams();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [leadsAutoOpenNew, setLeadsAutoOpenNew] = useState(false);
 
-  const sections = useMemo(
-    () => ALL_sections.filter((s) => !s.bewildOnly || role === "admin"),
+  const param = searchParams.get("m");
+  const active: SectionKey = isSectionKey(param) ? param : "units";
+
+  const setActive = useCallback(
+    (key: SectionKey) => {
+      const next = new URLSearchParams(searchParams);
+      next.delete("tab");
+      if (key === "units") next.delete("m");
+      else next.set("m", key);
+      setSearchParams(next, { replace: true });
+    },
+    [searchParams, setSearchParams],
+  );
+
+  const groups = useMemo(
+    () =>
+      GROUPS.map((g) => ({
+        ...g,
+        items: g.items.filter((s) => !s.bewildOnly || role === "admin"),
+      })).filter((g) => g.items.length > 0),
     [role],
   );
+
+  const allSections = useMemo(() => groups.flatMap((g) => g.items), [groups]);
+  const activeSection = allSections.find((s) => s.key === active);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
   };
 
+  const itemClass = (isActive: boolean) =>
+    `w-full flex items-center gap-2.5 px-3 h-9 rounded-lg text-sm transition-colors ${
+      isActive
+        ? "bg-primary text-primary-foreground font-semibold"
+        : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+    }`;
+
+  const SidebarItem = ({ s, onNavigate }: { s: SectionDef; onNavigate?: () => void }) => {
+    if (s.href) {
+      return (
+        <Link to={s.href} onClick={onNavigate} className={itemClass(false)}>
+          <s.icon className="h-4 w-4 shrink-0" />
+          {s.label}
+        </Link>
+      );
+    }
+    return (
+      <button
+        onClick={() => {
+          setActive(s.key);
+          onNavigate?.();
+        }}
+        className={itemClass(active === s.key)}
+      >
+        <s.icon className="h-4 w-4 shrink-0" />
+        {s.label}
+      </button>
+    );
+  };
+
+  const CollapsibleGroup = ({
+    group,
+    onNavigate,
+  }: {
+    group: SectionGroup;
+    onNavigate?: () => void;
+  }) => {
+    const hasActive = group.items.some((s) => s.key === active && !s.href);
+    const [open, setOpen] = useState(hasActive);
+    useEffect(() => {
+      if (hasActive) setOpen(true);
+    }, [hasActive]);
+
+    return (
+      <Collapsible open={open} onOpenChange={setOpen}>
+        <CollapsibleTrigger className={`${GROUP_LABEL_CLASS} flex w-full items-center justify-between`}>
+          {group.label}
+          <ChevronDown
+            className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`}
+          />
+        </CollapsibleTrigger>
+        <CollapsibleContent className="space-y-1">
+          {group.items.map((s) => (
+            <SidebarItem key={s.key} s={s} onNavigate={onNavigate} />
+          ))}
+        </CollapsibleContent>
+      </Collapsible>
+    );
+  };
 
   const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => (
     <nav className="space-y-1 p-3">
-      {sections.map((s) => {
-        const isActive = active === s.key;
-        const className = `w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm min-h-[44px] transition-colors ${
-          isActive
-            ? "bg-primary text-primary-foreground font-semibold"
-            : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-        }`;
-        if (s.href) {
-          return (
-            <Link key={s.key} to={s.href} onClick={onNavigate} className={className}>
-              <s.icon className="h-4 w-4 shrink-0" />
-              {s.label}
-            </Link>
-          );
-        }
-        return (
-          <button
-            key={s.key}
-            onClick={() => {
-              setActive(s.key as SectionKey);
-              onNavigate?.();
-            }}
-            className={className}
-          >
-            <s.icon className="h-4 w-4 shrink-0" />
-            {s.label}
-          </button>
-        );
-      })}
-      <p className="px-3 pt-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70">
-        Em breve
-      </p>
-      {COMING_SOON.map((label) => (
-        <div
-          key={label}
-          className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm text-muted-foreground/60 cursor-not-allowed"
-          aria-disabled="true"
-        >
-          <Lock className="h-4 w-4 shrink-0" />
-          {label}
-        </div>
-      ))}
+      {groups.map((g) =>
+        g.collapsible ? (
+          <CollapsibleGroup key={g.label} group={g} onNavigate={onNavigate} />
+        ) : (
+          <div key={g.label} className="space-y-1">
+            <p className={GROUP_LABEL_CLASS}>{g.label}</p>
+            {g.items.map((s) => (
+              <SidebarItem key={s.key} s={s} onNavigate={onNavigate} />
+            ))}
+          </div>
+        ),
+      )}
     </nav>
   );
 
@@ -152,7 +286,8 @@ export default function Admin() {
             </span>
             <Link to="/">
               <Button variant="ghost" size="sm" className="h-8">
-                <ArrowLeft className="h-3.5 w-3.5 mr-1" /> <span className="hidden sm:inline">Voltar ao site</span>
+                <ArrowLeft className="h-3.5 w-3.5 mr-1" />{" "}
+                <span className="hidden sm:inline">Voltar ao site</span>
               </Button>
             </Link>
             <Button variant="outline" size="sm" className="h-8" onClick={handleLogout}>
@@ -170,16 +305,15 @@ export default function Admin() {
         <main className="flex-1 min-w-0 px-4 md:px-6 py-6 md:py-8 space-y-6">
           <div className="md:hidden">
             <Tabs value={active} onValueChange={(v) => setActive(v as SectionKey)}>
-              <TabsList>
-                {sections.filter((s) => !s.href).map((s) => (
-                  <TabsTrigger key={s.key} value={s.key}>
-                    {s.label}
-                  </TabsTrigger>
-                ))}
+              <TabsList className="flex-wrap h-auto">
+                {allSections
+                  .filter((s) => !s.href)
+                  .map((s) => (
+                    <TabsTrigger key={s.key} value={s.key}>
+                      {s.label}
+                    </TabsTrigger>
+                  ))}
               </TabsList>
-              <TabsContent value="units" />
-              <TabsContent value="crm" />
-              <TabsContent value="comercial" />
             </Tabs>
             <div className="mt-3">
               <Link to="/admin/extrato">
@@ -192,24 +326,39 @@ export default function Admin() {
 
           <header>
             <h1 className="font-display text-2xl md:text-3xl font-bold">
-              {sections.find((s) => s.key === active)?.label}
+              {activeSection?.label}
             </h1>
-            <p className="text-sm text-muted-foreground">
-              {active === "crm"
-                ? "Pipeline de negócios e cadastro de pessoas."
-                : active === "comercial"
-                  ? "Corretores, roleta de distribuição, SLA e motivos de perda."
-                  : "Gestão das unidades à venda do Vila Park Mariana."}
-            </p>
+            <p className="text-sm text-muted-foreground">{DESCRIPTIONS[active]}</p>
           </header>
 
           {active === "units" && <UnitsManager />}
-          {active === "crm" && <CrmSection onOpenUnits={() => setActive("units")} />}
+          {active === "crm" && (
+            <CrmSection
+              onOpenUnits={() => setActive("units")}
+              onOpenLeads={(opts) => {
+                setActive("leads");
+                if (opts?.novo) setLeadsAutoOpenNew(true);
+              }}
+            />
+          )}
+          {active === "leads" && (
+            <LeadsSection
+              onOpenDeal={() => setActive("crm")}
+              onNewDealForPerson={() => setActive("crm")}
+              autoOpenNew={leadsAutoOpenNew}
+              onAutoOpenNewHandled={() => setLeadsAutoOpenNew(false)}
+            />
+          )}
           {active === "comercial" && (
             <div className="space-y-8">
               <BrokersManager />
               <LossReasonsManager />
             </div>
+          )}
+          {(active === "relatorios" || active === "config") && (
+            <p className="rounded-lg border border-dashed border-border/60 px-4 py-8 text-center text-sm text-muted-foreground">
+              Em construção — próxima etapa.
+            </p>
           )}
         </main>
       </div>

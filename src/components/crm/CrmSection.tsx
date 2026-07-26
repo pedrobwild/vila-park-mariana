@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import PipelineView from "./PipelineView";
-import PeopleManager from "./PeopleManager";
 import DealDetailSheet from "./DealDetailSheet";
 import NewDealDialog from "./NewDealDialog";
 import SalesMirrorView from "./SalesMirrorView";
@@ -29,9 +28,15 @@ export type DealFull = CrmDeal & {
   loss_reason: CrmLossReason | null;
 };
 
-type CrmTab = "pipeline" | "espelho" | "pessoas" | "painel";
+type CrmTab = "pipeline" | "espelho" | "painel";
 
-export default function CrmSection({ onOpenUnits }: { onOpenUnits?: () => void }) {
+export default function CrmSection({
+  onOpenUnits,
+  onOpenLeads,
+}: {
+  onOpenUnits?: () => void;
+  onOpenLeads?: (opts?: { novo?: boolean }) => void;
+}) {
   const [deals, setDeals] = useState<DealFull[]>([]);
   const [people, setPeople] = useState<CrmPerson[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
@@ -44,7 +49,6 @@ export default function CrmSection({ onOpenUnits }: { onOpenUnits?: () => void }
   const [newDeal, setNewDeal] = useState<{ open: boolean; personId?: string | null }>({
     open: false,
   });
-  const [openNewPerson, setOpenNewPerson] = useState(false);
 
 
 
@@ -98,7 +102,6 @@ export default function CrmSection({ onOpenUnits }: { onOpenUnits?: () => void }
         <TabsList className="flex-wrap">
           <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
           <TabsTrigger value="espelho">Espelho de vendas</TabsTrigger>
-          <TabsTrigger value="pessoas">Pessoas</TabsTrigger>
           <TabsTrigger value="painel">Painel</TabsTrigger>
         </TabsList>
 
@@ -122,22 +125,6 @@ export default function CrmSection({ onOpenUnits }: { onOpenUnits?: () => void }
               setOpenDealId(id);
             }}
             onOpenUnits={onOpenUnits}
-          />
-        </TabsContent>
-        <TabsContent value="pessoas" className="mt-4">
-
-          <PeopleManager
-            people={people}
-            deals={deals}
-            units={units}
-            onReload={load}
-            onOpenDeal={(id) => {
-              setTab("pipeline");
-              setOpenDealId(id);
-            }}
-            onNewDealForPerson={(personId) => setNewDeal({ open: true, personId })}
-            autoOpenNew={openNewPerson}
-            onAutoOpenNewHandled={() => setOpenNewPerson(false)}
           />
         </TabsContent>
         <TabsContent value="painel" className="mt-4">
@@ -170,8 +157,7 @@ export default function CrmSection({ onOpenUnits }: { onOpenUnits?: () => void }
         onCreated={handleDealCreated}
         onCreatePerson={() => {
           setNewDeal((s) => ({ ...s, open: false }));
-          setTab("pessoas");
-          setOpenNewPerson(true);
+          onOpenLeads?.({ novo: true });
         }}
       />
 
