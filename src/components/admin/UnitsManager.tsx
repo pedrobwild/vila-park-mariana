@@ -39,7 +39,10 @@ export default function UnitsManager() {
   const [values, setValues] = useState<Record<string, Record<string, unknown>>>({});
   const [loading, setLoading] = useState(true);
 
-  const [query, setQuery] = useState("");
+  // Deep link vindo do drill-down do painel: /admin?u=<código da unidade>
+  const [searchParams] = useSearchParams();
+  const [query, setQuery] = useState(() => searchParams.get("u") ?? "");
+
   const [sort, setSort] = useState<{ key: SortKey; dir: "asc" | "desc" }>({ key: "code", dir: "asc" });
 
   const [dialogOpen, setDialogOpen] = useState(false);
