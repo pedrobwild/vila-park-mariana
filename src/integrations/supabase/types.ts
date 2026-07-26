@@ -176,6 +176,13 @@ export type Database = {
             foreignKeyName: "contracts_unit_id_fkey"
             columns: ["unit_id"]
             isOneToOne: false
+            referencedRelation: "crm_sales_mirror"
+            referencedColumns: ["unit_id"]
+          },
+          {
+            foreignKeyName: "contracts_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
             referencedRelation: "units"
             referencedColumns: ["id"]
           },
@@ -206,6 +213,227 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "crm_activities_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "crm_deals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_brokers: {
+        Row: {
+          assigned_count: number
+          commission_pct: number
+          created_at: string
+          creci: string | null
+          email: string | null
+          full_name: string
+          id: string
+          in_rotation: boolean
+          is_active: boolean
+          last_assigned_at: string | null
+          phone: string | null
+          team: string | null
+          updated_at: string
+          user_id: string | null
+          weight: number
+        }
+        Insert: {
+          assigned_count?: number
+          commission_pct?: number
+          created_at?: string
+          creci?: string | null
+          email?: string | null
+          full_name: string
+          id?: string
+          in_rotation?: boolean
+          is_active?: boolean
+          last_assigned_at?: string | null
+          phone?: string | null
+          team?: string | null
+          updated_at?: string
+          user_id?: string | null
+          weight?: number
+        }
+        Update: {
+          assigned_count?: number
+          commission_pct?: number
+          created_at?: string
+          creci?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          in_rotation?: boolean
+          is_active?: boolean
+          last_assigned_at?: string | null
+          phone?: string | null
+          team?: string | null
+          updated_at?: string
+          user_id?: string | null
+          weight?: number
+        }
+        Relationships: []
+      }
+      crm_commission_splits: {
+        Row: {
+          amount_brl: number
+          beneficiary: string | null
+          broker_id: string | null
+          commission_id: string
+          created_at: string
+          id: string
+          pct: number
+          role: string
+        }
+        Insert: {
+          amount_brl?: number
+          beneficiary?: string | null
+          broker_id?: string | null
+          commission_id: string
+          created_at?: string
+          id?: string
+          pct?: number
+          role?: string
+        }
+        Update: {
+          amount_brl?: number
+          beneficiary?: string | null
+          broker_id?: string | null
+          commission_id?: string
+          created_at?: string
+          id?: string
+          pct?: number
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_commission_splits_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
+            referencedRelation: "crm_brokers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_commission_splits_commission_id_fkey"
+            columns: ["commission_id"]
+            isOneToOne: false
+            referencedRelation: "crm_commissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_commissions: {
+        Row: {
+          base_brl: number
+          created_at: string
+          deal_id: string
+          due_date: string | null
+          id: string
+          notes: string | null
+          paid_at: string | null
+          proposal_id: string | null
+          status: Database["public"]["Enums"]["crm_commission_status"]
+          total_brl: number
+          total_pct: number
+          updated_at: string
+        }
+        Insert: {
+          base_brl?: number
+          created_at?: string
+          deal_id: string
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          proposal_id?: string | null
+          status?: Database["public"]["Enums"]["crm_commission_status"]
+          total_brl?: number
+          total_pct?: number
+          updated_at?: string
+        }
+        Update: {
+          base_brl?: number
+          created_at?: string
+          deal_id?: string
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          proposal_id?: string | null
+          status?: Database["public"]["Enums"]["crm_commission_status"]
+          total_brl?: number
+          total_pct?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_commissions_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "crm_deals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_commissions_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "crm_proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_credit_checks: {
+        Row: {
+          approved_amount_brl: number | null
+          bank: string
+          created_at: string
+          deal_id: string
+          decided_at: string | null
+          fgts_brl: number | null
+          id: string
+          income_brl: number | null
+          notes: string | null
+          requested_amount_brl: number | null
+          status: Database["public"]["Enums"]["crm_credit_status"]
+          submitted_at: string | null
+          updated_at: string
+          valid_until: string | null
+        }
+        Insert: {
+          approved_amount_brl?: number | null
+          bank: string
+          created_at?: string
+          deal_id: string
+          decided_at?: string | null
+          fgts_brl?: number | null
+          id?: string
+          income_brl?: number | null
+          notes?: string | null
+          requested_amount_brl?: number | null
+          status?: Database["public"]["Enums"]["crm_credit_status"]
+          submitted_at?: string | null
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Update: {
+          approved_amount_brl?: number | null
+          bank?: string
+          created_at?: string
+          deal_id?: string
+          decided_at?: string | null
+          fgts_brl?: number | null
+          id?: string
+          income_brl?: number | null
+          notes?: string | null
+          requested_amount_brl?: number | null
+          status?: Database["public"]["Enums"]["crm_credit_status"]
+          submitted_at?: string | null
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_credit_checks_deal_id_fkey"
             columns: ["deal_id"]
             isOneToOne: false
             referencedRelation: "crm_deals"
@@ -250,6 +478,13 @@ export type Database = {
             foreignKeyName: "crm_deal_units_unit_id_fkey"
             columns: ["unit_id"]
             isOneToOne: false
+            referencedRelation: "crm_sales_mirror"
+            referencedColumns: ["unit_id"]
+          },
+          {
+            foreignKeyName: "crm_deal_units_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
             referencedRelation: "units"
             referencedColumns: ["id"]
           },
@@ -257,9 +492,13 @@ export type Database = {
       }
       crm_deals: {
         Row: {
+          broker_id: string | null
           created_at: string
+          expected_close_date: string | null
           id: string
+          loss_reason_id: string | null
           lost_reason: string | null
+          next_step: string | null
           notes: string | null
           person_id: string
           share_token: string | null
@@ -271,9 +510,13 @@ export type Database = {
           value_brl: number
         }
         Insert: {
+          broker_id?: string | null
           created_at?: string
+          expected_close_date?: string | null
           id?: string
+          loss_reason_id?: string | null
           lost_reason?: string | null
+          next_step?: string | null
           notes?: string | null
           person_id: string
           share_token?: string | null
@@ -285,9 +528,13 @@ export type Database = {
           value_brl?: number
         }
         Update: {
+          broker_id?: string | null
           created_at?: string
+          expected_close_date?: string | null
           id?: string
+          loss_reason_id?: string | null
           lost_reason?: string | null
+          next_step?: string | null
           notes?: string | null
           person_id?: string
           share_token?: string | null
@@ -299,6 +546,20 @@ export type Database = {
           value_brl?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "crm_deals_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
+            referencedRelation: "crm_brokers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_deals_loss_reason_id_fkey"
+            columns: ["loss_reason_id"]
+            isOneToOne: false
+            referencedRelation: "crm_loss_reasons"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "crm_deals_person_id_fkey"
             columns: ["person_id"]
@@ -314,6 +575,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      crm_loss_reasons: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          label: string
+          position: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label: string
+          position?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label?: string
+          position?: number
+        }
+        Relationships: []
       }
       crm_people: {
         Row: {
@@ -392,6 +677,63 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      crm_proposal_acceptances: {
+        Row: {
+          accepted_at: string
+          deal_id: string
+          doc_hash: string
+          id: string
+          ip: string | null
+          proposal_id: string
+          signer_cpf: string | null
+          signer_email: string | null
+          signer_name: string
+          snapshot: Json | null
+          user_agent: string | null
+        }
+        Insert: {
+          accepted_at?: string
+          deal_id: string
+          doc_hash: string
+          id?: string
+          ip?: string | null
+          proposal_id: string
+          signer_cpf?: string | null
+          signer_email?: string | null
+          signer_name: string
+          snapshot?: Json | null
+          user_agent?: string | null
+        }
+        Update: {
+          accepted_at?: string
+          deal_id?: string
+          doc_hash?: string
+          id?: string
+          ip?: string | null
+          proposal_id?: string
+          signer_cpf?: string | null
+          signer_email?: string | null
+          signer_name?: string
+          snapshot?: Json | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_proposal_acceptances_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "crm_deals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_proposal_acceptances_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "crm_proposals"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       crm_proposal_installments: {
         Row: {
@@ -507,7 +849,79 @@ export type Database = {
             foreignKeyName: "crm_proposals_unit_id_fkey"
             columns: ["unit_id"]
             isOneToOne: false
+            referencedRelation: "crm_sales_mirror"
+            referencedColumns: ["unit_id"]
+          },
+          {
+            foreignKeyName: "crm_proposals_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
             referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_settings: {
+        Row: {
+          default_commission_pct: number
+          id: boolean
+          roleta_enabled: boolean
+          stale_deal_days: number
+          task_sla_days: number
+          updated_at: string
+          vpl_correct_by_incc: boolean
+          vpl_monthly_rate: number
+        }
+        Insert: {
+          default_commission_pct?: number
+          id?: boolean
+          roleta_enabled?: boolean
+          stale_deal_days?: number
+          task_sla_days?: number
+          updated_at?: string
+          vpl_correct_by_incc?: boolean
+          vpl_monthly_rate?: number
+        }
+        Update: {
+          default_commission_pct?: number
+          id?: boolean
+          roleta_enabled?: boolean
+          stale_deal_days?: number
+          task_sla_days?: number
+          updated_at?: string
+          vpl_correct_by_incc?: boolean
+          vpl_monthly_rate?: number
+        }
+        Relationships: []
+      }
+      crm_stage_events: {
+        Row: {
+          changed_at: string
+          deal_id: string
+          from_stage_id: string | null
+          id: string
+          to_stage_id: string | null
+        }
+        Insert: {
+          changed_at?: string
+          deal_id: string
+          from_stage_id?: string | null
+          id?: string
+          to_stage_id?: string | null
+        }
+        Update: {
+          changed_at?: string
+          deal_id?: string
+          from_stage_id?: string | null
+          id?: string
+          to_stage_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_stage_events_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "crm_deals"
             referencedColumns: ["id"]
           },
         ]
@@ -544,6 +958,63 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      crm_tasks: {
+        Row: {
+          broker_id: string | null
+          created_at: string
+          deal_id: string
+          done: boolean
+          done_at: string | null
+          due_date: string | null
+          id: string
+          kind: Database["public"]["Enums"]["crm_task_kind"]
+          notes: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          broker_id?: string | null
+          created_at?: string
+          deal_id: string
+          done?: boolean
+          done_at?: string | null
+          due_date?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["crm_task_kind"]
+          notes?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          broker_id?: string | null
+          created_at?: string
+          deal_id?: string
+          done?: boolean
+          done_at?: string | null
+          due_date?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["crm_task_kind"]
+          notes?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_tasks_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
+            referencedRelation: "crm_brokers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_tasks_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "crm_deals"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       custom_field_definitions: {
         Row: {
@@ -610,6 +1081,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "custom_field_definitions"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "custom_field_values_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "crm_sales_mirror"
+            referencedColumns: ["unit_id"]
           },
           {
             foreignKeyName: "custom_field_values_unit_id_fkey"
@@ -698,6 +1176,13 @@ export type Database = {
             foreignKeyName: "unit_plantas_unit_id_fkey"
             columns: ["unit_id"]
             isOneToOne: false
+            referencedRelation: "crm_sales_mirror"
+            referencedColumns: ["unit_id"]
+          },
+          {
+            foreignKeyName: "unit_plantas_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
             referencedRelation: "units"
             referencedColumns: ["id"]
           },
@@ -765,10 +1250,71 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      crm_sales_mirror: {
+        Row: {
+          area_m2: number | null
+          best_proposal_brl: number | null
+          block: string | null
+          code: string | null
+          col_no: string | null
+          floor_no: number | null
+          interested_count: number | null
+          interested_names: string | null
+          mirror_status: string | null
+          price_brl: number | null
+          proposals_count: number | null
+          unit_id: string | null
+          unit_status: string | null
+        }
+        Insert: {
+          area_m2?: number | null
+          best_proposal_brl?: never
+          block?: string | null
+          code?: string | null
+          col_no?: never
+          floor_no?: never
+          interested_count?: never
+          interested_names?: never
+          mirror_status?: never
+          price_brl?: number | null
+          proposals_count?: never
+          unit_id?: string | null
+          unit_status?: never
+        }
+        Update: {
+          area_m2?: number | null
+          best_proposal_brl?: never
+          block?: string | null
+          code?: string | null
+          col_no?: never
+          floor_no?: never
+          interested_count?: never
+          interested_names?: never
+          mirror_status?: never
+          price_brl?: number | null
+          proposals_count?: never
+          unit_id?: string | null
+          unit_status?: never
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      accept_shared_proposal: {
+        Args: {
+          _proposal_id: string
+          _signer_cpf?: string
+          _signer_email?: string
+          _signer_name: string
+          _token: string
+          _user_agent?: string
+        }
+        Returns: Json
+      }
       crm_apply_deal_value: { Args: { d: string }; Returns: undefined }
+      crm_assign_broker: { Args: { _deal: string }; Returns: string }
+      crm_dashboard: { Args: { _from?: string; _to?: string }; Returns: Json }
+      crm_next_broker: { Args: never; Returns: string }
       get_shared_proposal: { Args: { _token: string }; Returns: Json }
       has_role: {
         Args: {
@@ -788,6 +1334,13 @@ export type Database = {
         | "whatsapp"
         | "visita"
         | "mudanca_etapa"
+      crm_commission_status: "prevista" | "a_pagar" | "paga" | "cancelada"
+      crm_credit_status:
+        | "nao_iniciada"
+        | "em_analise"
+        | "aprovada"
+        | "aprovada_parcial"
+        | "reprovada"
       crm_interest_level: "alta" | "media" | "baixa"
       crm_source:
         | "indicacao"
@@ -804,6 +1357,14 @@ export type Database = {
         | "reserva"
         | "fechado"
         | "perdido"
+      crm_task_kind:
+        | "ligacao"
+        | "whatsapp"
+        | "email"
+        | "visita"
+        | "documentacao"
+        | "follow_up"
+        | "outro"
       custom_field_type:
         | "text"
         | "currency"
@@ -948,6 +1509,14 @@ export const Constants = {
         "visita",
         "mudanca_etapa",
       ],
+      crm_commission_status: ["prevista", "a_pagar", "paga", "cancelada"],
+      crm_credit_status: [
+        "nao_iniciada",
+        "em_analise",
+        "aprovada",
+        "aprovada_parcial",
+        "reprovada",
+      ],
       crm_interest_level: ["alta", "media", "baixa"],
       crm_source: [
         "indicacao",
@@ -965,6 +1534,15 @@ export const Constants = {
         "reserva",
         "fechado",
         "perdido",
+      ],
+      crm_task_kind: [
+        "ligacao",
+        "whatsapp",
+        "email",
+        "visita",
+        "documentacao",
+        "follow_up",
+        "outro",
       ],
       custom_field_type: [
         "text",
