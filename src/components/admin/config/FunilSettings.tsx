@@ -48,8 +48,9 @@ export default function FunilSettings() {
         <div className="space-y-1">
           <CardTitle className="text-base">Etapas do funil</CardTitle>
           <CardDescription>
-            Ordem em que os negócios avançam no pipeline. Etapas de sistema (ganho e perdido) não
-            podem ser removidas.
+            Ordem em que os negócios avançam no pipeline e a chance de ganho de cada etapa, usada na
+            previsão ponderada dos relatórios. Etapas de sistema (ganho e perdido) não podem ser
+            removidas.
           </CardDescription>
         </div>
         <Button variant="outline" onClick={() => setOpen(true)}>
@@ -71,6 +72,9 @@ export default function FunilSettings() {
                 <span className="text-sm font-medium">{s.label}</span>
                 <Badge variant={s.kind === "aberto" ? "secondary" : "outline"}>
                   {KIND_LABEL[s.kind] ?? s.kind}
+                </Badge>
+                <Badge variant="outline" className="text-xs tabular-nums">
+                  {s.win_probability_pct}% de chance de ganho
                 </Badge>
                 {s.reserves_unit && (
                   <Badge variant="outline" className="text-xs">
