@@ -45,17 +45,33 @@ export interface GoalsData {
 
 const num = (v: unknown) => (typeof v === "number" ? v : Number(v ?? 0)) || 0;
 
+/** Número opcional: mantém `null` quando o backend não tem valor (meta não cadastrada). */
+const numOrNull = (v: unknown): number | null => {
+  if (v === null || v === undefined || v === "") return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+};
+
+/** Data do mês a partir de `yyyy-MM-dd`; `null` quando o valor é inválido. */
+function mesDate(iso: string): Date | null {
+  const [y, m] = String(iso).split("-").map(Number);
+  if (!Number.isFinite(y) || !Number.isFinite(m) || m < 1 || m > 12) return null;
+  return new Date(y, m - 1, 1);
+}
+
 function mesExtenso(iso: string) {
-  const [y, m] = iso.split("-").map(Number);
-  const d = new Date(y, (m ?? 1) - 1, 1);
+  const d = mesDate(iso);
+  if (!d) return "mês não informado";
   const s = d.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 function mesCurto(iso: string) {
-  const [y, m] = iso.split("-").map(Number);
-  return new Date(y, (m ?? 1) - 1, 1).toLocaleDateString("pt-BR", { month: "short", year: "2-digit" });
+  const d = mesDate(iso);
+  if (!d) return "—";
+  return d.toLocaleDateString("pt-BR", { month: "short", year: "2-digit" });
 }
+
 
 /** Barra de progresso do termômetro de meta — trava em 100% e informa o excedente por texto. */
 function Termometro({
@@ -109,20 +125,30 @@ export default function MetasBlock({ data }: Props) {
   const e = data.equipe;
   const semMeta = num(e.vgv_meta) === 0 && num(e.unid_meta) === 0;
 
+  // Meses sem meta cadastrada entram com `null`: a barra "Meta" simplesmente não é
+  // desenhada (em vez de virar uma barra zerada) e o tooltip mostra "—".
   const historico = useMemo(
     () =>
-      (data.historico ?? []).map((h) => ({
-        mes: mesCurto(String(h.mes)),
-        Meta: num(h.vgv_meta),
-        Realizado: num(h.vgv_realizado),
-      })),
+      (data.historico ?? [])
+        .filter((h) => mesDate(String(h?.mes)) !== null)
+        .map((h) => ({
+          mes: mesCurto(String(h.mes)),
+          Meta: numOrNull(h.vgv_meta),
+          Realizado: numOrNull(h.vgv_realizado) ?? 0,
+        })),
     [data.historico],
   );
 
+  const historicoTemMeta = historico.some((h) => h.Meta !== null && h.Meta > 0);
+
+
   const melhorPct = useMemo(() => {
-    const pcts = (data.por_corretor ?? []).map((c) => c.vgv_pct).filter((p): p is number => p !== null);
+    const pcts = (data.por_corretor ?? [])
+      .map((c) => numOrNull(c.vgv_pct))
+      .filter((p): p is number => p !== null);
     return pcts.length ? Math.max(...pcts) : null;
   }, [data.por_corretor]);
+
 
   const vgvExcedente = num(e.vgv_realizado) - num(e.vgv_meta);
   const unidExcedente = num(e.unid_realizado) - num(e.unid_meta);
@@ -158,7 +184,7 @@ export default function MetasBlock({ data }: Props) {
             <div className="grid gap-3 lg:grid-cols-2">
               <Termometro
                 titulo="Meta de VGV do mês"
-                pct={e.vgv_pct}
+                pct={numOrNull(e.vgv_pct)}
                 realizadoTexto={formatBRL2(num(e.vgv_realizado))}
                 metaTexto={formatBRL2(num(e.vgv_meta))}
                 faltaTexto={
@@ -169,7 +195,7 @@ export default function MetasBlock({ data }: Props) {
               />
               <Termometro
                 titulo="Meta de unidades vendidas"
-                pct={e.unid_pct}
+                pct={numOrNull(e.unid_pct)}
                 realizadoTexto={`${num(e.unid_realizado)} unidade(s)`}
                 metaTexto={`${num(e.unid_meta)} unidade(s)`}
                 faltaTexto={
@@ -230,7 +256,8 @@ export default function MetasBlock({ data }: Props) {
                     </TableRow>
                   ) : (
                     data.por_corretor.map((c) => {
-                      const destaque = melhorPct !== null && c.vgv_pct === melhorPct;
+                      const pct = numOrNull(c.vgv_pct);
+                      const destaque = melhorPct !== null && pct !== null && pct === melhorPct;
                       return (
                         <TableRow key={c.broker_id} className={cn(destaque && "bg-primary/5")}>
                           <TableCell className="pl-6 text-sm font-medium">{c.corretor}</TableCell>
@@ -242,15 +269,17 @@ export default function MetasBlock({ data }: Props) {
                             {formatBRLCompact(num(c.vgv_realizado))}
                           </TableCell>
                           <TableCell>
-                            {c.vgv_pct === null ? (
-                              <span className="text-xs text-muted-foreground">Sem meta cadastrada</span>
+                            {pct === null ? (
+                              <span className="text-xs text-muted-foreground">
+                                <span aria-hidden>— </span>Sem meta cadastrada
+                              </span>
                             ) : (
                               <div className="space-y-1">
-                                <span className="text-sm font-medium tabular-nums">{formatPct(c.vgv_pct)}</span>
+                                <span className="text-sm font-medium tabular-nums">{formatPct(pct)}</span>
                                 <div className="h-2 w-full overflow-hidden rounded-full bg-muted/60">
                                   <div
                                     className="h-2 rounded-full bg-primary"
-                                    style={{ width: `${Math.max(0, Math.min(100, c.vgv_pct))}%` }}
+                                    style={{ width: `${Math.max(0, Math.min(100, pct))}%` }}
                                   />
                                 </div>
                               </div>
@@ -259,6 +288,7 @@ export default function MetasBlock({ data }: Props) {
                           <TableCell className="text-right tabular-nums">
                             {num(c.unid_meta) > 0 ? num(c.unid_meta) : "—"}
                           </TableCell>
+
                           <TableCell className="text-right tabular-nums">{num(c.unid_realizado)}</TableCell>
                           <TableCell className="text-right tabular-nums">{num(c.deals_abertos)}</TableCell>
                           <TableCell className="pr-6 text-right tabular-nums">
@@ -279,6 +309,11 @@ export default function MetasBlock({ data }: Props) {
             <p className="mb-2 text-xs uppercase tracking-wider text-muted-foreground">
               Meta e realizado de VGV nos últimos 6 meses
             </p>
+            {!historicoTemMeta && (
+              <p className="mb-2 text-xs text-muted-foreground">
+                Nenhum mês do período tem meta cadastrada — o gráfico mostra apenas o realizado.
+              </p>
+            )}
             <div className="h-56 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={historico} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
@@ -287,11 +322,16 @@ export default function MetasBlock({ data }: Props) {
                   <YAxis
                     tick={{ fontSize: 11 }}
                     stroke="hsl(var(--muted-foreground))"
-                    tickFormatter={(v: number) => formatBRLCompact(v)}
+                    tickFormatter={(v: number) => (Number.isFinite(v) ? formatBRLCompact(v) : "—")}
                     width={72}
                   />
                   <RTooltip
-                    formatter={(v: number, n) => [formatBRL2(Number(v)), String(n)]}
+                    formatter={(v: number | null, n) => [
+                      v === null || v === undefined || !Number.isFinite(Number(v))
+                        ? "—"
+                        : formatBRL2(Number(v)),
+                      String(n),
+                    ]}
                     contentStyle={{
                       background: "hsl(var(--popover))",
                       border: "1px solid hsl(var(--border))",
@@ -307,6 +347,7 @@ export default function MetasBlock({ data }: Props) {
             </div>
           </div>
         )}
+
       </CardContent>
     </Card>
   );
