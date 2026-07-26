@@ -369,7 +369,7 @@ export default function PeopleManager({
       if (editingId) {
         const { error } = await supabase.from("crm_people").update(payload).eq("id", editingId);
         if (error) throw error;
-        toast.success("Pessoa atualizada.");
+        toast.success("Lead atualizado.");
       } else {
         const { data: person, error } = await supabase
           .from("crm_people")
@@ -408,7 +408,7 @@ export default function PeopleManager({
             if (duErr) throw duErr;
           }
         }
-        toast.success("Pessoa cadastrada.");
+        toast.success("Lead cadastrado.");
       }
 
       setOpenDialog(false);
@@ -417,7 +417,7 @@ export default function PeopleManager({
       await onReload();
     } catch (e) {
       notifyCrmError(e as SbErr, {
-        entity: "pessoa",
+        entity: "lead",
         action: editingId ? "atualizar" : "criar",
       });
     } finally {
@@ -436,12 +436,12 @@ export default function PeopleManager({
           <Input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Buscar por nome, e-mail, telefone ou CPF"
+            placeholder="Buscar lead por nome, e-mail, telefone ou CPF"
             className="pl-8 h-9"
           />
         </div>
         <Button onClick={openNew} size="sm" className="h-9">
-          <Plus className="h-3.5 w-3.5 mr-1" /> Nova pessoa
+          <Plus className="h-3.5 w-3.5 mr-1" /> Novo lead
         </Button>
       </div>
 
@@ -461,7 +461,7 @@ export default function PeopleManager({
             {filtered.length === 0 && (
               <tr>
                 <td colSpan={6} className="px-3 py-8 text-center text-xs text-muted-foreground">
-                  Nenhuma pessoa encontrada.
+                  Nenhum lead encontrado.
                 </td>
               </tr>
             )}
@@ -577,12 +577,12 @@ export default function PeopleManager({
         >
           <DialogHeader>
             <DialogTitle className="font-display">
-              {editingId ? "Editar pessoa" : "Nova pessoa"}
+              {editingId ? "Editar lead" : "Novo lead"}
             </DialogTitle>
             <DialogDescription>
               {editingId
-                ? "Atualize os dados da pessoa."
-                : "Cadastre o contato e, opcionalmente, já abra um negócio com unidades de interesse."}
+                ? "Atualize os dados do lead."
+                : "Cadastre o lead e, opcionalmente, já abra um negócio com as unidades de interesse."}
             </DialogDescription>
           </DialogHeader>
 
