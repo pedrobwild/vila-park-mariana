@@ -1,11 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import PipelineView from "./PipelineView";
 import DealDetailSheet from "./DealDetailSheet";
 import NewDealDialog from "./NewDealDialog";
 import SalesMirrorView from "./SalesMirrorView";
-import CrmDashboard from "./CrmDashboard";
+
 import {
   sortStages,
   type CrmBroker,
@@ -28,16 +30,21 @@ export type DealFull = CrmDeal & {
   loss_reason: CrmLossReason | null;
 };
 
-type CrmTab = "pipeline" | "espelho" | "painel";
+type CrmTab = "pipeline" | "espelho";
 
 export default function CrmSection({
   onOpenUnits,
   onOpenLeads,
+  onOpenRelatorios,
 }: {
   onOpenUnits?: () => void;
   onOpenLeads?: (opts?: { novo?: boolean }) => void;
+  onOpenRelatorios?: () => void;
 }) {
+
+  const [searchParams, setSearchParams] = useSearchParams();
   const [deals, setDeals] = useState<DealFull[]>([]);
+
   const [people, setPeople] = useState<CrmPerson[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
   const [stages, setStages] = useState<CrmStageRow[]>([]);
@@ -96,14 +103,36 @@ export default function CrmSection({
     [load],
   );
 
+  // Deep link ?deal=<id> vindo do módulo Leads
+  const deepLinkParam = searchParams.get("deal");
+  const handledDeepLink = useRef<string | null>(null);
+  useEffect(() => {
+    if (loading || !deepLinkParam) return;
+    if (handledDeepLink.current === deepLinkParam) return;
+    handledDeepLink.current = deepLinkParam;
+    if (deals.some((d) => d.id === deepLinkParam)) {
+      setTab("pipeline");
+      setOpenDealId(deepLinkParam);
+    }
+    const next = new URLSearchParams(searchParams);
+    next.delete("deal");
+    setSearchParams(next, { replace: true });
+  }, [loading, deepLinkParam, deals, searchParams, setSearchParams]);
+
   return (
     <div className="space-y-4">
       <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
-        <TabsList className="flex-wrap">
-          <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
-          <TabsTrigger value="espelho">Espelho de vendas</TabsTrigger>
-          <TabsTrigger value="painel">Painel</TabsTrigger>
-        </TabsList>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <TabsList className="flex-wrap">
+            <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
+            <TabsTrigger value="espelho">Espelho de vendas</TabsTrigger>
+          </TabsList>
+          {onOpenRelatorios && (
+            <Button variant="link" size="sm" className="h-8 px-1" onClick={onOpenRelatorios}>
+              Ver indicadores em Relatórios
+            </Button>
+          )}
+        </div>
 
         <TabsContent value="pipeline" className="mt-4">
           <PipelineView
@@ -127,12 +156,8 @@ export default function CrmSection({
             onOpenUnits={onOpenUnits}
           />
         </TabsContent>
-        <TabsContent value="painel" className="mt-4">
-          <CrmDashboard onGoToPipeline={() => setTab("pipeline")} />
-        </TabsContent>
-
-
       </Tabs>
+
 
       <DealDetailSheet
         deal={openDeal}
