@@ -15,6 +15,7 @@ export type CrmEntity =
   | "análise de crédito"
   | "comissão"
   | "rateio"
+  | "meta"
   | "roleta";
 export type CrmAction =
   | "criar"
@@ -22,9 +23,11 @@ export type CrmAction =
   | "reordenar"
   | "excluir"
   | "atualizar"
+  | "salvar"
   | "mover"
   | "consultar"
   | "distribuir";
+
 
 export type SbErr =
   | { message?: string; code?: string; details?: string; hint?: string }
