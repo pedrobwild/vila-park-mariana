@@ -225,9 +225,17 @@ export default function CrmDashboard({ onGoToPipeline }: Props) {
       _area_m2: area === "todas" ? null : Number(area),
       _stage_id: stageId === "todas" ? null : stageId,
     };
-    const [base, adv] = await Promise.all([
+    // Mês das metas: o mês final do período — ou o mês corrente quando o período termina no futuro.
+    const hoje = new Date();
+    const fim = new Date(`${to}T00:00:00`);
+    fim.setDate(fim.getDate() - 1);
+    const refMes = fim > hoje ? hoje : fim;
+    const goalsMonth = `${refMes.getFullYear()}-${String(refMes.getMonth() + 1).padStart(2, "0")}-01`;
+
+    const [base, adv, gls] = await Promise.all([
       supabase.rpc("crm_dashboard", args),
       supabase.rpc("crm_dashboard_advanced", args),
+      supabase.rpc("crm_goals_report", { _month: goalsMonth }),
     ]);
     if (base.error) {
       toast.error("Não foi possível carregar o painel.");
@@ -241,7 +249,14 @@ export default function CrmDashboard({ onGoToPipeline }: Props) {
     } else {
       setAdvanced(adv.data as unknown as AdvancedData);
     }
+    if (gls.error) {
+      toast.error("Não foi possível carregar as metas do mês.");
+      setGoals(null);
+    } else {
+      setGoals(gls.data as unknown as GoalsData);
+    }
     setLoading(false);
+
   }, [period, custom, brokerId, area, stageId]);
 
   useEffect(() => {
