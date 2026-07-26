@@ -27,6 +27,8 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import UnitsManager from "@/components/admin/UnitsManager";
 import CrmSection from "@/components/crm/CrmSection";
+import RelatoriosSection from "@/components/crm/RelatoriosSection";
+
 import LeadsSection from "@/components/crm/LeadsSection";
 import BrokersManager from "@/components/admin/BrokersManager";
 import LossReasonsManager from "@/components/admin/LossReasonsManager";
