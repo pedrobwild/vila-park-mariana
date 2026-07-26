@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -39,7 +39,12 @@ import {
   Calculator,
   RotateCcw,
   CalendarClock,
+  ShieldCheck,
+  Loader2,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "sonner";
 import { formatBRL2, PAYMENT_METHOD_LABEL, type CrmPaymentMethod } from "@/lib/crm";
 import { tipologias } from "@/data/tipologias";
 import { WHATSAPP_PHONE } from "@/data/surroundings";
@@ -60,7 +65,11 @@ import {
 } from "@/lib/proposalFlow";
 
 type SharedProposal = {
+  id: string;
   status: "enviada" | "aceita";
+  accepted?: boolean | null;
+  accepted_at?: string | null;
+  accepted_by?: string | null;
   list_price_brl: number | string;
   discount_pct: number | string;
   discount_brl: number | string;
@@ -87,6 +96,7 @@ type SharedUnit = {
   planta_url: string | null;
   is_primary: boolean;
   custom_fields: Record<string, string | number | null> | null;
+  unit_interested_count?: number | null;
   proposals: SharedProposal[];
 };
 
@@ -360,6 +370,14 @@ function UnitCard({ u }: { u: SharedUnit }) {
                 <p className="text-sm text-muted-foreground mt-0.5">Bloco {u.block}</p>
               )}
             </div>
+            {(u.unit_interested_count ?? 0) > 0 && (
+              <span className="text-[11px] text-muted-foreground whitespace-nowrap print:hidden">
+                <span className="tabular-nums text-foreground font-medium">
+                  {u.unit_interested_count}
+                </span>{" "}
+                {u.unit_interested_count === 1 ? "interessado" : "interessados"} nesta unidade
+              </span>
+            )}
             {primary?.status === "aceita" && (
               <Badge className="bg-emerald-600/15 text-emerald-700 dark:text-emerald-400 border border-emerald-600/30 hover:bg-emerald-600/15">
                 Condição aceita
@@ -730,7 +748,180 @@ function financeableOptionsFrom(units: SharedUnit[]): FinanceableOption[] {
   return out;
 }
 
-function ProposalPage({ data }: { data: SharedPayload }) {
+function AcceptanceCard({
+  token,
+  unit,
+  proposal,
+  onAccepted,
+}: {
+  token: string;
+  unit: SharedUnit;
+  proposal: SharedProposal;
+  onAccepted: () => void;
+}) {
+  const [name, setName] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [email, setEmail] = useState("");
+  const [agree, setAgree] = useState(false);
+  const [sending, setSending] = useState(false);
+
+  if (proposal.accepted) {
+    return (
+      <div className="rounded-lg border border-emerald-600/40 bg-emerald-500/5 p-4 md:p-5">
+        <p className="flex items-center gap-2 text-sm font-medium text-emerald-800 dark:text-emerald-300">
+          <ShieldCheck className="h-4 w-4" />
+          Proposta da unidade {unit.code} aceita digitalmente
+        </p>
+        <p className="mt-1.5 text-xs text-muted-foreground">
+          {proposal.accepted_by ? `Por ${proposal.accepted_by}` : "Aceite registrado"}
+          {proposal.accepted_at
+            ? ` · ${new Date(proposal.accepted_at).toLocaleString("pt-BR")}`
+            : ""}
+          . O time comercial dará sequência ao processo.
+        </p>
+      </div>
+    );
+  }
+
+  const canSubmit = name.trim().length >= 3 && agree && !sending;
+
+  const submit = async () => {
+    if (!canSubmit) return;
+    setSending(true);
+    try {
+      const { error } = await supabase.rpc("accept_shared_proposal", {
+        _token: token,
+        _proposal_id: proposal.id,
+        _signer_name: name.trim(),
+        _signer_cpf: cpf.trim() || null,
+        _signer_email: email.trim() || null,
+        _user_agent: navigator.userAgent,
+      });
+      if (error) throw error;
+      toast.success("Aceite registrado. Nosso time entrará em contato.");
+      onAccepted();
+    } catch (e) {
+      toast.error("Não foi possível registrar o aceite. Tente novamente ou fale com o time.");
+      setSending(false);
+    }
+  };
+
+  return (
+    <div className="rounded-lg border border-border/60 bg-background p-4 md:p-5 space-y-4 print:hidden">
+      <div>
+        <p className="eyebrow text-[10px] mb-1.5">Aceite digital desta proposta</p>
+        <h3 className="font-display text-lg text-foreground">
+          Unidade {unit.code} · {formatBRL2(n(proposal.final_price_brl))}
+        </h3>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Ao aceitar, você registra sua concordância com as condições apresentadas. Não constitui
+          contrato nem reserva — o time comercial confirmará os próximos passos.
+        </p>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div className="space-y-1.5 sm:col-span-3">
+          <Label htmlFor={`ac-name-${proposal.id}`}>Nome completo</Label>
+          <Input
+            id={`ac-name-${proposal.id}`}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            autoComplete="name"
+            placeholder="Como consta no documento"
+          />
+        </div>
+        <div className="space-y-1.5 sm:col-span-1">
+          <Label htmlFor={`ac-cpf-${proposal.id}`}>CPF (opcional)</Label>
+          <Input
+            id={`ac-cpf-${proposal.id}`}
+            value={cpf}
+            onChange={(e) => setCpf(e.target.value)}
+            inputMode="numeric"
+            placeholder="000.000.000-00"
+          />
+        </div>
+        <div className="space-y-1.5 sm:col-span-2">
+          <Label htmlFor={`ac-email-${proposal.id}`}>E-mail (opcional)</Label>
+          <Input
+            id={`ac-email-${proposal.id}`}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            type="email"
+            autoComplete="email"
+            placeholder="voce@email.com"
+          />
+        </div>
+      </div>
+
+      <div className="flex items-start gap-2.5">
+        <Checkbox
+          id={`ac-agree-${proposal.id}`}
+          checked={agree}
+          onCheckedChange={(v) => setAgree(v === true)}
+          className="mt-0.5"
+        />
+        <Label
+          htmlFor={`ac-agree-${proposal.id}`}
+          className="text-xs font-normal leading-relaxed text-muted-foreground"
+        >
+          Li e concordo com as condições comerciais desta proposta e autorizo o registro do meu
+          aceite digital.
+        </Label>
+      </div>
+
+      <Button
+        onClick={submit}
+        disabled={!canSubmit}
+        className="bg-accent text-accent-foreground hover:bg-accent/90"
+      >
+        {sending ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Registrando…
+          </>
+        ) : (
+          <>
+            <ShieldCheck className="mr-2 h-4 w-4" /> Aceitar proposta
+          </>
+        )}
+      </Button>
+      {name.trim().length > 0 && name.trim().length < 3 && (
+        <p className="text-[11px] text-destructive">Informe o nome completo.</p>
+      )}
+    </div>
+  );
+}
+
+function AcceptanceSection({
+  token,
+  units,
+  onAccepted,
+}: {
+  token: string;
+  units: SharedUnit[];
+  onAccepted: () => void;
+}) {
+  const blocks = units
+    .map((u) => ({ u, p: bestProposal(u) }))
+    .filter((x): x is { u: SharedUnit; p: SharedProposal } => !!x.p);
+  if (blocks.length === 0) return null;
+  return (
+    <div className="space-y-4">
+      {blocks.map(({ u, p }) => (
+        <AcceptanceCard key={p.id} token={token} unit={u} proposal={p} onAccepted={onAccepted} />
+      ))}
+    </div>
+  );
+}
+
+function ProposalPage({
+  data,
+  token,
+  onReload,
+}: {
+  data: SharedPayload;
+  token: string;
+  onReload: () => void;
+}) {
   const units = useMemo(
     () => [...data.units].sort((a, b) => (a.is_primary === b.is_primary ? 0 : a.is_primary ? -1 : 1)),
     [data.units],
@@ -878,6 +1069,7 @@ function ProposalPage({ data }: { data: SharedPayload }) {
           {units.map((u) => (
             <UnitCard key={u.code} u={u} />
           ))}
+          <AcceptanceSection token={token} units={units} onAccepted={onReload} />
         </div>
 
         <aside className="lg:sticky lg:top-8 lg:self-start space-y-4 print:hidden">
@@ -1219,29 +1411,28 @@ export default function PublicProposal() {
     };
   }, []);
 
+  const load = useCallback(
+    async (showLoading: boolean) => {
+      if (!token) {
+        setState({ kind: "notfound" });
+        return;
+      }
+      if (showLoading) setState({ kind: "loading" });
+      const { data, error } = await supabase.rpc("get_shared_proposal", { _token: token });
+      if (error || !data) {
+        setState({ kind: "notfound" });
+        return;
+      }
+      setState({ kind: "ok", data: data as unknown as SharedPayload });
+    },
+    [token],
+  );
+
   useEffect(() => {
-    let cancelled = false;
-    if (!token) {
-      setState({ kind: "notfound" });
-      return;
-    }
-    setState({ kind: "loading" });
-    supabase
-      .rpc("get_shared_proposal", { _token: token })
-      .then(({ data, error }) => {
-        if (cancelled) return;
-        if (error || !data) {
-          setState({ kind: "notfound" });
-          return;
-        }
-        setState({ kind: "ok", data: data as unknown as SharedPayload });
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [token]);
+    load(true);
+  }, [load]);
 
   if (state.kind === "loading") return <LoadingState />;
   if (state.kind === "notfound") return <NotFoundState />;
-  return <ProposalPage data={state.data} />;
+  return <ProposalPage data={state.data} token={token!} onReload={() => load(false)} />;
 }
