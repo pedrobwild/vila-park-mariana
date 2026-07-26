@@ -143,9 +143,12 @@ export default function MetasBlock({ data }: Props) {
 
 
   const melhorPct = useMemo(() => {
-    const pcts = (data.por_corretor ?? []).map((c) => c.vgv_pct).filter((p): p is number => p !== null);
+    const pcts = (data.por_corretor ?? [])
+      .map((c) => numOrNull(c.vgv_pct))
+      .filter((p): p is number => p !== null);
     return pcts.length ? Math.max(...pcts) : null;
   }, [data.por_corretor]);
+
 
   const vgvExcedente = num(e.vgv_realizado) - num(e.vgv_meta);
   const unidExcedente = num(e.unid_realizado) - num(e.unid_meta);
