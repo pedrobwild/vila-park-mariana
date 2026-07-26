@@ -5,6 +5,8 @@ import PipelineView from "./PipelineView";
 import PeopleManager from "./PeopleManager";
 import DealDetailSheet from "./DealDetailSheet";
 import NewDealDialog from "./NewDealDialog";
+import SalesMirrorView from "./SalesMirrorView";
+import CrmDashboard from "./CrmDashboard";
 import { sortStages, type CrmDeal, type CrmDealUnit, type CrmPerson, type CrmProposal, type CrmStageRow } from "@/lib/crm";
 import type { Unit } from "@/lib/units";
 
@@ -15,18 +17,21 @@ export type DealFull = CrmDeal & {
   proposals: CrmProposal[];
 };
 
-export default function CrmSection() {
+type CrmTab = "pipeline" | "espelho" | "pessoas" | "painel";
+
+export default function CrmSection({ onOpenUnits }: { onOpenUnits?: () => void }) {
   const [deals, setDeals] = useState<DealFull[]>([]);
   const [people, setPeople] = useState<CrmPerson[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
   const [stages, setStages] = useState<CrmStageRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [openDealId, setOpenDealId] = useState<string | null>(null);
-  const [tab, setTab] = useState<"pipeline" | "pessoas">("pipeline");
+  const [tab, setTab] = useState<CrmTab>("pipeline");
   const [newDeal, setNewDeal] = useState<{ open: boolean; personId?: string | null }>({
     open: false,
   });
   const [openNewPerson, setOpenNewPerson] = useState(false);
+
 
 
   const loadStages = useCallback(async () => {
@@ -72,10 +77,13 @@ export default function CrmSection() {
   return (
     <div className="space-y-4">
       <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
-        <TabsList>
+        <TabsList className="flex-wrap">
           <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
+          <TabsTrigger value="espelho">Espelho de vendas</TabsTrigger>
           <TabsTrigger value="pessoas">Pessoas</TabsTrigger>
+          <TabsTrigger value="painel">Painel</TabsTrigger>
         </TabsList>
+
         <TabsContent value="pipeline" className="mt-4">
           <PipelineView
             deals={deals}
@@ -87,7 +95,17 @@ export default function CrmSection() {
             onNewDeal={() => setNewDeal({ open: true })}
           />
         </TabsContent>
+        <TabsContent value="espelho" className="mt-4">
+          <SalesMirrorView
+            onOpenDeal={(id) => {
+              setTab("pipeline");
+              setOpenDealId(id);
+            }}
+            onOpenUnits={onOpenUnits}
+          />
+        </TabsContent>
         <TabsContent value="pessoas" className="mt-4">
+
           <PeopleManager
             people={people}
             deals={deals}
@@ -102,6 +120,10 @@ export default function CrmSection() {
             onAutoOpenNewHandled={() => setOpenNewPerson(false)}
           />
         </TabsContent>
+        <TabsContent value="painel" className="mt-4">
+          <CrmDashboard onGoToPipeline={() => setTab("pipeline")} />
+        </TabsContent>
+
 
       </Tabs>
 

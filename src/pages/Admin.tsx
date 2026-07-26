@@ -198,7 +198,7 @@ export default function Admin() {
           </header>
 
           {active === "units" && <UnitsManager />}
-          {active === "crm" && <CrmSection />}
+          {active === "crm" && <CrmSection onOpenUnits={() => setActive("units")} />}
         </main>
       </div>
 
