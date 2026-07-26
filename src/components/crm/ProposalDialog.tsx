@@ -72,6 +72,7 @@ export default function ProposalDialog({ open, onOpenChange, deal, proposal, onS
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
   const [vplRatePct, setVplRatePct] = useState("0,8");
+  const [defaults, setDefaults] = useState({ downPct: 10, monthlyCount: 15, keysPct: 75, validityDays: 15 });
   const [correctByIncc, setCorrectByIncc] = useState(false);
 
   useEffect(() => {
@@ -110,7 +111,9 @@ export default function ProposalDialog({ open, onOpenChange, deal, proposal, onS
     let alive = true;
     supabase
       .from("crm_settings")
-      .select("vpl_monthly_rate, vpl_correct_by_incc")
+      .select(
+        "vpl_monthly_rate, vpl_correct_by_incc, proposal_default_down_pct, proposal_default_monthly_count, proposal_default_keys_pct, proposal_validity_days",
+      )
       .maybeSingle()
       .then(({ data }) => {
         if (!alive || !data) return;
@@ -120,11 +123,23 @@ export default function ProposalDialog({ open, onOpenChange, deal, proposal, onS
           }),
         );
         setCorrectByIncc(!!data.vpl_correct_by_incc);
+        const d = {
+          downPct: Number(data.proposal_default_down_pct ?? 10),
+          monthlyCount: Number(data.proposal_default_monthly_count ?? 15),
+          keysPct: Number(data.proposal_default_keys_pct ?? 75),
+          validityDays: Number(data.proposal_validity_days ?? 15),
+        };
+        setDefaults(d);
+        // Sugestão para propostas novas — segue totalmente editável.
+        if (!proposal) {
+          setMonthlyCount(String(d.monthlyCount));
+          setValidUntil(addDaysISO(new Date(), d.validityDays));
+        }
       });
     return () => {
       alive = false;
     };
-  }, [open]);
+  }, [open, proposal]);
 
   const onPickUnit = (id: string) => {
     setUnitId(id);
@@ -132,8 +147,15 @@ export default function ProposalDialog({ open, onOpenChange, deal, proposal, onS
     const du = deal.deal_units.find((x) => x.unit_id === id);
     const price = Number(du?.unit?.price_brl ?? 0);
     setListPrice(price);
-    // default ato 10%
-    setDownPayment(String(round2(price * 0.1)));
+    // Sugestões a partir das configurações (ato, mensais e saldo nas chaves).
+    const ato0 = round2((price * defaults.downPct) / 100);
+    const keys0 = round2((price * defaults.keysPct) / 100);
+    setDownPayment(String(ato0));
+    const count = Math.max(0, Math.floor(defaults.monthlyCount));
+    if (count > 0) {
+      setMonthlyCount(String(count));
+      setMonthlyBrl(String(round2(Math.max(0, price - ato0 - keys0) / count)));
+    }
   };
 
   const pct = toNum(discountPct);
