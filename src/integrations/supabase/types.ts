@@ -861,6 +861,47 @@ export type Database = {
           },
         ]
       }
+      crm_sales_goals: {
+        Row: {
+          broker_id: string | null
+          created_at: string
+          id: string
+          month: string
+          notes: string | null
+          units_target: number
+          updated_at: string
+          vgv_target_brl: number
+        }
+        Insert: {
+          broker_id?: string | null
+          created_at?: string
+          id?: string
+          month: string
+          notes?: string | null
+          units_target?: number
+          updated_at?: string
+          vgv_target_brl?: number
+        }
+        Update: {
+          broker_id?: string | null
+          created_at?: string
+          id?: string
+          month?: string
+          notes?: string | null
+          units_target?: number
+          updated_at?: string
+          vgv_target_brl?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_sales_goals_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
+            referencedRelation: "crm_brokers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       crm_settings: {
         Row: {
           default_commission_pct: number
@@ -1332,6 +1373,7 @@ export type Database = {
       crm_apply_deal_value: { Args: { d: string }; Returns: undefined }
       crm_assign_broker: { Args: { _deal: string }; Returns: string }
       crm_dashboard: { Args: { _from?: string; _to?: string }; Returns: Json }
+      crm_goals_report: { Args: { _month?: string }; Returns: Json }
       crm_next_broker: { Args: never; Returns: string }
       get_shared_proposal: { Args: { _token: string }; Returns: Json }
       has_role: {
