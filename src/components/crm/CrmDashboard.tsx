@@ -263,8 +263,9 @@ export default function CrmDashboard({ onGoToPipeline }: Props) {
 
   return (
     <div className="space-y-4">
-      {/* Período */}
+      {/* Filtros globais — valem para todos os blocos do painel */}
       <div className="flex flex-wrap items-center gap-2">
+
         <Select value={period} onValueChange={(v) => setPeriod(v as PeriodKey)}>
           <SelectTrigger className="h-9 w-[190px]" aria-label="Período de análise">
             <SelectValue />
@@ -301,12 +302,70 @@ export default function CrmDashboard({ onGoToPipeline }: Props) {
           </Popover>
         )}
 
+        <Select value={brokerId} onValueChange={setBrokerId}>
+          <SelectTrigger className="h-9 w-[180px]" aria-label="Filtrar por corretor">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todos os corretores</SelectItem>
+            {brokers.map((b) => (
+              <SelectItem key={b.id} value={b.id}>
+                {b.full_name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={area} onValueChange={setArea}>
+          <SelectTrigger className="h-9 w-[170px]" aria-label="Filtrar por tipologia">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todas">Todas as tipologias</SelectItem>
+            {areas.map((a) => (
+              <SelectItem key={a} value={String(a)}>
+                {a.toLocaleString("pt-BR")} m²
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={stageId} onValueChange={setStageId}>
+          <SelectTrigger className="h-9 w-[170px]" aria-label="Filtrar por etapa do funil">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todas">Todas as etapas</SelectItem>
+            {stages.map((s) => (
+              <SelectItem key={s.id} value={s.id}>
+                {s.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {temFiltro && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-9"
+            onClick={() => {
+              setBrokerId("todos");
+              setArea("todas");
+              setStageId("todas");
+            }}
+          >
+            Limpar filtros
+          </Button>
+        )}
+
         {data && (
           <p className="text-xs text-muted-foreground">
             {format(new Date(data.periodo.de), "dd/MM/yyyy")} até {format(new Date(data.periodo.ate), "dd/MM/yyyy")}
           </p>
         )}
       </div>
+
 
       {loading ? (
         <div className="space-y-4">
