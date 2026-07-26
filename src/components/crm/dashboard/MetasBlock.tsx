@@ -195,7 +195,7 @@ export default function MetasBlock({ data }: Props) {
               />
               <Termometro
                 titulo="Meta de unidades vendidas"
-                pct={e.unid_pct}
+                pct={numOrNull(e.unid_pct)}
                 realizadoTexto={`${num(e.unid_realizado)} unidade(s)`}
                 metaTexto={`${num(e.unid_meta)} unidade(s)`}
                 faltaTexto={
