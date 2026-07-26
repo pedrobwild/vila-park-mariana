@@ -31,7 +31,7 @@ import RelatoriosSection from "@/components/crm/RelatoriosSection";
 
 import LeadsSection from "@/components/crm/LeadsSection";
 import BrokersManager from "@/components/admin/BrokersManager";
-import LossReasonsManager from "@/components/admin/LossReasonsManager";
+import ConfiguracoesSection from "@/components/admin/ConfiguracoesSection";
 import bwildLogo from "@/assets/bwild-logo.png";
 
 type SectionKey =
@@ -361,7 +361,6 @@ export default function Admin() {
           {active === "comercial" && (
             <div className="space-y-8">
               <BrokersManager />
-              <LossReasonsManager />
             </div>
           )}
           {active === "relatorios" && (
@@ -371,9 +370,7 @@ export default function Admin() {
             />
           )}
           {active === "config" && (
-            <p className="rounded-lg border border-dashed border-border/60 px-4 py-8 text-center text-sm text-muted-foreground">
-              Em construção — próxima etapa.
-            </p>
+<ConfiguracoesSection />
           )}
 
         </main>
