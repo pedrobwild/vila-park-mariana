@@ -7,8 +7,9 @@ const GeralSettings = lazy(() => import("./config/GeralSettings"));
 const FunilSettings = lazy(() => import("./config/FunilSettings"));
 const LossReasonsManager = lazy(() => import("./LossReasonsManager"));
 const PropostaSettings = lazy(() => import("./config/PropostaSettings"));
+const MetasSettings = lazy(() => import("./config/MetasSettings"));
 
-const VALID_TABS = ["geral", "funil", "motivos-perda", "proposta"] as const;
+const VALID_TABS = ["geral", "funil", "motivos-perda", "proposta", "metas"] as const;
 type ConfigTab = (typeof VALID_TABS)[number];
 const DEFAULT_TAB: ConfigTab = "geral";
 
@@ -38,6 +39,7 @@ export default function ConfiguracoesSection() {
         <TabsTrigger value="funil">Etapas do funil</TabsTrigger>
         <TabsTrigger value="motivos-perda">Motivos de perda</TabsTrigger>
         <TabsTrigger value="proposta">Proposta</TabsTrigger>
+        <TabsTrigger value="metas">Metas</TabsTrigger>
       </TabsList>
 
       <TabsContent value="geral" className="mt-4">
@@ -68,6 +70,13 @@ export default function ConfiguracoesSection() {
         {tab === "proposta" && (
           <Suspense fallback={FALLBACK}>
             <PropostaSettings />
+          </Suspense>
+        )}
+      </TabsContent>
+      <TabsContent value="metas" className="mt-4">
+        {tab === "metas" && (
+          <Suspense fallback={FALLBACK}>
+            <MetasSettings />
           </Suspense>
         )}
       </TabsContent>
