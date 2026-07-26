@@ -184,7 +184,7 @@ export default function MetasBlock({ data }: Props) {
             <div className="grid gap-3 lg:grid-cols-2">
               <Termometro
                 titulo="Meta de VGV do mês"
-                pct={e.vgv_pct}
+                pct={numOrNull(e.vgv_pct)}
                 realizadoTexto={formatBRL2(num(e.vgv_realizado))}
                 metaTexto={formatBRL2(num(e.vgv_meta))}
                 faltaTexto={
