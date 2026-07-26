@@ -72,6 +72,25 @@ describe("DrillDownSheet", () => {
     expect(screen.getByText(/Mostrando 2 de 120 registros/i)).toBeInTheDocument();
   });
 
+  it("mostra 'Mostrando 50 de N' com o teto de 50 itens devolvido pelo backend", () => {
+    // o RPC crm_dashboard_advanced devolve no máximo 50 itens por agrupamento,
+    // mas itens_total traz a contagem completa do bucket.
+    const itens: DrillItem[] = Array.from({ length: 50 }, (_, i) => ({
+      ...deal,
+      id: `d-${i}`,
+      titulo: `Negócio ${i}`,
+    }));
+    setup(itens, 137);
+    expect(screen.getByText(/Mostrando 50 de 137 registros/i)).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /Abrir o negócio/i })).toHaveLength(50);
+  });
+
+  it("não mostra o rodapé quando todos os registros couberam na lista", () => {
+    setup([deal, unit], 2);
+    expect(screen.queryByText(/Mostrando \d+ de/i)).not.toBeInTheDocument();
+  });
+
+
   it("mostra estado vazio quando não há registros", () => {
     setup([], 0);
     expect(screen.getByText(/Nenhum registro neste agrupamento/i)).toBeInTheDocument();
