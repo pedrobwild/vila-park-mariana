@@ -136,14 +136,21 @@ export function buildMarketMetrics(
         aluguelM2 == null ? null : `${fmtBRLValue(aluguelM2, 2)}/m²`,
         "Aluguel mensal médio dividido pela área média do bairro.",
       ),
-      base(
-        "vacancia",
-        "Vacância entre inquilinos",
-        nOrNull(m?.vacancia_media_dias) == null
-          ? null
-          : `${fmtIntValue(nOrNull(m?.vacancia_media_dias))} dias`,
-        "Tempo médio que o imóvel fica vago entre um contrato e outro.",
-      ),
+      {
+        ...base(
+          "rentabilidade",
+          "Rentabilidade do aluguel",
+          rentabilidade == null
+            ? null
+            : `${rentabilidade.toLocaleString("pt-BR", {
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 1,
+              })}% a.a.`,
+          "Aluguel anual do bairro ÷ valor de venda do m². Rentabilidade bruta, antes de condomínio, IPTU, vacância e IR.",
+        ),
+        emptyHint: "Sem dados suficientes para este bairro.",
+      },
+
       base(
         "m2",
         "Valor do m²",
