@@ -397,8 +397,19 @@ export default function DealDetailSheet({
           <SheetDescription>{deal.title}</SheetDescription>
         </SheetHeader>
 
+        <DealMarketHeader
+          dealId={deal.id}
+          purpose={purpose}
+          bairro={dealBairro}
+          cidade={dealCidade}
+          onPurposeChange={(p) => {
+            setPurpose(p);
+            void reload();
+          }}
+        />
 
         <div className="mt-5 space-y-6">
+
           {/* Person */}
           <section className="rounded-lg border border-border/60 p-3 space-y-2 text-sm">
             <div className="flex items-center justify-between gap-2 flex-wrap">
