@@ -165,7 +165,7 @@ export default function DealMarketHeader({
                 <TooltipContent className="max-w-[260px] text-xs">
                   <p>{m.hint}</p>
                   <p className="mt-1 text-muted-foreground">
-                    Fonte: {m.fonte} · {bairro}
+                    Fonte: {m.fonte && m.fonte !== "—" ? m.fonte : "não informada"} · {bairro}
                     {fmtDateRef(m.dataReferencia)
                       ? ` · ref. ${fmtDateRef(m.dataReferencia)}`
                       : ""}
