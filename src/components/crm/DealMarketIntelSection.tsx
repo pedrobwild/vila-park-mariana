@@ -28,7 +28,10 @@ interface Props {
   bairro: string;
   cidade: string;
   purpose: DealPurpose | null;
+  /** Avisa que a análise foi regerada, para revalidar os dados do bairro no cabeçalho. */
+  onAnalysisRefreshed?: () => void;
 }
+
 
 const fmtDateTime = (iso: string) => {
   const d = new Date(iso);
