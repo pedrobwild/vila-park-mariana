@@ -106,7 +106,10 @@ export default function DealMarketIntelSection({
         });
         // Revalida os indicadores do bairro para que fontes e datas de
         // referência do cabeçalho fiquem coerentes com a análise exibida.
-        onAnalysisRefreshed?.();
+        onAnalysisRefreshed?.({
+          cached: data.cached === true,
+          generatedAt: data.generated_at,
+        });
       } catch (e) {
         toast.error("Não foi possível gerar a análise do bairro", {
           description: e instanceof Error ? e.message : "Tente novamente em alguns segundos.",
