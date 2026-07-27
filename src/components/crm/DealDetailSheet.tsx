@@ -169,6 +169,12 @@ export default function DealDetailSheet({
 
   if (!deal) return null;
 
+  const primaryUnit =
+    deal.deal_units.find((du) => du.is_primary)?.unit ?? deal.deal_units[0]?.unit ?? null;
+  const dealBairro = primaryUnit?.bairro || DEFAULT_BAIRRO;
+  const dealCidade = primaryUnit?.cidade || DEFAULT_CIDADE;
+
+
   const reload = async () => {
     await onReload();
     const { data } = await supabase
