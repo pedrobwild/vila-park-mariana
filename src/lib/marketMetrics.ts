@@ -28,6 +28,8 @@ export interface MarketMetric {
   hint: string;
   fonte: string;
   dataReferencia: string | null;
+  /** Texto do tooltip quando não há valor. */
+  emptyHint?: string;
 }
 
 const nOrNull = (v: unknown): number | null => {
@@ -123,6 +125,10 @@ export function buildMarketMetrics(
   if (purpose === "long_stay") {
     const aluguelM2 =
       aluguel != null && areaMedia != null && areaMedia > 0 ? aluguel / areaMedia : null;
+    const rentabilidade =
+      aluguelM2 != null && precoM2 != null && precoM2 > 0
+        ? ((aluguelM2 * 12) / precoM2) * 100
+        : null;
     return [
       base(
         "aluguel",
@@ -136,14 +142,21 @@ export function buildMarketMetrics(
         aluguelM2 == null ? null : `${fmtBRLValue(aluguelM2, 2)}/m²`,
         "Aluguel mensal médio dividido pela área média do bairro.",
       ),
-      base(
-        "vacancia",
-        "Vacância entre inquilinos",
-        nOrNull(m?.vacancia_media_dias) == null
-          ? null
-          : `${fmtIntValue(nOrNull(m?.vacancia_media_dias))} dias`,
-        "Tempo médio que o imóvel fica vago entre um contrato e outro.",
-      ),
+      {
+        ...base(
+          "rentabilidade",
+          "Rentabilidade do aluguel",
+          rentabilidade == null
+            ? null
+            : `${rentabilidade.toLocaleString("pt-BR", {
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 1,
+              })}% a.a.`,
+          "Aluguel anual do bairro ÷ valor de venda do m². Rentabilidade bruta, antes de condomínio, IPTU, vacância e IR.",
+        ),
+        emptyHint: "Sem dados suficientes para este bairro.",
+      },
+
       base(
         "m2",
         "Valor do m²",
