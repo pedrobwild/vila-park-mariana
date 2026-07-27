@@ -172,6 +172,45 @@ export default function DealMarketIntelSection({
         </div>
       </div>
 
+      {error && (
+        <div
+          role="alert"
+          className="flex flex-wrap items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/5 p-3"
+        >
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" aria-hidden="true" />
+          <div className="min-w-[12rem] flex-1">
+            <p className="text-xs font-medium text-destructive">
+              Não foi possível atualizar a análise do bairro
+            </p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              {error}
+              {insight
+                ? " Os dados exibidos continuam sendo os da última análise válida."
+                : ""}
+            </p>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8"
+            onClick={() => generate(lastAttemptRefresh)}
+            disabled={generating}
+          >
+            {generating ? (
+              <>
+                <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                Tentando…
+              </>
+            ) : (
+              <>
+                <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
+                Tentar novamente
+              </>
+            )}
+          </Button>
+        </div>
+      )}
+
       {loadingCache ? (
         <div className="h-20 animate-pulse rounded-lg bg-muted/50" aria-busy="true" />
       ) : !insight ? (
