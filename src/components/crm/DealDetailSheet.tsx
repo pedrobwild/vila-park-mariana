@@ -659,6 +659,7 @@ export default function DealDetailSheet({
             bairro={dealBairro}
             cidade={dealCidade}
             purpose={purpose}
+            dealId={deal?.id ?? null}
             onAnalysisRefreshed={(status) => {
               setMarketDataStatus(status);
               setMarketRefreshToken((n) => n + 1);

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, RefreshCw, Sparkles, ExternalLink, BarChart3, AlertTriangle } from "lucide-react";
 import { PURPOSE_SHORT_LABEL, type DealPurpose } from "@/lib/marketMetrics";
-import { logMarketIntelEvent } from "@/lib/marketIntelLog";
+import { logMarketIntelEvent, newCorrelationId } from "@/lib/marketIntelLog";
 
 interface Secao {
   id: string;
@@ -36,6 +36,8 @@ interface Props {
   bairro: string;
   cidade: string;
   purpose: DealPurpose | null;
+  /** Negócio de origem, registrado nos eventos de auditoria. */
+  dealId?: string | null;
   /** Avisa que a análise foi lida/regerada, para revalidar os dados do bairro no cabeçalho. */
   onAnalysisRefreshed?: (status: MarketDataStatus) => void;
 }
@@ -52,6 +54,7 @@ export default function DealMarketIntelSection({
   bairro,
   cidade,
   purpose,
+  dealId,
   onAnalysisRefreshed,
 }: Props) {
 
@@ -102,9 +105,10 @@ export default function DealMarketIntelSection({
       setLastAttemptRefresh(refresh);
       setError(null);
       const startedAt = performance.now();
+      const correlationId = newCorrelationId();
       try {
         const { data, error } = await supabase.functions.invoke("market-intel", {
-          body: { bairro, cidade, finalidade, structured: true, refresh },
+          body: { bairro, cidade, finalidade, structured: true, refresh, deal_id: dealId ?? null, correlation_id: correlationId },
         });
         if (error) throw error;
         if (!data?.success) throw new Error(data?.error || "Não foi possível gerar a análise.");
@@ -124,6 +128,8 @@ export default function DealMarketIntelSection({
           bairro,
           cidade,
           finalidade,
+          dealId,
+          correlationId,
           refresh,
           cached: data.cached === true,
           latencyMs: performance.now() - startedAt,
@@ -141,6 +147,8 @@ export default function DealMarketIntelSection({
           bairro,
           cidade,
           finalidade,
+          dealId,
+          correlationId,
           refresh,
           cached: null,
           latencyMs: performance.now() - startedAt,
@@ -151,7 +159,7 @@ export default function DealMarketIntelSection({
         setGenerating(false);
       }
     },
-    [bairro, cidade, finalidade, onAnalysisRefreshed],
+    [bairro, cidade, finalidade, dealId, onAnalysisRefreshed],
   );
 
 
