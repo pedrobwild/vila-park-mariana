@@ -659,7 +659,10 @@ export default function DealDetailSheet({
             bairro={dealBairro}
             cidade={dealCidade}
             purpose={purpose}
-            onAnalysisRefreshed={() => setMarketRefreshToken((n) => n + 1)}
+            onAnalysisRefreshed={(status) => {
+              setMarketDataStatus(status);
+              setMarketRefreshToken((n) => n + 1);
+            }}
           />
 
 
