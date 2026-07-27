@@ -97,6 +97,9 @@ export default function DealMarketIntelSection({
           generated_at: data.generated_at,
           cached: data.cached,
         });
+        // Revalida os indicadores do bairro para que fontes e datas de
+        // referência do cabeçalho fiquem coerentes com a análise exibida.
+        onAnalysisRefreshed?.();
       } catch (e) {
         toast.error("Não foi possível gerar a análise do bairro", {
           description: e instanceof Error ? e.message : "Tente novamente em alguns segundos.",
@@ -105,8 +108,9 @@ export default function DealMarketIntelSection({
         setGenerating(false);
       }
     },
-    [bairro, cidade, finalidade],
+    [bairro, cidade, finalidade, onAnalysisRefreshed],
   );
+
 
   const findFonte = (n: number) => insight?.sources.find((f) => f.n === n);
 
