@@ -96,6 +96,8 @@ export default function DealMarketIntelSection({
   const generate = useCallback(
     async (refresh: boolean) => {
       setGenerating(true);
+      setLastAttemptRefresh(refresh);
+      setError(null);
       try {
         const { data, error } = await supabase.functions.invoke("market-intel", {
           body: { bairro, cidade, finalidade, structured: true, refresh },
@@ -115,15 +117,20 @@ export default function DealMarketIntelSection({
           generatedAt: data.generated_at,
         });
       } catch (e) {
-        toast.error("Não foi possível gerar a análise do bairro", {
-          description: e instanceof Error ? e.message : "Tente novamente em alguns segundos.",
-        });
+        // Mantemos a última análise válida em tela (e, portanto, as fontes e
+        // datas dos tooltips do cabeçalho) — apenas sinalizamos a falha.
+        const description =
+          e instanceof Error ? e.message : "Tente novamente em alguns segundos.";
+        setError(description);
+        toast.error("Não foi possível atualizar a análise do bairro", { description });
       } finally {
         setGenerating(false);
       }
     },
     [bairro, cidade, finalidade, onAnalysisRefreshed],
   );
+
+
 
 
   const findFonte = (n: number) => insight?.sources.find((f) => f.n === n);
