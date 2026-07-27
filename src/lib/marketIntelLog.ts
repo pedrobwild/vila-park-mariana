@@ -1,0 +1,52 @@
+import { supabase } from "@/integrations/supabase/client";
+
+export interface MarketIntelEvent {
+  bairro: string;
+  cidade: string;
+  finalidade: string;
+  /** true = usuário pediu "Atualizar análise"; false = primeira geração. */
+  refresh: boolean;
+  /** true = resposta veio do cache; false = regerada agora; null quando falhou. */
+  cached: boolean | null;
+  /** Tempo total da chamada, em milissegundos. */
+  latencyMs: number;
+  success: boolean;
+  errorMessage?: string;
+  /** ISO da geração retornada pela análise, quando houver. */
+  generatedAt?: string;
+}
+
+/**
+ * Registra a tentativa de geração/atualização da análise de mercado em
+ * `audit_logs`, com origem (cache vs recarregado) e latência.
+ * Fire-and-forget: nunca interrompe o fluxo da UI.
+ */
+export async function logMarketIntelEvent(event: MarketIntelEvent): Promise<void> {
+  try {
+    const { data: userData } = await supabase.auth.getUser();
+    const user = userData.user;
+    if (!user) return;
+
+    await supabase.from("audit_logs").insert({
+      actor_id: user.id,
+      actor_email: user.email ?? null,
+      action: event.refresh ? "market_intel_refresh" : "market_intel_generate",
+      entity: "market_insights",
+      entity_id: `${event.cidade}/${event.bairro}/${event.finalidade}`,
+      metadata: {
+        bairro: event.bairro,
+        cidade: event.cidade,
+        finalidade: event.finalidade,
+        refresh: event.refresh,
+        origem: event.cached === null ? "erro" : event.cached ? "cache" : "recarregado",
+        cached: event.cached,
+        latency_ms: Math.round(event.latencyMs),
+        success: event.success,
+        error: event.errorMessage ?? null,
+        generated_at: event.generatedAt ?? null,
+      },
+    });
+  } catch {
+    // Log é best-effort; falhas aqui não afetam a análise exibida.
+  }
+}
