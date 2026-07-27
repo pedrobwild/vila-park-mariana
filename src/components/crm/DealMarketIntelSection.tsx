@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, RefreshCw, Sparkles, ExternalLink, BarChart3 } from "lucide-react";
+import { Loader2, RefreshCw, Sparkles, ExternalLink, BarChart3, AlertTriangle } from "lucide-react";
 import { PURPOSE_SHORT_LABEL, type DealPurpose } from "@/lib/marketMetrics";
 
 interface Secao {
