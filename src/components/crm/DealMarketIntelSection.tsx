@@ -24,12 +24,19 @@ interface Insight {
   cached?: boolean;
 }
 
+export interface MarketDataStatus {
+  /** true = veio do cache do banco; false = regerada agora. */
+  cached: boolean;
+  /** ISO da geração/atualização da análise. */
+  generatedAt: string;
+}
+
 interface Props {
   bairro: string;
   cidade: string;
   purpose: DealPurpose | null;
-  /** Avisa que a análise foi regerada, para revalidar os dados do bairro no cabeçalho. */
-  onAnalysisRefreshed?: () => void;
+  /** Avisa que a análise foi lida/regerada, para revalidar os dados do bairro no cabeçalho. */
+  onAnalysisRefreshed?: (status: MarketDataStatus) => void;
 }
 
 
