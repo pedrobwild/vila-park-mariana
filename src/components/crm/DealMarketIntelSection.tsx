@@ -40,7 +40,13 @@ const fmtDateTime = (iso: string) => {
     : d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
 };
 
-export default function DealMarketIntelSection({ bairro, cidade, purpose }: Props) {
+export default function DealMarketIntelSection({
+  bairro,
+  cidade,
+  purpose,
+  onAnalysisRefreshed,
+}: Props) {
+
   const finalidade = purpose ?? "geral";
   const [insight, setInsight] = useState<Insight | null>(null);
   const [loadingCache, setLoadingCache] = useState(true);
