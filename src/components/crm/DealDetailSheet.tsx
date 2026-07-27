@@ -425,6 +425,7 @@ export default function DealDetailSheet({
           bairro={dealBairro}
           cidade={dealCidade}
           refreshToken={marketRefreshToken}
+          dataStatus={marketDataStatus}
           onPurposeChange={(p) => {
             setPurpose(p);
             void reload();
