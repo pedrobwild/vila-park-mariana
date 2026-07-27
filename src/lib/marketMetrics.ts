@@ -28,6 +28,8 @@ export interface MarketMetric {
   hint: string;
   fonte: string;
   dataReferencia: string | null;
+  /** Texto do tooltip quando não há valor. */
+  emptyHint?: string;
 }
 
 const nOrNull = (v: unknown): number | null => {
