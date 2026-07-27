@@ -237,9 +237,11 @@ export default function DealMarketIntelSection({
           )}
 
           <p className="text-[10px] text-muted-foreground">
-            Análise gerada em {fmtDateTime(insight.generated_at)} · conteúdo produzido por IA a
-            partir de fontes públicas — confira antes de usar com o cliente.
+            Análise gerada em {fmtDateTime(insight.generated_at)}
+            {insight.cached ? " · versão em cache" : " · atualizada agora"} · conteúdo produzido
+            por IA a partir de fontes públicas — confira antes de usar com o cliente.
           </p>
+
         </div>
       )}
     </section>
