@@ -91,6 +91,10 @@ import ProposalsSection from "./ProposalsSection";
 import DealTasksSection from "./DealTasksSection";
 import DealCreditSection from "./DealCreditSection";
 import DealCommissionSection from "./DealCommissionSection";
+import DealMarketHeader from "./DealMarketHeader";
+import DealMarketIntelSection from "./DealMarketIntelSection";
+import { DEFAULT_BAIRRO, DEFAULT_CIDADE, type DealPurpose } from "@/lib/marketMetrics";
+
 import LossReasonDialog from "./LossReasonDialog";
 import {
   DropdownMenu,
