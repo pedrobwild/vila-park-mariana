@@ -58,6 +58,8 @@ export default function DealMarketIntelSection({
   const [insight, setInsight] = useState<Insight | null>(null);
   const [loadingCache, setLoadingCache] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [lastAttemptRefresh, setLastAttemptRefresh] = useState(false);
   const refreshedCbRef = useRef(onAnalysisRefreshed);
   refreshedCbRef.current = onAnalysisRefreshed;
 
