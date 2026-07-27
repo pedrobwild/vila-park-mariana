@@ -37,8 +37,38 @@ describe("buildMarketMetrics · rentabilidade do aluguel (long stay)", () => {
     expect(find(m)?.value).toBeNull();
   });
 
+  it("retorna null quando o preço do m² é 0", () => {
+    const m = { ...base, preco_m2_brl: 0 } as unknown as NeighborhoodMetrics;
+    expect(find(m)?.value).toBeNull();
+  });
+
+  it("retorna null quando o preço do m² é negativo", () => {
+    const m = { ...base, preco_m2_brl: -5000 } as unknown as NeighborhoodMetrics;
+    expect(find(m)?.value).toBeNull();
+  });
+
   it("retorna null quando falta o aluguel", () => {
     const m = { ...base, aluguel_mensal_brl: null } as unknown as NeighborhoodMetrics;
+    expect(find(m)?.value).toBeNull();
+  });
+
+  it("retorna null quando o aluguel é 0", () => {
+    const m = { ...base, aluguel_mensal_brl: 0 } as unknown as NeighborhoodMetrics;
+    expect(find(m)?.value).toBeNull();
+  });
+
+  it("retorna null quando o aluguel é negativo", () => {
+    const m = { ...base, aluguel_mensal_brl: -1000 } as unknown as NeighborhoodMetrics;
+    expect(find(m)?.value).toBeNull();
+  });
+
+  it("retorna null quando a área média é 0", () => {
+    const m = { ...base, area_media_m2: 0 } as unknown as NeighborhoodMetrics;
+    expect(find(m)?.value).toBeNull();
+  });
+
+  it("retorna null quando a área média é negativa", () => {
+    const m = { ...base, area_media_m2: -10 } as unknown as NeighborhoodMetrics;
     expect(find(m)?.value).toBeNull();
   });
 
@@ -48,6 +78,11 @@ describe("buildMarketMetrics · rentabilidade do aluguel (long stay)", () => {
 
   it("expõe tooltip de ausência de dados", () => {
     expect(find(null)?.emptyHint).toBe("Sem dados suficientes para este bairro.");
+  });
+
+  it("mantém tooltip de dados insuficientes quando insumos são zero", () => {
+    const m = { ...base, aluguel_mensal_brl: 0, preco_m2_brl: 0 } as unknown as NeighborhoodMetrics;
+    expect(find(m)?.emptyHint).toBe("Sem dados suficientes para este bairro.");
   });
 
   it("não expõe mais o card de vacância", () => {
