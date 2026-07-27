@@ -155,8 +155,9 @@ export default function DealMarketHeader({
                       ? `Fonte: ${m.fonte} · ${bairro}${
                           fmtDateRef(m.dataReferencia) ? ` · ref. ${fmtDateRef(m.dataReferencia)}` : ""
                         }`
-                      : "Sem dados para este bairro."}
+                      : (m.emptyHint ?? "Sem dados para este bairro.")}
                   </p>
+
                 </TooltipContent>
               </Tooltip>
             ))}
