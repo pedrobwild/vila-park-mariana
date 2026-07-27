@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, RefreshCw, Sparkles, ExternalLink, BarChart3 } from "lucide-react";
+import { Loader2, RefreshCw, Sparkles, ExternalLink, BarChart3, AlertTriangle } from "lucide-react";
 import { PURPOSE_SHORT_LABEL, type DealPurpose } from "@/lib/marketMetrics";
 
 interface Secao {
@@ -58,6 +58,8 @@ export default function DealMarketIntelSection({
   const [insight, setInsight] = useState<Insight | null>(null);
   const [loadingCache, setLoadingCache] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [lastAttemptRefresh, setLastAttemptRefresh] = useState(false);
   const refreshedCbRef = useRef(onAnalysisRefreshed);
   refreshedCbRef.current = onAnalysisRefreshed;
 
@@ -96,6 +98,8 @@ export default function DealMarketIntelSection({
   const generate = useCallback(
     async (refresh: boolean) => {
       setGenerating(true);
+      setLastAttemptRefresh(refresh);
+      setError(null);
       try {
         const { data, error } = await supabase.functions.invoke("market-intel", {
           body: { bairro, cidade, finalidade, structured: true, refresh },
@@ -115,15 +119,20 @@ export default function DealMarketIntelSection({
           generatedAt: data.generated_at,
         });
       } catch (e) {
-        toast.error("Não foi possível gerar a análise do bairro", {
-          description: e instanceof Error ? e.message : "Tente novamente em alguns segundos.",
-        });
+        // Mantemos a última análise válida em tela (e, portanto, as fontes e
+        // datas dos tooltips do cabeçalho) — apenas sinalizamos a falha.
+        const description =
+          e instanceof Error ? e.message : "Tente novamente em alguns segundos.";
+        setError(description);
+        toast.error("Não foi possível atualizar a análise do bairro", { description });
       } finally {
         setGenerating(false);
       }
     },
     [bairro, cidade, finalidade, onAnalysisRefreshed],
   );
+
+
 
 
   const findFonte = (n: number) => insight?.sources.find((f) => f.n === n);
@@ -162,6 +171,45 @@ export default function DealMarketIntelSection({
           )}
         </div>
       </div>
+
+      {error && (
+        <div
+          role="alert"
+          className="flex flex-wrap items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/5 p-3"
+        >
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" aria-hidden="true" />
+          <div className="min-w-[12rem] flex-1">
+            <p className="text-xs font-medium text-destructive">
+              Não foi possível atualizar a análise do bairro
+            </p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              {error}
+              {insight
+                ? " Os dados exibidos continuam sendo os da última análise válida."
+                : ""}
+            </p>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8"
+            onClick={() => generate(lastAttemptRefresh)}
+            disabled={generating}
+          >
+            {generating ? (
+              <>
+                <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                Tentando…
+              </>
+            ) : (
+              <>
+                <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
+                Tentar novamente
+              </>
+            )}
+          </Button>
+        </div>
+      )}
 
       {loadingCache ? (
         <div className="h-20 animate-pulse rounded-lg bg-muted/50" aria-busy="true" />
