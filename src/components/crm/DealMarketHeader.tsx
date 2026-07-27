@@ -31,7 +31,22 @@ interface Props {
   onPurposeChange: (p: DealPurpose) => void;
   /** Muda de valor para forçar releitura dos dados do bairro (ex.: após "Atualizar análise"). */
   refreshToken?: number;
+  /** Origem/horário da análise exibida: cache do banco ou atualização recém-feita. */
+  dataStatus?: { cached: boolean; generatedAt: string } | null;
 }
+
+const fmtTime = (iso: string) => {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime())
+    ? null
+    : d.toLocaleString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+};
 
 export default function DealMarketHeader({
   dealId,
@@ -40,6 +55,7 @@ export default function DealMarketHeader({
   cidade,
   onPurposeChange,
   refreshToken = 0,
+  dataStatus = null,
 }: Props) {
   const [metrics, setMetrics] = useState<NeighborhoodMetrics | null>(null);
   const [loading, setLoading] = useState(true);
