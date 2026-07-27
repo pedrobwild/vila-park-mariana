@@ -91,6 +91,10 @@ import ProposalsSection from "./ProposalsSection";
 import DealTasksSection from "./DealTasksSection";
 import DealCreditSection from "./DealCreditSection";
 import DealCommissionSection from "./DealCommissionSection";
+import DealMarketHeader from "./DealMarketHeader";
+import DealMarketIntelSection from "./DealMarketIntelSection";
+import { DEFAULT_BAIRRO, DEFAULT_CIDADE, type DealPurpose } from "@/lib/marketMetrics";
+
 import LossReasonDialog from "./LossReasonDialog";
 import {
   DropdownMenu,
@@ -140,6 +144,11 @@ export default function DealDetailSheet({
   const [updateUnitStatus, setUpdateUnitStatus] = useState(true);
   const [lostReason, setLostReason] = useState("");
   const [lossStage, setLossStage] = useState<CrmStageRow | null>(null);
+  const [purpose, setPurpose] = useState<DealPurpose | null>(deal?.finalidade ?? null);
+
+  useEffect(() => {
+    setPurpose(deal?.finalidade ?? null);
+  }, [deal?.id, deal?.finalidade]);
 
   useEffect(() => {
     if (!deal) return;
@@ -155,6 +164,7 @@ export default function DealDetailSheet({
       });
   }, [deal?.id]);
 
+
   const availableUnits = useMemo(() => {
     if (!deal) return [];
     const linked = new Set(deal.deal_units.map((du) => du.unit_id));
@@ -162,6 +172,12 @@ export default function DealDetailSheet({
   }, [deal, units]);
 
   if (!deal) return null;
+
+  const primaryUnit =
+    deal.deal_units.find((du) => du.is_primary)?.unit ?? deal.deal_units[0]?.unit ?? null;
+  const dealBairro = primaryUnit?.bairro || DEFAULT_BAIRRO;
+  const dealCidade = primaryUnit?.cidade || DEFAULT_CIDADE;
+
 
   const reload = async () => {
     await onReload();
@@ -397,8 +413,19 @@ export default function DealDetailSheet({
           <SheetDescription>{deal.title}</SheetDescription>
         </SheetHeader>
 
+        <DealMarketHeader
+          dealId={deal.id}
+          purpose={purpose}
+          bairro={dealBairro}
+          cidade={dealCidade}
+          onPurposeChange={(p) => {
+            setPurpose(p);
+            void reload();
+          }}
+        />
 
         <div className="mt-5 space-y-6">
+
           {/* Person */}
           <section className="rounded-lg border border-border/60 p-3 space-y-2 text-sm">
             <div className="flex items-center justify-between gap-2 flex-wrap">
@@ -618,6 +645,16 @@ export default function DealDetailSheet({
           />
 
           <Separator />
+
+          <DealMarketIntelSection
+            bairro={dealBairro}
+            cidade={dealCidade}
+            purpose={purpose}
+          />
+
+          <Separator />
+
+
 
 
 

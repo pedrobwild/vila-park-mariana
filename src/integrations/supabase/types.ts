@@ -495,6 +495,7 @@ export type Database = {
           broker_id: string | null
           created_at: string
           expected_close_date: string | null
+          finalidade: Database["public"]["Enums"]["crm_deal_purpose"] | null
           id: string
           loss_reason_id: string | null
           lost_reason: string | null
@@ -513,6 +514,7 @@ export type Database = {
           broker_id?: string | null
           created_at?: string
           expected_close_date?: string | null
+          finalidade?: Database["public"]["Enums"]["crm_deal_purpose"] | null
           id?: string
           loss_reason_id?: string | null
           lost_reason?: string | null
@@ -531,6 +533,7 @@ export type Database = {
           broker_id?: string | null
           created_at?: string
           expected_close_date?: string | null
+          finalidade?: Database["public"]["Enums"]["crm_deal_purpose"] | null
           id?: string
           loss_reason_id?: string | null
           lost_reason?: string | null
@@ -1202,6 +1205,105 @@ export type Database = {
         }
         Relationships: []
       }
+      market_insights: {
+        Row: {
+          bairro: string
+          cidade: string
+          created_at: string
+          finalidade: string
+          generated_at: string
+          id: string
+          model: string | null
+          payload: Json
+          sources: Json
+          updated_at: string
+        }
+        Insert: {
+          bairro: string
+          cidade?: string
+          created_at?: string
+          finalidade?: string
+          generated_at?: string
+          id?: string
+          model?: string | null
+          payload?: Json
+          sources?: Json
+          updated_at?: string
+        }
+        Update: {
+          bairro?: string
+          cidade?: string
+          created_at?: string
+          finalidade?: string
+          generated_at?: string
+          id?: string
+          model?: string | null
+          payload?: Json
+          sources?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      market_neighborhood_metrics: {
+        Row: {
+          adr_medio_brl: number | null
+          aluguel_mensal_brl: number | null
+          anuncios_ativos: number | null
+          anuncios_studio_1q: number | null
+          area_media_m2: number | null
+          bairro: string
+          cidade: string
+          created_at: string
+          data_referencia: string
+          dias_medio_venda: number | null
+          fonte: string
+          id: string
+          ocupacao_media_pct: number | null
+          preco_m2_brl: number | null
+          updated_at: string
+          vacancia_media_dias: number | null
+          valorizacao_12m_pct: number | null
+        }
+        Insert: {
+          adr_medio_brl?: number | null
+          aluguel_mensal_brl?: number | null
+          anuncios_ativos?: number | null
+          anuncios_studio_1q?: number | null
+          area_media_m2?: number | null
+          bairro: string
+          cidade?: string
+          created_at?: string
+          data_referencia?: string
+          dias_medio_venda?: number | null
+          fonte?: string
+          id?: string
+          ocupacao_media_pct?: number | null
+          preco_m2_brl?: number | null
+          updated_at?: string
+          vacancia_media_dias?: number | null
+          valorizacao_12m_pct?: number | null
+        }
+        Update: {
+          adr_medio_brl?: number | null
+          aluguel_mensal_brl?: number | null
+          anuncios_ativos?: number | null
+          anuncios_studio_1q?: number | null
+          area_media_m2?: number | null
+          bairro?: string
+          cidade?: string
+          created_at?: string
+          data_referencia?: string
+          dias_medio_venda?: number | null
+          fonte?: string
+          id?: string
+          ocupacao_media_pct?: number | null
+          preco_m2_brl?: number | null
+          updated_at?: string
+          vacancia_media_dias?: number | null
+          valorizacao_12m_pct?: number | null
+        }
+        Relationships: []
+      }
       unit_plantas: {
         Row: {
           created_at: string
@@ -1253,7 +1355,9 @@ export type Database = {
       units: {
         Row: {
           area_m2: number
+          bairro: string | null
           block: string
+          cidade: string | null
           code: string
           created_at: string
           id: string
@@ -1265,7 +1369,9 @@ export type Database = {
         }
         Insert: {
           area_m2: number
+          bairro?: string | null
           block: string
+          cidade?: string | null
           code: string
           created_at?: string
           id?: string
@@ -1277,7 +1383,9 @@ export type Database = {
         }
         Update: {
           area_m2?: number
+          bairro?: string | null
           block?: string
+          cidade?: string | null
           code?: string
           created_at?: string
           id?: string
@@ -1423,6 +1531,7 @@ export type Database = {
         | "aprovada"
         | "aprovada_parcial"
         | "reprovada"
+      crm_deal_purpose: "short_stay" | "long_stay" | "moradia"
       crm_interest_level: "alta" | "media" | "baixa"
       crm_source:
         | "indicacao"
@@ -1599,6 +1708,7 @@ export const Constants = {
         "aprovada_parcial",
         "reprovada",
       ],
+      crm_deal_purpose: ["short_stay", "long_stay", "moradia"],
       crm_interest_level: ["alta", "media", "baixa"],
       crm_source: [
         "indicacao",
