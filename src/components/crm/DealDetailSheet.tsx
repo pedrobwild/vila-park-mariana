@@ -418,11 +418,13 @@ export default function DealDetailSheet({
           purpose={purpose}
           bairro={dealBairro}
           cidade={dealCidade}
+          refreshToken={marketRefreshToken}
           onPurposeChange={(p) => {
             setPurpose(p);
             void reload();
           }}
         />
+
 
         <div className="mt-5 space-y-6">
 
