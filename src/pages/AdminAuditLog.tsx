@@ -222,7 +222,9 @@ export default function AdminAuditLog() {
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-6">
+        <AuditMetricsSummary />
         <div className="mb-4 grid gap-3 md:grid-cols-[1fr_auto_auto_auto] md:items-center">
+
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
