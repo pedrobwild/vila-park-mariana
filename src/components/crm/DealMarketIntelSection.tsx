@@ -100,6 +100,7 @@ export default function DealMarketIntelSection({
       setGenerating(true);
       setLastAttemptRefresh(refresh);
       setError(null);
+      const startedAt = performance.now();
       try {
         const { data, error } = await supabase.functions.invoke("market-intel", {
           body: { bairro, cidade, finalidade, structured: true, refresh },
@@ -118,6 +119,16 @@ export default function DealMarketIntelSection({
           cached: data.cached === true,
           generatedAt: data.generated_at,
         });
+        void logMarketIntelEvent({
+          bairro,
+          cidade,
+          finalidade,
+          refresh,
+          cached: data.cached === true,
+          latencyMs: performance.now() - startedAt,
+          success: true,
+          generatedAt: data.generated_at,
+        });
       } catch (e) {
         // Mantemos a última análise válida em tela (e, portanto, as fontes e
         // datas dos tooltips do cabeçalho) — apenas sinalizamos a falha.
@@ -125,12 +136,23 @@ export default function DealMarketIntelSection({
           e instanceof Error ? e.message : "Tente novamente em alguns segundos.";
         setError(description);
         toast.error("Não foi possível atualizar a análise do bairro", { description });
+        void logMarketIntelEvent({
+          bairro,
+          cidade,
+          finalidade,
+          refresh,
+          cached: null,
+          latencyMs: performance.now() - startedAt,
+          success: false,
+          errorMessage: description,
+        });
       } finally {
         setGenerating(false);
       }
     },
     [bairro, cidade, finalidade, onAnalysisRefreshed],
   );
+
 
 
 
