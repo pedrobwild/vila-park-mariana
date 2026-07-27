@@ -125,6 +125,10 @@ export function buildMarketMetrics(
   if (purpose === "long_stay") {
     const aluguelM2 =
       aluguel != null && areaMedia != null && areaMedia > 0 ? aluguel / areaMedia : null;
+    const rentabilidade =
+      aluguelM2 != null && precoM2 != null && precoM2 > 0
+        ? ((aluguelM2 * 12) / precoM2) * 100
+        : null;
     return [
       base(
         "aluguel",
