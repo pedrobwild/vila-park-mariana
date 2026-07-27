@@ -646,6 +646,16 @@ export default function DealDetailSheet({
 
           <Separator />
 
+          <DealMarketIntelSection
+            bairro={dealBairro}
+            cidade={dealCidade}
+            purpose={purpose}
+          />
+
+          <Separator />
+
+
+
 
 
           {/* Activity form */}
