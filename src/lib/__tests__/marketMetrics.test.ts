@@ -88,4 +88,24 @@ describe("buildMarketMetrics · rentabilidade do aluguel (long stay)", () => {
   it("não expõe mais o card de vacância", () => {
     expect(buildMarketMetrics("long_stay", base).map((m) => m.key)).not.toContain("vacancia");
   });
+
+  it("inclui a fórmula por extenso e a nota de rentabilidade bruta no tooltip", () => {
+    const metric = find(base);
+    expect(metric?.hint).toContain("Aluguel anual do bairro ÷ valor de venda do m²");
+    expect(metric?.hint).toContain("Rentabilidade bruta, antes de condomínio, IPTU, vacância e IR");
+  });
+
+  it("expõe a data de referência no tooltip quando há dados do bairro", () => {
+    const metric = find(base);
+    expect(metric?.dataReferencia).toBe("2026-07-01");
+  });
+
+  it("mantém a fórmula, a nota e a data de referência no tooltip mesmo sem valor calculável", () => {
+    const m = { ...base, aluguel_mensal_brl: 0, preco_m2_brl: 0 } as unknown as NeighborhoodMetrics;
+    const metric = find(m);
+    expect(metric?.hint).toContain("Aluguel anual do bairro ÷ valor de venda do m²");
+    expect(metric?.hint).toContain("Rentabilidade bruta");
+    expect(metric?.dataReferencia).toBe("2026-07-01");
+    expect(metric?.emptyHint).toBe("Sem dados suficientes para este bairro.");
+  });
 });
