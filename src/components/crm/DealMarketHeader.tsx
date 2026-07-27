@@ -47,7 +47,14 @@ export default function DealMarketHeader({
 
   useEffect(() => {
     let alive = true;
-    setLoading(true);
+    // Só mostra esqueleto na primeira carga do bairro: em recargas (cache/
+    // "Atualizar análise") mantemos os valores atuais para que fonte e data
+    // de referência continuem visíveis no tooltip enquanto revalidamos.
+    setMetrics((prev) => {
+      if (prev && prev.bairro === bairro && prev.cidade === cidade) return prev;
+      setLoading(true);
+      return null;
+    });
     supabase
       .from("market_neighborhood_metrics")
       .select("*")
@@ -56,13 +63,16 @@ export default function DealMarketHeader({
       .maybeSingle()
       .then(({ data }) => {
         if (!alive) return;
-        setMetrics((data ?? null) as NeighborhoodMetrics | null);
+        // Só substitui o que já está em tela quando a releitura traz dados;
+        // assim uma resposta vazia transitória não apaga fonte/data de ref.
+        setMetrics((prev) => ((data as NeighborhoodMetrics | null) ?? (prev?.bairro === bairro && prev?.cidade === cidade ? prev : null)));
         setLoading(false);
       });
     return () => {
       alive = false;
     };
   }, [bairro, cidade, refreshToken]);
+
 
 
   const savePurpose = async (p: DealPurpose) => {
