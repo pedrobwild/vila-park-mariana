@@ -148,16 +148,19 @@ export default function DealMarketHeader({
                     )}
                   </div>
                 </TooltipTrigger>
-                <TooltipContent className="max-w-[240px] text-xs">
+                <TooltipContent className="max-w-[260px] text-xs">
                   <p>{m.hint}</p>
                   <p className="mt-1 text-muted-foreground">
-                    {m.value
-                      ? `Fonte: ${m.fonte} · ${bairro}${
-                          fmtDateRef(m.dataReferencia) ? ` · ref. ${fmtDateRef(m.dataReferencia)}` : ""
-                        }`
-                      : (m.emptyHint ?? "Sem dados para este bairro.")}
+                    Fonte: {m.fonte} · {bairro}
+                    {fmtDateRef(m.dataReferencia)
+                      ? ` · ref. ${fmtDateRef(m.dataReferencia)}`
+                      : ""}
                   </p>
-
+                  {!m.value && (
+                    <p className="mt-1 text-muted-foreground">
+                      {m.emptyHint ?? "Sem dados para este bairro."}
+                    </p>
+                  )}
                 </TooltipContent>
               </Tooltip>
             ))}
