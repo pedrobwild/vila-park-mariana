@@ -140,6 +140,11 @@ export default function DealDetailSheet({
   const [updateUnitStatus, setUpdateUnitStatus] = useState(true);
   const [lostReason, setLostReason] = useState("");
   const [lossStage, setLossStage] = useState<CrmStageRow | null>(null);
+  const [purpose, setPurpose] = useState<DealPurpose | null>(deal?.finalidade ?? null);
+
+  useEffect(() => {
+    setPurpose(deal?.finalidade ?? null);
+  }, [deal?.id, deal?.finalidade]);
 
   useEffect(() => {
     if (!deal) return;
@@ -154,6 +159,7 @@ export default function DealDetailSheet({
         setLoadingAct(false);
       });
   }, [deal?.id]);
+
 
   const availableUnits = useMemo(() => {
     if (!deal) return [];
