@@ -58,6 +58,8 @@ export default function DealMarketIntelSection({
   const [insight, setInsight] = useState<Insight | null>(null);
   const [loadingCache, setLoadingCache] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const refreshedCbRef = useRef(onAnalysisRefreshed);
+  refreshedCbRef.current = onAnalysisRefreshed;
 
   // Lê o cache do banco (sem custo de API)
   useEffect(() => {
