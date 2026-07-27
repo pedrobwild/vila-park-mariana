@@ -146,6 +146,10 @@ export default function DealDetailSheet({
   const [lossStage, setLossStage] = useState<CrmStageRow | null>(null);
   const [purpose, setPurpose] = useState<DealPurpose | null>(deal?.finalidade ?? null);
   const [marketRefreshToken, setMarketRefreshToken] = useState(0);
+  const [marketDataStatus, setMarketDataStatus] = useState<{
+    cached: boolean;
+    generatedAt: string;
+  } | null>(null);
 
 
   useEffect(() => {
@@ -421,6 +425,7 @@ export default function DealDetailSheet({
           bairro={dealBairro}
           cidade={dealCidade}
           refreshToken={marketRefreshToken}
+          dataStatus={marketDataStatus}
           onPurposeChange={(p) => {
             setPurpose(p);
             void reload();
@@ -654,7 +659,10 @@ export default function DealDetailSheet({
             bairro={dealBairro}
             cidade={dealCidade}
             purpose={purpose}
-            onAnalysisRefreshed={() => setMarketRefreshToken((n) => n + 1)}
+            onAnalysisRefreshed={(status) => {
+              setMarketDataStatus(status);
+              setMarketRefreshToken((n) => n + 1);
+            }}
           />
 
 

@@ -31,7 +31,22 @@ interface Props {
   onPurposeChange: (p: DealPurpose) => void;
   /** Muda de valor para forçar releitura dos dados do bairro (ex.: após "Atualizar análise"). */
   refreshToken?: number;
+  /** Origem/horário da análise exibida: cache do banco ou atualização recém-feita. */
+  dataStatus?: { cached: boolean; generatedAt: string } | null;
 }
+
+const fmtTime = (iso: string) => {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime())
+    ? null
+    : d.toLocaleString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+};
 
 export default function DealMarketHeader({
   dealId,
@@ -40,6 +55,7 @@ export default function DealMarketHeader({
   cidade,
   onPurposeChange,
   refreshToken = 0,
+  dataStatus = null,
 }: Props) {
   const [metrics, setMetrics] = useState<NeighborhoodMetrics | null>(null);
   const [loading, setLoading] = useState(true);
@@ -160,6 +176,14 @@ export default function DealMarketHeader({
                         <span className="italic">sem dados</span>
                       </p>
                     )}
+                    {m.key === "rentabilidade" && dataStatus && (
+                      <p className="mt-1 text-[10px] leading-tight text-muted-foreground">
+                        {dataStatus.cached ? "Dados do cache" : "Atualizado agora"}
+                        {fmtTime(dataStatus.generatedAt)
+                          ? ` · ${fmtTime(dataStatus.generatedAt)}`
+                          : ""}
+                      </p>
+                    )}
                   </div>
                 </TooltipTrigger>
                 <TooltipContent className="max-w-[260px] text-xs">
@@ -170,12 +194,28 @@ export default function DealMarketHeader({
                       ? ` · ref. ${fmtDateRef(m.dataReferencia)}`
                       : ""}
                   </p>
+                  {m.key === "rentabilidade" && (
+                    <p className="mt-1 text-muted-foreground">
+                      {dataStatus
+                        ? `${
+                            dataStatus.cached
+                              ? "Indicadores lidos do cache da análise"
+                              : "Indicadores revalidados nesta atualização"
+                          }${
+                            fmtTime(dataStatus.generatedAt)
+                              ? ` · última atualização em ${fmtTime(dataStatus.generatedAt)}`
+                              : ""
+                          }`
+                        : "Sem análise carregada ainda para este bairro."}
+                    </p>
+                  )}
                   {!m.value && (
                     <p className="mt-1 text-muted-foreground">
                       {m.emptyHint ?? "Sem dados para este bairro."}
                     </p>
                   )}
                 </TooltipContent>
+
               </Tooltip>
             ))}
           </div>

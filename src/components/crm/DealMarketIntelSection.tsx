@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -24,12 +24,19 @@ interface Insight {
   cached?: boolean;
 }
 
+export interface MarketDataStatus {
+  /** true = veio do cache do banco; false = regerada agora. */
+  cached: boolean;
+  /** ISO da geração/atualização da análise. */
+  generatedAt: string;
+}
+
 interface Props {
   bairro: string;
   cidade: string;
   purpose: DealPurpose | null;
-  /** Avisa que a análise foi regerada, para revalidar os dados do bairro no cabeçalho. */
-  onAnalysisRefreshed?: () => void;
+  /** Avisa que a análise foi lida/regerada, para revalidar os dados do bairro no cabeçalho. */
+  onAnalysisRefreshed?: (status: MarketDataStatus) => void;
 }
 
 
@@ -51,6 +58,8 @@ export default function DealMarketIntelSection({
   const [insight, setInsight] = useState<Insight | null>(null);
   const [loadingCache, setLoadingCache] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const refreshedCbRef = useRef(onAnalysisRefreshed);
+  refreshedCbRef.current = onAnalysisRefreshed;
 
   // Lê o cache do banco (sem custo de API)
   useEffect(() => {
@@ -74,6 +83,8 @@ export default function DealMarketIntelSection({
             generated_at: data.generated_at,
             cached: true,
           });
+          // Informa o cabeçalho que a análise exibida veio do cache.
+          refreshedCbRef.current?.({ cached: true, generatedAt: data.generated_at });
         }
         setLoadingCache(false);
       });
@@ -99,7 +110,10 @@ export default function DealMarketIntelSection({
         });
         // Revalida os indicadores do bairro para que fontes e datas de
         // referência do cabeçalho fiquem coerentes com a análise exibida.
-        onAnalysisRefreshed?.();
+        onAnalysisRefreshed?.({
+          cached: data.cached === true,
+          generatedAt: data.generated_at,
+        });
       } catch (e) {
         toast.error("Não foi possível gerar a análise do bairro", {
           description: e instanceof Error ? e.message : "Tente novamente em alguns segundos.",
