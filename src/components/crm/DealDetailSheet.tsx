@@ -654,7 +654,9 @@ export default function DealDetailSheet({
             bairro={dealBairro}
             cidade={dealCidade}
             purpose={purpose}
+            onAnalysisRefreshed={() => setMarketRefreshToken((n) => n + 1)}
           />
+
 
           <Separator />
 
