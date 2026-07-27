@@ -81,6 +81,8 @@ export default function DealMarketIntelSection({
             generated_at: data.generated_at,
             cached: true,
           });
+          // Informa o cabeçalho que a análise exibida veio do cache.
+          refreshedCbRef.current?.({ cached: true, generatedAt: data.generated_at });
         }
         setLoadingCache(false);
       });
