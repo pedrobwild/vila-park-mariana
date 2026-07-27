@@ -26,6 +26,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import AuditMetricsSummary from "@/components/admin/AuditMetricsSummary";
+
 
 interface AuditLog {
   id: string;
