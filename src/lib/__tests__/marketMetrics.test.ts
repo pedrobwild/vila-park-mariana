@@ -26,6 +26,12 @@ describe("buildMarketMetrics · rentabilidade do aluguel (long stay)", () => {
     expect(find(m)?.value).toBe("5,1% a.a.");
   });
 
+  it("exibe o yield com separador decimal PT-BR e exatamente 1 casa decimal", () => {
+    const m = { ...base, aluguel_mensal_brl: 2150 } as NeighborhoodMetrics;
+    // 53,75/m² → 645 ÷ 12000 = 5,375% → arredonda para 5,4%
+    expect(find(m)?.value).toBe("5,4% a.a.");
+  });
+
   it("retorna null quando falta o preço do m²", () => {
     const m = { ...base, preco_m2_brl: null } as unknown as NeighborhoodMetrics;
     expect(find(m)?.value).toBeNull();
