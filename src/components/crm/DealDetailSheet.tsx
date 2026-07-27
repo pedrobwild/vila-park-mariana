@@ -145,6 +145,8 @@ export default function DealDetailSheet({
   const [lostReason, setLostReason] = useState("");
   const [lossStage, setLossStage] = useState<CrmStageRow | null>(null);
   const [purpose, setPurpose] = useState<DealPurpose | null>(deal?.finalidade ?? null);
+  const [marketRefreshToken, setMarketRefreshToken] = useState(0);
+
 
   useEffect(() => {
     setPurpose(deal?.finalidade ?? null);
