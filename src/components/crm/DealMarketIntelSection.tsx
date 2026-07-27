@@ -28,7 +28,10 @@ interface Props {
   bairro: string;
   cidade: string;
   purpose: DealPurpose | null;
+  /** Avisa que a análise foi regerada, para revalidar os dados do bairro no cabeçalho. */
+  onAnalysisRefreshed?: () => void;
 }
+
 
 const fmtDateTime = (iso: string) => {
   const d = new Date(iso);
@@ -37,7 +40,13 @@ const fmtDateTime = (iso: string) => {
     : d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
 };
 
-export default function DealMarketIntelSection({ bairro, cidade, purpose }: Props) {
+export default function DealMarketIntelSection({
+  bairro,
+  cidade,
+  purpose,
+  onAnalysisRefreshed,
+}: Props) {
+
   const finalidade = purpose ?? "geral";
   const [insight, setInsight] = useState<Insight | null>(null);
   const [loadingCache, setLoadingCache] = useState(true);
@@ -88,6 +97,9 @@ export default function DealMarketIntelSection({ bairro, cidade, purpose }: Prop
           generated_at: data.generated_at,
           cached: data.cached,
         });
+        // Revalida os indicadores do bairro para que fontes e datas de
+        // referência do cabeçalho fiquem coerentes com a análise exibida.
+        onAnalysisRefreshed?.();
       } catch (e) {
         toast.error("Não foi possível gerar a análise do bairro", {
           description: e instanceof Error ? e.message : "Tente novamente em alguns segundos.",
@@ -96,8 +108,9 @@ export default function DealMarketIntelSection({ bairro, cidade, purpose }: Prop
         setGenerating(false);
       }
     },
-    [bairro, cidade, finalidade],
+    [bairro, cidade, finalidade, onAnalysisRefreshed],
   );
+
 
   const findFonte = (n: number) => insight?.sources.find((f) => f.n === n);
 
@@ -224,9 +237,11 @@ export default function DealMarketIntelSection({ bairro, cidade, purpose }: Prop
           )}
 
           <p className="text-[10px] text-muted-foreground">
-            Análise gerada em {fmtDateTime(insight.generated_at)} · conteúdo produzido por IA a
-            partir de fontes públicas — confira antes de usar com o cliente.
+            Análise gerada em {fmtDateTime(insight.generated_at)}
+            {insight.cached ? " · versão em cache" : " · atualizada agora"} · conteúdo produzido
+            por IA a partir de fontes públicas — confira antes de usar com o cliente.
           </p>
+
         </div>
       )}
     </section>

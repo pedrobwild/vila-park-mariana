@@ -145,6 +145,8 @@ export default function DealDetailSheet({
   const [lostReason, setLostReason] = useState("");
   const [lossStage, setLossStage] = useState<CrmStageRow | null>(null);
   const [purpose, setPurpose] = useState<DealPurpose | null>(deal?.finalidade ?? null);
+  const [marketRefreshToken, setMarketRefreshToken] = useState(0);
+
 
   useEffect(() => {
     setPurpose(deal?.finalidade ?? null);
@@ -418,11 +420,13 @@ export default function DealDetailSheet({
           purpose={purpose}
           bairro={dealBairro}
           cidade={dealCidade}
+          refreshToken={marketRefreshToken}
           onPurposeChange={(p) => {
             setPurpose(p);
             void reload();
           }}
         />
+
 
         <div className="mt-5 space-y-6">
 
@@ -650,7 +654,9 @@ export default function DealDetailSheet({
             bairro={dealBairro}
             cidade={dealCidade}
             purpose={purpose}
+            onAnalysisRefreshed={() => setMarketRefreshToken((n) => n + 1)}
           />
+
 
           <Separator />
 

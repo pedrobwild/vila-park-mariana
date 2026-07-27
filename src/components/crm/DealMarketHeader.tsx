@@ -29,6 +29,8 @@ interface Props {
   bairro: string;
   cidade: string;
   onPurposeChange: (p: DealPurpose) => void;
+  /** Muda de valor para forçar releitura dos dados do bairro (ex.: após "Atualizar análise"). */
+  refreshToken?: number;
 }
 
 export default function DealMarketHeader({
@@ -37,6 +39,7 @@ export default function DealMarketHeader({
   bairro,
   cidade,
   onPurposeChange,
+  refreshToken = 0,
 }: Props) {
   const [metrics, setMetrics] = useState<NeighborhoodMetrics | null>(null);
   const [loading, setLoading] = useState(true);
@@ -59,7 +62,8 @@ export default function DealMarketHeader({
     return () => {
       alive = false;
     };
-  }, [bairro, cidade]);
+  }, [bairro, cidade, refreshToken]);
+
 
   const savePurpose = async (p: DealPurpose) => {
     setSaving(true);
