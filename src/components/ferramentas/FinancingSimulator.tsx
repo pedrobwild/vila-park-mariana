@@ -230,10 +230,24 @@ export interface Snapshot {
   monthlyIncome: number;
   extraAnnual: number;
   extraStrategy: "reduce-term" | "reduce-installment";
+  /** Presente só no modo "busca" (quem ainda procura imóvel). */
+  modo?: "busca";
+  empreendimento?: string;
+  bairro?: string;
+  metragem?: number;
 }
+
+/**
+ * "vila-park": a pessoa escolhe uma unidade do Vila Park na lista.
+ * "busca": a pessoa ainda procura imóvel e informa empreendimento, bairro e metragem.
+ */
+export type ModoImovel = "vila-park" | "busca";
 
 export interface SimulatorInitialForm {
   typologyId?: string;
+  empreendimento?: string;
+  bairro?: string;
+  metragem?: number;
   propertyValue?: number;
   downPct?: number;
   downOverride?: number | null;
@@ -258,10 +272,22 @@ export interface ControllerOptions {
   onGenerated?: (snapshot: Snapshot) => void;
   /** Called after reset (form cleared, snapshot cleared). */
   onReset?: () => void;
+  /** Como a pessoa identifica o imóvel. Default "vila-park". */
+  modo?: ModoImovel;
+  /**
+   * Prefixo dos ids dos campos. Necessário quando há mais de um simulador na
+   * mesma página (ids, labels e mensagens de erro não podem se repetir).
+   */
+  idPrefix?: string;
 }
+
+export const STORAGE_KEY_BUSCA = "vp_financing_sim_busca_v1";
 
 const EMPTY_FORM: Required<SimulatorInitialForm> = {
   typologyId: "custom",
+  empreendimento: "",
+  bairro: "",
+  metragem: 0,
   propertyValue: 0,
   downPct: 0,
   downOverride: null,
@@ -280,10 +306,16 @@ const EMPTY_FORM: Required<SimulatorInitialForm> = {
 
 export function useFinancingSimulatorController(options: ControllerOptions = {}) {
   const persist = options.persist ?? true;
-  const storageKey = options.storageKey ?? DEFAULT_STORAGE_KEY;
+  const modo: ModoImovel = options.modo ?? "vila-park";
+  const storageKey = options.storageKey ?? (modo === "busca" ? STORAGE_KEY_BUSCA : DEFAULT_STORAGE_KEY);
+  const idPrefix = options.idPrefix ?? "";
+  const fid = (key: string) => (idPrefix ? `${idPrefix}-${key}` : key);
   const initial = { ...EMPTY_FORM, ...(options.initialForm ?? {}) };
 
   const [typologyId, setTypologyId] = useState<string>(initial.typologyId);
+  const [empreendimento, setEmpreendimento] = useState<string>(initial.empreendimento);
+  const [bairro, setBairro] = useState<string>(initial.bairro);
+  const [metragem, setMetragem] = useState<number>(initial.metragem);
   const [propertyValue, setPropertyValue] = useState<number>(initial.propertyValue);
   const [downPct, setDownPct] = useState<number>(initial.downPct);
   const [downOverride, setDownOverride] = useState<number | null>(initial.downOverride);
@@ -320,13 +352,20 @@ export function useFinancingSimulatorController(options: ControllerOptions = {})
     try {
       const params = new URLSearchParams(window.location.search);
       const simParam = params.get("sim");
-      if (simParam) {
-        const decoded = JSON.parse(
-          decodeURIComponent(escape(atob(simParam.replace(/-/g, "+").replace(/_/g, "/"))))
-        ) as { form?: any; snapshot?: Snapshot | null };
+      const decoded = simParam
+        ? (JSON.parse(
+            decodeURIComponent(escape(atob(simParam.replace(/-/g, "+").replace(/_/g, "/"))))
+          ) as { form?: Partial<Required<SimulatorInitialForm>>; snapshot?: Snapshot | null; modo?: ModoImovel })
+        : null;
+      // Links antigos não trazem "modo": pertencem ao simulador do Vila Park.
+      // Com dois simuladores na página, cada um só abre o link do próprio modo.
+      if (decoded && (decoded.modo ?? "vila-park") === modo) {
         if (decoded.form) {
           const f = decoded.form;
           if (f.typologyId !== undefined) setTypologyId(f.typologyId);
+          if (typeof f.empreendimento === "string") setEmpreendimento(f.empreendimento);
+          if (typeof f.bairro === "string") setBairro(f.bairro);
+          if (typeof f.metragem === "number") setMetragem(f.metragem);
           if (f.propertyValue !== undefined) setPropertyValue(f.propertyValue);
           if (f.downPct !== undefined) setDownPct(f.downPct);
           if (f.downOverride !== undefined) setDownOverride(f.downOverride);
@@ -348,7 +387,8 @@ export function useFinancingSimulatorController(options: ControllerOptions = {})
         toast.success("Simulação carregada do link compartilhado");
       }
     } catch {
-      toast.error("Não foi possível carregar o link da simulação");
+      // Um só aviso, mesmo com dois simuladores na página.
+      if (modo === "vila-park") toast.error("Não foi possível carregar o link da simulação");
     }
 
     if (!fromUrl) {
@@ -363,6 +403,9 @@ export function useFinancingSimulatorController(options: ControllerOptions = {})
           };
           if (s.form) {
             if (s.form.typologyId !== undefined) setTypologyId(s.form.typologyId);
+            if (typeof s.form.empreendimento === "string") setEmpreendimento(s.form.empreendimento);
+            if (typeof s.form.bairro === "string") setBairro(s.form.bairro);
+            if (typeof s.form.metragem === "number") setMetragem(s.form.metragem);
             if (s.form.propertyValue !== undefined) setPropertyValue(s.form.propertyValue);
             if (s.form.downPct !== undefined) setDownPct(s.form.downPct);
             if (s.form.downOverride !== undefined) setDownOverride(s.form.downOverride);
@@ -411,7 +454,8 @@ export function useFinancingSimulatorController(options: ControllerOptions = {})
     try {
       const payload = {
         form: {
-          typologyId, propertyValue, downPct, downOverride, termMonths,
+          typologyId, empreendimento, bairro, metragem,
+          propertyValue, downPct, downOverride, termMonths,
           bankId, rateInput, system, buyerAge, monthlyIncome, fgts,
           extraAnnual, extraStrategy,
         },
@@ -425,7 +469,8 @@ export function useFinancingSimulatorController(options: ControllerOptions = {})
     }
   }, [
     persist, storageKey,
-    typologyId, propertyValue, downPct, downOverride, termMonths,
+    typologyId, empreendimento, bairro, metragem,
+    propertyValue, downPct, downOverride, termMonths,
     bankId, rateInput, system, buyerAge, monthlyIncome, fgts,
     extraAnnual, extraStrategy, snapshot, reportEmittedAt,
   ]);
@@ -466,6 +511,12 @@ export function useFinancingSimulatorController(options: ControllerOptions = {})
     monthlyIncome,
     extraAnnual,
     extraStrategy,
+    // Só no modo busca: no modo Vila Park o snapshot segue igual ao de antes
+    // (JSON.stringify ignora undefined), então simulações salvas não ficam "desatualizadas".
+    modo: modo === "busca" ? "busca" : undefined,
+    empreendimento: modo === "busca" ? empreendimento.trim() : undefined,
+    bairro: modo === "busca" ? bairro.trim() : undefined,
+    metragem: modo === "busca" ? metragem : undefined,
   };
 
   const stale = useMemo(() => {
@@ -500,6 +551,9 @@ export function useFinancingSimulatorController(options: ControllerOptions = {})
     if (propertyValue > 0 && !ltvOk) {
       errs.dp = "Entrada abaixo de 20% — fora das regras do SFH.";
     }
+    if (modo === "busca" && metragem > 0 && (metragem < 10 || metragem > 1000)) {
+      errs.metragem = "Informe a metragem entre 10 e 1.000 m².";
+    }
 
     const parse = schema.safeParse({
       bankId,
@@ -520,9 +574,10 @@ export function useFinancingSimulatorController(options: ControllerOptions = {})
 
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
-      const order = ["bankId", "annualRate", "propertyValue", "dp", "financed", "termMonths", "buyerAge", "monthlyIncome", "system"];
+      const order = ["metragem", "bankId", "annualRate", "propertyValue", "dp", "financed", "termMonths", "buyerAge", "monthlyIncome", "system"];
       const firstKey = order.find((k) => errs[k]) ?? Object.keys(errs)[0];
       const idMap: Record<string, string> = {
+        metragem: "metragem",
         bankId: "bank",
         annualRate: "rate",
         propertyValue: "pv",
@@ -533,7 +588,7 @@ export function useFinancingSimulatorController(options: ControllerOptions = {})
         monthlyIncome: "income",
         system: "system",
       };
-      focusField(idMap[firstKey] ?? firstKey);
+      focusField(fid(idMap[firstKey] ?? firstKey));
       return;
     }
 
@@ -555,6 +610,9 @@ export function useFinancingSimulatorController(options: ControllerOptions = {})
   const applyForm = (next: SimulatorInitialForm) => {
     const merged = { ...EMPTY_FORM, ...next };
     setTypologyId(merged.typologyId);
+    setEmpreendimento(merged.empreendimento);
+    setBairro(merged.bairro);
+    setMetragem(merged.metragem);
     setPropertyValue(merged.propertyValue);
     setDownPct(merged.downPct);
     setDownOverride(merged.downOverride);
@@ -591,7 +649,7 @@ export function useFinancingSimulatorController(options: ControllerOptions = {})
   const handleStart = () => {
     formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     setTimeout(() => {
-      const el = document.getElementById("typology");
+      const el = document.getElementById(fid(modo === "busca" ? "empreendimento" : "typology"));
       if (el) el.focus();
     }, 400);
   };
@@ -600,11 +658,13 @@ export function useFinancingSimulatorController(options: ControllerOptions = {})
     try {
       const payload = {
         form: {
-          typologyId, propertyValue, downPct, downOverride, termMonths,
+          typologyId, empreendimento, bairro, metragem,
+          propertyValue, downPct, downOverride, termMonths,
           bankId, rateInput, system, buyerAge, monthlyIncome, fgts,
           extraAnnual, extraStrategy,
         },
         snapshot,
+        modo,
       };
       const json = JSON.stringify(payload);
       const b64 = btoa(unescape(encodeURIComponent(json)))
@@ -620,8 +680,13 @@ export function useFinancingSimulatorController(options: ControllerOptions = {})
   };
 
   return {
+    // modo e ids
+    modo, fid,
     // form state
     typologyId, setTypologyId,
+    empreendimento, setEmpreendimento,
+    bairro, setBairro,
+    metragem, setMetragem,
     propertyValue, setPropertyValue,
     downPct, setDownPct,
     downOverride, setDownOverride,
@@ -653,10 +718,139 @@ export function useFinancingSimulatorController(options: ControllerOptions = {})
 
 export type FinancingSimulatorController = ReturnType<typeof useFinancingSimulatorController>;
 
+/* ---------- imóvel buscado (modo "busca") ---------- */
+
+export const fmtMetragem = (m: number) => m.toLocaleString("pt-BR", { maximumFractionDigits: 2 });
+
+/** "27,5" → 27.5; vazio ou inválido → 0. Aceita no máximo 2 casas decimais. */
+export function parseMetragem(texto: string): number {
+  const limpo = texto.replace(/[^\d,.]/g, "").replace(/\./g, ",");
+  const [inteiro, decimal = ""] = limpo.split(",");
+  if (!inteiro && !decimal) return 0;
+  const n = parseFloat(`${inteiro || "0"}.${decimal.slice(0, 2)}`);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function ImovelBuscado({
+  fid,
+  empreendimento,
+  setEmpreendimento,
+  bairro,
+  setBairro,
+  metragem,
+  setMetragem,
+  propertyValue,
+  erroMetragem,
+}: {
+  fid: (key: string) => string;
+  empreendimento: string;
+  setEmpreendimento: (v: string) => void;
+  bairro: string;
+  setBairro: (v: string) => void;
+  metragem: number;
+  setMetragem: (v: number) => void;
+  propertyValue: number;
+  erroMetragem?: string;
+}) {
+  const [textoMetragem, setTextoMetragem] = useState(metragem > 0 ? fmtMetragem(metragem) : "");
+  const [editando, setEditando] = useState(false);
+  useEffect(() => {
+    if (!editando) setTextoMetragem(metragem > 0 ? fmtMetragem(metragem) : "");
+  }, [metragem, editando]);
+
+  const precoM2 = propertyValue > 0 && metragem >= 10 ? propertyValue / metragem : 0;
+
+  return (
+    <>
+      <p className="text-xs text-muted-foreground -mt-1">
+        Ainda escolhendo? Descreva o imóvel que está avaliando. Esses dados identificam a simulação e o
+        relatório; o cálculo usa o valor, a entrada e o prazo.
+      </p>
+
+      <div className="space-y-1.5">
+        <Label htmlFor={fid("empreendimento")}>Nome do empreendimento</Label>
+        <Input
+          id={fid("empreendimento")}
+          className="h-11"
+          autoComplete="off"
+          maxLength={120}
+          placeholder="Ex.: Residencial Jardim das Flores"
+          value={empreendimento}
+          onChange={(e) => setEmpreendimento(e.target.value)}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 min-[400px]:grid-cols-[1fr_8.5rem] gap-3">
+        <div className="space-y-1.5 min-w-0">
+          <Label htmlFor={fid("bairro")}>Bairro</Label>
+          <Input
+            id={fid("bairro")}
+            className="h-11"
+            autoComplete="off"
+            maxLength={80}
+            placeholder="Ex.: Vila Mariana"
+            value={bairro}
+            onChange={(e) => setBairro(e.target.value)}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor={fid("metragem")}>Metragem</Label>
+          <div className="relative">
+            <Input
+              id={fid("metragem")}
+              inputMode="decimal"
+              autoComplete="off"
+              placeholder="0"
+              value={textoMetragem}
+              aria-invalid={!!erroMetragem || undefined}
+              aria-describedby={erroMetragem ? fid("metragem-error") : undefined}
+              className={[
+                "pr-10 h-11 text-right tabular-nums",
+                erroMetragem ? "border-destructive focus-visible:ring-destructive" : "",
+              ].join(" ")}
+              onFocus={() => setEditando(true)}
+              onChange={(e) => {
+                setTextoMetragem(e.target.value);
+                setMetragem(clamp(parseMetragem(e.target.value), 0, 10_000));
+              }}
+              onBlur={() => {
+                setEditando(false);
+                setTextoMetragem(metragem > 0 ? fmtMetragem(metragem) : "");
+              }}
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">m²</span>
+          </div>
+        </div>
+      </div>
+      <FieldError id={fid("metragem-error")} msg={erroMetragem} />
+
+      {precoM2 > 0 && !erroMetragem && (
+        <p className="text-xs text-muted-foreground tabular-nums">
+          Preço por m²: <strong className="text-foreground">{BRL(precoM2)}/m²</strong>{" "}
+          <span className="text-muted-foreground">(valor do imóvel ÷ metragem)</span>
+        </p>
+      )}
+    </>
+  );
+}
+
+/** Linha de identificação do imóvel buscado, para relatório e mensagens. */
+export function descricaoImovelBuscado(snap: Pick<Snapshot, "empreendimento" | "bairro" | "metragem">): string {
+  const partes: string[] = [];
+  if (snap.empreendimento) partes.push(snap.empreendimento);
+  if (snap.bairro) partes.push(snap.bairro);
+  if (snap.metragem && snap.metragem > 0) partes.push(`${fmtMetragem(snap.metragem)} m²`);
+  return partes.join(" · ");
+}
+
 /* ---------- form subcomponent ---------- */
 
 export function FinancingSimulatorForm({ ctl }: { ctl: FinancingSimulatorController }) {
   const {
+    modo, fid,
+    empreendimento, setEmpreendimento,
+    bairro, setBairro,
+    metragem, setMetragem,
     typologyId, setTypologyId,
     propertyValue, setPropertyValue,
     downPct, setDownPct,
@@ -689,39 +883,53 @@ export function FinancingSimulatorForm({ ctl }: { ctl: FinancingSimulatorControl
         <CardContent className="space-y-6">
           {/* ============= IMÓVEL ============= */}
           <Fieldset title="Imóvel">
-            <div className="space-y-1.5">
-              <Label>Unidade Vila Park</Label>
-              <Select
-                value={typologyId}
-                onValueChange={(v) => {
-                  setTypologyId(v);
-                  const t = TYPOLOGIES.find((x) => x.id === v);
-                  if (t && t.purchasePrice > 0) setPropertyValue(t.purchasePrice);
-                }}
-              >
-                <SelectTrigger id="typology" className="h-11"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="custom">Personalizado</SelectItem>
-                  {TYPOLOGIES.map((t) => (
-                    <SelectItem key={t.id} value={t.id}>{t.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {modo === "busca" ? (
+              <ImovelBuscado
+                fid={fid}
+                empreendimento={empreendimento}
+                setEmpreendimento={setEmpreendimento}
+                bairro={bairro}
+                setBairro={setBairro}
+                metragem={metragem}
+                setMetragem={setMetragem}
+                propertyValue={propertyValue}
+                erroMetragem={errors.metragem}
+              />
+            ) : (
+              <div className="space-y-1.5">
+                <Label htmlFor={fid("typology")}>Unidade Vila Park</Label>
+                <Select
+                  value={typologyId}
+                  onValueChange={(v) => {
+                    setTypologyId(v);
+                    const t = TYPOLOGIES.find((x) => x.id === v);
+                    if (t && t.purchasePrice > 0) setPropertyValue(t.purchasePrice);
+                  }}
+                >
+                  <SelectTrigger id={fid("typology")} className="h-11"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="custom">Personalizado</SelectItem>
+                    {TYPOLOGIES.map((t) => (
+                      <SelectItem key={t.id} value={t.id}>{t.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="pv">Valor do imóvel</Label>
+                <Label htmlFor={fid("pv")}>Valor do imóvel</Label>
                 <span className="text-sm font-semibold text-foreground tabular-nums">
                   {propertyValue > 0 ? BRL(propertyValue) : "—"}
                 </span>
               </div>
               <CurrencyInput
-                id="pv"
+                id={fid("pv")}
                 value={propertyValue}
                 onChange={setPropertyValue}
                 invalid={!!errors.propertyValue}
-                aria-describedby={errors.propertyValue ? "pv-error" : undefined}
+                aria-describedby={errors.propertyValue ? fid("pv-error") : undefined}
               />
               <Slider
                 value={[propertyValue]}
@@ -731,9 +939,9 @@ export function FinancingSimulatorForm({ ctl }: { ctl: FinancingSimulatorControl
                 onValueChange={(v) => setPropertyValue(v[0])}
                 className={SLIDER_TOUCH}
                 aria-invalid={!!errors.propertyValue || undefined}
-                aria-describedby={errors.propertyValue ? "pv-error" : undefined}
+                aria-describedby={errors.propertyValue ? fid("pv-error") : undefined}
               />
-              <FieldError id="pv-error" msg={errors.propertyValue} />
+              <FieldError id={fid("pv-error")} msg={errors.propertyValue} />
             </div>
           </Fieldset>
 
@@ -751,10 +959,10 @@ export function FinancingSimulatorForm({ ctl }: { ctl: FinancingSimulatorControl
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <CurrencyInput
-                  id="dp"
+                  id={fid("dp")}
                   value={downOverride ?? Math.round((propertyValue * downPct) / 100)}
                   invalid={!!errors.dp}
-                  aria-describedby={errors.dp ? "dp-error" : undefined}
+                  aria-describedby={errors.dp ? fid("dp-error") : undefined}
                   onChange={(v) => {
                     const maxDown = Math.max(propertyValue - fgts, 0);
                     const clamped = clamp(v, 0, maxDown);
@@ -764,7 +972,7 @@ export function FinancingSimulatorForm({ ctl }: { ctl: FinancingSimulatorControl
                 />
                 <div className="relative">
                   <Input
-                    id="dp-pct"
+                    id={fid("dp-pct")}
                     inputMode="decimal"
                     value={downPct.toFixed(0)}
                     onChange={(e) => {
@@ -773,7 +981,7 @@ export function FinancingSimulatorForm({ ctl }: { ctl: FinancingSimulatorControl
                       setDownOverride(null);
                     }}
                     className="pr-8 h-11 text-right tabular-nums"
-                    aria-describedby={errors.dp ? "dp-error" : undefined}
+                    aria-describedby={errors.dp ? fid("dp-error") : undefined}
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">%</span>
                 </div>
@@ -789,19 +997,19 @@ export function FinancingSimulatorForm({ ctl }: { ctl: FinancingSimulatorControl
                 }}
                 className={SLIDER_TOUCH}
                 aria-invalid={!!errors.dp || undefined}
-                aria-describedby={errors.dp ? "dp-error" : undefined}
+                aria-describedby={errors.dp ? fid("dp-error") : undefined}
               />
               <div className="flex justify-between text-[11px] text-muted-foreground px-0.5">
                 <span>20% (mín. SFH)</span>
                 <span>80%</span>
               </div>
-              <FieldError id="dp-error" msg={errors.dp} />
+              <FieldError id={fid("dp-error")} msg={errors.dp} />
             </div>
 
             {/* Financed amount (auto) */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="financed" className="flex items-center gap-1.5">
+                <Label htmlFor={fid("financed")} className="flex items-center gap-1.5">
                   <RefreshCw className="h-3 w-3 text-primary" aria-hidden="true" />
                   Valor financiado
                   <InfoHint text="Valor financiado = valor do imóvel − entrada. O FGTS, quando informado, compõe a entrada e reduz o valor financiado." label="Valor financiado" />
@@ -818,13 +1026,13 @@ export function FinancingSimulatorForm({ ctl }: { ctl: FinancingSimulatorControl
                   R$
                 </span>
                 <Input
-                  id="financed"
+                  id={fid("financed")}
                   readOnly
                   aria-readonly="true"
                   tabIndex={-1}
                   inputMode="numeric"
                   value={fmtBRL(financedAmount)}
-                  aria-describedby={errors.financed ? "financed-error" : undefined}
+                  aria-describedby={errors.financed ? fid("financed-error") : undefined}
                   className={[
                     "pl-9 pr-3 h-11 text-right font-semibold tabular-nums cursor-default transition-colors duration-300",
                     financedAmountInvalid || errors.financed
@@ -834,19 +1042,19 @@ export function FinancingSimulatorForm({ ctl }: { ctl: FinancingSimulatorControl
                   ].join(" ")}
                 />
               </div>
-              <FieldError id="financed-error" msg={errors.financed} />
+              <FieldError id={fid("financed-error")} msg={errors.financed} />
             </div>
 
             {/* Term */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="term">Prazo</Label>
+                <Label htmlFor={fid("term")}>Prazo</Label>
                 <span className="text-sm font-semibold text-foreground tabular-nums">
                   {currentSnap.termMonths} meses · {(currentSnap.termMonths / 12).toFixed(0)} anos
                 </span>
               </div>
               <Slider
-                id="term"
+                id={fid("term")}
                 value={[termMonths]}
                 min={60}
                 max={420}
@@ -854,25 +1062,25 @@ export function FinancingSimulatorForm({ ctl }: { ctl: FinancingSimulatorControl
                 onValueChange={(v) => setTermMonths(v[0])}
                 className={SLIDER_TOUCH}
                 aria-invalid={!!errors.termMonths || undefined}
-                aria-describedby={errors.termMonths ? "term-error" : undefined}
+                aria-describedby={errors.termMonths ? fid("term-error") : undefined}
               />
               <div className="flex justify-between text-[11px] text-muted-foreground px-0.5">
                 <span>5 anos (60 meses)</span>
                 <span>35 anos (420 meses)</span>
               </div>
-              <FieldError id="term-error" msg={errors.termMonths} />
+              <FieldError id={fid("term-error")} msg={errors.termMonths} />
             </div>
           </Fieldset>
 
           {/* ============= CONDIÇÕES ============= */}
           <Fieldset title="Condições">
             <div className="space-y-1.5">
-              <Label htmlFor="bank" className="flex items-center gap-1.5">
+              <Label htmlFor={fid("bank")} className="flex items-center gap-1.5">
                 Banco / linha
                 <InfoHint text="Base de instituições consultada em 19/07/2026. Bancos com taxa 'sob consulta' exigem digitar a taxa manualmente." label="Banco" />
               </Label>
               <Select value={bankId} onValueChange={(v) => setBankId(v)}>
-                <SelectTrigger id="bank" className="h-11" aria-invalid={!!errors.bankId || undefined} aria-describedby={errors.bankId ? "bank-error" : undefined}>
+                <SelectTrigger id={fid("bank")} className="h-11" aria-invalid={!!errors.bankId || undefined} aria-describedby={errors.bankId ? fid("bank-error") : undefined}>
                   <SelectValue placeholder="Selecione um banco/linha" />
                 </SelectTrigger>
                 <SelectContent className="max-h-80">
@@ -899,17 +1107,17 @@ export function FinancingSimulatorForm({ ctl }: { ctl: FinancingSimulatorControl
                   </span>
                 </div>
               )}
-              <FieldError id="bank-error" msg={errors.bankId} />
+              <FieldError id={fid("bank-error")} msg={errors.bankId} />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="rate" className="flex items-center gap-1.5">
+              <Label htmlFor={fid("rate")} className="flex items-center gap-1.5">
                 Taxa de juros (a.a.)
                 <InfoHint text="Juros anuais definidos pela instituição. Para bancos 'sob consulta', digite a taxa proposta pelo gerente." label="Taxa" />
               </Label>
               <div className="relative">
                 <Input
-                  id="rate"
+                  id={fid("rate")}
                   inputMode="decimal"
                   readOnly={!rateIsManual}
                   aria-readonly={!rateIsManual}
@@ -917,7 +1125,7 @@ export function FinancingSimulatorForm({ ctl }: { ctl: FinancingSimulatorControl
                   onChange={(e) => setRateInput(e.target.value)}
                   placeholder={rateIsManual ? "0,00" : ""}
                   aria-invalid={!!errors.annualRate || undefined}
-                  aria-describedby={errors.annualRate ? "rate-error" : undefined}
+                  aria-describedby={errors.annualRate ? fid("rate-error") : undefined}
                   className={[
                     "pr-20 h-11 font-semibold tabular-nums text-right",
                     rateIsManual ? "" : "cursor-default bg-muted/40",
@@ -931,10 +1139,10 @@ export function FinancingSimulatorForm({ ctl }: { ctl: FinancingSimulatorControl
               {!rateIsManual && (
                 <p className="text-[11px] text-muted-foreground">Taxa fixa da linha selecionada — troque de linha para simular outra.</p>
               )}
-              <FieldError id="rate-error" msg={errors.annualRate} />
+              <FieldError id={fid("rate-error")} msg={errors.annualRate} />
             </div>
 
-            <div className="space-y-2" id="system">
+            <div className="space-y-2" id={fid("system")}>
               <Label className="flex items-center gap-1.5">
                 Sistema de amortização
                 <InfoHint text="SAC: parcelas decrescem, paga menos juros total. Price: parcelas fixas, mais previsível." label="Sistema" />
@@ -943,7 +1151,7 @@ export function FinancingSimulatorForm({ ctl }: { ctl: FinancingSimulatorControl
                 role="tablist"
                 aria-label="Sistema de amortização"
                 aria-invalid={!!errors.system || undefined}
-                aria-describedby={errors.system ? "system-error" : undefined}
+                aria-describedby={errors.system ? fid("system-error") : undefined}
                 className={[
                   "inline-flex w-full rounded-md border bg-muted/30 p-0.5",
                   errors.system ? "border-destructive" : "border-border/60",
@@ -975,7 +1183,7 @@ export function FinancingSimulatorForm({ ctl }: { ctl: FinancingSimulatorControl
                   );
                 })}
               </div>
-              <FieldError id="system-error" msg={errors.system} />
+              <FieldError id={fid("system-error")} msg={errors.system} />
             </div>
 
             {mcmvForm.eligible && (
@@ -994,40 +1202,40 @@ export function FinancingSimulatorForm({ ctl }: { ctl: FinancingSimulatorControl
           <Fieldset title="Perfil do comprador">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="age" className="flex items-center gap-1.5">
+                <Label htmlFor={fid("age")} className="flex items-center gap-1.5">
                   Idade
                   <InfoHint text="Usada para estimar o MIP (seguro por morte/invalidez). Quanto mais jovem, mais barato." label="Idade" />
                 </Label>
                 <Input
-                  id="age"
+                  id={fid("age")}
                   type="number"
                   min={18}
                   max={80}
                   value={buyerAge || ""}
                   aria-invalid={!!errors.buyerAge || undefined}
-                  aria-describedby={errors.buyerAge ? "age-error" : undefined}
+                  aria-describedby={errors.buyerAge ? fid("age-error") : undefined}
                   className={["h-11 text-right tabular-nums", errors.buyerAge ? "border-destructive focus-visible:ring-destructive" : ""].join(" ")}
                   onChange={(e) => {
                     const raw = e.target.value;
                     setBuyerAge(raw === "" ? 0 : clamp(parseInt(raw) || 0, 0, 120));
                   }}
                 />
-                <FieldError id="age-error" msg={errors.buyerAge} />
+                <FieldError id={fid("age-error")} msg={errors.buyerAge} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="income" className="flex items-center gap-1.5">
+                <Label htmlFor={fid("income")} className="flex items-center gap-1.5">
                   Renda familiar
                   <InfoHint text="Renda familiar mensal bruta. Comprometimento máx. de 30% da renda com a 1ª parcela." label="Renda" />
                 </Label>
                 <CurrencyInput
-                  id="income"
+                  id={fid("income")}
                   value={monthlyIncome}
                   onChange={setMonthlyIncome}
                   placeholder="0"
                   invalid={!!errors.monthlyIncome}
-                  aria-describedby={errors.monthlyIncome ? "income-error" : undefined}
+                  aria-describedby={errors.monthlyIncome ? fid("income-error") : undefined}
                 />
-                <FieldError id="income-error" msg={errors.monthlyIncome} />
+                <FieldError id={fid("income-error")} msg={errors.monthlyIncome} />
               </div>
             </div>
           </Fieldset>
@@ -1035,12 +1243,12 @@ export function FinancingSimulatorForm({ ctl }: { ctl: FinancingSimulatorControl
           {/* ============= OPCIONAIS ============= */}
           <Fieldset title="Opcionais">
             <div className="space-y-1.5">
-              <Label htmlFor="fgts" className="flex items-center gap-1.5">
+              <Label htmlFor={fid("fgts")} className="flex items-center gap-1.5">
                 FGTS na entrada <span className="text-[10px] uppercase tracking-wide text-muted-foreground">(opcional)</span>
                 <InfoHint text="Somamos ao valor da entrada. Regras: 3 anos de contribuição e imóvel em SP até R$ 1,5 mi." label="FGTS" />
               </Label>
               <CurrencyInput
-                id="fgts"
+                id={fid("fgts")}
                 value={fgts}
                 onChange={(v) => {
                   const base = downOverride ?? Math.round((propertyValue * downPct) / 100);
@@ -1055,7 +1263,7 @@ export function FinancingSimulatorForm({ ctl }: { ctl: FinancingSimulatorControl
                 Aporte extra anual <span className="text-[10px] uppercase tracking-wide text-muted-foreground">(opcional)</span>
                 <InfoHint text="Aporte extra a cada 12 meses. Escolha se reduz o prazo ou a parcela." label="Amortização extra" />
               </Label>
-              <CurrencyInput id="extra" value={extraAnnual} onChange={setExtraAnnual} />
+              <CurrencyInput id={fid("extra")} value={extraAnnual} onChange={setExtraAnnual} />
               <Tabs value={extraStrategy} onValueChange={(v) => setExtraStrategy(v as typeof extraStrategy)}>
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="reduce-term">Reduzir prazo</TabsTrigger>
@@ -1143,7 +1351,7 @@ export function FinancingSimulatorResults({
 
   if (!snapshot) {
     if (!showEmpty) return null;
-    return <EmptyResults onStart={handleStart} />;
+    return <EmptyResults onStart={handleStart} modo={ctl.modo} />;
   }
   return (
     <ResultsView
@@ -1164,18 +1372,38 @@ export function FinancingSimulatorResults({
 
 /* ---------- default composed export (used by /ferramentas) ---------- */
 
-export default function FinancingSimulator() {
-  const ctl = useFinancingSimulatorController();
+export default function FinancingSimulator({
+  modo = "vila-park",
+  sectionId,
+  titulo,
+  descricao,
+}: {
+  modo?: ModoImovel;
+  /** id da <section> (âncora). Default: "simulator-form" no Vila Park, "simulador-busca" na busca. */
+  sectionId?: string;
+  titulo?: React.ReactNode;
+  descricao?: React.ReactNode;
+} = {}) {
+  const emBusca = modo === "busca";
+  const ctl = useFinancingSimulatorController({ modo, idPrefix: emBusca ? "busca" : undefined });
   return (
-    <section id="simulator-form" ref={ctl.formRef} className="scroll-mt-24 py-12 md:py-16">
+    <section
+      id={sectionId ?? (emBusca ? "simulador-busca" : "simulator-form")}
+      ref={ctl.formRef}
+      className="scroll-mt-24 py-12 md:py-16"
+    >
       <header className="mb-6">
         <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2">
-          <Calculator className="h-6 w-6 text-primary" />
-          Simulador de financiamento imobiliário
+          <Calculator className="h-6 w-6 text-primary shrink-0" />
+          {titulo ?? "Simulador de financiamento imobiliário"}
         </h2>
         <p className="text-muted-foreground mt-1 max-w-2xl">
-          Preencha as premissas e clique em <strong>Gerar simulação</strong> para ver KPIs, comparativo entre bancos,
-          gráficos e relatório. Simulação estimativa — a proposta oficial é sempre do banco.
+          {descricao ?? (
+            <>
+              Preencha as premissas e clique em <strong>Gerar simulação</strong> para ver KPIs, comparativo entre bancos,
+              gráficos e relatório. Simulação estimativa — a proposta oficial é sempre do banco.
+            </>
+          )}
         </p>
       </header>
 
@@ -1194,7 +1422,12 @@ export default function FinancingSimulator() {
 
 /* ---------- Empty state ---------- */
 
-function EmptyResults({ onStart }: { onStart: () => void }) {
+const MSG_WHATSAPP_VAZIO: Record<ModoImovel, string> = {
+  "vila-park": "Olá! Gostaria de simular um financiamento para o Vila Park Vila Mariana.",
+  busca: "Olá! Estou buscando um imóvel e gostaria de ajuda para simular o financiamento.",
+};
+
+function EmptyResults({ onStart, modo = "vila-park" }: { onStart: () => void; modo?: ModoImovel }) {
   return (
     <Card className="border-dashed border-border/70 bg-muted/10">
       <CardContent className="py-14 md:py-20 flex flex-col items-center text-center gap-4">
@@ -1204,7 +1437,9 @@ function EmptyResults({ onStart }: { onStart: () => void }) {
         <div className="space-y-1 max-w-sm">
           <h3 className="font-display text-xl font-semibold text-foreground">Preencha os campos ao lado</h3>
           <p className="text-sm text-muted-foreground">
-            Informe o banco, o valor do imóvel, a entrada e o prazo. Depois clique em{" "}
+            {modo === "busca"
+              ? "Descreva o imóvel que está avaliando e informe o banco, o valor, a entrada e o prazo. Depois clique em "
+              : "Informe o banco, o valor do imóvel, a entrada e o prazo. Depois clique em "}
             <strong className="text-foreground">Gerar simulação</strong> para ver KPIs, comparativo entre bancos,
             gráficos e o relatório completo.
           </p>
@@ -1217,7 +1452,7 @@ function EmptyResults({ onStart }: { onStart: () => void }) {
           </Button>
           <a
             href={`https://api.whatsapp.com/send?phone=${WHATSAPP_PHONE}&text=${encodeURIComponent(
-              "Olá! Gostaria de simular um financiamento para o Vila Park Vila Mariana."
+              MSG_WHATSAPP_VAZIO[modo],
             )}`}
             target="_blank"
             rel="noopener noreferrer"
@@ -1271,6 +1506,8 @@ function ResultsView({ snap, stale, onRegenerate, onReset, onCopyLink, showCopyL
     extraAnnual,
     extraStrategy,
   } = snap;
+  const emBusca = snap.modo === "busca";
+  const imovelBuscado = emBusca ? descricaoImovelBuscado(snap) : "";
 
   const inputBase = { propertyValue, downPayment, termMonths, annualRate, annualRateType, buyerAgeYears: buyerAge };
 
@@ -1363,7 +1600,12 @@ function ResultsView({ snap, stale, onRegenerate, onReset, onCopyLink, showCopyL
   }, [active]);
 
   const whatsappMsg = encodeURIComponent(
-    `Olá! Simulei um financiamento no Vila Park Vila Mariana (${simCode}):\n` +
+    (emBusca
+      ? `Olá! Estou buscando um imóvel e simulei um financiamento (${simCode}):\n` +
+        (snap.empreendimento ? `• Empreendimento: ${snap.empreendimento}\n` : "") +
+        (snap.bairro ? `• Bairro: ${snap.bairro}\n` : "") +
+        (snap.metragem ? `• Metragem: ${fmtMetragem(snap.metragem)} m²\n` : "")
+      : `Olá! Simulei um financiamento no Vila Park Vila Mariana (${simCode}):\n`) +
       `• Imóvel: ${BRL(propertyValue)}\n` +
       `• Entrada: ${BRL(downPayment)} (${downPctActual.toFixed(0)}%)\n` +
       `• Prazo: ${termMonths} meses (${system})\n` +
@@ -1402,6 +1644,12 @@ function ResultsView({ snap, stale, onRegenerate, onReset, onCopyLink, showCopyL
             </Button>
           )}
         </div>
+      )}
+
+      {imovelBuscado && (
+        <p className="text-sm text-muted-foreground break-words">
+          Simulação para <strong className="text-foreground">{imovelBuscado}</strong>
+        </p>
       )}
 
       {/* KPIs */}
@@ -1709,8 +1957,11 @@ function ResultsView({ snap, stale, onRegenerate, onReset, onCopyLink, showCopyL
 
           <div className="print-report space-y-6 py-4">
             <div className="border-b border-border/60 pb-4">
-              <p className="text-xs uppercase tracking-wider text-primary font-semibold">Vila Park · Vila Mariana</p>
+              <p className="text-xs uppercase tracking-wider text-primary font-semibold">
+                {emBusca ? "Simulação · imóvel em avaliação" : "Vila Park · Vila Mariana"}
+              </p>
               <h1 className="font-display text-2xl font-bold text-foreground mt-1">Demonstrativo de financiamento imobiliário</h1>
+              {imovelBuscado && <p className="text-sm text-muted-foreground mt-1">{imovelBuscado}</p>}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs mt-3">
                 <IdRow label="Código">{simCode}</IdRow>
                 <IdRow label="Emitido em">{reportEmittedAt.toLocaleString("pt-BR")}</IdRow>
@@ -1727,6 +1978,18 @@ function ResultsView({ snap, stale, onRegenerate, onReset, onCopyLink, showCopyL
             <section>
               <h2 className="font-display font-bold text-lg mb-2">Premissas</h2>
               <ul className="text-sm space-y-1 text-muted-foreground">
+                {emBusca && snap.empreendimento && (
+                  <li>• Empreendimento: <strong className="text-foreground">{snap.empreendimento}</strong></li>
+                )}
+                {emBusca && snap.bairro && (
+                  <li>• Bairro: <strong className="text-foreground">{snap.bairro}</strong></li>
+                )}
+                {emBusca && !!snap.metragem && snap.metragem > 0 && (
+                  <li>
+                    • Metragem: <strong className="text-foreground">{fmtMetragem(snap.metragem)} m²</strong>
+                    {propertyValue > 0 && snap.metragem >= 10 && ` · ${BRL(propertyValue / snap.metragem)}/m²`}
+                  </li>
+                )}
                 <li>• Valor do imóvel: <strong className="text-foreground">{BRL2(propertyValue)}</strong></li>
                 <li>• Entrada: <strong className="text-foreground">{BRL2(downPayment)}</strong> ({downPctActual.toFixed(0)}%){fgts > 0 && ` — incluindo ${BRL2(fgts)} de FGTS`}</li>
                 <li>• Valor financiado: <strong className="text-foreground">{BRL2(active.financedAmount)}</strong> · LTV {ltvPct.toFixed(0)}%</li>

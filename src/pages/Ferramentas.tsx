@@ -5,7 +5,7 @@ import { GuideDecisionProvider } from "@/hooks/useGuideDecision";
 import FinancingSimulator from "@/components/ferramentas/FinancingSimulator";
 import SiteFooter from "@/components/shared/SiteFooter";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, MessageCircle } from "lucide-react";
+import { ArrowRight, Building2, MessageCircle, Search } from "lucide-react";
 import { WHATSAPP_PHONE } from "@/data/surroundings";
 
 export default function Ferramentas() {
@@ -30,12 +30,43 @@ export default function Ferramentas() {
             <p className="text-muted-foreground text-lg max-w-2xl">
               Simule seu financiamento e entenda todos os custos para planejar a compra do seu apartamento com tranquilidade.
             </p>
+            <nav aria-label="Escolha o simulador" className="mt-6 flex flex-col sm:flex-row gap-3">
+              <Button asChild size="lg" className="min-h-[48px] w-full sm:w-auto gap-2">
+                <a href="#simulador-busca">
+                  <Search className="h-4 w-4" aria-hidden="true" />
+                  Ainda estou buscando um imóvel
+                </a>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="min-h-[48px] w-full sm:w-auto gap-2">
+                <a href="#simulator-form">
+                  <Building2 className="h-4 w-4" aria-hidden="true" />
+                  Já escolhi uma unidade Vila Park
+                </a>
+              </Button>
+            </nav>
           </div>
         </div>
 
+        {/* Seção inicial: quem ainda está procurando imóvel descreve o que está avaliando */}
         <div className="w-full">
           <div className="max-w-[1280px] mx-auto px-5 lg:px-10">
-            <FinancingSimulator />
+            <FinancingSimulator
+              modo="busca"
+              titulo="Ainda buscando um imóvel? Simule antes de escolher"
+              descricao={
+                <>
+                  Informe o nome do empreendimento, o bairro e a metragem do imóvel que está avaliando, ajuste valor,
+                  entrada e prazo e clique em <strong>Gerar simulação</strong>. Simulação estimativa — a proposta
+                  oficial é sempre do banco.
+                </>
+              }
+            />
+          </div>
+        </div>
+
+        <div className="w-full border-t border-border/60">
+          <div className="max-w-[1280px] mx-auto px-5 lg:px-10">
+            <FinancingSimulator titulo="Simulador de financiamento · unidades Vila Park" />
           </div>
         </div>
 
