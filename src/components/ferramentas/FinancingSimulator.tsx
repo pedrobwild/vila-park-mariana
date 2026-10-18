@@ -68,6 +68,17 @@ import {
   type InstitutionRate,
 } from "@/data/institutionRates";
 import BankComparator, { formatConsultDate } from "./BankComparator";
+import {
+  PRAZOS_COMPRA,
+  ROTULO_PRAZO_COMPRA,
+  TEXTO_CONSENTIMENTO,
+  idSessaoBusca,
+  isPrazoCompra,
+  montarRegistroBusca,
+  registrarSimulacaoBusca,
+  type PrazoCompra,
+} from "@/lib/demandaBusca";
+import { Checkbox } from "@/components/ui/checkbox";
 import FinancingGuide from "./FinancingGuide";
 
 const SLIDER_TOUCH =
@@ -235,6 +246,7 @@ export interface Snapshot {
   empreendimento?: string;
   bairro?: string;
   metragem?: number;
+  prazoCompra?: PrazoCompra;
 }
 
 /**
@@ -248,6 +260,10 @@ export interface SimulatorInitialForm {
   empreendimento?: string;
   bairro?: string;
   metragem?: number;
+  /** Quando pretende comprar (modo busca). */
+  prazoCompra?: PrazoCompra | "";
+  /** Consentimento para gravar a simulação anônima (modo busca). */
+  consentimento?: boolean;
   propertyValue?: number;
   downPct?: number;
   downOverride?: number | null;
@@ -288,6 +304,8 @@ const EMPTY_FORM: Required<SimulatorInitialForm> = {
   empreendimento: "",
   bairro: "",
   metragem: 0,
+  prazoCompra: "",
+  consentimento: false,
   propertyValue: 0,
   downPct: 0,
   downOverride: null,
@@ -316,6 +334,8 @@ export function useFinancingSimulatorController(options: ControllerOptions = {})
   const [empreendimento, setEmpreendimento] = useState<string>(initial.empreendimento);
   const [bairro, setBairro] = useState<string>(initial.bairro);
   const [metragem, setMetragem] = useState<number>(initial.metragem);
+  const [prazoCompra, setPrazoCompra] = useState<PrazoCompra | "">(initial.prazoCompra);
+  const [consentimento, setConsentimento] = useState<boolean>(initial.consentimento);
   const [propertyValue, setPropertyValue] = useState<number>(initial.propertyValue);
   const [downPct, setDownPct] = useState<number>(initial.downPct);
   const [downOverride, setDownOverride] = useState<number | null>(initial.downOverride);
@@ -366,6 +386,8 @@ export function useFinancingSimulatorController(options: ControllerOptions = {})
           if (typeof f.empreendimento === "string") setEmpreendimento(f.empreendimento);
           if (typeof f.bairro === "string") setBairro(f.bairro);
           if (typeof f.metragem === "number") setMetragem(f.metragem);
+          if (isPrazoCompra(f.prazoCompra)) setPrazoCompra(f.prazoCompra);
+          // O consentimento nunca vem do link: quem abre decide por si.
           if (f.propertyValue !== undefined) setPropertyValue(f.propertyValue);
           if (f.downPct !== undefined) setDownPct(f.downPct);
           if (f.downOverride !== undefined) setDownOverride(f.downOverride);
@@ -406,6 +428,8 @@ export function useFinancingSimulatorController(options: ControllerOptions = {})
             if (typeof s.form.empreendimento === "string") setEmpreendimento(s.form.empreendimento);
             if (typeof s.form.bairro === "string") setBairro(s.form.bairro);
             if (typeof s.form.metragem === "number") setMetragem(s.form.metragem);
+            if (isPrazoCompra(s.form.prazoCompra)) setPrazoCompra(s.form.prazoCompra);
+            if (typeof s.form.consentimento === "boolean") setConsentimento(s.form.consentimento);
             if (s.form.propertyValue !== undefined) setPropertyValue(s.form.propertyValue);
             if (s.form.downPct !== undefined) setDownPct(s.form.downPct);
             if (s.form.downOverride !== undefined) setDownOverride(s.form.downOverride);
@@ -454,7 +478,7 @@ export function useFinancingSimulatorController(options: ControllerOptions = {})
     try {
       const payload = {
         form: {
-          typologyId, empreendimento, bairro, metragem,
+          typologyId, empreendimento, bairro, metragem, prazoCompra, consentimento,
           propertyValue, downPct, downOverride, termMonths,
           bankId, rateInput, system, buyerAge, monthlyIncome, fgts,
           extraAnnual, extraStrategy,
@@ -469,7 +493,7 @@ export function useFinancingSimulatorController(options: ControllerOptions = {})
     }
   }, [
     persist, storageKey,
-    typologyId, empreendimento, bairro, metragem,
+    typologyId, empreendimento, bairro, metragem, prazoCompra, consentimento,
     propertyValue, downPct, downOverride, termMonths,
     bankId, rateInput, system, buyerAge, monthlyIncome, fgts,
     extraAnnual, extraStrategy, snapshot, reportEmittedAt,
@@ -517,6 +541,7 @@ export function useFinancingSimulatorController(options: ControllerOptions = {})
     empreendimento: modo === "busca" ? empreendimento.trim() : undefined,
     bairro: modo === "busca" ? bairro.trim() : undefined,
     metragem: modo === "busca" ? metragem : undefined,
+    prazoCompra: modo === "busca" && prazoCompra ? prazoCompra : undefined,
   };
 
   const stale = useMemo(() => {
@@ -600,6 +625,10 @@ export function useFinancingSimulatorController(options: ControllerOptions = {})
       setReportEmittedAt(new Date());
       setSnapshot(currentSnap);
       setIsLoading(false);
+      // Só com consentimento, e só no modo busca: linha anônima para os estudos por bairro.
+      if (modo === "busca" && consentimento) {
+        void registrarSimulacaoBusca(montarRegistroBusca(currentSnap, idSessaoBusca()));
+      }
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
         options.onGenerated?.(currentSnap);
@@ -613,6 +642,8 @@ export function useFinancingSimulatorController(options: ControllerOptions = {})
     setEmpreendimento(merged.empreendimento);
     setBairro(merged.bairro);
     setMetragem(merged.metragem);
+    setPrazoCompra(merged.prazoCompra);
+    setConsentimento(merged.consentimento);
     setPropertyValue(merged.propertyValue);
     setDownPct(merged.downPct);
     setDownOverride(merged.downOverride);
@@ -658,7 +689,7 @@ export function useFinancingSimulatorController(options: ControllerOptions = {})
     try {
       const payload = {
         form: {
-          typologyId, empreendimento, bairro, metragem,
+          typologyId, empreendimento, bairro, metragem, prazoCompra,
           propertyValue, downPct, downOverride, termMonths,
           bankId, rateInput, system, buyerAge, monthlyIncome, fgts,
           extraAnnual, extraStrategy,
@@ -687,6 +718,8 @@ export function useFinancingSimulatorController(options: ControllerOptions = {})
     empreendimento, setEmpreendimento,
     bairro, setBairro,
     metragem, setMetragem,
+    prazoCompra, setPrazoCompra,
+    consentimento, setConsentimento,
     propertyValue, setPropertyValue,
     downPct, setDownPct,
     downOverride, setDownOverride,
@@ -741,6 +774,8 @@ function ImovelBuscado({
   setMetragem,
   propertyValue,
   erroMetragem,
+  prazoCompra,
+  setPrazoCompra,
 }: {
   fid: (key: string) => string;
   empreendimento: string;
@@ -751,6 +786,8 @@ function ImovelBuscado({
   setMetragem: (v: number) => void;
   propertyValue: number;
   erroMetragem?: string;
+  prazoCompra: PrazoCompra | "";
+  setPrazoCompra: (v: PrazoCompra | "") => void;
 }) {
   const [textoMetragem, setTextoMetragem] = useState(metragem > 0 ? fmtMetragem(metragem) : "");
   const [editando, setEditando] = useState(false);
@@ -830,6 +867,20 @@ function ImovelBuscado({
           <span className="text-muted-foreground">(valor do imóvel ÷ metragem)</span>
         </p>
       )}
+
+      <div className="space-y-1.5">
+        <Label htmlFor={fid("prazo-compra")}>Quando pretende comprar?</Label>
+        <Select value={prazoCompra || undefined} onValueChange={(v) => setPrazoCompra(isPrazoCompra(v) ? v : "")}>
+          <SelectTrigger id={fid("prazo-compra")} className="h-11">
+            <SelectValue placeholder="Selecione" />
+          </SelectTrigger>
+          <SelectContent>
+            {PRAZOS_COMPRA.map((p) => (
+              <SelectItem key={p.valor} value={p.valor}>{p.rotulo}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
     </>
   );
 }
@@ -851,6 +902,8 @@ export function FinancingSimulatorForm({ ctl }: { ctl: FinancingSimulatorControl
     empreendimento, setEmpreendimento,
     bairro, setBairro,
     metragem, setMetragem,
+    prazoCompra, setPrazoCompra,
+    consentimento, setConsentimento,
     typologyId, setTypologyId,
     propertyValue, setPropertyValue,
     downPct, setDownPct,
@@ -894,6 +947,8 @@ export function FinancingSimulatorForm({ ctl }: { ctl: FinancingSimulatorControl
                 setMetragem={setMetragem}
                 propertyValue={propertyValue}
                 erroMetragem={errors.metragem}
+                prazoCompra={prazoCompra}
+                setPrazoCompra={setPrazoCompra}
               />
             ) : (
               <div className="space-y-1.5">
@@ -1282,6 +1337,19 @@ export function FinancingSimulatorForm({ ctl }: { ctl: FinancingSimulatorControl
         </div>
 
         <div className="border-t border-border/60 px-6 py-4">
+          {modo === "busca" && (
+            <div className="flex items-start gap-3 mb-4">
+              <Checkbox
+                id={fid("consentimento")}
+                checked={consentimento}
+                onCheckedChange={(v) => setConsentimento(v === true)}
+                className="mt-0.5 h-5 w-5"
+              />
+              <Label htmlFor={fid("consentimento")} className="text-xs font-normal leading-relaxed text-muted-foreground cursor-pointer">
+                {TEXTO_CONSENTIMENTO} <span className="text-foreground/80">Opcional — a simulação funciona sem isso.</span>
+              </Label>
+            </div>
+          )}
           <Button
             type="button"
             size="lg"
@@ -1422,11 +1490,6 @@ export default function FinancingSimulator({
 
 /* ---------- Empty state ---------- */
 
-const MSG_WHATSAPP_VAZIO: Record<ModoImovel, string> = {
-  "vila-park": "Olá! Gostaria de simular um financiamento para o Vila Park Vila Mariana.",
-  busca: "Olá! Estou buscando um imóvel e gostaria de ajuda para simular o financiamento.",
-};
-
 function EmptyResults({ onStart, modo = "vila-park" }: { onStart: () => void; modo?: ModoImovel }) {
   return (
     <Card className="border-dashed border-border/70 bg-muted/10">
@@ -1450,19 +1513,22 @@ function EmptyResults({ onStart, modo = "vila-park" }: { onStart: () => void; mo
             <Play className="h-4 w-4" aria-hidden="true" />
             Começar a simulação
           </Button>
-          <a
-            href={`https://api.whatsapp.com/send?phone=${WHATSAPP_PHONE}&text=${encodeURIComponent(
-              MSG_WHATSAPP_VAZIO[modo],
-            )}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1"
-          >
-            <Button size="lg" variant="outline" className="w-full gap-2 min-h-[48px]">
-              <MessageCircle className="h-4 w-4" aria-hidden="true" />
-              Falar com o time
-            </Button>
-          </a>
+          {/* No modo busca não há contato: a seção não direciona ninguém ao Vila Park. */}
+          {modo !== "busca" && (
+            <a
+              href={`https://api.whatsapp.com/send?phone=${WHATSAPP_PHONE}&text=${encodeURIComponent(
+                "Olá! Gostaria de simular um financiamento para o Vila Park Vila Mariana.",
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1"
+            >
+              <Button size="lg" variant="outline" className="w-full gap-2 min-h-[48px]">
+                <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                Falar com o time
+              </Button>
+            </a>
+          )}
         </div>
 
         <p className="text-xs text-muted-foreground flex items-center gap-1">
@@ -1601,7 +1667,7 @@ function ResultsView({ snap, stale, onRegenerate, onReset, onCopyLink, showCopyL
 
   const whatsappMsg = encodeURIComponent(
     (emBusca
-      ? `Olá! Estou buscando um imóvel e simulei um financiamento (${simCode}):\n` +
+      ? `Simulei o financiamento de um imóvel que estou avaliando (${simCode}):\n` +
         (snap.empreendimento ? `• Empreendimento: ${snap.empreendimento}\n` : "") +
         (snap.bairro ? `• Bairro: ${snap.bairro}\n` : "") +
         (snap.metragem ? `• Metragem: ${fmtMetragem(snap.metragem)} m²\n` : "")
@@ -1610,9 +1676,13 @@ function ResultsView({ snap, stale, onRegenerate, onReset, onCopyLink, showCopyL
       `• Entrada: ${BRL(downPayment)} (${downPctActual.toFixed(0)}%)\n` +
       `• Prazo: ${termMonths} meses (${system})\n` +
       `• 1ª parcela: ${BRL(active.firstInstallment)}\n` +
-      `• CET: ${PCT(active.cetAnnual)} a.a.\n` +
-      `Gostaria de mais informações.`,
+      `• CET: ${PCT(active.cetAnnual)} a.a.` +
+      (emBusca ? "" : `\nGostaria de mais informações.`),
   );
+  // Modo busca: a pessoa compartilha com quem quiser (sem número fixo); nada vai para o time do Vila Park.
+  const whatsappHref = emBusca
+    ? `https://api.whatsapp.com/send?text=${whatsappMsg}`
+    : `https://api.whatsapp.com/send?phone=${WHATSAPP_PHONE}&text=${whatsappMsg}`;
 
   const openReport = () => setReportOpen(true);
 
@@ -1855,9 +1925,9 @@ function ResultsView({ snap, stale, onRegenerate, onReset, onCopyLink, showCopyL
         <Button size="lg" className="flex-1 min-h-[48px] gap-2" onClick={openReport}>
           <Printer className="h-4 w-4" /> Gerar relatório completo
         </Button>
-        <a href={`https://api.whatsapp.com/send?phone=${WHATSAPP_PHONE}&text=${whatsappMsg}`} target="_blank" rel="noopener noreferrer" className="flex-1">
+        <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className="flex-1">
           <Button size="lg" variant="outline" className="w-full min-h-[48px] gap-2">
-            <MessageCircle className="h-4 w-4" /> Enviar simulação por WhatsApp
+            <MessageCircle className="h-4 w-4" /> {emBusca ? "Compartilhar por WhatsApp" : "Enviar simulação por WhatsApp"}
           </Button>
         </a>
       </div>
@@ -1990,6 +2060,9 @@ function ResultsView({ snap, stale, onRegenerate, onReset, onCopyLink, showCopyL
                     {propertyValue > 0 && snap.metragem >= 10 && ` · ${BRL(propertyValue / snap.metragem)}/m²`}
                   </li>
                 )}
+                {emBusca && snap.prazoCompra && (
+                  <li>• Pretende comprar: <strong className="text-foreground">{ROTULO_PRAZO_COMPRA[snap.prazoCompra]}</strong></li>
+                )}
                 <li>• Valor do imóvel: <strong className="text-foreground">{BRL2(propertyValue)}</strong></li>
                 <li>• Entrada: <strong className="text-foreground">{BRL2(downPayment)}</strong> ({downPctActual.toFixed(0)}%){fgts > 0 && ` — incluindo ${BRL2(fgts)} de FGTS`}</li>
                 <li>• Valor financiado: <strong className="text-foreground">{BRL2(active.financedAmount)}</strong> · LTV {ltvPct.toFixed(0)}%</li>
@@ -2102,11 +2175,13 @@ function ResultsView({ snap, stale, onRegenerate, onReset, onCopyLink, showCopyL
               </p>
             </section>
 
-            <div className="print:hidden pt-2">
-              <a href={`https://api.whatsapp.com/send?phone=${WHATSAPP_PHONE}&text=${whatsappMsg}`} target="_blank" rel="noopener noreferrer">
-                <Button size="lg" className="w-full gap-2"><MessageCircle className="h-4 w-4" /> Falar com o time Vila Park</Button>
-              </a>
-            </div>
+            {!emBusca && (
+              <div className="print:hidden pt-2">
+                <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
+                  <Button size="lg" className="w-full gap-2"><MessageCircle className="h-4 w-4" /> Falar com o time Vila Park</Button>
+                </a>
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>

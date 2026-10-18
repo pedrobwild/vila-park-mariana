@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useRole } from "@/hooks/useIsAdmin";
@@ -23,6 +23,7 @@ import {
   BarChart3,
   Settings,
   ChevronDown,
+  Search,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import UnitsManager from "@/components/admin/UnitsManager";
@@ -34,12 +35,15 @@ import BrokersManager from "@/components/admin/BrokersManager";
 import ConfiguracoesSection from "@/components/admin/ConfiguracoesSection";
 import bwildLogo from "@/assets/bwild-logo.png";
 
+const DemandaBuscaSection = lazy(() => import("@/components/admin/DemandaBuscaSection"));
+
 type SectionKey =
   | "units"
   | "crm"
   | "leads"
   | "comercial"
   | "relatorios"
+  | "demanda"
   | "config"
   | "extrato"
   | "upload"
@@ -71,7 +75,11 @@ const GROUPS: SectionGroup[] = [
   },
   {
     label: "Análise",
-    items: [{ key: "relatorios", label: "Relatórios", icon: BarChart3 }],
+    items: [
+      { key: "relatorios", label: "Relatórios", icon: BarChart3 },
+      // Só Bewild (papel admin): a incorporadora não vê esta seção nem lê a tabela (RLS).
+      { key: "demanda", label: "Demanda de quem busca", icon: Search, bewildOnly: true },
+    ],
   },
   {
     label: "Configurações e ferramentas",
@@ -97,6 +105,7 @@ const SECTION_KEYS: SectionKey[] = [
   "leads",
   "comercial",
   "relatorios",
+  "demanda",
   "config",
   "extrato",
   "upload",
@@ -113,6 +122,7 @@ const DESCRIPTIONS: Partial<Record<SectionKey, string>> = {
   leads: "Base de leads, qualificação e origem do contato.",
   comercial: "Corretores, roleta de distribuição e SLA.",
   relatorios: "Indicadores de funil, base de leads e comissões.",
+  demanda: "Perfil anônimo de quem simula financiamento enquanto procura imóvel, agregado por bairro.",
   config: "Parâmetros do CRM, etapas do funil e padrões de proposta.",
 };
 
@@ -368,6 +378,11 @@ export default function Admin() {
               onGoToPipeline={() => setActive("crm")}
               onGoToLeads={() => setActive("leads")}
             />
+          )}
+          {active === "demanda" && role === "admin" && (
+            <Suspense fallback={<div className="h-64 rounded-lg bg-muted/40 animate-pulse" />}>
+              <DemandaBuscaSection />
+            </Suspense>
           )}
           {active === "config" && (
 <ConfiguracoesSection />

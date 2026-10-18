@@ -15,6 +15,12 @@ import {
   type ModoImovel,
   type SimulatorInitialForm,
 } from "@/components/ferramentas/FinancingSimulator";
+import { registrarSimulacaoBusca } from "@/lib/demandaBusca";
+
+vi.mock("@/lib/demandaBusca", async (importOriginal) => {
+  const real = await importOriginal<typeof import("@/lib/demandaBusca")>();
+  return { ...real, registrarSimulacaoBusca: vi.fn(async () => true) };
+});
 
 class ROMock {
   observe() {}
@@ -67,7 +73,10 @@ async function gerar(ctlRef: { current: FinancingSimulatorController | null }) {
 }
 
 describe("FinancingSimulator · modo busca", () => {
-  beforeEach(() => vi.useFakeTimers());
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.mocked(registrarSimulacaoBusca).mockClear();
+  });
   afterEach(() => vi.useRealTimers());
 
   it("troca a lista de unidades por empreendimento, bairro e metragem (ids com prefixo)", () => {
@@ -127,6 +136,64 @@ describe("FinancingSimulator · modo busca", () => {
     expect(json).not.toHaveProperty("modo");
     expect(json).not.toHaveProperty("empreendimento");
     expect(json).not.toHaveProperty("metragem");
+  });
+});
+
+describe("FinancingSimulator · consentimento e prazo de compra", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.mocked(registrarSimulacaoBusca).mockClear();
+  });
+  afterEach(() => vi.useRealTimers());
+
+  it("sem consentimento, nada é gravado", async () => {
+    const ctlRef: { current: FinancingSimulatorController | null } = { current: null };
+    render(<Harness modo="busca" idPrefix="busca" onCtl={(c) => (ctlRef.current = c)} />);
+    expect(screen.getByLabelText(/Autorizo a Bewild/)).toBeTruthy();
+    await gerar(ctlRef);
+    expect(ctlRef.current!.snapshot).not.toBeNull();
+    expect(registrarSimulacaoBusca).not.toHaveBeenCalled();
+  });
+
+  it("com consentimento, grava a linha anônima com o prazo de compra", async () => {
+    const ctlRef: { current: FinancingSimulatorController | null } = { current: null };
+    render(
+      <Harness
+        modo="busca"
+        idPrefix="busca"
+        initialForm={{ ...BASE, bairro: "Saúde", metragem: 30, prazoCompra: "ate_3_meses" }}
+        onCtl={(c) => (ctlRef.current = c)}
+      />,
+    );
+    expect(screen.getByLabelText("Quando pretende comprar?").id).toBe("busca-prazo-compra");
+    fireEvent.click(screen.getByLabelText(/Autorizo a Bewild/));
+    await gerar(ctlRef);
+
+    expect(registrarSimulacaoBusca).toHaveBeenCalledTimes(1);
+    const registro = vi.mocked(registrarSimulacaoBusca).mock.calls[0][0];
+    expect(registro).toMatchObject({ bairro: "Saúde", metragem: 30, prazo_compra: "ate_3_meses", faixa_renda: "15k_25k" });
+    expect(JSON.stringify(registro)).not.toContain("20000"); // renda exata fica fora
+    expect(ctlRef.current!.snapshot!.prazoCompra).toBe("ate_3_meses");
+  });
+
+  it("no modo busca nenhum link de WhatsApp leva ao número do Vila Park", async () => {
+    const ctlRef: { current: FinancingSimulatorController | null } = { current: null };
+    const { container } = render(<Harness modo="busca" idPrefix="busca" onCtl={(c) => (ctlRef.current = c)} />);
+    // estado vazio: sem botão de contato
+    expect(screen.queryByText("Falar com o time")).toBeNull();
+    await gerar(ctlRef);
+    const links = Array.from(container.querySelectorAll<HTMLAnchorElement>('a[href*="whatsapp"]'));
+    expect(links.length).toBeGreaterThan(0);
+    for (const a of links) expect(a.href).not.toContain("phone=");
+    expect(screen.queryByText(/Falar com o time Vila Park/)).toBeNull();
+  });
+
+  it("no modo Vila Park não há consentimento nem gravação", async () => {
+    const ctlRef: { current: FinancingSimulatorController | null } = { current: null };
+    render(<Harness modo="vila-park" initialForm={{ ...BASE, consentimento: true }} onCtl={(c) => (ctlRef.current = c)} />);
+    expect(screen.queryByLabelText(/Autorizo a Bewild/)).toBeNull();
+    await gerar(ctlRef);
+    expect(registrarSimulacaoBusca).not.toHaveBeenCalled();
   });
 });
 
